@@ -1,7 +1,5 @@
 # Creative Toolkit
 
-![Creative Toolkit Screenshot](screenshot.png) <!-- Consider adding a screenshot here -->
-
 Welcome to the Creative Toolkit – a collection of web-based mini-applications designed to assist designers, developers, and creatives with various daily tasks. This toolkit brings together several utilities, from generating visual assets to organizing creative ideas, all within a simple and intuitive interface.
 
 ## 🚀 Features
