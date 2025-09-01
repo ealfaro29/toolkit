@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Notepad</title>
+  <title>Notepad & Kanban</title>
   
   <style>
     :root {
-      --accent-color: #ff648b; /* Red accent */
+      --accent-color: #EF4444; /* Red accent */
       --accent-color-tint: #FEE2E2; /* Light red tint */
       --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
       --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
@@ -31,7 +31,7 @@
     .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); }
     header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
     aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
-    main.panel { padding: var(--space-5); min-height: 0; overflow-y: auto; }
+    main.panel { padding: var(--space-5); min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-5);}
     .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
     header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
     header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
@@ -55,62 +55,79 @@
     .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
     .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
     .form-group label { font-weight: var(--font-weight-medium); }
-    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; resize: vertical; min-height: 80px; }
+    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; resize: vertical; min-height: 40px; }
+    textarea.form-control { min-height: 80px; }
 
-    /* Notes List Specific Styles */
-    #notes-list {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
+    /* Kanban Board Styles */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      flex-grow: 1;
     }
 
-    .note-item {
-      display: flex;
-      align-items: flex-start;
-      gap: var(--space-3);
+    .kanban-column {
       background-color: var(--surface);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       padding: var(--space-3);
-      word-break: break-word;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      min-height: 150px; /* Minimum height for drag targets */
+      box-shadow: var(--shadow-raised-2);
+    }
+    .kanban-column.drag-over {
+        box-shadow: 0 0 0 2px var(--accent-color);
+        border-color: var(--accent-color);
     }
 
-    .note-item.completed {
-      opacity: 0.6;
-      text-decoration: line-through;
-      color: var(--muted);
+    .kanban-column-header {
+      font-weight: var(--font-weight-emphasis);
+      font-size: var(--font-size-body);
+      color: var(--ink);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--border-color);
     }
 
-    .note-checkbox {
-      flex-shrink: 0;
-      margin-top: 3px; /* Align checkbox with text */
-      width: 18px;
-      height: 18px;
+    .kanban-column-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      overflow-y: auto;
+      padding: 0px; /* Reset padding to contain scrollbar */
+      padding-right: 2px; /* For better scrollbar visibility */
+    }
+    .kanban-column-content::-webkit-scrollbar { width: 2px; }
+    .kanban-column-content::-webkit-scrollbar-track { background: transparent; }
+    .kanban-column-content::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 5px; }
+    .kanban-column-content::-webkit-scrollbar-thumb:hover { background-color: var(--muted); }
+
+    .kanban-card {
+      background-color: var(--surface-alt);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      appearance: none;
-      -webkit-appearance: none;
-      background-color: var(--surface-alt);
-      cursor: pointer;
-      display: grid;
-      place-content: center;
-      transition: background-color var(--duration-standard) ease, border-color var(--duration-standard) ease;
+      padding: var(--space-2);
+      word-break: break-word;
+      cursor: grab;
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      position: relative;
+    }
+    .kanban-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+    .kanban-card.done .note-content {
+        text-decoration: line-through;
+        color: var(--muted);
     }
 
-    .note-checkbox:checked {
-      background-color: var(--accent-color);
-      border-color: var(--accent-color);
-    }
-    .note-checkbox:checked::before {
-      content: '✓';
-      font-size: 14px;
-      color: var(--color-accent-text);
-      line-height: 1;
-    }
-
-    .note-content {
+    .kanban-card .note-content {
       flex-grow: 1;
-      min-width: 0; /* Allows content to shrink */
+      min-width: 0;
       padding: 0;
       border: none;
       background: none;
@@ -124,34 +141,91 @@
       cursor: text;
     }
 
-    .note-content:focus {
+    .kanban-card .note-content:focus {
       outline: none;
-      background-color: var(--surface-alt);
+      background-color: var(--surface);
       border-radius: var(--radius-sm);
       padding: 2px 4px;
       margin: -2px -4px;
     }
 
-    .delete-note-btn {
+    .kanban-card .delete-btn {
       flex-shrink: 0;
       background: none;
       border: none;
       color: var(--muted);
       cursor: pointer;
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1;
       padding: 0;
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       display: grid;
       place-items: center;
       border-radius: 50%;
       transition: color var(--duration-standard) ease, background-color var(--duration-standard) ease;
     }
-
-    .delete-note-btn:hover {
+    .kanban-card .delete-btn:hover {
       color: var(--accent-color);
       background-color: var(--accent-color-tint);
+    }
+
+    /* Permanent Notes (Post-its) Styles */
+    .permanent-notes-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    .permanent-notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: var(--space-3);
+    }
+    .permanent-note-item {
+        background-color: var(--accent-color-tint); /* Light tint for post-it feel */
+        border: 1px solid var(--accent-color);
+        border-radius: var(--radius-md);
+        padding: var(--space-3);
+        word-break: break-word;
+        position: relative;
+        box-shadow: var(--shadow-raised-2);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100px;
+    }
+    .permanent-note-item textarea {
+        flex-grow: 1;
+        min-height: 60px;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--ink);
+        font-size: var(--font-size-body);
+        line-height: 1.5;
+        font-family: var(--font-family-sans);
+        resize: vertical;
+        overflow-y: auto;
+    }
+    .permanent-note-item textarea:focus {
+        outline: none;
+        background-color: rgba(255,255,255,0.2); /* Slightly lighter background on focus */
+        border-radius: var(--radius-sm);
+        padding: 2px 4px;
+        margin: -2px -4px;
+    }
+    .permanent-note-item .delete-btn {
+        position: absolute;
+        top: var(--space-2);
+        right: var(--space-2);
+        background: rgba(0,0,0,0.1);
+        color: var(--ink);
+        opacity: 0.7;
+    }
+    .permanent-note-item .delete-btn:hover {
+        background: var(--accent-color);
+        color: var(--color-accent-text);
+        opacity: 1;
     }
 
     .empty-state {
@@ -160,9 +234,20 @@
         padding: var(--space-5);
         border: 2px dashed var(--border-color);
         border-radius: var(--radius-md);
+        grid-column: 1 / -1; /* For Kanban, spans all columns */
+    }
+    .empty-state.permanent {
+        grid-column: auto; /* For permanent notes, fits its grid */
     }
 
-    @media (max-width: 800px) { body { padding: var(--space-4); } .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } aside.controls { position: static; max-height: none; } main.panel { min-height: 50vh; } }
+    @media (max-width: 800px) { 
+        body { padding: var(--space-4); } 
+        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
+        aside.controls { position: static; max-height: none; } 
+        main.panel { min-height: 50vh; } 
+        .kanban-board { grid-template-columns: 1fr; } /* Stack columns on small screens */
+        .permanent-notes-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -171,8 +256,8 @@
       <a href="../index.html" class="back-to-home" title="Return to Home">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
       </a>
-      <h1>Notepad</h1>
-      <div class="sub">Quick notes and simple tasks.</div>
+      <h1>Notepad & Kanban</h1>
+      <div class="sub">Quick notes, simple tasks, and Kanban boards.</div>
       <div class="theme-switcher">
         <button id="theme-toggle" title="Change theme"></button>
       </div>
@@ -181,23 +266,56 @@
     <aside class="panel controls" id="controls">
       <div class="control-group">
           <div class="form-group">
-              <label for="new-note-text">New Note / Task</label>
-              <textarea id="new-note-text" class="form-control" placeholder="Type your note or task here..."></textarea>
+              <label for="new-kanban-task-text">New Kanban Task</label>
+              <textarea id="new-kanban-task-text" class="form-control" placeholder="Add a task to 'To Do'"></textarea>
           </div>
-          <button id="add-note-btn" class="btn btn-primary">Add Note</button>
+          <button id="add-kanban-task-btn" class="btn btn-primary">Add Task</button>
       </div>
       
-      <div class="control-group" style="margin-top: auto;">
-          <button id="clear-all-btn" class="btn btn-secondary">Clear All Notes</button>
+      <div class="control-group">
+          <div class="form-group">
+              <label for="new-permanent-note-text">New Permanent Note</label>
+              <textarea id="new-permanent-note-text" class="form-control" placeholder="Add a post-it style note"></textarea>
+          </div>
+          <button id="add-permanent-note-btn" class="btn btn-primary">Add Note</button>
       </div>
-      <div class="note">Tip: Click on a note to edit it. Check the box to mark as complete.</div>
+
+      <div class="control-group" style="margin-top: auto;">
+          <button id="clear-kanban-btn" class="btn btn-secondary">Clear Kanban Board</button>
+          <button id="clear-permanent-notes-btn" class="btn btn-secondary">Clear Permanent Notes</button>
+      </div>
+      <div class="note">Tip: Drag tasks between Kanban columns. Click to edit any note/task.</div>
     </aside>
 
     <main class="panel" id="main-panel">
-      <div id="notes-list">
-        <!-- Notes will be rendered here -->
-        <div class="empty-state" id="empty-notes-message">
-            Your notepad is empty. Add a new note!
+      <div class="permanent-notes-section">
+        <h2 class="kanban-column-header">Permanent Notes</h2>
+        <div id="permanent-notes-grid" class="permanent-notes-grid">
+          <!-- Permanent notes will be rendered here -->
+          <div class="empty-state permanent" id="empty-permanent-notes-message">
+              No permanent notes yet!
+          </div>
+        </div>
+      </div>
+
+      <div class="kanban-board">
+        <div class="kanban-column" data-status="todo" id="todo-column">
+          <h2 class="kanban-column-header">To Do</h2>
+          <div class="kanban-column-content" id="todo-column-content">
+            <!-- To Do tasks will be rendered here -->
+          </div>
+        </div>
+        <div class="kanban-column" data-status="in-progress" id="in-progress-column">
+          <h2 class="kanban-column-header">In Progress</h2>
+          <div class="kanban-column-content" id="in-progress-column-content">
+            <!-- In Progress tasks will be rendered here -->
+          </div>
+        </div>
+        <div class="kanban-column" data-status="done" id="done-column">
+          <h2 class="kanban-column-header">Done</h2>
+          <div class="kanban-column-content" id="done-column-content">
+            <!-- Done tasks will be rendered here -->
+          </div>
         </div>
       </div>
     </main>
@@ -207,7 +325,11 @@
     const NotepadApp = {
       el: {},
       state: {
-        notes: []
+        kanbanTasks: [], // { id, text, status: 'todo'|'in-progress'|'done' }
+        permanentNotes: [] // { id, text }
+      },
+      DRAG_STATE: {
+        draggedTaskId: null,
       },
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
@@ -217,131 +339,349 @@
         this.initTheme();
         this.loadState();
         this.bindEvents();
-        this.renderNotes();
+        this.renderAll();
       },
 
       cacheDOMElements() {
-        const ids = ['theme-toggle', 'new-note-text', 'add-note-btn', 'clear-all-btn', 'notes-list', 'empty-notes-message'];
+        const ids = [
+          'theme-toggle', 'new-kanban-task-text', 'add-kanban-task-btn', 
+          'new-permanent-note-text', 'add-permanent-note-btn',
+          'clear-kanban-btn', 'clear-permanent-notes-btn',
+          'todo-column-content', 'in-progress-column-content', 'done-column-content',
+          'permanent-notes-grid', 'empty-permanent-notes-message'
+        ];
         ids.forEach(id => {
           const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
           this.el[key] = document.getElementById(id);
         });
+
+        this.el.kanbanColumns = [
+            document.getElementById('todo-column'),
+            document.getElementById('in-progress-column'),
+            document.getElementById('done-column')
+        ];
       },
 
       bindEvents() {
         this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
-        this.el.addNoteBtn.addEventListener('click', () => this.addNote());
-        this.el.newNoteText.addEventListener('keypress', (e) => {
+        
+        // Kanban Task controls
+        this.el.addKanbanTaskBtn.addEventListener('click', () => this.addKanbanTask());
+        this.el.newKanbanTaskText.addEventListener('keypress', (e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            this.addNote();
+            this.addKanbanTask();
           }
         });
-        this.el.clearAllBtn.addEventListener('click', () => this.clearAllNotes());
-        this.el.notesList.addEventListener('click', (e) => this.handleNotesListClick(e));
-        this.el.notesList.addEventListener('input', (e) => this.handleNotesListInput(e));
-        this.el.notesList.addEventListener('focusout', (e) => this.handleNotesListFocusOut(e));
+        this.el.clearKanbanBtn.addEventListener('click', () => this.clearAllKanbanTasks());
+        
+        // Permanent Note controls
+        this.el.addPermanentNoteBtn.addEventListener('click', () => this.addPermanentNote());
+        this.el.newPermanentNoteText.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            this.addPermanentNote();
+          }
+        });
+        this.el.clearPermanentNotesBtn.addEventListener('click', () => this.clearAllPermanentNotes());
+
+        // Event delegation for Kanban tasks
+        this.el.todoColumnContent.addEventListener('click', (e) => this.handleKanbanTaskClick(e));
+        this.el.inProgressColumnContent.addEventListener('click', (e) => this.handleKanbanTaskClick(e));
+        this.el.doneColumnContent.addEventListener('click', (e) => this.handleKanbanTaskClick(e));
+        this.el.todoColumnContent.addEventListener('input', (e) => this.handleKanbanTaskInput(e));
+        this.el.inProgressColumnContent.addEventListener('input', (e) => this.handleKanbanTaskInput(e));
+        this.el.doneColumnContent.addEventListener('input', (e) => this.handleKanbanTaskInput(e));
+        this.el.todoColumnContent.addEventListener('focusout', (e) => this.handleKanbanTaskFocusOut(e));
+        this.el.inProgressColumnContent.addEventListener('focusout', (e) => this.handleKanbanTaskFocusOut(e));
+        this.el.doneColumnContent.addEventListener('focusout', (e) => this.handleKanbanTaskFocusOut(e));
+
+        // Event delegation for Permanent Notes
+        this.el.permanentNotesGrid.addEventListener('click', (e) => this.handlePermanentNoteClick(e));
+        this.el.permanentNotesGrid.addEventListener('input', (e) => this.handlePermanentNoteInput(e));
+        this.el.permanentNotesGrid.addEventListener('focusout', (e) => this.handlePermanentNoteFocusOut(e));
+
+        // Drag & Drop for Kanban
+        this.el.kanbanColumns.forEach(column => {
+            column.addEventListener('dragover', (e) => this.handleKanbanDragOver(e));
+            column.addEventListener('dragleave', (e) => this.handleKanbanDragLeave(e));
+            column.addEventListener('drop', (e) => this.handleKanbanDrop(e));
+        });
+        this.el.todoColumnContent.addEventListener('dragstart', (e) => this.handleKanbanDragStart(e));
+        this.el.inProgressColumnContent.addEventListener('dragstart', (e) => this.handleKanbanDragStart(e));
+        this.el.doneColumnContent.addEventListener('dragstart', (e) => this.handleKanbanDragStart(e));
+        this.el.todoColumnContent.addEventListener('dragend', (e) => this.handleKanbanDragEnd(e));
+        this.el.inProgressColumnContent.addEventListener('dragend', (e) => this.handleKanbanDragEnd(e));
+        this.el.doneColumnContent.addEventListener('dragend', (e) => this.handleKanbanDragEnd(e));
       },
       
       loadState() {
-        const savedNotes = localStorage.getItem('notepadState');
-        if (savedNotes) {
-          this.state.notes = JSON.parse(savedNotes);
+        const savedKanbanTasks = localStorage.getItem('notepadKanbanTasks');
+        if (savedKanbanTasks) {
+          this.state.kanbanTasks = JSON.parse(savedKanbanTasks);
+        }
+        const savedPermanentNotes = localStorage.getItem('notepadPermanentNotes');
+        if (savedPermanentNotes) {
+          this.state.permanentNotes = JSON.parse(savedPermanentNotes);
         }
       },
 
       saveState() {
-        localStorage.setItem('notepadState', JSON.stringify(this.state.notes));
+        localStorage.setItem('notepadKanbanTasks', JSON.stringify(this.state.kanbanTasks));
+        localStorage.setItem('notepadPermanentNotes', JSON.stringify(this.state.permanentNotes));
       },
 
-      renderNotes() {
-        this.el.notesList.innerHTML = '';
-        if (this.state.notes.length === 0) {
-          this.el.notesList.appendChild(this.el.emptyNotesMessage);
+      renderAll() {
+        this.renderKanbanTasks();
+        this.renderPermanentNotes();
+      },
+
+      // --- Kanban Tasks ---
+      renderKanbanTasks() {
+        this.el.todoColumnContent.innerHTML = '';
+        this.el.inProgressColumnContent.innerHTML = '';
+        this.el.doneColumnContent.innerHTML = '';
+
+        const emptyKanbanMessage = document.createElement('div');
+        emptyKanbanMessage.className = 'empty-state';
+        emptyKanbanMessage.textContent = 'Add a task above!';
+
+        const hasTasks = this.state.kanbanTasks.length > 0;
+        
+        if (!hasTasks) {
+            this.el.todoColumnContent.appendChild(emptyKanbanMessage.cloneNode(true));
+            this.el.inProgressColumnContent.appendChild(emptyKanbanMessage.cloneNode(true));
+            this.el.doneColumnContent.appendChild(emptyKanbanMessage.cloneNode(true));
+        } else {
+            // Remove empty messages from content areas if they exist before rendering tasks
+            [this.el.todoColumnContent, this.el.inProgressColumnContent, this.el.doneColumnContent].forEach(contentEl => {
+                const existingEmpty = contentEl.querySelector('.empty-state');
+                if (existingEmpty) existingEmpty.remove();
+            });
+        }
+
+
+        this.state.kanbanTasks.forEach(task => {
+          const taskItem = document.createElement('div');
+          taskItem.className = `kanban-card ${task.status === 'done' ? 'done' : ''}`;
+          taskItem.dataset.id = task.id;
+          taskItem.draggable = true;
+          taskItem.innerHTML = `
+            <textarea class="note-content" rows="1">${task.text}</textarea>
+            <button class="delete-btn" title="Delete Task">×</button>
+          `;
+          
+          switch(task.status) {
+            case 'todo': this.el.todoColumnContent.appendChild(taskItem); break;
+            case 'in-progress': this.el.inProgressColumnContent.appendChild(taskItem); break;
+            case 'done': this.el.doneColumnContent.appendChild(taskItem); break;
+          }
+          this.adjustTextareaHeight(taskItem.querySelector('.note-content'));
+        });
+
+        // If a column is empty after rendering, add its specific empty message
+        if (!this.el.todoColumnContent.querySelector('.kanban-card')) {
+            const emptyMessage = emptyKanbanMessage.cloneNode(true);
+            emptyMessage.textContent = "No tasks here!";
+            this.el.todoColumnContent.appendChild(emptyMessage);
+        }
+        if (!this.el.inProgressColumnContent.querySelector('.kanban-card')) {
+            const emptyMessage = emptyKanbanMessage.cloneNode(true);
+            emptyMessage.textContent = "No tasks here!";
+            this.el.inProgressColumnContent.appendChild(emptyMessage);
+        }
+        if (!this.el.doneColumnContent.querySelector('.kanban-card')) {
+            const emptyMessage = emptyKanbanMessage.cloneNode(true);
+            emptyMessage.textContent = "No tasks here!";
+            this.el.doneColumnContent.appendChild(emptyMessage);
+        }
+      },
+
+      addKanbanTask() {
+        const text = this.el.newKanbanTaskText.value.trim();
+        if (text) {
+          this.state.kanbanTasks.unshift({
+            id: Date.now(),
+            text: text,
+            status: 'todo'
+          });
+          this.el.newKanbanTaskText.value = '';
+          this.saveState();
+          this.renderKanbanTasks();
+        }
+      },
+
+      clearAllKanbanTasks() {
+        if (confirm('Are you sure you want to delete all Kanban tasks?')) {
+          this.state.kanbanTasks = [];
+          this.saveState();
+          this.renderKanbanTasks();
+        }
+      },
+
+      handleKanbanTaskClick(e) {
+        const taskItem = e.target.closest('.kanban-card');
+        if (!taskItem) return;
+        const id = parseInt(taskItem.dataset.id);
+
+        if (e.target.classList.contains('delete-btn')) {
+          this.state.kanbanTasks = this.state.kanbanTasks.filter(t => t.id !== id);
+          this.saveState();
+          this.renderKanbanTasks();
+        }
+      },
+
+      handleKanbanTaskInput(e) {
+        if (e.target.classList.contains('note-content')) {
+          this.adjustTextareaHeight(e.target);
+          const taskItem = e.target.closest('.kanban-card');
+          const id = parseInt(taskItem.dataset.id);
+          const task = this.state.kanbanTasks.find(t => t.id === id);
+          if (task) {
+            task.text = e.target.value;
+          }
+        }
+      },
+
+      handleKanbanTaskFocusOut(e) {
+        if (e.target.classList.contains('note-content')) {
+          this.saveState();
+          this.renderKanbanTasks(); // Re-render to ensure visual consistency
+        }
+      },
+
+      // --- Permanent Notes ---
+      renderPermanentNotes() {
+        this.el.permanentNotesGrid.innerHTML = '';
+        if (this.state.permanentNotes.length === 0) {
+          this.el.permanentNotesGrid.appendChild(this.el.emptyPermanentNotesMessage);
           return;
         }
 
-        this.state.notes.forEach(note => {
+        this.state.permanentNotes.forEach(note => {
           const noteItem = document.createElement('div');
-          noteItem.className = `note-item ${note.completed ? 'completed' : ''}`;
+          noteItem.className = 'permanent-note-item';
           noteItem.dataset.id = note.id;
-
           noteItem.innerHTML = `
-            <input type="checkbox" class="note-checkbox" ${note.completed ? 'checked' : ''}>
-            <textarea class="note-content" rows="1">${note.text}</textarea>
-            <button class="delete-note-btn" title="Delete Note">×</button>
+            <textarea rows="4">${note.text}</textarea>
+            <button class="delete-btn" title="Delete Note">×</button>
           `;
-          this.el.notesList.appendChild(noteItem);
-          this.adjustTextareaHeight(noteItem.querySelector('.note-content'));
+          this.el.permanentNotesGrid.appendChild(noteItem);
+          this.adjustTextareaHeight(noteItem.querySelector('textarea'));
         });
       },
 
-      addNote() {
-        const text = this.el.newNoteText.value.trim();
+      addPermanentNote() {
+        const text = this.el.newPermanentNoteText.value.trim();
         if (text) {
-          this.state.notes.unshift({
+          this.state.permanentNotes.unshift({
             id: Date.now(),
-            text: text,
-            completed: false
+            text: text
           });
-          this.el.newNoteText.value = '';
+          this.el.newPermanentNoteText.value = '';
           this.saveState();
-          this.renderNotes();
+          this.renderPermanentNotes();
         }
       },
 
-      clearAllNotes() {
-        if (confirm('Are you sure you want to delete all notes?')) {
-          this.state.notes = [];
+      clearAllPermanentNotes() {
+        if (confirm('Are you sure you want to delete all permanent notes?')) {
+          this.state.permanentNotes = [];
           this.saveState();
-          this.renderNotes();
+          this.renderPermanentNotes();
         }
       },
 
-      handleNotesListClick(e) {
-        const noteItem = e.target.closest('.note-item');
+      handlePermanentNoteClick(e) {
+        const noteItem = e.target.closest('.permanent-note-item');
         if (!noteItem) return;
         const id = parseInt(noteItem.dataset.id);
 
-        if (e.target.classList.contains('note-checkbox')) {
-          const note = this.state.notes.find(n => n.id === id);
-          if (note) {
-            note.completed = e.target.checked;
-            this.saveState();
-            this.renderNotes(); // Re-render to apply completed styles
-          }
-        } else if (e.target.classList.contains('delete-note-btn')) {
-          this.state.notes = this.state.notes.filter(n => n.id !== id);
+        if (e.target.classList.contains('delete-btn')) {
+          this.state.permanentNotes = this.state.permanentNotes.filter(n => n.id !== id);
           this.saveState();
-          this.renderNotes();
+          this.renderPermanentNotes();
         }
       },
 
-      handleNotesListInput(e) {
-        if (e.target.classList.contains('note-content')) {
+      handlePermanentNoteInput(e) {
+        if (e.target.tagName === 'TEXTAREA') {
           this.adjustTextareaHeight(e.target);
-          const noteItem = e.target.closest('.note-item');
+          const noteItem = e.target.closest('.permanent-note-item');
           const id = parseInt(noteItem.dataset.id);
-          const note = this.state.notes.find(n => n.id === id);
+          const note = this.state.permanentNotes.find(n => n.id === id);
           if (note) {
             note.text = e.target.value;
-            // No need to saveState on every input, focusout handles it
           }
         }
       },
 
-      handleNotesListFocusOut(e) {
-        if (e.target.classList.contains('note-content')) {
-          this.saveState(); // Save when done editing
-          this.renderNotes(); // Re-render to ensure visual consistency
+      handlePermanentNoteFocusOut(e) {
+        if (e.target.tagName === 'TEXTAREA') {
+          this.saveState();
+          this.renderPermanentNotes(); // Re-render to ensure visual consistency
         }
       },
 
+      // --- Drag & Drop Handlers (Kanban) ---
+      handleKanbanDragStart(e) {
+        const card = e.target.closest('.kanban-card');
+        if (card) {
+          this.DRAG_STATE.draggedTaskId = card.dataset.id;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', this.DRAG_STATE.draggedTaskId);
+          setTimeout(() => card.classList.add('dragging'), 0);
+        }
+      },
+
+      handleKanbanDragOver(e) {
+        e.preventDefault(); // Necessary to allow drop
+        const column = e.target.closest('.kanban-column');
+        if (column && !column.classList.contains('drag-over')) {
+          column.classList.add('drag-over');
+        }
+      },
+
+      handleKanbanDragLeave(e) {
+        const column = e.target.closest('.kanban-column');
+        if (column) {
+          column.classList.remove('drag-over');
+        }
+      },
+
+      handleKanbanDrop(e) {
+        e.preventDefault();
+        const column = e.target.closest('.kanban-column');
+        if (column) {
+          column.classList.remove('drag-over');
+          const newStatus = column.dataset.status;
+          const taskId = parseInt(this.DRAG_STATE.draggedTaskId);
+
+          const taskIndex = this.state.kanbanTasks.findIndex(t => t.id === taskId);
+          if (taskIndex > -1) {
+            this.state.kanbanTasks[taskIndex].status = newStatus;
+            this.saveState();
+            this.renderKanbanTasks();
+          }
+        }
+      },
+
+      handleKanbanDragEnd(e) {
+        const card = e.target.closest('.kanban-card');
+        if (card) {
+          card.classList.remove('dragging');
+        }
+        this.DRAG_STATE.draggedTaskId = null;
+      },
+
+      // --- Utility ---
       adjustTextareaHeight(textarea) {
+        if (!textarea) return;
         textarea.style.height = 'auto'; // Reset height
         textarea.style.height = textarea.scrollHeight + 'px'; // Set to scrollHeight
       },
 
+      // --- Theme Toggle ---
       initTheme() {
         const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
         this.setTheme(savedTheme, false);
