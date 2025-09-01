@@ -1,0 +1,410 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creative Toolkit</title>
+  <style>
+    :root {
+      --accent-color: #4f46e5; /* Using the purple from Locator/Colors as a neutral default */
+      --accent-color-tint: #c7d2fe;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    
+    header.panel {
+      height: 65px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0 var(--space-4);
+    }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; }
+    #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover { background-color: var(--surface-alt); }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .app-card {
+      text-decoration: none;
+      color: var(--ink);
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--panel-shadow);
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      transition: transform var(--duration-standard) ease, box-shadow var(--duration-standard) ease;
+      border-top: 4px solid var(--card-accent-color);
+      /* Make cards draggable */
+      cursor: grab; /* Indicate draggable */
+    }
+
+    .app-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-floating-3);
+    }
+    
+    .app-card-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-md);
+      /* Emojis are text, so font-size is key for their display size */
+      font-size: 28px; 
+      line-height: 1; /* Ensure emoji sits centrally */
+      /* Removed background-color and color to let emoji show on card background */
+    }
+
+    /* Styles for drag and drop feedback */
+    .app-card--dragging {
+        opacity: 0.4;
+        cursor: grabbing;
+    }
+
+    /* Placeholder for insertion point */
+    .app-grid__placeholder {
+        width: 100%; /* Take full width of a grid column */
+        height: 120px; /* Make it visible, slightly taller than card header */
+        border: 2px dashed var(--accent-color);
+        background-color: var(--accent-color-tint);
+        border-radius: var(--radius-xl);
+        box-sizing: border-box; /* Ensure padding/border doesn't increase total size */
+        transition: all var(--duration-standard) ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--ink);
+        font-size: var(--font-size-body);
+        font-weight: var(--font-weight-medium);
+    }
+    
+    .app-card-title {
+      font-size: 18px;
+      font-weight: var(--font-weight-emphasis);
+      margin: 0;
+    }
+    
+    .app-card-description {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="panel">
+      <h1>Creative Toolkit</h1>
+      <div class="sub">A universe of mini-apps.</div>
+      <div class="theme-switcher">
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <main>
+      <div class="app-grid">
+
+        <!-- Moodboard Studio (Emoji Icon) -->
+        <a href="moodboards/moodboards.html" class="app-card" data-app-id="moodboards.html" draggable="true" style="--card-accent-color: #D4AF37;">
+          <div class="app-card-icon">
+            🖼️
+          </div>
+          <h2 class="app-card-title">Moodboard Studio</h2>
+          <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding, colors, and images.</p>
+        </a>
+        
+        <!-- Blob Studio (Emoji Icon) -->
+        <a href="blobs/blobs.html" class="app-card" data-app-id="blobs.html" draggable="true" style="--card-accent-color: #8c19d8;">
+            <div class="app-card-icon">
+                🌊
+            </div>
+            <h2 class="app-card-title">Blob Studio</h2>
+            <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Tweak points, variance, and smoothness.</p>
+        </a>
+
+        <!-- Jigsaw Generator (Emoji Icon) -->
+        <a href="jigsaws/jigsaws.html" class="app-card" data-app-id="jigsaws.html" draggable="true" style="--card-accent-color: #09a9b1;">
+          <div class="app-card-icon">
+            🧩
+          </div>
+          <h2 class="app-card-title">Jigsaw Generator</h2>
+          <p class="app-card-description">Design and export custom vector jigsaw puzzle grids with control over rows, columns, and tab size.</p>
+        </a>
+
+        <!-- QR Code Generator (Emoji Icon) -->
+        <a href="qrcodes/qrcodes.html" class="app-card" data-app-id="qrcodes.html" draggable="true" style="--card-accent-color: #2BA24C;">
+            <div class="app-card-icon">
+              📱
+            </div>
+            <h2 class="app-card-title">QR Code Generator</h2>
+            <p class="app-card-description">Create custom QR codes for URLs, WiFi, vCards, and more. All data is generated locally in your browser.</p>
+        </a>
+
+        <!-- Color Mixer (Emoji Icon) -->
+        <a href="colors/colors.html" class="app-card" data-app-id="colors.html" draggable="true" style="--card-accent-color: #c5401d;">
+            <div class="app-card-icon">
+                🎨
+            </div>
+            <h2 class="app-card-title">Color Mixer</h2>
+            <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a single base color.</p>
+        </a>
+
+        <!-- Locator (Emoji Icon) -->
+        <a href="locator/locator.html" class="app-card" data-app-id="locator.html" draggable="true" style="--card-accent-color: #4F46E5;">
+            <div class="app-card-icon">
+              📍
+            </div>
+            <h2 class="app-card-title">Locator</h2>
+            <p class="app-card-description">Geocode a list of locations and visualize the results on an interactive world map. Export as SVG.</p>
+        </a>
+
+        <!-- Icon Factory (Emoji Icon) -->
+        <a href="iconfactory/iconfactory.html" class="app-card" data-app-id="iconfactory.html" draggable="true" style="--card-accent-color: #49568c;">
+            <div class="app-card-icon">
+                ⚙️
+            </div>
+            <h2 class="app-card-title">Icon Factory</h2>
+            <p class="app-card-description">Combine shapes to create custom icons. Download your collection as SVG.</p>
+        </a>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Theme switching logic (unchanged)
+    const ThemeApp = {
+      el: {},
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+      init() {
+        this.el.themeToggle = document.getElementById('theme-toggle');
+        this.bindEvents();
+        this.initTheme();
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') {
+            this.applyTheme('system');
+          }
+        });
+      },
+
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+      },
+
+      setTheme(theme, save = true) {
+        if (save) {
+          localStorage.setItem('creative-toolkit-theme', theme);
+        }
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
+
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        const currentIndex = this.THEMES.indexOf(currentTheme);
+        const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length];
+        this.setTheme(nextTheme);
+      },
+
+      applyTheme(theme) {
+        const isDark = (theme === 'system')
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      }
+    };
+
+    // Drag and Drop / Reordering Logic
+    let dragged = null; // Stores the currently dragged element
+    let placeholder = null; // Stores the placeholder element
+
+    function createPlaceholder() {
+        if (!placeholder) {
+            placeholder = document.createElement('div');
+            placeholder.classList.add('app-grid__placeholder');
+            placeholder.textContent = 'Suelta aquí'; // Optional text
+        }
+        return placeholder;
+    }
+
+    function removePlaceholder() {
+        if (placeholder && placeholder.parentNode) {
+            placeholder.parentNode.removeChild(placeholder);
+        }
+    }
+
+    function handleDragStart(e) {
+        dragged = e.target;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', dragged.dataset.appId);
+        
+        setTimeout(() => {
+            dragged.classList.add('app-card--dragging');
+        }, 0); 
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault(); // Necessary to allow drop
+        e.dataTransfer.dropEffect = 'move';
+
+        removePlaceholder(); // Always remove existing placeholder first
+
+        const appGrid = document.querySelector('.app-grid');
+        // Filter out the dragged item and any placeholder (if it somehow lingered)
+        const children = Array.from(appGrid.children).filter(child => 
+            child !== dragged && !child.classList.contains('app-grid__placeholder')
+        ); 
+
+        if (children.length === 0) {
+            // If no other cards, just append the placeholder
+            appGrid.appendChild(createPlaceholder());
+            return;
+        }
+
+        let closestCard = null;
+        let minDist = Infinity;
+        let insertBefore = true; // Flag to determine insertion point (true for before, false for after)
+
+        children.forEach(child => {
+            const rect = child.getBoundingClientRect();
+            // Calculate distance to the center of the child card
+            const center = rect.top + rect.height / 2;
+            const dist = Math.abs(e.clientY - center);
+
+            if (dist < minDist) {
+                minDist = dist;
+                closestCard = child;
+                // If cursor is past the center of the closest card, insert after it
+                insertBefore = (e.clientY < center);
+            }
+        });
+
+        if (closestCard) {
+            if (insertBefore) {
+                appGrid.insertBefore(createPlaceholder(), closestCard);
+            } else {
+                appGrid.insertBefore(createPlaceholder(), closestCard.nextSibling);
+            }
+        }
+        // If no closestCard found (e.g., dragged outside of cards but still in grid, unlikely with proper grid styling),
+        // no placeholder will be shown. This is generally fine as it implies no valid drop point near cards.
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        
+        if (dragged && placeholder && placeholder.parentNode) {
+            placeholder.parentNode.insertBefore(dragged, placeholder);
+            removePlaceholder();
+            saveCardOrder(); // Save the new order
+        } else {
+            // If dropped outside valid target or placeholder not found, ensure dragged state is reset
+            removePlaceholder();
+            if (dragged) {
+                dragged.classList.remove('app-card--dragging');
+            }
+        }
+    }
+
+    function handleDragEnd(e) {
+        if (dragged) {
+            dragged.classList.remove('app-card--dragging');
+            dragged = null;
+        }
+        removePlaceholder(); // Ensure placeholder is removed even if drag is cancelled
+    }
+
+    function saveCardOrder() {
+        const appGrid = document.querySelector('.app-grid');
+        const orderedIds = Array.from(appGrid.children)
+                               .filter(card => card.classList.contains('app-card')) // Only save actual cards
+                               .map(card => card.dataset.appId);
+        localStorage.setItem('creativeToolkitAppOrder', JSON.stringify(orderedIds));
+    }
+
+    function loadCardOrder() {
+        const savedOrder = JSON.parse(localStorage.getItem('creativeToolkitAppOrder'));
+        if (savedOrder && savedOrder.length > 0) {
+            const appGrid = document.querySelector('.app-grid');
+            const currentCards = Array.from(appGrid.children).filter(card => card.classList.contains('app-card'));
+            const cardMap = new Map();
+            currentCards.forEach(card => cardMap.set(card.dataset.appId, card));
+
+            const reorderedCards = [];
+            savedOrder.forEach(id => {
+                if (cardMap.has(id)) {
+                    reorderedCards.push(cardMap.get(id));
+                    cardMap.delete(id); // Remove from map once added to reordered list
+                }
+            });
+
+            // Add any new cards that weren't in the saved order to the end
+            cardMap.forEach(card => reorderedCards.push(card));
+
+            // Clear the grid and append cards in the new order
+            appGrid.innerHTML = '';
+            reorderedCards.forEach(card => appGrid.appendChild(card));
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        ThemeApp.init(); // Initialize theme
+
+        const appGrid = document.querySelector('.app-grid');
+        Array.from(appGrid.children).forEach(card => {
+            card.addEventListener('dragstart', handleDragStart);
+        });
+        
+        appGrid.addEventListener('dragover', handleDragOver);
+        appGrid.addEventListener('drop', handleDrop);
+        appGrid.addEventListener('dragend', handleDragEnd);
+
+        loadCardOrder(); // Load saved order on page load
+    });
+  </script>
+</body>
+</html>

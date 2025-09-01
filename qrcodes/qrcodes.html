@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced QR Code Generator</title>
+    <style>
+        :root {
+          --accent-color: #2BA24C;
+          --accent-color-tint: #bcf0cb;
+          --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+          --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+          --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+          --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+          --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+          --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+          --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+          --font-weight-emphasis: 600; --font-weight-medium: 500;
+          --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+          --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+          --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06); --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+        html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+        html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+        body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); }
+        header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
+        aside.panel.controls { position: sticky; top: 0; max-height: 100%; }
+        main.panel.canvas { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; }
+        .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+        header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+        header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+        header .sub { color: var(--muted); }
+        .theme-switcher { margin-left: auto; }
+        .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+        .back-to-home:hover { background-color: var(--surface-alt); }
+        .back-to-home svg { width: 18px; height: 18px; }
+        #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all 200ms ease; }
+        #theme-toggle:hover { background-color: var(--surface-alt); }
+        .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); height: 100%; box-sizing: border-box; }
+        .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+        .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+        .note { font-size: var(--font-size-caption); color: var(--muted); padding-top: var(--space-4); border-top: 1px solid var(--border-color); }
+        .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+        .form-group label { font-weight: var(--font-weight-medium); color: var(--ink); }
+        .form-control, .select-wrapper select { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-weight: var(--font-weight-medium); padding: 10px 12px; cursor: pointer; transition: border-color 200ms ease; }
+        .select-wrapper select { padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
+        .form-control { width: 100%; font-size: 14px; }
+        .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { border-color: var(--accent-color); outline: none; }
+        textarea.form-control { min-height: 80px; resize: vertical; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all 200ms ease; text-decoration: none; }
+        .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
+        .btn-secondary:hover { filter: brightness(0.95); }
+        .btn[disabled] { background-color: var(--surface); color: var(--muted); border-color: var(--border-color); pointer-events: none; filter: none; }
+        .slider-row { display: flex; align-items: center; gap: var(--space-4); }
+        .slider-row label { flex: 0 0 90px; }
+        .slider-row .select-wrapper { flex: 1 1 auto; }
+        .slider-row .select-wrapper select { width: 100%; }
+        #input-forms { overflow-y: auto; padding-right: 4px; }
+        main.panel.canvas { background-size: 40px 40px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
+        #qrcode-container { width: 100%; max-width: 400px; aspect-ratio: 1 / 1; padding: var(--space-4); background-color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+        #qrcode { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        #qrcode img, #qrcode canvas { max-width: 100%; max-height: 100%; }
+        .hidden { display: none !important; } .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--ink); color: var(--surface-alt); padding: var(--space-3) var(--space-5); border-radius: var(--radius-md); font-weight: var(--font-weight-emphasis); font-size: 14px; box-shadow: var(--shadow-floating-3); z-index: 1000; opacity: 0; visibility: hidden; transition: all 300ms ease; }
+        .toast.show { bottom: 30px; opacity: 1; visibility: visible; }
+        @media (max-width: 800px) { body { padding: var(--space-4); } .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } aside.controls { position: static; max-height: none; } main.canvas { min-height: 50vh; } }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="container">
+        <header class="panel">
+            <a href="../index.html" class="back-to-home" title="Return to Home">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+            </a>
+            <h1>Advanced QR Code Generator</h1>
+            <div class="sub">Create and download custom QR codes for any purpose.</div>
+            <div class="theme-switcher">
+              <button id="theme-toggle" title="Change theme"></button>
+            </div>
+        </header>
+        <aside class="panel controls">
+            <div class="control-group">
+                <button id="generate-btn" class="btn btn-secondary">Generate</button>
+            </div>
+            <div class="control-group">
+                <div class="slider-row">
+                    <label for="qr-type">QR Type</label>
+                    <div class="select-wrapper">
+                      <select id="qr-type" class="form-control">
+                          <option value="url" selected>URL / Plain Text</option> <option value="email">Email</option> <option value="phone">Phone Number</option> <option value="sms">SMS</option> <option value="wifi">WiFi Network</option> <option value="vcard">vCard (Contact)</option>
+                      </select>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div id="input-forms">
+                    <div id="form-url"><div class="form-group"><label for="url-text">Text or URL</label><textarea id="url-text" class="form-control" placeholder="e.g., https://www.example.com">https://www.brokenorbit.art</textarea></div></div>
+                    <div id="form-email" class="hidden"><div class="form-group"><label for="email-to">To</label><input type="email" id="email-to" class="form-control" placeholder="recipient@example.com"></div><div class="form-group"><label for="email-subject">Subject</label><input type="text" id="email-subject" class="form-control"></div><div class="form-group"><label for="email-body">Body</label><textarea id="email-body" class="form-control"></textarea></div></div>
+                    <div id="form-phone" class="hidden"><div class="form-group"><label for="phone-number">Phone Number</label><input type="tel" id="phone-number" class="form-control" placeholder="+15551234567"></div></div>
+                    <div id="form-sms" class="hidden"><div class="form-group"><label for="sms-number">Phone Number</label><input type="tel" id="sms-number" class="form-control" placeholder="+15551234567"></div><div class="form-group"><label for="sms-message">Message</label><textarea id="sms-message" class="form-control"></textarea></div></div>
+                    <div id="form-wifi" class="hidden"><div class="form-group"><label for="wifi-ssid">Network Name (SSID)</label><input type="text" id="wifi-ssid" class="form-control"></div><div class="form-group"><label for="wifi-password">Password</label><input type="password" id="wifi-password" class="form-control"></div><div class="form-group"><label for="wifi-encryption">Encryption</label><div class="select-wrapper"><select id="wifi-encryption" class="form-control"><option value="WPA" selected>WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">None</option></select></div></div></div>
+                    <div id="form-vcard" class="hidden"><div class="form-group"><label for="vcard-name">Full Name</label><input type="text" id="vcard-name" class="form-control"></div><div class="form-group"><label for="vcard-phone">Phone Number</label><input type="tel" id="vcard-phone" class="form-control"></div><div class="form-group"><label for="vcard-email">Email</label><input type="email" id="vcard-email" class="form-control"></div></div>
+                </div>
+            </div>
+            <div class="control-group" style="margin-top: auto;">
+                <a id="download-link" class="btn btn-primary">Download</a>
+            </div>
+            <div class="note"> Tip: All QR codes are generated locally. No data is sent to any server. </div>
+        </aside>
+        <main class="panel canvas"> <div id="qrcode-container" class="hidden"> <div id="qrcode"></div> </div> </main>
+    </div>
+    <div id="toast" class="toast"></div>
+    <div class="visually-hidden" aria-live="polite" id="aria-notifications"></div>
+    <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const themeToggle = document.getElementById('theme-toggle'); const THEMES = ['light', 'dark', 'system']; const THEME_ICONS = { light: '☀️', dark: '🌔', system: '⚙️' };
+            const applyTheme = (theme) => { if (theme === 'system') { const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = systemPrefersDark ? 'dark' : 'light'; } else { document.documentElement.dataset.theme = theme; } themeToggle.textContent = THEME_ICONS[theme]; };
+            const cycleTheme = () => { const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; const currentIndex = THEMES.indexOf(currentTheme); const nextTheme = THEMES[(currentIndex + 1) % THEMES.length]; localStorage.setItem('creative-toolkit-theme', nextTheme); applyTheme(nextTheme); };
+            themeToggle.addEventListener('click', cycleTheme); const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; applyTheme(savedTheme);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('creative-toolkit-theme') === 'system') { applyTheme('system'); } });
+            
+            const toast = document.getElementById('toast'); const ariaNotifications = document.getElementById('aria-notifications');
+            const showToast = (message) => { toast.textContent = message; toast.classList.add('show'); ariaNotifications.textContent = message; setTimeout(() => toast.classList.remove('show'), 2000); };
+            const qrTypeSelect = document.getElementById('qr-type'); const inputForms = document.getElementById('input-forms'); const generateBtn = document.getElementById('generate-btn'); const qrcodeContainer = document.getElementById('qrcode-container'); const qrcodeElement = document.getElementById('qrcode'); const downloadLink = document.getElementById('download-link');
+            let qrcode = null; downloadLink.setAttribute('disabled', true);
+            const disableDownloadLink = () => { downloadLink.setAttribute('disabled', true); qrcodeContainer.classList.add('hidden'); };
+            qrTypeSelect.addEventListener('change', () => { const forms = inputForms.children; for (let i = 0; i < forms.length; i++) { forms[i].classList.add('hidden'); } document.getElementById('form-' + qrTypeSelect.value).classList.remove('hidden'); disableDownloadLink(); });
+            inputForms.addEventListener('input', disableDownloadLink);
+            function getQRCodeData() { const type = qrTypeSelect.value; let data = ''; switch (type) { case 'url': data = document.getElementById('url-text').value; break; case 'email': const to = document.getElementById('email-to').value, subject = document.getElementById('email-subject').value, body = document.getElementById('email-body').value; data = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; break; case 'phone': data = `tel:${document.getElementById('phone-number').value}`; break; case 'sms': const smsNum = document.getElementById('sms-number').value, smsMsg = document.getElementById('sms-message').value; data = `smsto:${smsNum}:${encodeURIComponent(smsMsg)}`; break; case 'wifi': const ssid = document.getElementById('wifi-ssid').value, password = document.getElementById('wifi-password').value, encryption = document.getElementById('wifi-encryption').value; if (!ssid) { showToast("Network Name (SSID) is required."); return null; } data = `WIFI:T:${encryption};S:${ssid};P:${password};;`; break; case 'vcard': const name = document.getElementById('vcard-name').value, phone = document.getElementById('vcard-phone').value, email = document.getElementById('vcard-email').value; data = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`; break; } return data.trim(); }
+            function generateQRCode() { const text = getQRCodeData(); if (text === null || text === "") { if(text === "") showToast("Please fill in the details to generate."); return; } qrcodeElement.innerHTML = ""; qrcodeContainer.classList.remove('hidden'); const qrCodeSize = 300; qrcode = new QRCode(qrcodeElement, { text, width: qrCodeSize, height: qrCodeSize, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H }); setTimeout(() => { const originalCanvas = qrcodeElement.querySelector('canvas'); if (originalCanvas) { const margin = 10; const newCanvas = document.createElement('canvas'); newCanvas.width = originalCanvas.width + margin * 2; newCanvas.height = originalCanvas.height + margin * 2; const ctx = newCanvas.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, newCanvas.width, newCanvas.height); ctx.drawImage(originalCanvas, margin, margin); downloadLink.href = newCanvas.toDataURL('image/png'); downloadLink.download = 'qrcode.png'; downloadLink.removeAttribute('disabled'); } }, 100); }
+            generateBtn.addEventListener('click', generateQRCode);
+            generateQRCode();
+        });
+    </script>
+</body>
+</html>

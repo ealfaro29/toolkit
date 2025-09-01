@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jigsaw Generator</title>
+    <style>
+    :root {
+      --accent-color: #09a9b1;
+      --accent-color-tint: #a8e9ed;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06); --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); }
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
+    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
+    main.panel.grid { display: flex; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; overflow: hidden; }
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; }
+    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+    #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover { background-color: var(--surface-alt); }
+    .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
+    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
+    .num-input { background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0 var(--space-3); height: 36px; width: 100%; text-align: center; box-sizing: border-box; }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
+    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
+    .btn-secondary:hover { filter: brightness(0.95); }
+    .slider-row { display: flex; align-items: center; gap: var(--space-4); }
+    .slider-row label { flex: 0 0 90px; }
+    .slider-row input[type="range"] { flex: 1 1 auto; }
+    .slider-row .num-input { width: 60px; text-align: right; }
+    input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 0; background: transparent; padding: 0; border: none; cursor: pointer; height: 16px; }
+    input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: var(--surface); border-radius: 2px; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 16px; width: 16px; background: var(--surface-alt); border-radius: 50%; border: 2px solid var(--accent-color); margin-top: -6px; }
+    main.panel.grid { background-size: 40px 40px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
+    #svg-preview-container { max-width: 100%; max-height: 100%; aspect-ratio: var(--aspect-ratio, 1 / 1); }
+    #svg-preview-container svg { display: block; width: 100%; height: 100%; }
+    #svg-preview-container path { transition: fill var(--duration-standard) ease; fill: var(--accent-color); }
+    @media (max-width: 800px) { body { padding: var(--space-4); } .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } aside.controls { position: static; max-height: none; } main.grid { min-height: 50vh; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="panel">
+          <a href="../index.html" class="back-to-home" title="Return to Home">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+          </a>
+          <h1>Jigsaw Generator</h1>
+          <div class="sub">Generate and export custom SVG jigsaws.</div>
+          <div class="theme-switcher">
+            <button id="theme-toggle" title="Change theme"></button>
+          </div>
+        </header>
+        <aside class="panel controls" id="controls">
+            <div class="control-group">
+                <button id="regenerate" class="btn btn-secondary">Generate</button>
+            </div>
+            <div class="control-group">
+                <div class="slider-row">
+                  <label for="cols">Columns</label>
+                  <input id="cols" type="range" min="1" max="12" value="5" step="1">
+                  <input class="num-input" id="cols_num" type="number" min="1" max="12" step="1" value="5">
+                </div>
+                <div class="slider-row">
+                  <label for="rows">Rows</label>
+                  <input id="rows" type="range" min="1" max="12" value="2" step="1">
+                  <input class="num-input" id="rows_num" type="number" min="1" max="12" step="1" value="2">
+                </div>
+                <div class="slider-row">
+                  <label for="gap">Gap</label>
+                  <input id="gap" type="range" min="0" max="25" value="5" step="1">
+                  <input class="num-input" id="gap_num" type="number" min="0" max="25" step="1" value="5">
+                </div>
+                <div class="slider-row">
+                  <label for="tabSize">Tab Size</label>
+                  <input id="tabSize" type="range" min="15" max="35" value="25" step="1">
+                  <input class="num-input" id="tabSize_num" type="number" min="15" max="35" step="1" value="25">
+                </div>
+            </div>
+            <div class="control-group" style="margin-top: auto;">
+                <button id="download-svg-btn" class="btn btn-primary">Download</button>
+            </div>
+            <div class="note">Tip: The jigsaw shapes are randomly generated every time you click 'Generate'.</div>
+        </aside>
+        <main class="grid panel">
+            <div id="svg-preview-container"></div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const JigsawApp = { el: {}, state: { rows: 2, cols: 5, gap: 5, tabSize: 25, currentSvgString: null, currentWidth: 0, currentHeight: 0, currentShapes: [] }, PIECE_BASE_SIZE: 160, THEMES: ['light', 'dark', 'system'], THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' }, init() { this.cacheDOMElements(); this.initState(); this.initTheme(); this.bindEvents(); this.resetAndGenerateAll(); }, cacheDOMElements() { const ids = ['theme-toggle', 'controls', 'regenerate', 'cols', 'cols_num', 'rows', 'rows_num', 'gap', 'gap_num', 'tabSize', 'tabSize_num', 'download-svg-btn', 'svg-preview-container']; ids.forEach(id => this.el[id] = document.getElementById(id)); }, initState() { this.state.cols = parseInt(this.el.cols.value); this.state.rows = parseInt(this.el.rows.value); this.state.gap = parseInt(this.el.gap.value); this.state.tabSize = parseInt(this.el.tabSize.value); }, initTheme() { const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(savedTheme, false); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system'); }); }, bindEvents() { this.el['theme-toggle'].addEventListener('click', () => this.cycleTheme()); this.el.regenerate.addEventListener('click', () => { this.regenerateShapes(); this.generatePreview(); }); this.el['download-svg-btn'].addEventListener('click', () => this.downloadSvg()); this.el.controls.addEventListener('input', e => { if (!e.target.id || e.target.type === 'button') return; const { id, value } = e.target; const stateKey = id.replace('_num', ''); if (this.state.hasOwnProperty(stateKey)) { this.state[stateKey] = +value; } this.syncUIProperty(stateKey); const isGridChange = stateKey === 'rows' || stateKey === 'cols'; if (isGridChange) { this.resetAndGenerateAll(); } else { this.generatePreview(); } }); }, syncUIProperty(key) { const elRange = this.el[key]; const elNum = this.el[`${key}_num`]; if (this.state.hasOwnProperty(key)) { const value = this.state[key]; if (elRange) elRange.value = value; if (elNum) elNum.value = value; } }, setTheme(theme, save = true) { if (save) { localStorage.setItem('creative-toolkit-theme', theme); } this.el['theme-toggle'].textContent = this.THEME_ICONS[theme]; this.applyTheme(theme); }, cycleTheme() { const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; const currentIndex = this.THEMES.indexOf(currentTheme); const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length]; this.setTheme(nextTheme); }, applyTheme(theme) { if (theme === 'system') { const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.dataset.theme = systemPrefersDark ? 'dark' : 'light'; } else { document.documentElement.dataset.theme = theme; } }, regenerateShapes() { const { rows, cols } = this.state; const shapes = Array.from({ length: rows }, () => Array.from({ length: cols }, () => null)); for (let r = 0; r < rows; r++) { for (let c = 0; c < cols; c++) { const top = r > 0 ? -shapes[r - 1][c].bottom : 0; const left = c > 0 ? -shapes[r][c - 1].right : 0; const bottom = r < rows - 1 ? (Math.random() > 0.5 ? 1 : -1) : 0; const right = c < cols - 1 ? (Math.random() > 0.5 ? 1 : -1) : 0; shapes[r][c] = { top, right, bottom, left }; } } this.state.currentShapes = shapes; }, generatePreview() { const { currentWidth, currentHeight, currentShapes } = this.state; this.el['svg-preview-container'].style.setProperty('--aspect-ratio', `${currentWidth} / ${currentHeight}`); this.state.currentSvgString = this.generateSvgString(currentWidth, currentHeight, currentShapes); this.el['svg-preview-container'].innerHTML = this.state.currentSvgString; }, resetAndGenerateAll() { this.state.currentWidth = this.state.cols * this.PIECE_BASE_SIZE; this.state.currentHeight = this.state.rows * this.PIECE_BASE_SIZE; this.regenerateShapes(); this.generatePreview(); }, generateSvgString(totalWidth, totalHeight, shapes) { const { rows, cols, gap, tabSize } = this.state; const tabRatio = tabSize / 100; const pieceWidth = totalWidth / cols; const pieceHeight = totalHeight / rows; const shorterSide = Math.min(pieceWidth, pieceHeight); const protrusion = shorterSide * tabRatio; const padding = protrusion * 1.1; const gridWidth = (cols * pieceWidth) + Math.max(0, cols - 1) * gap; const gridHeight = (rows * pieceHeight) + Math.max(0, rows - 1) * gap; const viewBox = `${-padding} ${-padding} ${gridWidth + 2 * padding} ${gridHeight + 2 * padding}`; let pieces = '<g>'; for (let r = 0; r < rows; r++) { for (let c = 0; c < cols; c++) { const pathData = this.generatePiecePath(pieceWidth, pieceHeight, shapes[r][c], gap, protrusion); const x = c * (pieceWidth + gap); const y = r * (pieceHeight + gap); pieces += `<path d="${pathData}" transform="translate(${x}, ${y})"/>`; } } pieces += '</g>'; return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="${viewBox}">${pieces}</svg>`; }, generatePiecePath(w, h, shape, gap, p) { const neck = p * 0.85; const getFeatureWidth = (dir, baseSize) => { if (dir === 0) return 0; if (dir < 0) return baseSize + gap; return baseSize; }; let d = 'M 0,0 '; const topWidth = getFeatureWidth(shape.top, neck); const topShoulder = topWidth * 0.2; d += `l ${w/2 - topWidth/2},0 c ${topShoulder},${-p*shape.top*0.8} ${topWidth-topShoulder},${-p*shape.top*0.8} ${topWidth},0 l ${w/2 - topWidth/2},0 `; const rightWidth = getFeatureWidth(shape.right, neck); const rightShoulder = rightWidth * 0.2; d += `l 0,${h/2 - rightWidth/2} c ${p*shape.right*0.8},${rightShoulder} ${p*shape.right*0.8},${rightWidth - rightShoulder} 0,${rightWidth} l 0,${h/2 - rightWidth/2} `; const bottomWidth = getFeatureWidth(shape.bottom, neck); const bottomShoulder = bottomWidth * 0.2; d += `l -${w/2 - bottomWidth/2},0 c -${bottomShoulder},${p*shape.bottom*0.8} -${bottomWidth - bottomShoulder},${p*shape.bottom*0.8} -${bottomWidth},0 l -${w/2 - bottomWidth/2},0 `; const leftWidth = getFeatureWidth(shape.left, neck); const leftShoulder = leftWidth * 0.2; d += `l 0,-${h/2 - leftWidth/2} c ${-p*shape.left*0.8},-${leftShoulder} ${-p*shape.left*0.8},-${leftWidth - leftShoulder} 0,-${leftWidth} `; d += 'Z'; return d; }, downloadSvg() { const previewSvg = this.el['svg-preview-container'].querySelector('svg'); const group = previewSvg ? previewSvg.querySelector('g') : null; if (!group) { console.error("Could not find SVG group to download."); return; } const bbox = group.getBBox(); const tightViewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`; const fillColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(); const clonedGroup = group.cloneNode(true); clonedGroup.querySelectorAll('path').forEach(path => { path.style.fill = ''; path.setAttribute('fill', fillColor); }); const finalSvgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${tightViewBox}">${clonedGroup.outerHTML}</svg>`; this.triggerDownload(finalSvgString, 'jigsaw.svg', 'image/svg+xml'); }, triggerDownload(data, filename, type) { const a = document.createElement('a'); if (type) { const blob = new Blob([data], { type }); a.href = URL.createObjectURL(blob); } else { a.href = data; } a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); if (type) URL.revokeObjectURL(a.href); } };
+            JigsawApp.init();
+        });
+    </script>
+</body>
+</html>

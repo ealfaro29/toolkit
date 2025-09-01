@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Moodboard Studio</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
+  <style>
+    :root {
+      --accent-color: #D4AF37;
+      --accent-color-tint: #F0E2B6;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #000000; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); }
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
+    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
+    main.panel { padding: var(--space-5); min-height: 0; overflow-y: auto; transition: border-color 0.2s ease; }
+    main.panel.drag-over { border-color: var(--accent-color); }
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; }
+    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+    #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover { background-color: var(--surface-alt); }
+    .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
+    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
+    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
+    .btn-secondary:hover { filter: brightness(0.95); }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group label { font-weight: var(--font-weight-medium); }
+    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; }
+    #color-palette { display: flex; justify-content: space-between; align-items: center; }
+    .color-circle { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border-color); }
+    .logo-upload { width: 100%; height: 60px; border: 2px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); overflow: hidden; }
+    .logo-upload img { width: 100%; height: 100%; object-fit: contain; }
+    #moodboard-canvas { column-count: 5; column-gap: var(--space-4); }
+    .moodboard-card { display: inline-block; width: 100%; margin-bottom: var(--space-4); position: relative; break-inside: avoid; cursor: grab; }
+    .moodboard-card.dragging { opacity: 0.5; }
+    .moodboard-card img { width: 100%; height: auto; display: block; border-radius: var(--radius-md); }
+    .moodboard-card:hover .delete-btn { opacity: 1; }
+    .add-card-btn { width: 100%; padding: var(--space-5) 0; border: 2px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--surface); color: var(--muted); font-size: 24px; cursor: pointer; text-align: center; }
+    .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity var(--duration-standard); }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal-content { background: var(--surface-alt); padding: var(--space-5); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); width: 90%; max-width: 300px; border: 1px solid var(--border-color); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
+    .modal-header h2 { margin: 0; font-size: 1.2rem; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4); }
+    #color-picker-body { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+    #color-picker-native { width: 150px; height: 150px; border: none; padding: 0; background: none; cursor: pointer; }
+    #color-picker-native::-webkit-color-swatch-wrapper { padding: 0; }
+    #color-picker-native::-webkit-color-swatch { border-radius: 50%; border: 1px solid var(--border-color); }
+    #color-picker-native::-moz-color-swatch { border-radius: 50%; border: 1px solid var(--border-color); }
+    .hex-input { font-family: var(--font-family-mono); text-align: center; text-transform: uppercase; }
+    @media (max-width: 800px) { body { padding: var(--space-4); } .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } aside.controls { position: static; max-height: none; } main.panel { min-height: 50vh; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+      </a>
+      <h1>Moodboard Studio</h1>
+      <div class="sub">Create and export beautiful, inspiring moodboards.</div>
+      <div class="theme-switcher">
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls" id="controls">
+      <div class="control-group">
+          <div class="form-group">
+              <label for="logo-input">Logo</label>
+              <div class="logo-upload" id="logo-upload-container">
+                  <span>Upload Logo</span>
+                  <input type="file" id="logo-input" accept="image/*" style="display:none;">
+              </div>
+          </div>
+      </div>
+      <div class="control-group">
+        <div class="form-group">
+          <label for="board-title">Client</label>
+          <input type="text" id="board-title" class="form-control" value="My Project Inspiration">
+        </div>
+      </div>
+      <div class="control-group">
+          <div class="form-group">
+              <label>Client Colors</label>
+              <div id="color-palette"></div>
+          </div>
+      </div>
+      <div class="control-group" style="margin-top: auto;">
+        <button id="reset-btn" class="btn btn-secondary">Reset</button>
+      </div>
+      <div class="control-group">
+          <button id="export-btn" class="btn btn-primary">Download</button>
+      </div>
+      <div class="note">Tip: Drag images onto the main panel to add them. You can also drag to reorder.</div>
+    </aside>
+
+    <main class="panel" id="main-panel">
+      <div id="moodboard-canvas"></div>
+      <div class="add-card-btn" id="add-card-btn">+</div>
+    </main>
+  </div>
+  
+  <div class="modal-overlay" id="color-picker-modal">
+    <div class="modal-content">
+        <div class="modal-header"> <h2>Edit Color</h2> </div>
+        <div class="modal-body" id="color-picker-body">
+            <input type="color" id="color-picker-native">
+            <input type="text" id="color-picker-hex" class="form-control hex-input">
+        </div>
+        <div class="modal-footer">
+            <button id="cancel-color-btn" class="btn btn-secondary">Cancel</button>
+            <button id="save-color-btn" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+  </div>
+
+  <script type="module">
+    const MoodboardApp = {
+      el: {},
+      state: {
+        title: "My Project Inspiration",
+        colors: ["#D4AF37", "#F3D578", "#A48011", "#4F4F4F", "#F5F5F5", "#BFBFBF"],
+        logo: null,
+        images: []
+      },
+      currentColorIndex: null,
+      draggedItemId: null,
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.loadState();
+        this.bindEvents();
+        this.render();
+      },
+
+      cacheDOMElements() {
+        const ids = ['theme-toggle', 'board-title', 'color-palette', 'logo-upload-container', 'logo-input', 'export-btn', 'reset-btn', 'main-panel', 'moodboard-canvas', 'add-card-btn', 'color-picker-modal', 'color-picker-native', 'color-picker-hex', 'cancel-color-btn', 'save-color-btn'];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          this.el[key] = document.getElementById(id);
+        });
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        this.el.boardTitle.addEventListener('input', (e) => this.updateState({ title: e.target.value }, false));
+        this.el.boardTitle.addEventListener('change', () => this.saveState());
+        this.el.logoUploadContainer.addEventListener('click', () => this.el.logoInput.click());
+        this.el.logoInput.addEventListener('change', (e) => this.handleFileUploads(e.target.files, e.target.id === 'logo-input'));
+        this.el.addCardBtn.addEventListener('click', () => this.addImage());
+        this.el.moodboardCanvas.addEventListener('click', (e) => {
+            if (e.target.closest('.delete-btn')) {
+                const card = e.target.closest('.moodboard-card');
+                if (card) this.removeImage(card.dataset.id);
+            }
+        });
+        this.el.resetBtn.addEventListener('click', () => this.resetState());
+        this.el.exportBtn.addEventListener('click', (e) => this.exportToImage(e.target));
+        
+        this.el.saveColorBtn.addEventListener('click', () => this.saveColorFromModal());
+        this.el.cancelColorBtn.addEventListener('click', () => this.closeModal('colorPickerModal'));
+        this.el.colorPickerModal.addEventListener('click', (e) => { if (e.target === this.el.colorPickerModal) this.closeModal('colorPickerModal'); });
+        this.el.colorPickerNative.addEventListener('input', () => this.syncColorInputs('native'));
+        this.el.colorPickerHex.addEventListener('input', () => this.syncColorInputs('hex'));
+        
+        this.el.mainPanel.addEventListener('dragover', (e) => this.handleDragOver(e));
+        this.el.mainPanel.addEventListener('dragleave', (e) => this.handleDragLeave(e));
+        this.el.mainPanel.addEventListener('drop', (e) => this.handleFileDrop(e));
+      },
+      
+      updateState(newState, shouldSave = true) {
+        Object.assign(this.state, newState);
+        if (shouldSave) this.saveState();
+        this.render();
+      },
+      
+      saveState() {
+        const { images, ...stateToSave } = this.state;
+        localStorage.setItem('moodboardState', JSON.stringify(stateToSave));
+      },
+
+      loadState() {
+        const savedState = localStorage.getItem('moodboardState');
+        if (savedState) {
+            Object.assign(this.state, JSON.parse(savedState));
+            this.state.images = [];
+        }
+      },
+      
+      resetState() {
+        if (confirm('Are you sure you want to clear the entire moodboard?')) {
+            this.state = { title: "My Project Inspiration", colors: ["#D4AF37", "#F3D578", "#A48011", "#4F4F4F", "#F5F5F5", "#BFBFBF"], logo: null, images: [] };
+            localStorage.removeItem('moodboardState');
+            this.render();
+        }
+      },
+
+      render() {
+        if (this.el.boardTitle.value !== this.state.title) this.el.boardTitle.value = this.state.title;
+
+        this.el.colorPalette.innerHTML = '';
+        this.state.colors.forEach((color, index) => {
+            const circle = document.createElement('div');
+            circle.className = 'color-circle';
+            circle.style.backgroundColor = color;
+            circle.title = `Edit ${color}`;
+            circle.addEventListener('click', () => this.openColorPickerModal(index));
+            this.el.colorPalette.appendChild(circle);
+        });
+
+        this.el.logoUploadContainer.innerHTML = this.state.logo ? `<img src="${this.state.logo}" alt="Client Logo">` : `<span>Upload Logo</span>`;
+        
+        this.el.moodboardCanvas.innerHTML = '';
+        this.state.images.forEach(image => {
+            const card = document.createElement('div');
+            card.className = 'moodboard-card';
+            card.dataset.id = image.id;
+            card.draggable = true;
+
+            card.addEventListener('dragstart', (e) => this.handleItemDragStart(e));
+            card.addEventListener('dragend', (e) => this.handleItemDragEnd(e));
+            card.addEventListener('dragover', (e) => this.handleItemDragOver(e));
+            card.addEventListener('drop', (e) => this.handleItemDrop(e));
+
+            card.innerHTML = `<img src="${image.src}" alt="Moodboard image" crossorigin="anonymous"><button class="delete-btn" title="Remove image">×</button>`;
+            this.el.moodboardCanvas.appendChild(card);
+        });
+      },
+      
+      openModal(modalId) { this.el[modalId].classList.add('show'); },
+      closeModal(modalId) { this.el[modalId].classList.remove('show'); },
+      
+      openColorPickerModal(index) {
+        this.currentColorIndex = index;
+        const color = this.state.colors[index];
+        this.el.colorPickerNative.value = color;
+        this.el.colorPickerHex.value = color;
+        this.openModal('colorPickerModal');
+      },
+      
+      saveColorFromModal() {
+        const newColor = this.el.colorPickerHex.value;
+        if (this.currentColorIndex !== null) {
+            const newColors = [...this.state.colors];
+            newColors[this.currentColorIndex] = newColor.toUpperCase();
+            this.updateState({ colors: newColors });
+        }
+        this.closeModal('colorPickerModal');
+      },
+
+      syncColorInputs(source) {
+        const hexRegex = /^#([0-9A-F]{3}){1,2}$/i;
+        if (source === 'native') {
+            this.el.colorPickerHex.value = this.el.colorPickerNative.value.toUpperCase();
+        } else if (hexRegex.test(this.el.colorPickerHex.value)) {
+            this.el.colorPickerNative.value = this.el.colorPickerHex.value;
+        }
+      },
+      
+      handleFileUploads(files, isLogo = false) {
+        if (!files || files.length === 0) return;
+
+        if (isLogo) {
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => this.updateState({ logo: e.target.result });
+            reader.readAsDataURL(file);
+        } else {
+            const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            const filePromises = imageFiles.map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve({ id: Date.now() + Math.random(), src: e.target.result });
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(filePromises).then((newImages) => {
+                this.updateState({ images: [...this.state.images, ...newImages] }, false);
+            });
+        }
+      },
+      
+      addImage() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.multiple = true;
+        input.onchange = (e) => this.handleFileUploads(e.target.files);
+        input.click();
+      },
+
+      removeImage(id) {
+        this.updateState({ images: this.state.images.filter(img => img.id != id) }, false);
+      },
+      
+      handleDragOver(e) { e.preventDefault(); this.el.mainPanel.classList.add('drag-over'); },
+      handleDragLeave(e) { this.el.mainPanel.classList.remove('drag-over'); },
+      handleFileDrop(e) {
+        e.preventDefault();
+        this.el.mainPanel.classList.remove('drag-over');
+        this.handleFileUploads(e.dataTransfer.files);
+      },
+
+      handleItemDragStart(e) {
+        this.draggedItemId = e.target.dataset.id;
+        e.target.classList.add('dragging');
+      },
+      handleItemDragEnd(e) {
+        e.target.classList.remove('dragging');
+        this.draggedItemId = null;
+      },
+      handleItemDragOver(e) { e.preventDefault(); },
+      handleItemDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetCard = e.target.closest('.moodboard-card');
+        if (!targetCard || targetCard.dataset.id === this.draggedItemId) return;
+
+        const draggedIndex = this.state.images.findIndex(img => img.id == this.draggedItemId);
+        const targetIndex = this.state.images.findIndex(img => img.id == targetCard.dataset.id);
+
+        const newImages = [...this.state.images];
+        const [draggedItem] = newImages.splice(draggedIndex, 1);
+        newImages.splice(targetIndex, 0, draggedItem);
+        this.updateState({ images: newImages }, false);
+      },
+      
+      async exportToImage(button) {
+        button.textContent = 'Generating...';
+        button.disabled = true;
+
+        const exportContainer = document.createElement('div');
+        const themeStyles = getComputedStyle(document.documentElement);
+        
+        const logoHtml = this.state.logo ? `<img src="${this.state.logo}" style="height: 40px; max-width: 120px; object-fit: contain; margin-left: 24px;">` : '';
+        const colorsHtml = this.state.colors.map(c => `<div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${c};"></div>`).join('');
+        const imagesHtml = this.state.images.map(img => `<img src="${img.src}" style="width: 100%; display: block; break-inside: avoid; margin-bottom: 16px; border-radius: 8px;">`).join('');
+
+        exportContainer.style.cssText = `position: absolute; left: -9999px; width: 1200px; padding: 40px; background-color: ${themeStyles.getPropertyValue('--surface-alt').trim()}; color: ${themeStyles.getPropertyValue('--ink').trim()}; font-family: ${themeStyles.getPropertyValue('--font-family-sans').trim()};`;
+        exportContainer.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${themeStyles.getPropertyValue('--border-color').trim()}; padding-bottom: 24px; margin-bottom: 24px;"><h1 style="font-size: 32px; font-weight: 600; margin: 0;">${this.state.title}</h1><div style="display: flex; gap: 12px; align-items: center;">${colorsHtml}${logoHtml}</div></div><div style="column-count: 4; column-gap: 16px;">${imagesHtml}</div>`;
+        document.body.appendChild(exportContainer);
+
+        try {
+            const canvas = await html2canvas(exportContainer, { scale: 2, useCORS: true });
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `${this.state.title.replace(/\s+/g, '-')}-moodboard.png`;
+            link.click();
+        } catch(error) {
+            console.error("Error exporting to image:", error);
+            alert("An error occurred while generating the image.");
+        } finally {
+            document.body.removeChild(exportContainer);
+            button.textContent = 'Download';
+            button.disabled = false;
+        }
+      },
+      
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+        });
+      },
+
+      setTheme(theme, save = true) {
+        if (save) localStorage.setItem('creative-toolkit-theme', theme);
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
+
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
+      },
+
+      applyTheme(theme) {
+        const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => MoodboardApp.init());
+  </script>
+</body>
+</html>
