@@ -61,40 +61,6 @@ The Creative Toolkit serves as a central hub for multiple standalone tools, each
     *   Zoom to individual locations and remove them from the list.
     *   Export the map with your locations as an SVG file.
 
-## 🛠️ Project Structure
-
-The project is organized as follows:
-creative-toolkit/
-├── index.html # Main homepage
-├── blobs/
-│ ├── blobs.html # Blob Studio application
-│ └── ... (assets for Blob Studio)
-├── colors/
-│ ├── colors.html # Color Mixer application
-│ ├── colors.json # Color name data
-│ └── ... (other assets)
-├── iconfactory/
-│ ├── iconfactory.html # Icon Factory application
-│ ├── frames/ # SVG files for icon frames
-│ ├── particles/ # SVG files for icon particles
-│ ├── names.json # Custom icon names
-│ ├── keywords.json # Keywords for icon search
-│ └── ... (other assets)
-├── jigsaws/
-│ ├── jigsaws.html # Jigsaw Generator application
-│ └── ... (assets for Jigsaw Generator)
-├── locator/
-│ ├── locator.html # Locator application
-│ └── ... (assets for Locator)
-├── moodboards/
-│ ├── moodboards.html # Moodboard Studio application
-│ └── ... (assets for Moodboard Studio)
-├── qrcodes/
-│ ├── qrcodes.html # QR Code Generator application
-│ └── ... (assets for QR Code Generator)
-└── screenshot.png # (Optional) Project screenshot
-code
-Code
 ## 🚀 Getting Started
 
 To use the Creative Toolkit:
