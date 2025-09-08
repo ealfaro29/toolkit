@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SVG Colorizer</title> 
+  <script>
+    (function() {
+      try {
+        let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        if (theme === 'system') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --accent-color: #0077B6; /* Azul Corporativo */
+      --accent-color-tint: #b3d7e8;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF;
+      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 400px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
+    .container.loading { filter: blur(5px); pointer-events: none; }
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
+    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+    aside.panel.controls { position: sticky; top: 0; max-height: 100%; display: flex; flex-direction: column; }
+    .controls-content { overflow-y: auto; padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-5); flex-grow: 1;}
+    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
+    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
+    .btn-secondary:hover { filter: brightness(0.95); }
+    .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group label { font-weight: var(--font-weight-medium); }
+    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; min-height: 40px; }
+    
+    main.panel { display: flex; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; overflow: auto; background-size: 20px 20px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
+    #svg-host { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    #svg-host svg { width: 100%; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+    .placeholder-text { color: var(--muted); }
+
+    .color-swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(28px, 1fr)); gap: var(--space-2); }
+    .swatch { width: 100%; aspect-ratio: 1 / 1; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
+    .swatch.selected { border-color: var(--accent-color); box-shadow: 0 0 0 3px var(--accent-color); transform: scale(1.1); }
+
+    .group-list { display: flex; flex-direction: column; gap: var(--space-4); }
+    .group-item { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-3); align-items: center; }
+    .group-item input[type="color"] { width: 40px; height: 40px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 4px; cursor: pointer; }
+    .group-original-colors { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; background-color: var(--surface); border-radius: var(--radius-sm); padding: var(--space-2); border: 1px solid var(--border-color); }
+    .group-original-colors .swatch { width: 20px; height: 20px; cursor: default; }
+
+    /* Splash & Wiki Modals */
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; align-items: center; justify-content: center; }
+    .popup-overlay.show { display: flex; }
+    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    .wiki-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); flex-shrink: 0; position: relative; height: 80px; color: white; background-image: url('modal.png'); background-size: cover; background-position: center bottom; }
+    .wiki-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 1; }
+    .wiki-header h3, #wiki-close-btn { position: relative; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    #wiki-close-btn { background: none; border: none; font-size: 24px; line-height: 1; padding: 0; width: 36px; height: 36px; border-radius: 50%; color: var(--color-accent-text); cursor: pointer; transition: background-color 0.2s ease; }
+    #wiki-close-btn:hover { background-color: rgba(255,255,255,0.1); }
+    #wiki-content { padding: var(--space-5); overflow: hidden; flex-grow: 1; display: flex; gap: var(--space-5); }
+    .wiki-column { flex: 1; min-width: 0; }
+    #wiki-content h4 { margin-top: 0; margin-bottom: var(--space-3); font-weight: var(--font-weight-emphasis); color: var(--accent-color); }
+    .splash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.1); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.5s ease-out; cursor: pointer; }
+    .splash-overlay.hidden { opacity: 0; pointer-events: none; }
+    .splash-content { display: flex; width: 800px; height: 450px; max-width: 90vw; max-height: 80vh; background: var(--surface-alt); border-radius: var(--radius-md); box-shadow: var(--shadow-floating-3); overflow: hidden; cursor: default; position: relative; }
+    #splash-close-btn { position: absolute; top: var(--space-3); right: var(--space-3); width: 32px; height: 32px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 24px; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: all 200ms ease; z-index: 10; }
+    #splash-close-btn:hover { background-color: var(--surface-alt); color: var(--ink); transform: scale(1.1); }
+    .splash-info { flex: 0 0 300px; padding: var(--space-5); display: flex; flex-direction: column; background-color: var(--surface-alt); color: var(--ink); border-left: 4px solid var(--accent-color); }
+    .splash-icon { font-size: 32px; margin-bottom: var(--space-4); }
+    .splash-title { font-size: 24px; font-weight: var(--font-weight-emphasis); color: var(--accent-color); margin-bottom: var(--space-5); }
+    .splash-tech { margin: 0; color: var(--muted); line-height: 1.6; }
+    .splash-credits { margin-top: auto; font-size: var(--font-size-caption); color: var(--muted); }
+    .splash-image { flex: 1; background-color: var(--surface); }
+    .splash-image img { width: 100%; height: 100%; object-fit: cover; }
+    
+    @media (max-width: 1024px) { 
+        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
+        aside.panel.controls { position: static; max-height: none; } 
+        main.panel { min-height: 50vh; } 
+    }
+    @media (max-width: 800px) {
+        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
+        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
+        .splash-image { width: 100%; height: 200px; }
+        #wiki-content { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-overlay" id="splash-screen">
+    <div class="splash-content">
+      <button id="splash-close-btn" title="Close">&times;</button>
+      <div class="splash-info">
+        <span class="splash-icon">🎨</span>
+        <h2 class="splash-title">SVG Colorizer</h2>
+        <p class="splash-tech">Load an SVG, group its colors, and remap entire palettes in real-time. All processing is done in your browser.</p>
+        <p class="splash-credits">2025. Toolkit by e</p>
+      </div>
+      <div class="splash-image">
+        <img src="modal.png" alt="SVG Colorizer Splash Image">
+      </div>
+    </div>
+  </div>
+
+  <div class="container loading" id="app-container">
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+      </a>
+      <h1>SVG Colorizer</h1>
+      <div class="sub">Group and remap colors in any SVG file.</div>
+      <div class="theme-switcher">
+        <button id="wiki-open-btn" title="Info">ⓘ</button>
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls">
+        <div class="controls-content">
+            <div class="control-group">
+                <div class="form-group">
+                    <label for="svg-file-input">1. Load SVG File</label>
+                    <input type="file" id="svg-file-input" class="form-control" accept=".svg, image/svg+xml">
+                </div>
+            </div>
+
+            <div class="control-group" id="original-colors-group">
+                <div class="form-group">
+                    <label>2. Original Colors</label>
+                    <div class="color-swatch-grid" id="original-colors-grid">
+                        <p class="placeholder-text" style="grid-column: 1 / -1;">Load an SVG to see its colors.</p>
+                    </div>
+                </div>
+                <button id="create-group-btn" class="btn btn-secondary" disabled>Group Selected Colors</button>
+            </div>
+            
+            <div class="control-group" id="color-groups-group">
+                <div class="form-group">
+                    <label>3. Color Groups</label>
+                    <div class="group-list" id="color-groups-list">
+                         <p class="placeholder-text">Your created groups will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="padding: var(--space-5); border-top: 1px solid var(--border-color);">
+             <button id="download-svg-btn" class="btn btn-primary" disabled>Download SVG</button>
+        </div>
+    </aside>
+
+    <main class="panel" id="main-panel">
+      <div id="svg-host">
+          <p class="placeholder-text">SVG Preview will appear here</p>
+      </div>
+    </main>
+  </div>
+  
+  <div id="wiki-overlay" class="popup-overlay"></div>
+
+  <script type="module">
+    const WIKI_DATA = {
+        "title": "SVG Colorizer Info",
+        "sections":[
+            {
+                "title":"How to Use",
+                "content":[
+                    "<b>1. Load SVG:</b> Click the button to select an SVG file from your computer.",
+                    "<b>2. Select Colors:</b> All unique colors from your SVG will appear in the 'Original Colors' panel. Click on one or more color swatches to select them.",
+                    "<b>3. Create Group:</b> Click the 'Group Selected Colors' button. This will create a new group in the panel below, containing the colors you selected.",
+                    "<b>4. Change Color:</b> Use the color picker for any group to choose a new master color. You will see all instances of the original colors change instantly in the live preview.",
+                    "<b>5. Download:</b> Once you're happy with your new color scheme, click 'Download SVG' to save your work."
+                ]
+            },
+            {
+                "title":"Features",
+                "content":[
+                   "<b>Live Preview:</b> All color changes are reflected instantly on the main SVG canvas.",
+                   "<b>Intelligent Color Parsing:</b> The tool finds colors in `fill`, `stroke`, and inline `style` attributes.",
+                   "<b>Non-Destructive:</b> You can continue to create new groups from the remaining original colors.",
+                   "<b>Client-Side & Private:</b> Your SVG files are processed entirely in your browser and are never uploaded to a server."
+                ]
+            }
+        ]
+    };
+
+    const App = {
+      el: {},
+      state: {
+        svgDOM: null,
+        colorToElementsMap: new Map(),
+        ungroupedColors: [],
+        selectedColors: new Set(),
+        colorGroups: [],
+        splashHidden: false,
+        isWikiLoaded: false
+      },
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.bindEvents();
+      },
+
+      hideSplashScreen() {
+          if (!this.state.splashHidden) {
+              this.state.splashHidden = true;
+              this.el.splashScreen.classList.add('hidden');
+              this.el.appContainer.classList.remove('loading');
+          }
+      },
+      
+      cacheDOMElements() {
+        const ids = [
+            'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen',
+            'app-container', 'splash-close-btn', 'svg-file-input', 'svg-host',
+            'original-colors-grid', 'create-group-btn', 'color-groups-list',
+            'download-svg-btn'
+        ];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          this.el[key] = document.getElementById(id);
+        });
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+        this.el.splashScreen.addEventListener('click', (e) => {
+            if (e.target === this.el.splashScreen) this.hideSplashScreen();
+        });
+        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+
+        this.el.svgFileInput.addEventListener('change', (e) => this.handleFileLoad(e));
+        this.el.createGroupBtn.addEventListener('click', () => this.createGroup());
+        this.el.downloadSvgBtn.addEventListener('click', () => this.downloadSVG());
+      },
+      
+      handleFileLoad(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const svgText = event.target.result;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(svgText, "image/svg+xml");
+            
+            if (doc.querySelector('parsererror')) {
+                alert("Invalid SVG file. Please check the file and try again.");
+                return;
+            }
+            this.state.svgDOM = doc.documentElement;
+            this.el.svgHost.innerHTML = '';
+            this.el.svgHost.appendChild(this.state.svgDOM.cloneNode(true));
+            
+            this.resetState();
+            this.extractColors();
+            this.render();
+            this.el.downloadSvgBtn.disabled = false;
+        };
+        reader.readAsText(file);
+      },
+
+      resetState() {
+        this.state.colorToElementsMap.clear();
+        this.state.ungroupedColors = [];
+        this.state.selectedColors.clear();
+        this.state.colorGroups = [];
+      },
+      
+      extractColors() {
+        const colorMap = new Map();
+        const allElements = this.state.svgDOM.querySelectorAll('*');
+
+        const normalizeColor = (colorStr) => {
+            if (!colorStr || colorStr.toLowerCase() === 'none') return null;
+            const tempDiv = document.createElement('div');
+            tempDiv.style.color = colorStr;
+            document.body.appendChild(tempDiv);
+            const rgb = window.getComputedStyle(tempDiv).color;
+            document.body.removeChild(tempDiv);
+            const match = rgb.match(/rgba?\((\d+), (\d+), (\d+)/);
+            if (!match) return null;
+            const [, r, g, b] = match;
+            const toHex = (c) => ('0' + parseInt(c).toString(16)).slice(-2);
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+        };
+
+        allElements.forEach(el => {
+            const processAttribute = (attr, prop) => {
+                const colorVal = el.getAttribute(attr);
+                const normalized = normalizeColor(colorVal);
+                if (normalized) {
+                    if (!colorMap.has(normalized)) colorMap.set(normalized, { fill: [], stroke: [] });
+                    colorMap.get(normalized)[prop].push(el);
+                }
+            };
+            
+            processAttribute('fill', 'fill');
+            processAttribute('stroke', 'stroke');
+
+            const style = el.getAttribute('style');
+            if (style) {
+                const fillMatch = style.match(/fill:\s*([^;]+)/);
+                if (fillMatch) {
+                    const normalized = normalizeColor(fillMatch[1]);
+                    if (normalized) {
+                        if (!colorMap.has(normalized)) colorMap.set(normalized, { fill: [], stroke: [] });
+                        colorMap.get(normalized).fill.push(el);
+                    }
+                }
+                const strokeMatch = style.match(/stroke:\s*([^;]+)/);
+                 if (strokeMatch) {
+                    const normalized = normalizeColor(strokeMatch[1]);
+                    if (normalized) {
+                        if (!colorMap.has(normalized)) colorMap.set(normalized, { fill: [], stroke: [] });
+                        colorMap.get(normalized).stroke.push(el);
+                    }
+                }
+            }
+        });
+
+        this.state.colorToElementsMap = colorMap;
+        this.state.ungroupedColors = [...colorMap.keys()].sort();
+      },
+
+      render() {
+        this.renderOriginalColors();
+        this.renderColorGroups();
+        this.el.createGroupBtn.disabled = this.state.selectedColors.size === 0;
+      },
+
+      renderOriginalColors() {
+        const grid = this.el.originalColorsGrid;
+        grid.innerHTML = '';
+        if (this.state.ungroupedColors.length === 0 && this.state.colorGroups.length > 0) {
+            grid.innerHTML = `<p class="placeholder-text" style="grid-column: 1 / -1;">All colors have been grouped.</p>`;
+        } else if (this.state.ungroupedColors.length === 0) {
+             grid.innerHTML = `<p class="placeholder-text" style="grid-column: 1 / -1;">Load an SVG to see its colors.</p>`;
+        }
+        
+        this.state.ungroupedColors.forEach(hex => {
+            const swatch = document.createElement('div');
+            swatch.className = 'swatch';
+            swatch.style.backgroundColor = hex;
+            swatch.title = hex;
+            if (this.state.selectedColors.has(hex)) {
+                swatch.classList.add('selected');
+            }
+            swatch.addEventListener('click', () => this.toggleColorSelection(hex));
+            grid.appendChild(swatch);
+        });
+      },
+
+      renderColorGroups() {
+        const list = this.el.colorGroupsList;
+        list.innerHTML = '';
+        if (this.state.colorGroups.length === 0) {
+            list.innerHTML = `<p class="placeholder-text">Your created groups will appear here.</p>`;
+            return;
+        }
+
+        this.state.colorGroups.forEach(group => {
+            const groupEl = document.createElement('div');
+            groupEl.className = 'group-item';
+
+            const colorPicker = document.createElement('input');
+            colorPicker.type = 'color';
+            colorPicker.value = group.masterColor;
+            colorPicker.addEventListener('input', (e) => this.updateGroupColor(group.id, e.target.value));
+            
+            const originalsContainer = document.createElement('div');
+            originalsContainer.className = 'group-original-colors';
+            group.originalColors.forEach(hex => {
+                const swatch = document.createElement('div');
+                swatch.className = 'swatch';
+                swatch.style.backgroundColor = hex;
+                swatch.title = hex;
+                originalsContainer.appendChild(swatch);
+            });
+            
+            groupEl.appendChild(colorPicker);
+            groupEl.appendChild(originalsContainer);
+            list.appendChild(groupEl);
+        });
+      },
+
+      toggleColorSelection(hex) {
+        if (this.state.selectedColors.has(hex)) {
+            this.state.selectedColors.delete(hex);
+        } else {
+            this.state.selectedColors.add(hex);
+        }
+        this.render();
+      },
+
+      createGroup() {
+        if (this.state.selectedColors.size === 0) return;
+        
+        const newGroup = {
+            id: Date.now(),
+            masterColor: this.state.selectedColors.values().next().value,
+            originalColors: [...this.state.selectedColors]
+        };
+
+        this.state.colorGroups.push(newGroup);
+        this.state.ungroupedColors = this.state.ungroupedColors.filter(c => !this.state.selectedColors.has(c));
+        this.state.selectedColors.clear();
+
+        this.updateSvgColors(newGroup.originalColors, newGroup.masterColor);
+        this.render();
+      },
+      
+      updateGroupColor(groupId, newColor) {
+        const group = this.state.colorGroups.find(g => g.id === groupId);
+        if (group) {
+            group.masterColor = newColor;
+            this.updateSvgColors(group.originalColors, newColor);
+            this.render();
+        }
+      },
+
+      updateSvgColors(originalHexArray, newHex) {
+        originalHexArray.forEach(hex => {
+            const elements = this.state.colorToElementsMap.get(hex);
+            if(elements) {
+                [...elements.fill, ...elements.stroke].forEach(el => {
+                    const isFill = elements.fill.includes(el);
+                    const isStroke = elements.stroke.includes(el);
+                    
+                    if (isFill) {
+                        el.setAttribute('fill', newHex);
+                        if (el.style.fill) el.style.fill = newHex;
+                    }
+                    if (isStroke) {
+                        el.setAttribute('stroke', newHex);
+                        if (el.style.stroke) el.style.stroke = newHex;
+                    }
+                });
+            }
+        });
+        // Refresh the preview
+        this.el.svgHost.innerHTML = '';
+        this.el.svgHost.appendChild(this.state.svgDOM.cloneNode(true));
+      },
+
+      downloadSVG() {
+        if (!this.state.svgDOM) return;
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(this.state.svgDOM);
+        const blob = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'colorized.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      },
+      
+      initTheme() { /* ... */ },
+      setTheme(theme, save = true) { /* ... */ },
+      cycleTheme() { /* ... */ },
+      applyTheme(theme) { /* ... */ },
+      openWiki() { /* ... */ },
+      closeWiki() { /* ... */ },
+    };
+    
+    // Rellenar las funciones omitidas con el código completo
+    App.initTheme = function() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+        });
+    };
+    App.setTheme = function(theme, save = true) {
+        if (save) localStorage.setItem('creative-toolkit-theme', theme);
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+    };
+    App.cycleTheme = function() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
+    };
+    App.applyTheme = function(theme) {
+        const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+    };
+    App.openWiki = function() {
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+            const wikiModal = document.createElement('div');
+            wikiModal.className = 'wiki-modal-content';
+            wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content"></div>`;
+            this.el.wikiOverlay.appendChild(wikiModal);
+            wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
+        if (!this.state.isWikiLoaded) {
+            const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+            const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+            titleEl.textContent = WIKI_DATA.title;
+            const col1 = document.createElement('div'); col1.className = 'wiki-column';
+            const col2 = document.createElement('div'); col2.className = 'wiki-column';
+            WIKI_DATA.sections.forEach((s, index) => {
+                const sectionContainer = document.createElement('div');
+                const h4 = document.createElement('h4'); h4.textContent = s.title;
+                sectionContainer.appendChild(h4);
+                s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+                if (index < Math.ceil(WIKI_DATA.sections.length / 2)) {
+                    col1.appendChild(sectionContainer);
+                } else {
+                    col2.appendChild(sectionContainer);
+                }
+            });
+            contentEl.innerHTML = '';
+            contentEl.appendChild(col1);
+            contentEl.appendChild(col2);
+            this.state.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
+    };
+    App.closeWiki = function() {
+        this.el.wikiOverlay.classList.remove('show');
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>

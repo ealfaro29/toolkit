@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pattern Maker</title>
+  
+  <style>
+    :root {
+      --accent-color: #10B981; /* Green Emerald */
+      --accent-color-tint: #ccfbf1; /* Light Green tint */
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF;
+      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); }
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
+    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
+    main.panel { padding: var(--space-5); min-height: 0; display: flex; align-items: center; justify-content: center; background-size: 40px 40px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; }
+    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+    #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover { background-color: var(--surface-alt); }
+    .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
+    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
+    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
+    .btn-secondary:hover { filter: brightness(0.95); }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group label { font-weight: var(--font-weight-medium); }
+    .form-control, .select-wrapper select, input[type="color"] { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; resize: vertical; min-height: 40px; }
+    .select-wrapper { position: relative; }
+    .select-wrapper select { -webkit-appearance: none; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
+    input[type="number"] { text-align: right; width: 80px; }
+    input[type="color"] { height: 40px; padding: 4px; border-radius: var(--radius-sm); }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border-radius: var(--radius-sm); border: none; }
+    input[type="color"]::-moz-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-moz-color-swatch { border-radius: var(--radius-sm); border: none; }
+
+    /* Pattern Canvas */
+    #pattern-canvas {
+      width: 100%;
+      height: 100%;
+      max-width: 600px; /* Limita el tamaño del canvas para mejor visualización */
+      max-height: 600px;
+      aspect-ratio: 1 / 1;
+      border: 1px solid var(--border-color);
+      background-color: var(--surface-alt); /* Fondo predeterminado */
+    }
+    #pattern-canvas svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 800px) { body { padding: var(--space-4); } .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } aside.controls { position: static; max-height: none; } main.panel { min-height: 50vh; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+      </a>
+      <h1>Pattern Maker</h1>
+      <div class="sub">Generate professional SVG patterns for presentations.</div>
+      <div class="theme-switcher">
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls" id="controls">
+      <div class="control-group">
+          <div class="form-group">
+              <label for="pattern-type">Pattern Type</label>
+              <div class="select-wrapper">
+                  <select id="pattern-type" class="form-control">
+                      <option value="lines">Lines</option>
+                      <option value="dots">Dots</option>
+                      <option value="grid">Grid</option>
+                      <!-- Add more types later: e.g., 'diagonal-lines', 'triangles' -->
+                  </select>
+              </div>
+          </div>
+      </div>
+
+      <div class="control-group">
+          <div class="form-group">
+              <label for="background-color">Background Color</label>
+              <input type="color" id="background-color" value="#FFFFFF">
+          </div>
+          <div class="form-group">
+              <label for="pattern-color">Pattern Color</label>
+              <input type="color" id="pattern-color" value="#333333">
+          </div>
+      </div>
+
+      <!-- Specific controls for 'Lines' pattern type -->
+      <div class="control-group" id="lines-controls">
+          <div class="form-group">
+              <label for="line-thickness">Line Thickness (px)</label>
+              <input type="number" id="line-thickness" class="form-control" value="2" min="0.5" step="0.5">
+          </div>
+          <div class="form-group">
+              <label for="line-spacing">Line Spacing (px)</label>
+              <input type="number" id="line-spacing" class="form-control" value="20" min="5" step="5">
+          </div>
+          <div class="form-group">
+              <label for="line-angle">Line Angle (deg)</label>
+              <input type="number" id="line-angle" class="form-control" value="0" min="0" max="360" step="5">
+          </div>
+      </div>
+
+      <!-- Specific controls for 'Dots' pattern type (hidden by default) -->
+      <div class="control-group" id="dots-controls" style="display: none;">
+        <div class="form-group">
+            <label for="dot-radius">Dot Radius (px)</label>
+            <input type="number" id="dot-radius" class="form-control" value="2" min="0.5" step="0.5">
+        </div>
+        <div class="form-group">
+            <label for="dot-spacing">Dot Spacing (px)</label>
+            <input type="number" id="dot-spacing" class="form-control" value="15" min="5" step="5">
+        </div>
+      </div>
+
+      <!-- Specific controls for 'Grid' pattern type (hidden by default) -->
+      <div class="control-group" id="grid-controls" style="display: none;">
+        <div class="form-group">
+            <label for="grid-line-thickness">Grid Line Thickness (px)</label>
+            <input type="number" id="grid-line-thickness" class="form-control" value="1" min="0.5" step="0.5">
+        </div>
+        <div class="form-group">
+            <label for="grid-spacing">Grid Spacing (px)</label>
+            <input type="number" id="grid-spacing" class="form-control" value="25" min="10" step="5">
+        </div>
+      </div>
+
+      <div class="control-group" style="margin-top: auto;">
+          <button id="generate-pattern-btn" class="btn btn-secondary">Generate Pattern</button>
+          <button id="download-svg-btn" class="btn btn-primary">Download SVG</button>
+      </div>
+      <div class="note">Tip: Generated SVG patterns are vector-based and scale perfectly in PowerPoint.</div>
+    </aside>
+
+    <main class="panel">
+      <div id="pattern-canvas">
+        <svg id="pattern-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 100 100"></svg>
+      </div>
+    </main>
+  </div>
+  
+  <script type="module">
+    const PatternMakerApp = {
+      el: {},
+      state: {
+        patternType: 'lines',
+        backgroundColor: '#FFFFFF',
+        patternColor: '#333333',
+        // Lines specific
+        lineThickness: 2,
+        lineSpacing: 20,
+        lineAngle: 0,
+        // Dots specific
+        dotRadius: 2,
+        dotSpacing: 15,
+        // Grid specific
+        gridLineThickness: 1,
+        gridSpacing: 25,
+      },
+      SVG_NAMESPACE: 'http://www.w3.org/2000/svg',
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.loadState(); // Cargar estado guardado si existe
+        this.bindEvents();
+        this.renderPattern();
+        this.updateControlVisibility();
+      },
+
+      cacheDOMElements() {
+        const ids = [
+          'theme-toggle', 'pattern-type', 'background-color', 'pattern-color',
+          'lines-controls', 'line-thickness', 'line-spacing', 'line-angle',
+          'dots-controls', 'dot-radius', 'dot-spacing',
+          'grid-controls', 'grid-line-thickness', 'grid-spacing',
+          'generate-pattern-btn', 'download-svg-btn', 'pattern-svg'
+        ];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          this.el[key] = document.getElementById(id);
+        });
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        this.el.patternType.addEventListener('change', () => {
+          this.state.patternType = this.el.patternType.value;
+          this.updateControlVisibility();
+          this.renderPattern();
+          this.saveState();
+        });
+        this.el.backgroundColor.addEventListener('input', (e) => {
+          this.state.backgroundColor = e.target.value;
+          this.renderPattern();
+          this.saveState();
+        });
+        this.el.patternColor.addEventListener('input', (e) => {
+          this.state.patternColor = e.target.value;
+          this.renderPattern();
+          this.saveState();
+        });
+
+        // Event listeners for lines controls
+        this.el.lineThickness.addEventListener('input', (e) => { this.state.lineThickness = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+        this.el.lineSpacing.addEventListener('input', (e) => { this.state.lineSpacing = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+        this.el.lineAngle.addEventListener('input', (e) => { this.state.lineAngle = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+
+        // Event listeners for dots controls
+        this.el.dotRadius.addEventListener('input', (e) => { this.state.dotRadius = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+        this.el.dotSpacing.addEventListener('input', (e) => { this.state.dotSpacing = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+
+        // Event listeners for grid controls
+        this.el.gridLineThickness.addEventListener('input', (e) => { this.state.gridLineThickness = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+        this.el.gridSpacing.addEventListener('input', (e) => { this.state.gridSpacing = parseFloat(e.target.value); this.renderPattern(); this.saveState(); });
+        
+        this.el.generatePatternBtn.addEventListener('click', () => this.renderPattern());
+        this.el.downloadSvgBtn.addEventListener('click', () => this.downloadSvg());
+      },
+      
+      loadState() {
+        const savedState = localStorage.getItem('patternMakerState');
+        if (savedState) {
+            Object.assign(this.state, JSON.parse(savedState));
+            // Sincronizar UI con el estado cargado
+            this.el.patternType.value = this.state.patternType;
+            this.el.backgroundColor.value = this.state.backgroundColor;
+            this.el.patternColor.value = this.state.patternColor;
+            this.el.lineThickness.value = this.state.lineThickness;
+            this.el.lineSpacing.value = this.state.lineSpacing;
+            this.el.lineAngle.value = this.state.lineAngle;
+            this.el.dotRadius.value = this.state.dotRadius;
+            this.el.dotSpacing.value = this.state.dotSpacing;
+            this.el.gridLineThickness.value = this.state.gridLineThickness;
+            this.el.gridSpacing.value = this.state.gridSpacing;
+        }
+      },
+
+      saveState() {
+        localStorage.setItem('patternMakerState', JSON.stringify(this.state));
+      },
+
+      updateControlVisibility() {
+        this.el.linesControls.style.display = 'none';
+        this.el.dotsControls.style.display = 'none';
+        this.el.gridControls.style.display = 'none';
+
+        switch (this.state.patternType) {
+          case 'lines':
+            this.el.linesControls.style.display = 'flex';
+            break;
+          case 'dots':
+            this.el.dotsControls.style.display = 'flex';
+            break;
+          case 'grid':
+            this.el.gridControls.style.display = 'flex';
+            break;
+        }
+      },
+
+      renderPattern() {
+        const svg = this.el.patternSvg;
+        svg.innerHTML = ''; // Limpiar SVG
+        const patternId = 'generatedPattern';
+
+        // Set background color
+        svg.style.backgroundColor = this.state.backgroundColor;
+
+        // Create a <defs> section for the pattern definition
+        const defs = document.createElementNS(this.SVG_NAMESPACE, 'defs');
+        svg.appendChild(defs);
+
+        let patternElement;
+
+        switch (this.state.patternType) {
+          case 'lines':
+            patternElement = this.generateLinesPattern(patternId);
+            break;
+          case 'dots':
+            patternElement = this.generateDotsPattern(patternId);
+            break;
+          case 'grid':
+            patternElement = this.generateGridPattern(patternId);
+            break;
+          default:
+            console.warn('Unknown pattern type:', this.state.patternType);
+            return;
+        }
+        
+        defs.appendChild(patternElement);
+
+        // Create a rect to fill with the pattern
+        const rect = document.createElementNS(this.SVG_NAMESPACE, 'rect');
+        rect.setAttribute('x', '0');
+        rect.setAttribute('y', '0');
+        rect.setAttribute('width', '100%');
+        rect.setAttribute('height', '100%');
+        rect.setAttribute('fill', `url(#${patternId})`);
+        svg.appendChild(rect);
+      },
+
+      generateLinesPattern(id) {
+        const { lineThickness, lineSpacing, patternColor, lineAngle } = this.state;
+        const patternSize = lineSpacing; // Size of the repeating tile
+        
+        const pattern = document.createElementNS(this.SVG_NAMESPACE, 'pattern');
+        pattern.setAttribute('id', id);
+        pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+        pattern.setAttribute('width', patternSize);
+        pattern.setAttribute('height', patternSize);
+        
+        // Rotate the pattern within its own coordinate system
+        pattern.setAttribute('patternTransform', `rotate(${lineAngle})`);
+
+        const line = document.createElementNS(this.SVG_NAMESPACE, 'line');
+        line.setAttribute('x1', '0');
+        line.setAttribute('y1', '0');
+        line.setAttribute('x2', patternSize);
+        line.setAttribute('y2', '0');
+        line.setAttribute('stroke', patternColor);
+        line.setAttribute('stroke-width', lineThickness);
+        line.setAttribute('vector-effect', 'non-scaling-stroke'); // Ensure thickness is constant regardless of zoom
+        
+        // Offset the line to center it if needed, or make it repeat nicely
+        // A simple way for a repeating line pattern is to draw it and let the pattern repeat
+        // Draw one line and let it repeat by defining width/height as spacing
+        // For lines at 0/90 degrees, it's straightforward. For angles, need a bit more math or rely on patternTransform.
+        
+        // To make sure a line at an angle always fills the pattern tile correctly, it might be simpler to define a diagonal line or adjust pattern dimensions.
+        // For now, let's keep it simple with width/height as spacing and rely on patternTransform.
+        // A single horizontal line in a square pattern will repeat vertically.
+        // If angle is 0, a line from (0,0) to (size,0) repeats every 'size' units.
+        // To make it visible for non-zero thickness, we need to place it.
+        // Let's make a line that repeats vertically in a pattern block.
+        line.setAttribute('y1', patternSize / 2); // Center a line horizontally in the middle of the pattern block
+        line.setAttribute('y2', patternSize / 2);
+
+        pattern.appendChild(line);
+        return pattern;
+      },
+
+      generateDotsPattern(id) {
+        const { dotRadius, dotSpacing, patternColor } = this.state;
+        const patternSize = dotSpacing; // Size of the repeating tile
+        
+        const pattern = document.createElementNS(this.SVG_NAMESPACE, 'pattern');
+        pattern.setAttribute('id', id);
+        pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+        pattern.setAttribute('width', patternSize);
+        pattern.setAttribute('height', patternSize);
+
+        const circle = document.createElementNS(this.SVG_NAMESPACE, 'circle');
+        circle.setAttribute('cx', patternSize / 2); // Center the dot in the repeating tile
+        circle.setAttribute('cy', patternSize / 2);
+        circle.setAttribute('r', dotRadius);
+        circle.setAttribute('fill', patternColor);
+        
+        pattern.appendChild(circle);
+        return pattern;
+      },
+
+      generateGridPattern(id) {
+        const { gridLineThickness, gridSpacing, patternColor } = this.state;
+        const patternSize = gridSpacing; // Size of the repeating tile
+        
+        const pattern = document.createElementNS(this.SVG_NAMESPACE, 'pattern');
+        pattern.setAttribute('id', id);
+        pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+        pattern.setAttribute('width', patternSize);
+        pattern.setAttribute('height', patternSize);
+
+        // Horizontal line
+        const hLine = document.createElementNS(this.SVG_NAMESPACE, 'line');
+        hLine.setAttribute('x1', '0');
+        hLine.setAttribute('y1', '0');
+        hLine.setAttribute('x2', patternSize);
+        hLine.setAttribute('y2', '0');
+        hLine.setAttribute('stroke', patternColor);
+        hLine.setAttribute('stroke-width', gridLineThickness);
+        hLine.setAttribute('vector-effect', 'non-scaling-stroke');
+
+        // Vertical line
+        const vLine = document.createElementNS(this.SVG_NAMESPACE, 'line');
+        vLine.setAttribute('x1', '0');
+        vLine.setAttribute('y1', '0');
+        vLine.setAttribute('x2', '0');
+        vLine.setAttribute('y2', patternSize);
+        vLine.setAttribute('stroke', patternColor);
+        vLine.setAttribute('stroke-width', gridLineThickness);
+        vLine.setAttribute('vector-effect', 'non-scaling-stroke');
+        
+        pattern.appendChild(hLine);
+        pattern.appendChild(vLine);
+        return pattern;
+      },
+
+      downloadSvg() {
+        const { backgroundColor } = this.state;
+        const currentSvgContent = this.el.patternSvg.innerHTML;
+        
+        // Reconstruct the full SVG with background and pattern
+        const svgWidth = 1000; // Fixed size for download, can be adjustable
+        const svgHeight = 1000;
+
+        // Ensure the pattern has its own defs with unique IDs if multiple are used in complex patterns
+        // For simple patterns like these, direct replication is fine.
+        let finalSvgString = `<svg xmlns="${this.SVG_NAMESPACE}" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">`;
+        
+        // Add a background rectangle to simulate the SVG background-color
+        finalSvgString += `<rect x="0" y="0" width="${svgWidth}" height="${svgHeight}" fill="${backgroundColor}"/>`;
+
+        // The innerHTML of patternSvg contains the <defs> and the <rect fill="url(#patternId)">
+        // Need to extract the defs and the rect, and adjust patternUnits if necessary.
+        const tempSvg = document.createElementNS(this.SVG_NAMESPACE, 'svg');
+        tempSvg.innerHTML = currentSvgContent;
+
+        const defsClone = tempSvg.querySelector('defs');
+        const patternClone = defsClone ? defsClone.querySelector('pattern') : null;
+        const rectClone = tempSvg.querySelector('rect');
+
+        if (defsClone && patternClone && rectClone) {
+            // Adjust patternUnits for download for better compatibility
+            patternClone.setAttribute('patternUnits', 'objectBoundingBox');
+            patternClone.setAttribute('width', '1');
+            patternClone.setAttribute('height', '1');
+
+            // Recalculate internal dimensions for objectBoundingBox
+            const patternType = this.state.patternType;
+            let internalSvgContent = '';
+            
+            // For simple patterns, scale values relative to patternSize (which becomes 1)
+            switch(patternType) {
+                case 'lines':
+                    const lineThicknessScaled = this.state.lineThickness / this.state.lineSpacing;
+                    const lineAngle = this.state.lineAngle;
+                    internalSvgContent = `<pattern id="downloadPattern" patternUnits="objectBoundingBox" width="1" height="1" patternTransform="rotate(${lineAngle})">
+                                            <line x1="0" y1="0.5" x2="1" y2="0.5" stroke="${this.state.patternColor}" stroke-width="${lineThicknessScaled}" vector-effect="non-scaling-stroke"/>
+                                          </pattern>`;
+                    break;
+                case 'dots':
+                    const dotRadiusScaled = this.state.dotRadius / this.state.dotSpacing;
+                    internalSvgContent = `<pattern id="downloadPattern" patternUnits="objectBoundingBox" width="1" height="1">
+                                            <circle cx="0.5" cy="0.5" r="${dotRadiusScaled}" fill="${this.state.patternColor}"/>
+                                          </pattern>`;
+                    break;
+                case 'grid':
+                    const gridThicknessScaled = this.state.gridLineThickness / this.state.gridSpacing;
+                    internalSvgContent = `<pattern id="downloadPattern" patternUnits="objectBoundingBox" width="1" height="1">
+                                            <line x1="0" y1="0" x2="1" y2="0" stroke="${this.state.patternColor}" stroke-width="${gridThicknessScaled}" vector-effect="non-scaling-stroke"/>
+                                            <line x1="0" y1="0" x2="0" y2="1" stroke="${this.state.patternColor}" stroke-width="${gridThicknessScaled}" vector-effect="non-scaling-stroke"/>
+                                          </pattern>`;
+                    break;
+            }
+
+            finalSvgString += `<defs>${internalSvgContent}</defs>`;
+            finalSvgString += `<rect x="0" y="0" width="${svgWidth}" height="${svgHeight}" fill="url(#downloadPattern)"/>`;
+        } else {
+             // Fallback if pattern structure is unexpected, just use current innerHTML
+             finalSvgString += currentSvgContent;
+        }
+
+        finalSvgString += `</svg>`;
+
+        this.triggerDownload(finalSvgString, 'pattern.svg', 'image/svg+xml');
+      },
+
+
+      triggerDownload(data, filename, type) {
+        const a = document.createElement('a');
+        const blob = new Blob([data], { type });
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      },
+
+      // --- Theme Toggle ---
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+        });
+      },
+
+      setTheme(theme, save = true) {
+        if (save) localStorage.setItem('creative-toolkit-theme', theme);
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
+
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
+      },
+
+      applyTheme(theme) {
+        const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+        // Re-render pattern to apply theme colors if patternColor or backgroundColor are dynamic (currently they are fixed by user input)
+        this.renderPattern();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => PatternMakerApp.init());
+  </script>
+</body>
+</html>

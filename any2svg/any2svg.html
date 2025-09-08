@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Any2SVG</title> 
+
+  <style>
+    :root {
+      --accent-color: #A4C639; /* Verde lima */
+      --accent-color-tint: #eaf2c2; 
+      --color-text-primary-light:#1C1C1E; --color-text-secondary-light:#3A3A3C;
+      --color-surface-light:#F5F5F7; --color-background-light:#FFFFFF; --color-divider-light:#EAEAEA;
+      --color-text-primary-dark:#EAEAEB; --color-text-secondary-dark:#9A9A9E;
+      --color-surface-dark:#121212; --color-background-dark:#1E1E1E; --color-divider-dark:#3A3A3C;
+      --color-accent-text:#FFFFFF; --font-family-sans:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1:20px; --font-size-body:14px; --font-size-caption:12px;
+      --font-weight-emphasis:600; --font-weight-medium:500;
+      --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px;
+      --radius-sm:6px; --radius-md:8px; --radius-xl:16px;
+      --shadow-raised-2:0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard:200ms;
+    }
+    html[data-theme="light"] { --ink:var(--color-text-primary-light); --muted:var(--color-text-secondary-light); --surface:var(--color-surface-light); --surface-alt:var(--color-background-light); --border-color:var(--color-divider-light); --panel-shadow:var(--shadow-raised-2); color-scheme:light; }
+    html[data-theme="dark"]  { --ink:var(--color-text-primary-dark); --muted:var(--color-text-secondary-dark); --surface:var(--color-surface-dark); --surface-alt:var(--color-background-dark); --border-color:var(--color-divider-dark); --panel-shadow:0 4px 12px rgba(0,0,0,0.3); color-scheme:dark; }
+    html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}
+    body{margin:0;color:var(--ink);background:var(--surface);font:var(--font-size-body)/1.5 var(--font-family-sans);padding:25px}
+
+    .container{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto 1fr;gap:25px;height:calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
+    .container.loading { filter: blur(5px); pointer-events: none; }
+    .panel{background:var(--surface-alt);border:1px solid var(--border-color);border-radius:var(--radius-xl);box-shadow:var(--panel-shadow)}
+    header.panel{grid-column:1 / -1;height:65px;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-4)}
+    header h1{font-size:var(--font-size-h1);font-weight:var(--font-weight-emphasis);margin:0}
+    header .sub{color:var(--muted)}
+    
+    .theme-switcher{margin-left:auto; display: flex; align-items: center; gap: var(--space-2); }
+    #theme-toggle, #wiki-open-btn {width:36px;height:36px;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--border-color);font-size:18px;display:grid;place-items:center;cursor:pointer;transition:all var(--duration-standard) ease}
+    #theme-toggle:hover, #wiki-open-btn:hover {background:var(--surface-alt)}
+    .back-to-home {width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+
+    aside.panel.controls{position:sticky;top:0;max-height:100%;display:flex;flex-direction:column;padding:var(--space-5); gap: var(--space-5);}
+    .control-group{display:flex;flex-direction:column;gap:var(--space-4)}
+    .form-group{display:flex;flex-direction:column;gap:var(--space-2)}
+    .form-group label{font-weight:var(--font-weight-medium)}
+    .form-control{width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:8px 12px;min-height:40px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;width:100%;cursor:pointer;font-weight:var(--font-weight-emphasis);font-size:14px;border-radius:var(--radius-md);height:40px;padding:0 var(--space-4);border:1px solid transparent;transition:all var(--duration-standard) ease}
+    .btn-primary{background:var(--accent-color);color:var(--color-accent-text)}
+    .btn:hover:not(:disabled){filter:brightness(1.1)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .btn:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    .note{font-size:var(--font-size-caption);color:var(--muted);border-top:1px solid var(--border-color);padding-top:var(--space-4)}
+    
+    main.panel{display:flex;align-items:center;justify-content:center;padding:var(--space-5);min-height:0;position:relative}
+    canvas#preview{max-width:100%;max-height:100%;border:1px dashed var(--border-color);border-radius:var(--radius-md);background:var(--surface)}
+    .placeholder{color:var(--muted);text-align:center}
+    
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
+    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
+    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    .wiki-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      flex-shrink: 0;
+      position: relative;
+      height: 80px;
+      color: white;
+      background-image: url('modal.png');
+      background-size: cover;
+      background-position: center bottom;
+    }
+    .wiki-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      z-index: 1;
+    }
+    .wiki-header h3, #wiki-close-btn {
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    #wiki-close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--color-accent-text);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    #wiki-close-btn:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    #wiki-content {
+        padding: var(--space-5);
+        overflow: hidden;
+        flex-grow: 1;
+        display: flex;
+        gap: var(--space-5);
+    }
+    .wiki-column {
+        flex: 1;
+        min-width: 0;
+    }
+    #wiki-content h4 {
+        margin-top: 0;
+        margin-bottom: var(--space-3);
+        font-weight: var(--font-weight-emphasis);
+        color: var(--accent-color);
+    }
+
+    /* Splash Screen Modal */
+    .splash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.1);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+      cursor: pointer;
+    }
+    .splash-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .splash-content {
+      display: flex;
+      width: 800px;
+      height: 450px;
+      max-width: 90vw;
+      max-height: 80vh;
+      background: var(--surface-alt);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-floating-3);
+      overflow: hidden;
+      cursor: default;
+      position: relative;
+    }
+     #splash-close-btn {
+        position: absolute;
+        top: var(--space-3);
+        right: var(--space-3);
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
+        background-color: var(--surface);
+        color: var(--muted);
+        border: 1px solid var(--border-color);
+        font-size: 24px;
+        line-height: 1;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: all var(--duration-standard) ease;
+        z-index: 10;
+    }
+    #splash-close-btn:hover {
+        background-color: var(--surface-alt);
+        color: var(--ink);
+        transform: scale(1.1);
+    }
+    .splash-info {
+        flex: 0 0 300px;
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        background-color: var(--surface-alt);
+        color: var(--ink);
+        border-left: 4px solid var(--accent-color);
+    }
+    .splash-icon {
+        font-size: 32px;
+        margin-bottom: var(--space-4);
+    }
+    .splash-title {
+        font-size: 24px;
+        font-weight: var(--font-weight-emphasis);
+        color: var(--accent-color);
+        margin-bottom: var(--space-5);
+    }
+    .splash-tech {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+    }
+    .splash-credits {
+        margin-top: auto;
+        font-size: var(--font-size-caption);
+        color: var(--muted);
+    }
+    .splash-image {
+        flex: 1;
+        background-color: var(--surface);
+    }
+    .splash-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    @media (max-width:800px){ 
+      body{padding:var(--space-4)} 
+      .container{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;height:auto;gap:var(--space-4)} 
+      aside.controls{position:static;max-height:none} 
+      main.panel{min-height:50vh} 
+      .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
+      .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
+      .splash-image { width: 100%; height: 200px; }
+      #wiki-content { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="splash-overlay" id="splash-screen">
+    <div class="splash-content">
+      <button id="splash-close-btn" title="Close">&times;</button>
+      <div class="splash-info">
+        <span class="splash-icon">🪄</span>
+        <h2 class="splash-title">Any2SVG</h2>
+        <p class="splash-tech">Utilizes a powerful client-side engine to process files directly in your browser for maximum speed and privacy.</p>
+        <p class="splash-credits">2025. Toolkit by e</p>
+      </div>
+      <div class="splash-image">
+        <img src="modal.png" alt="Any2SVG Splash Image">
+      </div>
+    </div>
+  </div>
+
+  <div class="container loading" id="app-container">
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </a>
+      <h1>Any2SVG</h1>
+      <div class="sub">Convert AI, PSD, PDF, and more to SVG.</div>
+      <div class="theme-switcher">
+        <button id="wiki-open-btn" title="Info">ⓘ</button>
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls" id="controls">
+      <div class="control-group">
+        <div class="form-group">
+          <label for="fileInput">Source File</label>
+          <input id="fileInput" class="form-control" type="file" accept="image/*,.ai,.psd,.pdf,.eps,.sketch,.xd,.cdr" disabled>
+          <div id="fileMeta" class="note" style="border-top:none;padding-top:var(--space-2);font-size:var(--font-size-caption);"></div>
+        </div>
+      </div>
+      <div class="control-group" style="margin-top: auto;">
+        <button id="convertBtn" class="btn btn-primary" disabled>Convert to SVG</button>
+      </div>
+      <div class="note">All files are processed locally in your browser for speed and privacy. No files are uploaded to any server.</div>
+    </aside>
+
+    <main class="panel" id="main-panel">
+      <div class="placeholder" id="ph">The preview will appear here once you select a file.</div>
+      <canvas id="preview" width="1" height="1" style="display:none"></canvas>
+    </main>
+  </div>
+  
+  <div id="wiki-overlay" class="popup-overlay"></div>
+
+  <iframe id="photopea" src="https://www.photopea.com" style="width:0;height:0;border:0;position:absolute;left:-9999px;top:-9999px" aria-hidden="true"></iframe>
+
+  <script type="module">
+    const WIKI_DATA = {
+        "title": "Any2SVG Info",
+        "sections": [
+            {
+                "title": "How to Use",
+                "content": [
+                    "<b>1. Wait for Ready:</b> The file input will become enabled once the conversion engine is ready (usually in a few seconds).",
+                    "<b>2. Select Your File:</b> Click the button to select a source file from your device.",
+                    "<b>3. Preview:</b> A PNG preview of your file will be generated and displayed in the main panel.",
+                    "<b>4. Convert:</b> Once you are happy with the preview, click the 'Convert to SVG' button. The converted SVG file will be downloaded automatically."
+                ]
+            },
+            {
+                "title": "Supported Formats",
+                "content": [
+                    "This tool can handle a vast array of file types, including:",
+                    "  - <b>Vector & Design:</b> AI (Adobe Illustrator), EPS, PDF, PSD (Adobe Photoshop), Sketch, XD (Adobe XD), CDR (CorelDRAW).",
+                    "  - <b>Raster Images:</b> PNG, JPG, GIF, WEBP, BMP, and many more."
+                ]
+            },
+            {
+                "title": "Privacy & Technology",
+                "content": [
+                    "This tool uses a powerful client-side engine to process files directly in your browser. <b>Your files never leave your computer.</b> No data is uploaded to any server, making the process fast, secure, and private."
+                ]
+            }
+        ]
+    };
+  
+    const App = {
+      el: {}, 
+      state: {
+        engineReady: false,
+        isOpening: false, 
+        isExpectingPreview: false,
+        filenameBase: 'converted',
+        splashHidden: false
+      },
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+      isWikiLoaded: false,
+
+      init(){
+        this.cache();
+        this.initTheme();
+        this.bind();
+        this.pp = document.getElementById('photopea').contentWindow;
+        window.addEventListener('message', (e) => this.onMessage(e));
+      },
+
+      hideSplashScreen() {
+          if (!this.state.splashHidden) {
+              this.state.splashHidden = true;
+              this.el.splashScreen.classList.add('hidden');
+              this.el.appContainer.classList.remove('loading');
+          }
+      },
+
+      cache(){
+        const ids = [
+          'theme-toggle', 'fileInput', 'convertBtn', 'fileMeta', 'main-panel', 'preview', 'ph',
+          'wiki-open-btn', 'wiki-overlay', 'splash-screen', 'app-container', 'splash-close-btn'
+        ];
+        ids.forEach(id => this.el[id.replace(/-(\w)/g, (_,c) => c.toUpperCase())] = document.getElementById(id));
+      },
+
+      bind(){
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        this.el.fileInput.addEventListener('change', (e) => this.handleFilePick(e));
+        this.el.convertBtn.addEventListener('click', () => this.convert());
+        this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+        this.el.splashScreen.addEventListener('click', (e) => {
+            if (e.target === this.el.splashScreen) {
+                this.hideSplashScreen();
+            }
+        });
+        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+      },
+
+      initTheme(){
+        const saved = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(saved, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') this.applyTheme('system');
+        });
+      },
+      setTheme(t, save=true){ 
+        if(save) localStorage.setItem('creative-toolkit-theme', t); 
+        this.el.themeToggle.textContent = this.THEME_ICONS[t]; 
+        this.applyTheme(t); 
+      },
+      cycleTheme(){ 
+        const cur = localStorage.getItem('creative-toolkit-theme') || 'system'; 
+        const i = (this.THEMES.indexOf(cur) + 1) % this.THEMES.length; 
+        this.setTheme(this.THEMES[i]); 
+      },
+      applyTheme(t){ 
+        const isDark = (t === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark'; 
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; 
+      },
+      
+      async handleFilePick(e){
+        const file = e.target.files && e.target.files[0];
+        if(!file || !this.state.engineReady) return;
+        
+        this.resetState();
+        this.state.filenameBase = file.name.replace(/\.[^.]+$/,'') || 'converted';
+        this.el.fileMeta.textContent = `${file.name}, ${this.prettyBytes(file.size)}`;
+        
+        const buffer = await file.arrayBuffer();
+        this.state.isOpening = true;
+        this.state.isExpectingPreview = true;
+        this.pp.postMessage(buffer, '*', [buffer]);
+      },
+      
+      resetState() {
+          this.state.isOpening = false;
+          this.state.isExpectingPreview = false;
+          this.el.convertBtn.disabled = true;
+          this.el.ph.style.display = 'block';
+          this.el.preview.style.display = 'none';
+          this.el.fileMeta.textContent = '';
+          this.el.fileInput.value = '';
+      },
+
+      convert(){
+        if(!this.state.engineReady) return;
+        this.state.isExpectingPreview = false;
+        this.el.convertBtn.disabled = true;
+        this.el.convertBtn.textContent = 'Converting...';
+        this.pp.postMessage('app.activeDocument.saveToOE("svg");', '*');
+      },
+
+      onMessage(e){
+        if (e.data === 'done') {
+            if (!this.state.engineReady) { 
+                this.state.engineReady = true; 
+                this.el.fileInput.disabled = false;
+                return; 
+            }
+            if (this.state.isOpening) {
+                this.state.isOpening = false;
+                this.pp.postMessage('app.activeDocument.saveToOE("png");', '*');
+            }
+            return;
+        }
+
+        const msg = e.data;
+        if (msg instanceof ArrayBuffer || (msg && msg.buffer instanceof ArrayBuffer)) {
+            const ab = msg instanceof ArrayBuffer ? msg : msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
+            
+            if (this.state.isExpectingPreview) {
+                this.renderPreview(ab);
+            } else {
+                this.autoDownload(ab, this.state.filenameBase + '.svg', 'image/svg+xml');
+            }
+        }
+      },
+
+      renderPreview(ab){
+        const blob = new Blob([ab], {type:'image/png'});
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.onload = () => {
+          const panel = this.el.mainPanel.getBoundingClientRect();
+          const maxW = panel.width - 40, maxH = panel.height - 40;
+          const scale = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight, 1);
+          const cw = Math.floor(img.naturalWidth * scale), ch = Math.floor(img.naturalHeight * scale);
+          const cv = this.el.preview;
+          cv.width = cw; cv.height = ch;
+          const ctx = cv.getContext('2d');
+          ctx.drawImage(img, 0, 0, cw, ch);
+          this.el.ph.style.display = 'none';
+          cv.style.display = 'block';
+          this.el.convertBtn.disabled = false;
+          URL.revokeObjectURL(url);
+        };
+        img.src = url;
+      },
+
+      autoDownload(ab, filename, mime){
+        const blob = new Blob([ab], {type:mime});
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement('a'), { href:url, download:filename });
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+        
+        // Reset for next conversion
+        this.el.convertBtn.textContent = 'Convert to SVG';
+        this.resetState();
+      },
+
+      prettyBytes(n){
+        if(n < 1024) return n + ' B';
+        const u=['KB','MB','GB','TB']; let i=-1;
+        do { n/=1024; i++; } while (n>=1024 && i<u.length-1);
+        return n.toFixed(1) + ' ' + u[i];
+      },
+      
+      openWiki() {
+          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+              const wikiModal = document.createElement('div');
+              wikiModal.className = 'wiki-modal-content';
+              wikiModal.setAttribute('role', 'dialog');
+              wikiModal.innerHTML = `
+                  <div class="wiki-header">
+                    <h3 id="wiki-title">Info</h3>
+                    <button id="wiki-close-btn" title="Close">×</button>
+                  </div>
+                  <div id="wiki-content"></div>
+              `;
+              this.el.wikiOverlay.appendChild(wikiModal);
+              document.getElementById('wiki-close-btn').addEventListener('click', () => this.closeWiki());
+          }
+
+          if (!this.isWikiLoaded) {
+              const titleEl = document.getElementById('wiki-title');
+              const contentEl = document.getElementById('wiki-content');
+              titleEl.textContent = WIKI_DATA.title;
+              
+              const col1 = document.createElement('div');
+              col1.className = 'wiki-column';
+              const col2 = document.createElement('div');
+              col2.className = 'wiki-column';
+
+              WIKI_DATA.sections.forEach((s, index) => {
+                  const sectionContainer = document.createElement('div');
+                  const h4 = document.createElement('h4'); 
+                  h4.textContent = s.title;
+                  sectionContainer.appendChild(h4);
+                  s.content.forEach(c => { 
+                      const p = document.createElement('p'); 
+                      p.innerHTML = c; 
+                      sectionContainer.appendChild(p); 
+                  });
+                  // Distribute sections between columns
+                  if (index < 2) { // How to Use, Supported Formats
+                      col1.appendChild(sectionContainer);
+                  } else { // Privacy & Technology
+                      col2.appendChild(sectionContainer);
+                  }
+              });
+              
+              contentEl.innerHTML = '';
+              contentEl.appendChild(col1);
+              contentEl.appendChild(col2);
+
+              this.isWikiLoaded = true;
+          }
+          this.el.wikiOverlay.classList.add('show');
+      },
+      closeWiki() { 
+          if(this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show'); 
+      },
+    };
+
+    document.addEventListener('DOMContentLoaded', ()=>App.init());
+  </script>
+</body>
+</html>
+

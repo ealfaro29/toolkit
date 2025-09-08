@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creative Toolkit</title>
+  <style>
+    :root {
+      --accent-color: #4f46e5; /* Using the purple from Locator/Colors as a neutral default */
+      --accent-color-tint: #c7d2fe;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    
+    header.panel {
+      height: 65px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0 var(--space-4);
+    }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; }
+    #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover { background-color: var(--surface-alt); }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .app-card {
+      text-decoration: none;
+      color: var(--ink);
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--panel-shadow);
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      transition: transform var(--duration-standard) ease, box-shadow var(--duration-standard) ease;
+      border-top: 4px solid var(--card-accent-color);
+      cursor: grab;
+    }
+
+    .app-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-floating-3);
+    }
+    
+    .app-card.dragging {
+      opacity: 0.5;
+      cursor: grabbing;
+    }
+    
+    .app-card-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-md);
+      background-color: var(--card-icon-bg-color-transparent);
+      color: var(--color-accent-text, #FFF);
+      font-size: 28px;
+    }
+    
+    .app-card-title {
+      font-size: 18px;
+      font-weight: var(--font-weight-emphasis);
+      margin: 0;
+    }
+    
+    .app-card-description {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="panel">
+      <h1>Creative Toolkit</h1>
+      <div class="sub">A universe of mini-apps.</div>
+      <div class="theme-switcher">
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <main>
+      <div class="app-grid" id="app-grid">
+
+        <a href="moodboards/moodboards.html" class="app-card" style="--card-accent-color: #FFD300; --card-icon-bg-color-transparent: rgba(255, 211, 0, 0.15);" data-id="moodboards" draggable="true">
+          <div class="app-card-icon">🖼️</div>
+          <h2 class="app-card-title">Moodboard Studio</h2>
+          <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding, colors, and images.</p>
+        </a>
+        
+        <a href="blobs/blobs.html" class="app-card" style="--card-accent-color: #800080; --card-icon-bg-color-transparent: rgba(128, 0, 128, 0.15);" data-id="blobs" draggable="true">
+            <div class="app-card-icon">💧</div>
+            <h2 class="app-card-title">Blob Studio</h2>
+            <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Tweak points, variance, and smoothness.</p>
+        </a>
+
+        <a href="jigsaws/jigsaws.html" class="app-card" style="--card-accent-color: #00B5AD; --card-icon-bg-color-transparent: rgba(0, 181, 173, 0.15);" data-id="jigsaws" draggable="true">
+          <div class="app-card-icon">🧩</div>
+          <h2 class="app-card-title">Jigsaw Generator</h2>
+          <p class="app-card-description">Design and export custom vector jigsaw puzzle grids with control over rows, columns, and tab size.</p>
+        </a>
+
+        <a href="iconfactory/iconfactory.html" class="app-card" style="--card-accent-color: #3B4352; --card-icon-bg-color-transparent: rgba(59, 67, 82, 0.15);" data-id="iconfactory" draggable="true">
+          <div class="app-card-icon">🛠️</div>
+          <h2 class="app-card-title">Icon Factory</h2>
+          <p class="app-card-description">Combine shapes to create custom icons. Build your collection and download them as a ZIP file.</p>
+        </a>
+
+        <a href="qrcodes/qrcodes.html" class="app-card" style="--card-accent-color: #2CA02C; --card-icon-bg-color-transparent: rgba(44, 160, 44, 0.15);" data-id="qrcodes" draggable="true">
+            <div class="app-card-icon">📱</div>
+            <h2 class="app-card-title">QR Code Generator</h2>
+            <p class="app-card-description">Create custom QR codes for URLs, WiFi, and more. All data is generated locally in your browser.</p>
+        </a>
+
+        <a href="palettes/palettes.html" class="app-card" style="--card-accent-color: #FF7F00; --card-icon-bg-color-transparent: rgba(255, 127, 0, 0.15);" data-id="colors" draggable="true">
+            <div class="app-card-icon">🌈</div>
+            <h2 class="app-card-title">Color Mixer</h2>
+            <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a single base color.</p>
+        </a>
+
+        <a href="notes/notes.html" class="app-card" style="--card-accent-color: #FF1493; --card-icon-bg-color-transparent: rgba(255, 20, 147, 0.15);" data-id="notes" draggable="true">
+            <div class="app-card-icon">📝</div>
+            <h2 class="app-card-title">Notepad & Kanban</h2>
+            <p class="app-card-description">Capture ideas, then drag them into your workflow. Your data is saved automatically in the browser.</p>
+        </a>
+
+        <a href="locator/locator.html" class="app-card" style="--card-accent-color: #4B0082; --card-icon-bg-color-transparent: rgba(75, 0, 130, 0.15);" data-id="locator" draggable="true">
+            <div class="app-card-icon">📍</div>
+            <h2 class="app-card-title">Locator</h2>
+            <p class="app-card-description">Geocode a list of locations and visualize the results on an interactive world map. Export as SVG.</p>
+        </a>
+        
+        <a href="signatures/signatures.html" class="app-card" style="--card-accent-color: #002493; --card-icon-bg-color-transparent: rgba(80, 96, 126, 0.15);" data-id="signatures" draggable="true">
+            <div class="app-card-icon">✍️</div>
+            <h2 class="app-card-title">Signature to SVG</h2>
+            <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with adjustable settings.</p>
+        </a>
+
+        <a href="any2svg/any2svg.html" class="app-card" style="--card-accent-color: #A4C639; --card-icon-bg-color-transparent: rgba(164, 198, 57, 0.15);" data-id="any2svg" draggable="true">
+            <div class="app-card-icon">🪄</div>
+            <h2 class="app-card-title">Any2SVG</h2>
+            <p class="app-card-description">Convert AI, PSD, PDF, and more to SVG. All files are processed locally in your browser.</p>
+        </a>
+
+        <a href="bgremover/bgremover.html" class="app-card" style="--card-accent-color: #E63946; --card-icon-bg-color-transparent: rgba(230, 57, 70, 0.15);" data-id="bgremover" draggable="true">
+          <div class="app-card-icon">✂️</div>
+          <h2 class="app-card-title">Background Remover</h2>
+          <p class="app-card-description">Client-side AI cutout. Click, drop or paste an image to automatically remove the background.</p>
+        </a>
+        
+        <a href="colorizer/colorizer.html" class="app-card" style="--card-accent-color: #0077B6; --card-icon-bg-color-transparent: rgba(0, 119, 182, 0.15);" data-id="colorizer" draggable="true">
+          <div class="app-card-icon">🎨</div>
+          <h2 class="app-card-title">SVG Color Grouper</h2>
+          <p class="app-card-description">Upload an SVG, define color groups, and drag-and-drop to remap the entire palette.</p>
+        </a>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const App = {
+      el: {},
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+      DRAG_STATE: {
+        dragged: null,
+        over: null
+      },
+
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.loadCardOrder();
+        this.bindEvents();
+      },
+
+      cacheDOMElements() {
+        this.el.themeToggle = document.getElementById('theme-toggle');
+        this.el.appGrid = document.getElementById('app-grid');
+        this.el.appCards = Array.from(this.el.appGrid.children);
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') {
+            this.applyTheme('system');
+          }
+        });
+
+        this.el.appGrid.addEventListener('dragstart', this.handleDragStart.bind(this));
+        this.el.appGrid.addEventListener('dragover', this.handleDragOver.bind(this));
+        this.el.appGrid.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        this.el.appGrid.addEventListener('drop', this.handleDrop.bind(this));
+        this.el.appGrid.addEventListener('dragend', this.handleDragEnd.bind(this));
+      },
+
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+      },
+
+      setTheme(theme, save = true) {
+        if (save) {
+          localStorage.setItem('creative-toolkit-theme', theme);
+        }
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
+
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        const currentIndex = this.THEMES.indexOf(currentTheme);
+        const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length];
+        this.setTheme(nextTheme);
+      },
+
+      applyTheme(theme) {
+        const isDark = (theme === 'system')
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      },
+
+      handleDragStart(e) {
+        const targetCard = e.target.closest('.app-card');
+        if (targetCard) {
+          this.DRAG_STATE.dragged = targetCard;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', targetCard.dataset.id);
+          setTimeout(() => targetCard.classList.add('dragging'), 0);
+        }
+      },
+
+      handleDragOver(e) {
+        e.preventDefault();
+        const targetCard = e.target.closest('.app-card');
+        if (targetCard && targetCard !== this.DRAG_STATE.dragged) {
+          if (this.DRAG_STATE.over && this.DRAG_STATE.over !== targetCard) {
+            this.DRAG_STATE.over.classList.remove('drag-over');
+          }
+          this.DRAG_STATE.over = targetCard;
+          targetCard.classList.add('drag-over');
+
+          const draggedRect = this.DRAG_STATE.dragged.getBoundingClientRect();
+          const targetRect = targetCard.getBoundingClientRect();
+          const targetCenterY = targetRect.top + targetRect.height / 2;
+
+          if (e.clientY > targetCenterY) {
+            this.el.appGrid.insertBefore(this.DRAG_STATE.dragged, targetCard.nextSibling);
+          } else {
+            this.el.appGrid.insertBefore(this.DRAG_STATE.dragged, targetCard);
+          }
+        }
+      },
+
+      handleDragLeave(e) {
+        const targetCard = e.target.closest('.app-card');
+        if (targetCard && targetCard === this.DRAG_STATE.over) {
+          targetCard.classList.remove('drag-over');
+          this.DRAG_STATE.over = null;
+        }
+      },
+
+      handleDrop(e) {
+        e.preventDefault();
+        if (this.DRAG_STATE.over) {
+          this.DRAG_STATE.over.classList.remove('drag-over');
+        }
+        this.saveCardOrder();
+      },
+
+      handleDragEnd(e) {
+        if (this.DRAG_STATE.dragged) {
+          this.DRAG_STATE.dragged.classList.remove('dragging');
+        }
+        if (this.DRAG_STATE.over) {
+          this.DRAG_STATE.over.classList.remove('drag-over');
+        }
+        this.DRAG_STATE.dragged = null;
+        this.DRAG_STATE.over = null;
+        this.saveCardOrder();
+      },
+
+      saveCardOrder() {
+        const order = Array.from(this.el.appGrid.children).map(card => card.dataset.id);
+        localStorage.setItem('appCardOrder', JSON.stringify(order));
+      },
+
+      loadCardOrder() {
+        const savedOrder = localStorage.getItem('appCardOrder');
+        if (savedOrder) {
+          const order = JSON.parse(savedOrder);
+          const currentCards = Array.from(this.el.appGrid.children);
+          const cardMap = new Map(currentCards.map(card => [card.dataset.id, card]));
+
+          const fragment = document.createDocumentFragment();
+          order.forEach(id => {
+            if (cardMap.has(id)) {
+              fragment.appendChild(cardMap.get(id));
+              cardMap.delete(id);
+            }
+          });
+          cardMap.forEach(card => fragment.appendChild(card));
+
+          this.el.appGrid.innerHTML = '';
+          this.el.appGrid.appendChild(fragment);
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>

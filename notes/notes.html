@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notes & Kanban Board</title> 
+  
+  <style>
+    /* Global CSS Variables from baseapp */
+    :root {
+      --accent-color: #FF1493; /* App's red accent color */
+      --accent-color-tint: #f4cde1; /* Light tint of the accent color */
+      --danger-color: #cc036e;
+      --danger-color-tint: #fee2f0;
+      --priority-high: #ef4444; --priority-medium: #f97316; --priority-low: #22c55e;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF;
+      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-h2: 16px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-bold: 700; --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    
+    /* Base Styles */
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
+    .container.loading { filter: blur(5px); pointer-events: none; }
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
+    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+    aside.panel.controls { position: sticky; top: 25px; max-height: calc(100vh - 50px); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
+    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+    .actions-group {  margin-top: auto;}
+    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group label { font-weight: var(--font-weight-medium); }
+    .form-control, textarea { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; resize: vertical; min-height: 40px; font-family: inherit; font-size: inherit; }
+    textarea.form-control { min-height: 80px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
+    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
+    .btn-secondary:hover { filter: brightness(0.95); }
+    .btn-danger { background-color: var(--danger-color-tint); color: var(--danger-color); border-color: transparent; }
+    .btn-danger:hover { background-color: var(--danger-color); color: var(--color-accent-text); }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    
+    /* --- App Specific Styles --- */
+    main.panel { padding: 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+    .main-header { padding: var(--space-4); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .main-content { overflow-y: auto; padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-5); }
+    .btn-group { display: flex; gap: var(--space-2); }
+    .btn-sm { height: 32px; padding: 0 var(--space-2); font-size: var(--font-size-caption); }
+    .kanban-board { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+    .kanban-column { background-color: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); min-height: 150px; }
+    .kanban-column.drag-over { border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-color); }
+    .kanban-column-header { font-weight: var(--font-weight-bold); font-size: var(--font-size-h2); color: var(--ink); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-color); margin: 0; }
+    .kanban-column-content { flex-grow: 1; display: flex; flex-direction: column; gap: var(--space-2); min-height: 50px; }
+    .card { background-color: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: var(--space-3); word-break: break-word; cursor: grab; position: relative; box-shadow: var(--shadow-raised); transition: transform var(--duration-standard), box-shadow var(--duration-standard); }
+    .card:hover { box-shadow: var(--shadow-raised-2); transform: translateY(-2px); }
+    .card.dragging { opacity: 0.5; cursor: grabbing; transform: rotate(3deg); box-shadow: var(--shadow-floating-3); }
+    .card.is-task { border-left: 4px solid var(--border-color); }
+    .card.is-task[data-priority="high"] { border-left-color: var(--priority-high); }
+    .card.is-task[data-priority="medium"] { border-left-color: var(--priority-medium); }
+    .card.is-task[data-priority="low"] { border-left-color: var(--priority-low); }
+    .card.status-done .editable-content { text-decoration: line-through; color: var(--muted); }
+    .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: var(--font-size-caption); color: var(--muted); }
+    .notes-section { display: flex; flex-direction: column; gap: var(--space-3); }
+    .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); }
+    .editable-content { cursor: text; margin-bottom: var(--space-2); }
+    .edit-controls { display: none; margin-top: var(--space-2); }
+    .is-editing .editable-content, .is-editing .card-meta { display: none; }
+    .is-editing .edit-controls { display: flex; flex-direction: column; gap: var(--space-3); }
+    .item-controls { position: absolute; top: var(--space-2); right: var(--space-2); }
+    .delete-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 16px; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; }
+    .delete-btn:hover { color: var(--danger-color); background-color: var(--danger-color-tint); }
+    .empty-state { text-align: center; color: var(--muted); padding: var(--space-5); border: 2px dashed var(--border-color); border-radius: var(--radius-md); grid-column: 1 / -1; margin-top: var(--space-2); }
+    .is-hidden { display: none; }
+    .select-wrapper { position: relative; }
+    .select-wrapper select { -webkit-appearance: none; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
+
+    /* Popups & Modals */
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; align-items: center; justify-content: center; }
+    .popup-overlay.show { display: flex; }
+    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+    .wiki-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      flex-shrink: 0;
+      position: relative;
+      height: 80px;
+      color: white;
+      background-image: url('modal.png');
+      background-size: cover;
+      background-position: center bottom;
+    }
+    .wiki-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      z-index: 1;
+    }
+    .wiki-header h3, #wiki-close-btn {
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    #wiki-close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--color-accent-text);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    #wiki-close-btn:hover { background-color: rgba(255,255,255,0.1); }
+    #wiki-content {
+        padding: var(--space-5);
+        overflow: hidden;
+        flex-grow: 1;
+        display: flex;
+        gap: var(--space-5);
+    }
+    .wiki-column { flex: 1; min-width: 0; }
+    #wiki-content h4 {
+        margin-top: 0;
+        margin-bottom: var(--space-3);
+        font-weight: var(--font-weight-emphasis);
+        color: var(--accent-color);
+    }
+    
+    .dialog-content {
+      width: 90%;
+      max-width: 400px;
+      padding: var(--space-5);
+      text-align: center;
+    }
+    #dialog-message {
+      margin: 0 0 var(--space-5);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    #dialog-actions {
+      justify-content: center;
+    }
+    #dialog-actions .btn {
+      width: auto;
+      min-width: 100px;
+    }
+
+    .splash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.1); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.5s ease-out; cursor: pointer; }
+    .splash-overlay.hidden { opacity: 0; pointer-events: none; }
+    .splash-content { display: flex; width: 800px; height: 450px; max-width: 90vw; max-height: 80vh; background: var(--surface-alt); border-radius: var(--radius-md); box-shadow: var(--shadow-floating-3); overflow: hidden; cursor: default; position: relative; }
+    #splash-close-btn { position: absolute; top: var(--space-3); right: var(--space-3); width: 32px; height: 32px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 24px; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; z-index: 10; }
+    #splash-close-btn:hover { background-color: var(--surface-alt); color: var(--ink); transform: scale(1.1); }
+    .splash-info { flex: 0 0 300px; padding: var(--space-5); display: flex; flex-direction: column; background-color: var(--surface-alt); color: var(--ink); border-left: 4px solid var(--accent-color); }
+    .splash-icon { font-size: 32px; margin-bottom: var(--space-4); }
+    .splash-title { font-size: 24px; font-weight: var(--font-weight-emphasis); color: var(--accent-color); margin-bottom: var(--space-5); }
+    .splash-tech { margin: 0; color: var(--muted); line-height: 1.6; }
+    .splash-credits { margin-top: auto; font-size: var(--font-size-caption); color: var(--muted); }
+    .splash-image { flex: 1; background-color: var(--surface); }
+    .splash-image img { width: 100%; height: 100%; object-fit: cover; }
+
+    @media (max-width: 800px) { 
+        body { padding: var(--space-4); } 
+        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
+        aside.controls { position: static; max-height: none; } 
+        main.panel { min-height: 60vh; } 
+        .kanban-board { grid-template-columns: 1fr; }
+        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
+        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
+        .splash-image { width: 100%; height: 200px; }
+        #wiki-content { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-overlay" id="splash-screen">
+    <div class="splash-content">
+      <button id="splash-close-btn" title="Close">&times;</button>
+      <div class="splash-info">
+        <span class="splash-icon">📝</span>
+        <h2 class="splash-title">Notes & Kanban Board</h2>
+        <p class="splash-tech">Capture ideas, then drag them into your workflow. Your data is saved automatically in the browser.</p>
+        <p class="splash-credits">2025. Toolkit by e</p>
+      </div>
+      <div class="splash-image">
+        <img src="modal.png" alt="Notes & Kanban Splash Image">
+      </div>
+    </div>
+  </div>
+
+  <div class="container loading" id="app-container">
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+      </a>
+      <h1>Notes & Kanban Board</h1>
+      <div class="sub">Capture ideas, then drag them into your workflow.</div>
+      <div class="theme-switcher">
+        <button id="wiki-open-btn" title="Info">ⓘ</button>
+        <button id="theme-toggle" title="Change Theme"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls">
+      <div class="control-group">
+          <div class="form-group">
+              <label for="new-item-text">New Note or Task</label>
+              <textarea id="new-item-text" class="form-control" placeholder="What's on your mind?"></textarea>
+          </div>
+          <button id="add-item-btn" class="btn btn-primary">Add as Note</button>
+      </div>
+
+      <div class="control-group actions-group">
+        <label>Global Actions</label>
+        <div class="btn-group">
+          <button id="export-data-btn" class="btn btn-secondary">Export Data</button>
+          <button id="import-data-btn" class="btn btn-secondary">Import Data</button>
+          <input type="file" id="import-file-input" class="is-hidden" accept=".json">
+        </div>
+        <button id="clear-all-btn" class="btn btn-danger">Clear All Data</button>
+      </div>
+      <div class="note">Tip: Add items as notes, then drag them onto the Kanban board to convert them into tasks.</div>
+    </aside>
+
+    <main class="panel" id="main-panel">
+      <div class="main-header">
+        <div class="form-group">
+          <label for="search-filter">Search & Filter</label>
+          <input type="text" id="search-filter" class="form-control" placeholder="Type to filter all items...">
+        </div>
+      </div>
+      <div class="main-content" id="main-content">
+        <section class="notes-section" data-status="note">
+          <h2 class="kanban-column-header">Notes</h2>
+          <div id="notes-grid" class="notes-grid"></div>
+        </section>
+
+        <section class="kanban-board">
+          <div class="kanban-column" data-status="todo">
+            <h2 class="kanban-column-header">To Do</h2>
+            <div class="kanban-column-content" id="todo-column-content"></div>
+          </div>
+          <div class="kanban-column" data-status="in-progress">
+            <h2 class="kanban-column-header">In Progress</h2>
+            <div class="kanban-column-content" id="in-progress-column-content"></div>
+          </div>
+          <div class="kanban-column" data-status="done">
+            <h2 class="kanban-column-header">Done</h2>
+            <div class="kanban-column-content" id="done-column-content"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  
+  <div id="wiki-overlay" class="popup-overlay"></div>
+
+  <div id="dialog-overlay" class="popup-overlay">
+    <div class="dialog-content panel">
+      <p id="dialog-message"></p>
+      <div id="dialog-actions" class="btn-group"></div>
+    </div>
+  </div>
+  
+  <script type="module">
+    const WIKI_DATA = {
+      "title": "Notes & Kanban Board Info",
+      "sections": [
+        { "title": "How It Works",
+          "content": [
+            "This tool is designed for a fluid workflow from idea to completion.",
+            "<b>1. Capture Everything:</b> Use the single input field to add all your thoughts, ideas, and tasks. Everything starts as a 'Note' in the top section.",
+            "<b>2. Organize Your Workflow:</b> When you're ready to work on a note, simply drag it from the 'Notes' section and drop it onto the 'To Do' column on the Kanban board.",
+            "<b>3. Track Progress:</b> The note is now a task. You can drag it from 'To Do' to 'In Progress' and finally to 'Done' as you complete the work.",
+            "<b>Double-Click to Edit:</b> You can edit the text of any note or task at any time by double-clicking it."
+          ]
+        },
+        { "title": "Features",
+          "content": [
+            "<b>Unified System:</b> No need to decide upfront if something is a note or a task. Capture first, organize later.",
+            "<b>Task Priorities:</b> Once an item is on the Kanban board, it's assigned a 'Medium' priority by default. Double-click to edit the text and its priority.",
+            "<b>Search & Filter:</b> The search bar instantly filters both your notes and your tasks simultaneously.",
+            "<b>Data Portability:</b> Use the 'Export Data' button to save a backup of all your items. 'Import Data' will restore from a backup file, but be aware that it overwrites existing data."
+          ]
+        }
+      ]
+    };
+
+    const App = {
+      el: {},
+      state: {
+        items: [],
+        filterQuery: '',
+        editingId: null,
+        splashHidden: false,
+      },
+      isWikiLoaded: false,
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.loadState();
+        this.bindEvents();
+        this.render();
+      },
+      
+      hideSplashScreen() {
+          if (!this.state.splashHidden) {
+              this.state.splashHidden = true;
+              this.el.splashScreen.classList.add('hidden');
+              this.el.appContainer.classList.remove('loading');
+          }
+      },
+
+      cacheDOMElements() {
+        const ids = [
+          'theme-toggle', 'wiki-open-btn', 'wiki-overlay',
+          'new-item-text', 'add-item-btn', 'clear-all-btn',
+          'notes-grid', 'todo-column-content', 'in-progress-column-content', 'done-column-content',
+          'main-content', 'search-filter', 'export-data-btn', 'import-data-btn', 'import-file-input',
+          'splash-screen', 'app-container', 'splash-close-btn',
+          'dialog-overlay', 'dialog-message', 'dialog-actions'
+        ];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          this.el[key] = document.getElementById(id);
+        });
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+        
+        this.el.splashScreen.addEventListener('click', (e) => {
+            if (e.target === this.el.splashScreen) this.hideSplashScreen();
+        });
+        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+
+        this.el.addItemBtn.addEventListener('click', () => { this.addItem(this.el.newItemText.value.trim()); this.el.newItemText.value = ''; });
+        this.el.newItemText.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.el.addItemBtn.click(); }
+        });
+        this.el.clearAllBtn.addEventListener('click', () => this.clearAll());
+        this.el.exportDataBtn.addEventListener('click', () => this.exportData());
+        this.el.importDataBtn.addEventListener('click', () => this.el.importFileInput.click());
+        this.el.importFileInput.addEventListener('change', (e) => this.importData(e.target.files[0]));
+        this.el.searchFilter.addEventListener('input', (e) => { this.state.filterQuery = e.target.value.toLowerCase(); this.render(); });
+        this.el.mainContent.addEventListener('click', this.handleMainContentClick.bind(this));
+        this.el.mainContent.addEventListener('dblclick', this.handleMainContentDblClick.bind(this));
+        this.el.mainContent.addEventListener('dragstart', this.handleDragStart.bind(this));
+        this.el.mainContent.addEventListener('dragover', this.handleDragOver.bind(this));
+        this.el.mainContent.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        this.el.mainContent.addEventListener('drop', this.handleDrop.bind(this));
+        this.el.mainContent.addEventListener('dragend', this.handleDragEnd.bind(this));
+      },
+
+      showDialog(message, { buttons = [], onConfirm = () => {}, onCancel = () => {} } = {}) {
+        this.el.dialogMessage.textContent = message;
+        this.el.dialogActions.innerHTML = '';
+
+        buttons.forEach(buttonInfo => {
+            const button = document.createElement('button');
+            button.className = `btn ${buttonInfo.class || 'btn-secondary'}`;
+            button.textContent = buttonInfo.text;
+            button.dataset.action = buttonInfo.action || 'cancel';
+            this.el.dialogActions.appendChild(button);
+        });
+
+        const actionHandler = (e) => {
+            const action = e.target.dataset.action;
+            if (action === 'confirm') {
+                onConfirm();
+            } else {
+                onCancel();
+            }
+            this.hideDialog();
+            this.el.dialogActions.removeEventListener('click', actionHandler);
+        };
+        
+        this.el.dialogActions.addEventListener('click', actionHandler);
+        this.el.dialogOverlay.classList.add('show');
+      },
+
+      hideDialog() {
+        this.el.dialogOverlay.classList.remove('show');
+      },
+
+      showAlert(message) {
+        this.showDialog(message, {
+            buttons: [{ text: 'OK', class: 'btn-primary', action: 'confirm' }]
+        });
+      },
+      
+      loadState() {
+        try {
+          this.state.items = JSON.parse(localStorage.getItem('unifiedNotesKanban_v3') || '[]');
+        } catch (e) {
+          console.error("Error loading state from localStorage, resetting.", e);
+          this.state.items = [];
+        }
+      },
+      saveState() { localStorage.setItem('unifiedNotesKanban_v3', JSON.stringify(this.state.items)); },
+      saveAndRender() { this.saveState(); this.render(); },
+      
+      addItem(text) {
+        if (!text) return;
+        this.state.items.unshift({ id: Date.now(), text, status: 'note', priority: null, createdAt: new Date().toISOString() });
+        this.saveAndRender();
+      },
+      updateItem(id, newText, newPriority) {
+          const item = this.state.items.find(i => i.id === id);
+          if(item) { item.text = newText; if (item.status !== 'note') item.priority = newPriority; }
+          this.state.editingId = null;
+          this.saveAndRender();
+      },
+      deleteItem(id) { this.state.items = this.state.items.filter(i => i.id !== id); this.saveAndRender(); },
+      updateItemStatus(itemId, newStatus) {
+        const item = this.state.items.find(i => i.id === itemId);
+        if (item) { 
+            item.status = newStatus; 
+            if(newStatus !== 'note' && !item.priority) { item.priority = 'medium'; }
+            if(newStatus === 'note') { item.priority = null; }
+        }
+        this.saveAndRender();
+      },
+      clearAll() {
+        this.showDialog('Are you sure you want to delete all notes and tasks?', {
+            buttons: [
+                { text: 'Cancel', class: 'btn-secondary', action: 'cancel' },
+                { text: 'Yes, delete all', class: 'btn-danger', action: 'confirm' }
+            ],
+            onConfirm: () => {
+                this.state.items = [];
+                this.saveAndRender();
+            }
+        });
+      },
+      exportData() {
+        const dataStr = JSON.stringify({ items: this.state.items }, null, 2);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([dataStr], { type: 'application/json' }));
+        a.download = `notes-kanban-backup-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      },
+      importData(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (Array.isArray(data.items)) {
+              this.showDialog('This will overwrite all current data. Continue?', {
+                buttons: [
+                    { text: 'Cancel', class: 'btn-secondary', action: 'cancel' },
+                    { text: 'Yes, import', class: 'btn-primary', action: 'confirm' }
+                ],
+                onConfirm: () => {
+                    this.state.items = data.items;
+                    this.saveAndRender();
+                }
+              });
+            } else this.showAlert('Invalid file format.');
+          } catch { this.showAlert('Error reading file.'); }
+        };
+        reader.readAsText(file);
+      },
+
+      handleMainContentClick(e) {
+          const action = e.target.dataset.action;
+          const card = e.target.closest('.card');
+          if (!card) return;
+          const id = parseInt(card.dataset.id);
+          if (action === 'delete') {
+              this.showDialog('Delete this item?', {
+                  buttons: [
+                      { text: 'Cancel', class: 'btn-secondary' },
+                      { text: 'Delete', class: 'btn-danger', action: 'confirm' }
+                  ],
+                  onConfirm: () => this.deleteItem(id)
+              });
+          }
+          else if (action === 'save-edit') { 
+              const newText = card.querySelector('.edit-textarea').value.trim();
+              const prioritySelect = card.querySelector('.priority-select');
+              const newPriority = prioritySelect ? prioritySelect.value : null;
+              this.updateItem(id, newText, newPriority); 
+          }
+          else if (action === 'cancel-edit') { this.state.editingId = null; this.render(); }
+      },
+      handleMainContentDblClick(e) {
+          const card = e.target.closest('.card');
+          if (card && !e.target.closest('.edit-controls') && !e.target.closest('button')) { this.state.editingId = parseInt(card.dataset.id); this.render(); }
+      },
+      handleDragStart(e) { const card = e.target.closest('.card'); if (card) { e.dataTransfer.setData('text/plain', card.dataset.id); setTimeout(() => card.classList.add('dragging'), 0); }},
+      handleDragOver(e) { e.preventDefault(); const col = e.target.closest('.kanban-column, .notes-section'); if (col) col.classList.add('drag-over'); },
+      handleDragLeave(e) { const col = e.target.closest('.kanban-column, .notes-section'); if (col) col.classList.remove('drag-over'); },
+      handleDrop(e) {
+        e.preventDefault();
+        const col = e.target.closest('.kanban-column, .notes-section');
+        if (col) { 
+            col.classList.remove('drag-over'); 
+            const newStatus = col.dataset.status;
+            this.updateItemStatus(parseInt(e.dataTransfer.getData('text/plain')), newStatus); 
+        }
+      },
+      handleDragEnd() { const d = document.querySelector('.dragging'); if (d) d.classList.remove('dragging'); },
+
+      render() {
+        const filteredItems = this.state.items.filter(i => i.text.toLowerCase().includes(this.state.filterQuery));
+        const containers = {
+            note: this.el.notesGrid,
+            todo: this.el.todoColumnContent,
+            'in-progress': this.el.inProgressColumnContent,
+            done: this.el.doneColumnContent
+        };
+        Object.values(containers).forEach(c => c.innerHTML = '');
+        
+        filteredItems.forEach(item => {
+            const container = containers[item.status];
+            if (container) container.appendChild(this.createCardElement(item));
+        });
+
+        Object.keys(containers).forEach(key => {
+            if (!containers[key].hasChildNodes()) {
+                const message = key === 'note' ? 'No notes yet. Add one!' : 'No tasks here.';
+                containers[key].innerHTML = `<div class="empty-state">${message}</div>`;
+            }
+        });
+      },
+      createCardElement(item) {
+        const isEditing = item.id === this.state.editingId;
+        const card = document.createElement('div');
+        card.className = `card ${item.status === 'note' ? 'is-note' : 'is-task'} status-${item.status} ${isEditing ? 'is-editing' : ''}`;
+        card.dataset.id = item.id;
+        card.draggable = true;
+        if(item.priority) card.dataset.priority = item.priority;
+
+        const priorityOptions = ['low', 'medium', 'high'].map(p => `<option value="${p}" ${item.priority === p ? 'selected' : ''}>${p.charAt(0).toUpperCase() + p.slice(1)}</option>`).join('');
+        const editPriorityHTML = item.status !== 'note' ? `<div class="form-group"><label>Priority</label><div class="select-wrapper"><select class="form-control priority-select">${priorityOptions}</select></div></div>` : '';
+
+        card.innerHTML = `
+          <div class="editable-content">${item.text.replace(/\n/g, '<br>')}</div>
+          <div class="card-meta">
+            <span>${new Date(item.createdAt).toLocaleDateString()}</span>
+            ${item.priority ? `<span>${item.priority}</span>` : ''}
+          </div>
+          <div class="edit-controls">
+              <div class="form-group"><label>Content</label><textarea class="form-control edit-textarea">${item.text}</textarea></div>
+              ${editPriorityHTML}
+              <div class="btn-group">
+                <button class="btn btn-sm btn-primary" data-action="save-edit">Save</button>
+                <button class="btn btn-sm btn-secondary" data-action="cancel-edit">Cancel</button>
+              </div>
+          </div>
+          <div class="item-controls"><button class="delete-btn" title="Delete" data-action="delete">×</button></div>`;
+        return card;
+      },
+
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+        });
+      },
+      setTheme(theme, save = true) {
+        if (save) localStorage.setItem('creative-toolkit-theme', theme);
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
+      },
+      applyTheme(theme) {
+        const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      },
+      openWiki() {
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+            const wikiModal = document.createElement('div');
+            wikiModal.className = 'wiki-modal-content';
+            wikiModal.innerHTML = `
+                <div class="wiki-header">
+                  <h3 id="wiki-title">Info</h3>
+                  <button id="wiki-close-btn" title="Close">×</button>
+                </div>
+                <div id="wiki-content"></div>`;
+            this.el.wikiOverlay.appendChild(wikiModal);
+            wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
+
+        if (!this.isWikiLoaded) {
+            const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+            const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+            titleEl.textContent = WIKI_DATA.title;
+            
+            const col1 = document.createElement('div'); col1.className = 'wiki-column';
+            const col2 = document.createElement('div'); col2.className = 'wiki-column';
+
+            WIKI_DATA.sections.forEach((s, index) => {
+                const sectionContainer = document.createElement('div');
+                const h4 = document.createElement('h4'); h4.textContent = s.title;
+                sectionContainer.appendChild(h4);
+                s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+                if (index < Math.ceil(WIKI_DATA.sections.length / 2)) {
+                    col1.appendChild(sectionContainer);
+                } else {
+                    col2.appendChild(sectionContainer);
+                }
+            });
+            
+            contentEl.innerHTML = '';
+            contentEl.appendChild(col1);
+            contentEl.appendChild(col2);
+
+            this.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
+      },
+      closeWiki() {
+        this.el.wikiOverlay.classList.remove('show');
+      }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>
