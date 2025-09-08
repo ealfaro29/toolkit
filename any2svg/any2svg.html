@@ -9,6 +9,7 @@
     :root {
       --accent-color: #A4C639; /* Verde lima */
       --accent-color-tint: #eaf2c2; 
+      --danger-color: #EF4444;
       --color-text-primary-light:#1C1C1E; --color-text-secondary-light:#3A3A3C;
       --color-surface-light:#F5F5F7; --color-background-light:#FFFFFF; --color-divider-light:#EAEAEA;
       --color-text-primary-dark:#EAEAEB; --color-text-secondary-dark:#9A9A9E;
@@ -48,6 +49,7 @@
     .form-control{width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:8px 12px;min-height:40px}
     .btn{display:inline-flex;align-items:center;justify-content:center;width:100%;cursor:pointer;font-weight:var(--font-weight-emphasis);font-size:14px;border-radius:var(--radius-md);height:40px;padding:0 var(--space-4);border:1px solid transparent;transition:all var(--duration-standard) ease}
     .btn-primary{background:var(--accent-color);color:var(--color-accent-text)}
+    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
     .btn:hover:not(:disabled){filter:brightness(1.1)}
     .btn:disabled{opacity:.5;cursor:not-allowed}
     .btn:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
@@ -119,7 +121,6 @@
         color: var(--accent-color);
     }
 
-    /* Splash Screen Modal */
     .splash-overlay {
       position: fixed;
       top: 0;
@@ -240,6 +241,7 @@
         border-radius: 4px;
         transition: width 0.4s ease;
     }
+    .error-note { color: var(--danger-color) !important; font-weight: var(--font-weight-medium); }
 
     @media (max-width:800px){ 
       body{padding:var(--space-4)} 
@@ -297,7 +299,10 @@
           <label for="fileInput">Source File</label>
           <input id="fileInput" class="form-control" type="file" accept="image/*,.ai,.psd,.pdf,.eps,.sketch,.xd,.cdr" disabled>
           <div id="fileMeta" class="note" style="border-top:none;padding-top:var(--space-2);font-size:var(--font-size-caption);"></div>
-          <div id="engine-status" class="note" style="border-top:none; padding-top:var(--space-2); font-size: var(--font-size-caption);"></div>
+          <div id="engine-status-container">
+            <div id="engine-status" class="note" style="border-top:none; padding-top:var(--space-2); font-size: var(--font-size-caption);"></div>
+            <button id="reload-engine-btn" class="btn btn-secondary" style="display: none; margin-top: var(--space-3);">Reload Engine</button>
+          </div>
         </div>
       </div>
       <div class="control-group" style="margin-top: auto;">
@@ -314,7 +319,7 @@
   
   <div id="wiki-overlay" class="popup-overlay"></div>
 
-  <iframe id="photopea" src="https://www.photopea.com" style="width:0;height:0;border:0;position:absolute;left:-9999px;top:-9999px" aria-hidden="true"></iframe>
+  <iframe id="photopea" style="width:0;height:0;border:0;position:absolute;left:-9999px;top:-9999px" aria-hidden="true"></iframe>
 
   <script type="module">
     const WIKI_DATA = { /* ... Contenido del Wiki ... */ };
@@ -337,9 +342,23 @@
         this.el.splashCloseBtn.disabled = true;
         this.initTheme();
         this.bind();
-        this.pp = document.getElementById('photopea').contentWindow;
+        
+        // MODIFICADO: Lógica de carga del Iframe
+        this.loadEngine();
+        
         window.addEventListener('message', (e) => this.onMessage(e));
         this.simulateLoading(); 
+      },
+
+      loadEngine() {
+        const iframe = document.getElementById('photopea');
+        // Este es el script que se le pasa a Photopea en la URL
+        const config = {
+          script: "parent.postMessage('done','*')"
+        };
+        // La URL se construye con el script codificado
+        iframe.src = `https://www.photopea.com#${encodeURIComponent(JSON.stringify(config))}`;
+        this.pp = iframe.contentWindow;
       },
 
       updateProgress(percentage, message) {
@@ -356,18 +375,15 @@
               if (!this.state.engineReady) this.updateProgress(75, 'Configuring components...');
           }, 3000);
           
-          // AÑADIDO: Timeout para detectar si el motor falla en cargar
           setTimeout(() => {
             if (!this.state.engineReady) {
               this.updateProgress(100, 'Engine failed to load.');
-              const statusEl = document.getElementById('engine-status');
-              if (statusEl) {
-                  statusEl.innerHTML = "<b>Engine failed to load.</b><br>Please disable ad blockers for this page and refresh.";
-                  statusEl.style.color = '#EF4444'; // Rojo de error
-              }
+              this.el.engineStatus.innerHTML = "<b>Engine failed to load.</b><br>Please disable ad blockers and click Reload.";
+              this.el.engineStatus.classList.add('error-note');
+              this.el.reloadEngineBtn.style.display = 'block';
               this.el.splashCloseBtn.disabled = false;
             }
-          }, 15000); // 15 segundos de espera
+          }, 15000);
       },
 
       hideSplashScreen() {
@@ -382,7 +398,7 @@
         const ids = [
           'theme-toggle', 'fileInput', 'convertBtn', 'fileMeta', 'main-panel', 'preview', 'ph',
           'wiki-open-btn', 'wiki-overlay', 'splash-screen', 'app-container', 'splash-close-btn',
-          'splash-progress-text', 'progress-bar-inner', 'engine-status'
+          'splash-progress-text', 'progress-bar-inner', 'engine-status', 'reload-engine-btn'
         ];
         ids.forEach(id => this.el[id.replace(/-(\w)/g, (_,c) => c.toUpperCase())] = document.getElementById(id));
       },
@@ -398,6 +414,19 @@
             }
         });
         this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+        this.el.reloadEngineBtn.addEventListener('click', () => this.reloadEngine());
+      },
+
+      reloadEngine() {
+        this.el.engineStatus.innerHTML = "Reloading engine...";
+        this.el.engineStatus.classList.remove('error-note');
+        this.el.reloadEngineBtn.style.display = 'none';
+        
+        // La recarga ahora se hace con el método de la API
+        this.loadEngine();
+        
+        this.state.engineReady = false;
+        this.simulateLoading();
       },
 
       onMessage(e){
@@ -407,6 +436,9 @@
                 this.updateProgress(100, 'Engine ready!');
                 this.el.fileInput.disabled = false;
                 this.el.splashCloseBtn.disabled = false;
+                this.el.engineStatus.innerHTML = "";
+                this.el.engineStatus.classList.remove('error-note');
+                this.el.reloadEngineBtn.style.display = 'none';
                 setTimeout(() => this.hideSplashScreen(), 500);
                 return; 
             }
@@ -419,7 +451,7 @@
 
         const msg = e.data;
         if (msg instanceof ArrayBuffer || (msg && msg.buffer instanceof ArrayBuffer)) {
-            const ab = msg instanceof ArrayBuffer ? msg : msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
+            const ab = msg instanceof ArrayBuffer ? msg : msg.buffer.slice(msg.byteOffset, msg.byteLength);
             
             if (this.state.isExpectingPreview) {
                 this.renderPreview(ab);
@@ -428,11 +460,21 @@
             }
         }
       },
-
-      // ... (El resto de las funciones de la App permanecen igual) ...
+      
+      initTheme() { /* ... (código completo abajo) ... */ },
+      setTheme(t, save=true){ /* ... (código completo abajo) ... */ },
+      cycleTheme(){ /* ... (código completo abajo) ... */ },
+      applyTheme(t){ /* ... (código completo abajo) ... */ },
+      async handleFilePick(e){ /* ... (código completo abajo) ... */ },
+      resetState() { /* ... (código completo abajo) ... */ },
+      convert(){ /* ... (código completo abajo) ... */ },
+      renderPreview(ab){ /* ... (código completo abajo) ... */ },
+      autoDownload(ab, filename, mime){ /* ... (código completo abajo) ... */ },
+      prettyBytes(n){ /* ... (código completo abajo) ... */ },
+      openWiki() { /* ... (código completo abajo) ... */ },
+      closeWiki() { /* ... (código completo abajo) ... */ },
     };
 
-    // --- COPIA COMPLETA DE LAS FUNCIONES RESTANTES ---
     App.initTheme = function(){
         const saved = localStorage.getItem('creative-toolkit-theme') || 'system';
         this.setTheme(saved, false);
