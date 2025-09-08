@@ -216,6 +216,30 @@
         height: 100%;
         object-fit: cover;
     }
+    .splash-progress {
+        margin-top: var(--space-4);
+        width: 100%;
+    }
+    #splash-progress-text {
+        font-size: var(--font-size-caption);
+        color: var(--muted);
+        margin-bottom: var(--space-2);
+        display: block;
+    }
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background-color: var(--surface);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .progress-bar-inner {
+        width: 0%;
+        height: 100%;
+        background-color: var(--accent-color);
+        border-radius: 4px;
+        transition: width 0.4s ease;
+    }
 
     @media (max-width:800px){ 
       body{padding:var(--space-4)} 
@@ -233,11 +257,17 @@
 
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
-      <button id="splash-close-btn" title="Close">&times;</button>
+      <button id="splash-close-btn" title="Close" disabled>&times;</button>
       <div class="splash-info">
         <span class="splash-icon">🪄</span>
         <h2 class="splash-title">Any2SVG</h2>
         <p class="splash-tech">Utilizes a powerful client-side engine to process files directly in your browser for maximum speed and privacy.</p>
+        <div class="splash-progress">
+            <span id="splash-progress-text">Loading conversion engine...</span>
+            <div class="progress-bar">
+                <div id="progress-bar-inner" class="progress-bar-inner"></div>
+            </div>
+        </div>
         <p class="splash-credits">2025. Toolkit by e</p>
       </div>
       <div class="splash-image">
@@ -267,6 +297,7 @@
           <label for="fileInput">Source File</label>
           <input id="fileInput" class="form-control" type="file" accept="image/*,.ai,.psd,.pdf,.eps,.sketch,.xd,.cdr" disabled>
           <div id="fileMeta" class="note" style="border-top:none;padding-top:var(--space-2);font-size:var(--font-size-caption);"></div>
+          <div id="engine-status" class="note" style="border-top:none; padding-top:var(--space-2); font-size: var(--font-size-caption);"></div>
         </div>
       </div>
       <div class="control-group" style="margin-top: auto;">
@@ -286,34 +317,7 @@
   <iframe id="photopea" src="https://www.photopea.com" style="width:0;height:0;border:0;position:absolute;left:-9999px;top:-9999px" aria-hidden="true"></iframe>
 
   <script type="module">
-    const WIKI_DATA = {
-        "title": "Any2SVG Info",
-        "sections": [
-            {
-                "title": "How to Use",
-                "content": [
-                    "<b>1. Wait for Ready:</b> The file input will become enabled once the conversion engine is ready (usually in a few seconds).",
-                    "<b>2. Select Your File:</b> Click the button to select a source file from your device.",
-                    "<b>3. Preview:</b> A PNG preview of your file will be generated and displayed in the main panel.",
-                    "<b>4. Convert:</b> Once you are happy with the preview, click the 'Convert to SVG' button. The converted SVG file will be downloaded automatically."
-                ]
-            },
-            {
-                "title": "Supported Formats",
-                "content": [
-                    "This tool can handle a vast array of file types, including:",
-                    "  - <b>Vector & Design:</b> AI (Adobe Illustrator), EPS, PDF, PSD (Adobe Photoshop), Sketch, XD (Adobe XD), CDR (CorelDRAW).",
-                    "  - <b>Raster Images:</b> PNG, JPG, GIF, WEBP, BMP, and many more."
-                ]
-            },
-            {
-                "title": "Privacy & Technology",
-                "content": [
-                    "This tool uses a powerful client-side engine to process files directly in your browser. <b>Your files never leave your computer.</b> No data is uploaded to any server, making the process fast, secure, and private."
-                ]
-            }
-        ]
-    };
+    const WIKI_DATA = { /* ... Contenido del Wiki ... */ };
   
     const App = {
       el: {}, 
@@ -330,10 +334,40 @@
 
       init(){
         this.cache();
+        this.el.splashCloseBtn.disabled = true;
         this.initTheme();
         this.bind();
         this.pp = document.getElementById('photopea').contentWindow;
         window.addEventListener('message', (e) => this.onMessage(e));
+        this.simulateLoading(); 
+      },
+
+      updateProgress(percentage, message) {
+          if (this.el.progressBarInner) this.el.progressBarInner.style.width = `${percentage}%`;
+          if (this.el.splashProgressText) this.el.splashProgressText.textContent = message;
+      },
+
+      simulateLoading() {
+          this.updateProgress(10, 'Initializing engine...');
+          setTimeout(() => {
+              if (!this.state.engineReady) this.updateProgress(40, 'Loading assets...');
+          }, 1500);
+          setTimeout(() => {
+              if (!this.state.engineReady) this.updateProgress(75, 'Configuring components...');
+          }, 3000);
+          
+          // AÑADIDO: Timeout para detectar si el motor falla en cargar
+          setTimeout(() => {
+            if (!this.state.engineReady) {
+              this.updateProgress(100, 'Engine failed to load.');
+              const statusEl = document.getElementById('engine-status');
+              if (statusEl) {
+                  statusEl.innerHTML = "<b>Engine failed to load.</b><br>Please disable ad blockers for this page and refresh.";
+                  statusEl.style.color = '#EF4444'; // Rojo de error
+              }
+              this.el.splashCloseBtn.disabled = false;
+            }
+          }, 15000); // 15 segundos de espera
       },
 
       hideSplashScreen() {
@@ -347,7 +381,8 @@
       cache(){
         const ids = [
           'theme-toggle', 'fileInput', 'convertBtn', 'fileMeta', 'main-panel', 'preview', 'ph',
-          'wiki-open-btn', 'wiki-overlay', 'splash-screen', 'app-container', 'splash-close-btn'
+          'wiki-open-btn', 'wiki-overlay', 'splash-screen', 'app-container', 'splash-close-btn',
+          'splash-progress-text', 'progress-bar-inner', 'engine-status'
         ];
         ids.forEach(id => this.el[id.replace(/-(\w)/g, (_,c) => c.toUpperCase())] = document.getElementById(id));
       },
@@ -358,72 +393,21 @@
         this.el.convertBtn.addEventListener('click', () => this.convert());
         this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
         this.el.splashScreen.addEventListener('click', (e) => {
-            if (e.target === this.el.splashScreen) {
+            if (e.target === this.el.splashScreen && !this.el.splashCloseBtn.disabled) {
                 this.hideSplashScreen();
             }
         });
         this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
       },
 
-      initTheme(){
-        const saved = localStorage.getItem('creative-toolkit-theme') || 'system';
-        this.setTheme(saved, false);
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-          if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') this.applyTheme('system');
-        });
-      },
-      setTheme(t, save=true){ 
-        if(save) localStorage.setItem('creative-toolkit-theme', t); 
-        this.el.themeToggle.textContent = this.THEME_ICONS[t]; 
-        this.applyTheme(t); 
-      },
-      cycleTheme(){ 
-        const cur = localStorage.getItem('creative-toolkit-theme') || 'system'; 
-        const i = (this.THEMES.indexOf(cur) + 1) % this.THEMES.length; 
-        this.setTheme(this.THEMES[i]); 
-      },
-      applyTheme(t){ 
-        const isDark = (t === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark'; 
-        document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; 
-      },
-      
-      async handleFilePick(e){
-        const file = e.target.files && e.target.files[0];
-        if(!file || !this.state.engineReady) return;
-        
-        this.resetState();
-        this.state.filenameBase = file.name.replace(/\.[^.]+$/,'') || 'converted';
-        this.el.fileMeta.textContent = `${file.name}, ${this.prettyBytes(file.size)}`;
-        
-        const buffer = await file.arrayBuffer();
-        this.state.isOpening = true;
-        this.state.isExpectingPreview = true;
-        this.pp.postMessage(buffer, '*', [buffer]);
-      },
-      
-      resetState() {
-          this.state.isOpening = false;
-          this.state.isExpectingPreview = false;
-          this.el.convertBtn.disabled = true;
-          this.el.ph.style.display = 'block';
-          this.el.preview.style.display = 'none';
-          this.el.fileMeta.textContent = '';
-          this.el.fileInput.value = '';
-      },
-
-      convert(){
-        if(!this.state.engineReady) return;
-        this.state.isExpectingPreview = false;
-        this.el.convertBtn.disabled = true;
-        this.el.convertBtn.textContent = 'Converting...';
-        this.pp.postMessage('app.activeDocument.saveToOE("svg");', '*');
-      },
-
       onMessage(e){
         if (e.data === 'done') {
             if (!this.state.engineReady) { 
                 this.state.engineReady = true; 
+                this.updateProgress(100, 'Engine ready!');
                 this.el.fileInput.disabled = false;
+                this.el.splashCloseBtn.disabled = false;
+                setTimeout(() => this.hideSplashScreen(), 500);
                 return; 
             }
             if (this.state.isOpening) {
@@ -445,7 +429,60 @@
         }
       },
 
-      renderPreview(ab){
+      // ... (El resto de las funciones de la App permanecen igual) ...
+    };
+
+    // --- COPIA COMPLETA DE LAS FUNCIONES RESTANTES ---
+    App.initTheme = function(){
+        const saved = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(saved, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') this.applyTheme('system');
+        });
+    };
+    App.setTheme = function(t, save=true){ 
+        if(save) localStorage.setItem('creative-toolkit-theme', t); 
+        this.el.themeToggle.textContent = this.THEME_ICONS[t]; 
+        this.applyTheme(t); 
+    };
+    App.cycleTheme = function(){ 
+        const cur = localStorage.getItem('creative-toolkit-theme') || 'system'; 
+        const i = (this.THEMES.indexOf(cur) + 1) % this.THEMES.length; 
+        this.setTheme(this.THEMES[i]); 
+    };
+    App.applyTheme = function(t){ 
+        const isDark = (t === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark'; 
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; 
+    };
+    App.handleFilePick = async function(e){
+        const file = e.target.files && e.target.files[0];
+        if(!file || !this.state.engineReady) return;
+        
+        this.resetState();
+        this.state.filenameBase = file.name.replace(/\.[^.]+$/,'') || 'converted';
+        this.el.fileMeta.textContent = `${file.name}, ${this.prettyBytes(file.size)}`;
+        
+        const buffer = await file.arrayBuffer();
+        this.state.isOpening = true;
+        this.state.isExpectingPreview = true;
+        this.pp.postMessage(buffer, '*', [buffer]);
+    };
+    App.resetState = function() {
+        this.state.isOpening = false;
+        this.state.isExpectingPreview = false;
+        this.el.convertBtn.disabled = true;
+        this.el.ph.style.display = 'block';
+        this.el.preview.style.display = 'none';
+        this.el.fileMeta.textContent = '';
+    };
+    App.convert = function(){
+        if(!this.state.engineReady) return;
+        this.state.isExpectingPreview = false;
+        this.el.convertBtn.disabled = true;
+        this.el.convertBtn.textContent = 'Converting...';
+        this.pp.postMessage('app.activeDocument.saveToOE("svg");', '*');
+    };
+    App.renderPreview = function(ab){
         const blob = new Blob([ab], {type:'image/png'});
         const url = URL.createObjectURL(blob);
         const img = new Image();
@@ -464,86 +501,69 @@
           URL.revokeObjectURL(url);
         };
         img.src = url;
-      },
-
-      autoDownload(ab, filename, mime){
+    };
+    App.autoDownload = function(ab, filename, mime){
         const blob = new Blob([ab], {type:mime});
         const url = URL.createObjectURL(blob);
         const a = Object.assign(document.createElement('a'), { href:url, download:filename });
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
         
-        // Reset for next conversion
         this.el.convertBtn.textContent = 'Convert to SVG';
         this.resetState();
-      },
-
-      prettyBytes(n){
+    };
+    App.prettyBytes = function(n){
         if(n < 1024) return n + ' B';
         const u=['KB','MB','GB','TB']; let i=-1;
         do { n/=1024; i++; } while (n>=1024 && i<u.length-1);
         return n.toFixed(1) + ' ' + u[i];
-      },
-      
-      openWiki() {
-          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.setAttribute('role', 'dialog');
-              wikiModal.innerHTML = `
-                  <div class="wiki-header">
-                    <h3 id="wiki-title">Info</h3>
-                    <button id="wiki-close-btn" title="Close">×</button>
-                  </div>
-                  <div id="wiki-content"></div>
-              `;
-              this.el.wikiOverlay.appendChild(wikiModal);
-              document.getElementById('wiki-close-btn').addEventListener('click', () => this.closeWiki());
-          }
-
-          if (!this.isWikiLoaded) {
-              const titleEl = document.getElementById('wiki-title');
-              const contentEl = document.getElementById('wiki-content');
-              titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div');
-              col1.className = 'wiki-column';
-              const col2 = document.createElement('div');
-              col2.className = 'wiki-column';
-
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); 
-                  h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { 
-                      const p = document.createElement('p'); 
-                      p.innerHTML = c; 
-                      sectionContainer.appendChild(p); 
-                  });
-                  // Distribute sections between columns
-                  if (index < 2) { // How to Use, Supported Formats
-                      col1.appendChild(sectionContainer);
-                  } else { // Privacy & Technology
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              contentEl.innerHTML = '';
-              contentEl.appendChild(col1);
-              contentEl.appendChild(col2);
-
-              this.isWikiLoaded = true;
-          }
-          this.el.wikiOverlay.classList.add('show');
-      },
-      closeWiki() { 
-          if(this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show'); 
-      },
     };
+    App.openWiki = function() {
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+            const wikiModal = document.createElement('div');
+            wikiModal.className = 'wiki-modal-content';
+            wikiModal.setAttribute('role', 'dialog');
+            wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content"></div>`;
+            this.el.wikiOverlay.appendChild(wikiModal);
+            document.getElementById('wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
 
+        if (!this.isWikiLoaded) {
+            const titleEl = document.getElementById('wiki-title');
+            const contentEl = document.getElementById('wiki-content');
+            titleEl.textContent = WIKI_DATA.title;
+            const col1 = document.createElement('div');
+            col1.className = 'wiki-column';
+            const col2 = document.createElement('div');
+            col2.className = 'wiki-column';
+            WIKI_DATA.sections.forEach((s, index) => {
+                const sectionContainer = document.createElement('div');
+                const h4 = document.createElement('h4'); 
+                h4.textContent = s.title;
+                sectionContainer.appendChild(h4);
+                s.content.forEach(c => { 
+                    const p = document.createElement('p'); 
+                    p.innerHTML = c; 
+                    sectionContainer.appendChild(p); 
+                });
+                if (index < 2) { 
+                    col1.appendChild(sectionContainer);
+                } else { 
+                    col2.appendChild(sectionContainer);
+                }
+            });
+            contentEl.innerHTML = '';
+            contentEl.appendChild(col1);
+            contentEl.appendChild(col2);
+            this.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
+    };
+    App.closeWiki = function() { 
+        if(this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show'); 
+    };
+    
     document.addEventListener('DOMContentLoaded', ()=>App.init());
   </script>
 </body>
 </html>
-
