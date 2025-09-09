@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Moodboard Studio</title>
+  <title>SVG Colorizer</title> 
   <script>
     (function() {
       try {
@@ -15,20 +15,17 @@
       } catch (e) {}
     })();
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  
   <style>
     :root {
-      --accent-color: #FFD300; /* Amarillo */
-      --accent-color-tint: #fff2b3;
+      --accent-color: #0077B6; /* Azul Corporativo */
+      --accent-color-tint: #b3d7e8;
       --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
       --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
       --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
       --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
       --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
-      --color-accent-text: #1C1C1E; 
+      --color-accent-text: #FFFFFF;
       --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
       --font-weight-emphasis: 600; --font-weight-medium: 500;
       --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
@@ -39,28 +36,25 @@
     }
     html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
     html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    
     html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
     body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out;}
+    .container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 400px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
     .container.loading { filter: blur(5px); pointer-events: none; }
-    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
-    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
-    main.panel { padding: var(--space-5); min-height: 0; overflow-y: auto; transition: border-color 0.2s ease; }
-    main.panel.drag-over { border-color: var(--accent-color); background-color: var(--accent-color-tint);}
     .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
     header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
     header .sub { color: var(--muted); }
     .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
     .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
     .back-to-home:hover { background-color: var(--surface-alt); }
     .back-to-home svg { width: 18px; height: 18px; }
-    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
-    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-    .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
+    aside.panel.controls { position: sticky; top: 0; max-height: 100%; display: flex; flex-direction: column; }
+    .controls-content { overflow-y: auto; padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-5); flex-grow: 1;}
     .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
     .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
-    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
     .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
     .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
     .btn-primary:hover { filter: brightness(1.1); }
@@ -70,74 +64,39 @@
     .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
     .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
     .form-group label { font-weight: var(--font-weight-medium); }
-    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; }
-    #color-palette { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-    .color-circle { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border-color); transition: transform 0.2s ease; }
-    .color-circle:hover { transform: scale(1.1); }
-    .logo-upload { width: 100%; height: 60px; border: 2px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); overflow: hidden; }
-    .logo-upload img { width: 100%; height: 100%; object-fit: contain; }
-    #moodboard-canvas { column-count: 5; column-gap: var(--space-4); }
-    .moodboard-card { display: inline-block; width: 100%; margin-bottom: var(--space-4); position: relative; break-inside: avoid; cursor: grab; background-color: var(--surface); }
-    .moodboard-card.dragging { opacity: 0.5; }
-    .moodboard-card img { width: 100%; height: auto; display: block; border-radius: var(--radius-md); opacity: 0; transition: opacity 0.5s ease; }
-    .moodboard-card img.loaded { opacity: 1; }
-    .moodboard-card .spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border: 3px solid var(--accent-color-tint); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-    .moodboard-card:hover .delete-btn { opacity: 1; }
-    .add-card-btn { width: 100%; padding: var(--space-5) 0; border: 2px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--surface); color: var(--muted); font-size: 24px; cursor: pointer; text-align: center; }
-    .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity var(--duration-standard); }
+    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; min-height: 40px; }
     
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
-    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
-    .wiki-modal-content, .search-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
-    .wiki-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-4);
-      flex-shrink: 0;
-      position: relative;
-      height: 80px;
-      color: white;
-      background-image: url('modal.png');
-      background-size: cover;
-      background-position: center bottom;
-    }
-    .wiki-header::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
-      z-index: 1;
-    }
-    .wiki-header h3, #wiki-close-btn, #search-modal-close-btn {
-      position: relative;
-      z-index: 2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-    #wiki-close-btn, #search-modal-close-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      line-height: 1;
-      padding: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      color: var(--ink);
-    }
-    .wiki-header #wiki-close-btn { color: var(--color-accent-text); }
-    .wiki-header #wiki-close-btn:hover { background-color: rgba(255,255,255,0.1); }
+    main.panel { display: flex; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; overflow: auto; background-size: 20px 20px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
+    #svg-host { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    #svg-host svg { width: 100%; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+    .placeholder-text { color: var(--muted); }
+
+    .color-swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(28px, 1fr)); gap: var(--space-2); }
+    .swatch { width: 100%; aspect-ratio: 1 / 1; border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
+    .swatch.selected { border-color: var(--accent-color); box-shadow: 0 0 0 3px var(--accent-color); transform: scale(1.1); }
+
+    .group-list { display: flex; flex-direction: column; gap: var(--space-4); }
+    .group-item { display: grid; grid-template-columns: 40px 1fr; gap: var(--space-3); align-items: center; }
+    .group-item input[type="color"] { width: 40px; height: 40px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 4px; cursor: pointer; }
+    .group-original-colors { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; background-color: var(--surface); border-radius: var(--radius-sm); padding: var(--space-2); border: 1px solid var(--border-color); }
+    .group-original-colors .swatch { width: 20px; height: 20px; cursor: default; }
+
+    /* Splash & Wiki Modals */
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; align-items: center; justify-content: center; }
+    .popup-overlay.show { display: flex; }
+    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    .wiki-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); flex-shrink: 0; position: relative; height: 80px; color: white; background-image: url('modal.png'); background-size: cover; background-position: center bottom; }
+    .wiki-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 1; }
+    .wiki-header h3, #wiki-close-btn { position: relative; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    #wiki-close-btn { background: none; border: none; font-size: 24px; line-height: 1; padding: 0; width: 36px; height: 36px; border-radius: 50%; color: var(--color-accent-text); cursor: pointer; transition: background-color 0.2s ease; }
+    #wiki-close-btn:hover { background-color: rgba(255,255,255,0.1); }
     #wiki-content { padding: var(--space-5); overflow: hidden; flex-grow: 1; display: flex; gap: var(--space-5); }
     .wiki-column { flex: 1; min-width: 0; }
     #wiki-content h4 { margin-top: 0; margin-bottom: var(--space-3); font-weight: var(--font-weight-emphasis); color: var(--accent-color); }
-
     .splash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.1); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.5s ease-out; cursor: pointer; }
     .splash-overlay.hidden { opacity: 0; pointer-events: none; }
     .splash-content { display: flex; width: 800px; height: 450px; max-width: 90vw; max-height: 80vh; background: var(--surface-alt); border-radius: var(--radius-md); box-shadow: var(--shadow-floating-3); overflow: hidden; cursor: default; position: relative; }
-    #splash-close-btn { position: absolute; top: var(--space-3); right: var(--space-3); width: 32px; height: 32px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 24px; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; z-index: 10; }
+    #splash-close-btn { position: absolute; top: var(--space-3); right: var(--space-3); width: 32px; height: 32px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 24px; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: all 200ms ease; z-index: 10; }
     #splash-close-btn:hover { background-color: var(--surface-alt); color: var(--ink); transform: scale(1.1); }
     .splash-info { flex: 0 0 300px; padding: var(--space-5); display: flex; flex-direction: column; background-color: var(--surface-alt); color: var(--ink); border-left: 4px solid var(--accent-color); }
     .splash-icon { font-size: 32px; margin-bottom: var(--space-4); }
@@ -147,21 +106,12 @@
     .splash-image { flex: 1; background-color: var(--surface); }
     .splash-image img { width: 100%; height: 100%; object-fit: cover; }
     
-    .search-modal-content { padding: 0; height: 80vh; }
-    .search-modal-header { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-color); background: var(--surface); flex-shrink: 0; }
-    .search-modal-header h3 { margin: 0; font-size: 16px; white-space: nowrap; }
-    #search-modal-close-btn { position: static; color: var(--muted); margin-left: auto; }
-    #search-modal-close-btn:hover { background-color: var(--surface-alt); color: var(--ink); }
-    .gcse-searchbox-only { flex-grow: 1; }
-    .gcse-results-container { padding: var(--space-4); flex-grow: 1; overflow-y: auto; }
-    #search-status { font-size: var(--font-size-caption); color: var(--muted); text-align: center; margin-top: var(--space-2); }
-
-
-    @media (max-width: 800px) { 
-        body { padding: var(--space-4); } 
+    @media (max-width: 1024px) { 
         .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
-        aside.controls { position: static; max-height: none; } 
+        aside.panel.controls { position: static; max-height: none; } 
         main.panel { min-height: 50vh; } 
+    }
+    @media (max-width: 800px) {
         .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
         .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
         .splash-image { width: 100%; height: 200px; }
@@ -174,13 +124,13 @@
     <div class="splash-content">
       <button id="splash-close-btn" title="Close">&times;</button>
       <div class="splash-info">
-        <span class="splash-icon">🖼️</span>
-        <h2 class="splash-title">Moodboard Studio</h2>
-        <p class="splash-tech">Visualizes ideas and concepts using html2canvas for exports and a client-side color palette generator.</p>
+        <span class="splash-icon">🎨</span>
+        <h2 class="splash-title">SVG Colorizer</h2>
+        <p class="splash-tech">Load an SVG, group its colors, and remap entire palettes in real-time. All processing is done in your browser.</p>
         <p class="splash-credits">2025. Toolkit by e</p>
       </div>
       <div class="splash-image">
-        <img src="modal.png" alt="Moodboard Studio Splash Image">
+        <img src="modal.png" alt="SVG Colorizer Splash Image">
       </div>
     </div>
   </div>
@@ -190,105 +140,100 @@
       <a href="../index.html" class="back-to-home" title="Return to Home">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
       </a>
-      <h1>Moodboard Studio</h1>
-      <div class="sub">Create and export beautiful, inspiring moodboards.</div>
+      <h1>SVG Colorizer</h1>
+      <div class="sub">Group and remap colors in any SVG file.</div>
       <div class="theme-switcher">
         <button id="wiki-open-btn" title="Info">ⓘ</button>
         <button id="theme-toggle" title="Change theme"></button>
       </div>
     </header>
 
-    <aside class="panel controls" id="controls">
-      <div class="control-group">
-          <button id="open-search-modal-btn" class="btn btn-secondary">Buscar Imágenes en Web</button>
-      </div>
-      <div class="control-group">
-          <div class="form-group">
-              <label for="logo-input">Logo</label>
-              <div class="logo-upload" id="logo-upload-container">
-                  <span>Upload Logo</span>
-                  <input type="file" id="logo-input" accept="image/*" style="display:none;">
-              </div>
-          </div>
-      </div>
-      <div class="control-group">
-        <div class="form-group">
-          <label for="board-title">Client</label>
-          <input type="text" id="board-title" class="form-control" value="My Project Inspiration">
+    <aside class="panel controls">
+        <div class="controls-content">
+            <div class="control-group">
+                <div class="form-group">
+                    <label for="svg-file-input">1. Load SVG File</label>
+                    <input type="file" id="svg-file-input" class="form-control" accept=".svg, image/svg+xml">
+                </div>
+            </div>
+
+            <div class="control-group" id="original-colors-group">
+                <div class="form-group">
+                    <label>2. Original Colors</label>
+                    <div class="color-swatch-grid" id="original-colors-grid">
+                        <p class="placeholder-text" style="grid-column: 1 / -1;">Load an SVG to see its colors.</p>
+                    </div>
+                </div>
+                <button id="create-group-btn" class="btn btn-secondary" disabled>Group Selected Colors</button>
+            </div>
+            
+            <div class="control-group" id="color-groups-group">
+                <div class="form-group">
+                    <label>3. Color Groups</label>
+                    <div class="group-list" id="color-groups-list">
+                         <p class="placeholder-text">Your created groups will appear here.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="control-group">
-          <div class="form-group">
-              <label>Auto-Generated Palette</label>
-              <div id="color-palette"></div>
-          </div>
-      </div>
-      <div class="control-group" style="margin-top: auto;">
-        <button id="reset-btn" class="btn btn-secondary">Reset</button>
-      </div>
-      <div class="control-group">
-          <button id="export-btn" class="btn btn-primary">Download</button>
-      </div>
-      <div class="note">Tip: Drag images onto the main panel to add them. The color palette will update automatically.</div>
+        <div style="padding: var(--space-5); border-top: 1px solid var(--border-color); flex-shrink: 0;">
+             <button id="download-svg-btn" class="btn btn-primary" disabled>Download SVG</button>
+        </div>
     </aside>
 
     <main class="panel" id="main-panel">
-      <div id="moodboard-canvas"></div>
-      <div class="add-card-btn" id="add-card-btn">+</div>
+      <div id="svg-host">
+          <p class="placeholder-text">SVG Preview will appear here</p>
+      </div>
     </main>
   </div>
   
   <div id="wiki-overlay" class="popup-overlay"></div>
-  
-  <div id="search-modal-overlay" class="popup-overlay">
-    <div class="search-modal-content">
-        <div class="search-modal-header">
-            <h3>Buscar Imágenes</h3>
-            <div class="gcse-searchbox-only"></div>
-            <button id="search-modal-close-btn" title="Close">&times;</button>
-        </div>
-        <div class="gcse-results-container">
-            <div id="search-status" style="font-size: var(--font-size-caption); color: var(--muted); text-align: center;"></div>
-            <div class="gcse-searchresults-only"></div>
-        </div>
-    </div>
-  </div>
-
-  <script>
-    window.__gcse = {
-      searchCallbacks: {
-        image: {
-          rendered: 'handleGoogleResultsRendered',
-        },
-      },
-    };
-  </script>
 
   <script type="module">
-    const WIKI_DATA = { /* ... Contenido del Wiki ... */ };
+    const WIKI_DATA = {
+        "title": "SVG Colorizer Info",
+        "sections":[
+            {
+                "title":"How to Use",
+                "content":[
+                    "<b>1. Load SVG:</b> Click the button to select an SVG file from your computer.",
+                    "<b>2. Select Colors:</b> All unique colors from your SVG will appear in the 'Original Colors' panel. Click on one or more color swatches to select them.",
+                    "<b>3. Create Group:</b> Click the 'Group Selected Colors' button. This will create a new group in the panel below, containing the colors you selected.",
+                    "<b>4. Change Color:</b> Use the color picker for any group to choose a new master color. You will see all instances of the original colors change instantly in the live preview.",
+                    "<b>5. Download:</b> Once you're happy with your new color scheme, click 'Download SVG' to save your work."
+                ]
+            },
+            {
+                "title":"Features",
+                "content":[
+                   "<b>Live Preview:</b> All color changes are reflected instantly on the main SVG canvas.",
+                   "<b>Intelligent Color Parsing:</b> The tool finds colors in `fill`, `stroke`, inline `style` attributes, and now from `<style>` tags.",
+                   "<b>Non-Destructive:</b> You can continue to create new groups from the remaining original colors.",
+                   "<b>Client-Side & Private:</b> Your SVG files are processed entirely in your browser and are never uploaded to a server."
+                ]
+            } 
+    };
 
     const App = {
       el: {},
       state: {
-        title: "My Project Inspiration",
-        colors: [],
-        logo: null,
-        images: [],
+        svgDOM: null,
+        originalSvgText: null,
+        colorToElementsMap: new Map(),
+        ungroupedColors: [],
+        selectedColors: new Set(),
+        colorGroups: [],
         splashHidden: false,
-        isWikiLoaded: false,
-        cseLoaded: false
+        isWikiLoaded: false
       },
-      currentColorIndex: null,
-      draggedItemId: null,
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
 
       init() {
         this.cacheDOMElements();
         this.initTheme();
-        this.loadState();
         this.bindEvents();
-        this.render();
       },
 
       hideSplashScreen() {
@@ -301,11 +246,10 @@
       
       cacheDOMElements() {
         const ids = [
-            'theme-toggle', 'wiki-open-btn', 'board-title', 'color-palette', 
-            'logo-upload-container', 'logo-input', 'export-btn', 'reset-btn', 
-            'main-panel', 'moodboard-canvas', 'add-card-btn', 'splash-screen', 
-            'app-container', 'splash-close-btn', 'wiki-overlay', 
-            'open-search-modal-btn', 'search-modal-overlay', 'search-modal-close-btn', 'search-status'
+            'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen',
+            'app-container', 'splash-close-btn', 'svg-file-input', 'svg-host',
+            'original-colors-grid', 'create-group-btn', 'color-groups-list',
+            'download-svg-btn'
         ];
         ids.forEach(id => {
           const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
@@ -316,363 +260,250 @@
       bindEvents() {
         this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
         this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
-        
         this.el.splashScreen.addEventListener('click', (e) => {
             if (e.target === this.el.splashScreen) this.hideSplashScreen();
         });
         this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
 
-        this.el.openSearchModalBtn.addEventListener('click', () => this.openSearchModal());
-        this.el.searchModalCloseBtn.addEventListener('click', () => this.closeSearchModal());
-        this.el.searchModalOverlay.addEventListener('click', (e) => {
-            if (e.target === this.el.searchModalOverlay) this.closeSearchModal();
-        });
-        
-        this.el.boardTitle.addEventListener('change', () => this.saveAndRender());
-        this.el.logoInput.addEventListener('change', (e) => this.handleFileUploads(e.target.files, true));
-        this.el.logoUploadContainer.addEventListener('click', () => this.el.logoInput.click());
-        this.el.addCardBtn.addEventListener('click', () => this.addImage());
-        this.el.moodboardCanvas.addEventListener('click', (e) => {
-            if (e.target.closest('.delete-btn')) {
-                const card = e.target.closest('.moodboard-card');
-                if (card) this.removeImage(card.dataset.id);
-            }
-        });
-        this.el.resetBtn.addEventListener('click', () => this.resetState());
-        this.el.exportBtn.addEventListener('click', (e) => this.exportToImage(e.target));
-        this.el.mainPanel.addEventListener('dragover', (e) => this.handleDragOver(e));
-        this.el.mainPanel.addEventListener('dragleave', (e) => this.handleDragLeave(e));
-        this.el.mainPanel.addEventListener('drop', (e) => this.handleFileDrop(e));
+        this.el.svgFileInput.addEventListener('change', (e) => this.handleFileLoad(e));
+        this.el.createGroupBtn.addEventListener('click', () => this.createGroup());
+        this.el.downloadSvgBtn.addEventListener('click', () => this.downloadSVG());
       },
+      
+      handleFileLoad(e) {
+        const file = e.target.files[0];
+        if (!file) return;
 
-      openSearchModal() {
-        if (!this.state.cseLoaded) {
-            this.loadGoogleSearchScript();
-            this.state.cseLoaded = true;
-        }
-        this.el.searchModalOverlay.classList.add('show');
-      },
-
-      closeSearchModal() {
-        this.el.searchModalOverlay.classList.remove('show');
-      },
-
-      loadGoogleSearchScript() {
-        const cx = 'TU_CX_AQUI'; // <-- REEMPLAZA CON TU ID
-        const script = document.createElement('script');
-        script.src = `https://cse.google.com/cse.js?cx=${cx}`;
-        script.async = true;
-        document.body.appendChild(script);
-      },
-
-      interceptGoogleResults() {
-        const resultsContainer = this.el.searchModalOverlay.querySelector('.gcse-searchresults-only');
-        if(!resultsContainer) return;
-
-        const observer = new MutationObserver((mutationsList, observer) => {
-            for(const mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    document.querySelectorAll('.gsc-imageResult').forEach(result => {
-                        const img = result.querySelector('img.gs-image');
-                        if (img && !result.onclick) {
-                            result.onclick = (e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                this.addImageFromUrl(img.src);
-                                this.closeSearchModal();
-                                return false;
-                            };
-                        }
-                    });
-                }
-            }
-        });
-
-        observer.observe(resultsContainer, { childList: true, subtree: true });
-      },
-
-      async addImageFromUrl(imageUrl) {
-        this.el.searchStatus.textContent = 'Agregando imagen...';
-        try {
-            const response = await fetch(imageUrl);
-            if (!response.ok) throw new Error('Network response was not ok.');
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            this.state.originalSvgText = event.target.result;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(this.state.originalSvgText, "image/svg+xml");
             
-            const blob = await response.blob();
-            const objectURL = URL.createObjectURL(blob);
+            if (doc.querySelector('parsererror')) {
+                alert("Invalid SVG file. Please check the file and try again.");
+                return;
+            }
+            this.state.svgDOM = doc.documentElement;
+            this.el.svgHost.innerHTML = '';
+            this.el.svgHost.appendChild(this.state.svgDOM.cloneNode(true));
             
-            const newImage = { id: Date.now() + Math.random(), src: objectURL };
-            this.state.images.push(newImage);
+            this.resetState();
+            this.extractColors();
             this.render();
-            this.regeneratePalette();
-            this.el.searchStatus.textContent = '';
-        } catch (error) {
-            console.error('Error fetching image:', error);
-            this.el.searchStatus.textContent = 'No se pudo agregar la imagen.';
-        }
-      },
-      
-      saveAndRender() { this.saveState(); this.render(); },
-      
-      saveState() {
-        const stateToSave = {
-          title: this.el.boardTitle.value, colors: this.state.colors, logo: this.state.logo,
+            this.el.downloadSvgBtn.disabled = false;
         };
-        localStorage.setItem('moodboardState_v3', JSON.stringify(stateToSave));
+        reader.readAsText(file);
       },
 
-      loadState() {
-        const savedState = localStorage.getItem('moodboardState_v3');
-        if (savedState) {
-          try {
-            const loaded = JSON.parse(savedState);
-            this.state.title = loaded.title || "My Project Inspiration";
-            this.state.colors = loaded.colors || [];
-            this.state.logo = loaded.logo || null;
-          } catch (e) {
-            console.error("Could not parse saved state, resetting.", e);
-            localStorage.removeItem('moodboardState_v3');
-          }
-        }
+      resetState() {
+        this.state.colorToElementsMap.clear();
+        this.state.ungroupedColors = [];
+        this.state.selectedColors.clear();
+        this.state.colorGroups = [];
       },
       
-      resetState() {
-        if (confirm('Are you sure you want to clear the entire moodboard?')) {
-            this.state = { 
-                ...this.state,
-                title: "My Project Inspiration", 
-                colors: [], 
-                logo: null, 
-                images: [] 
-            };
-            localStorage.removeItem('moodboardState_v3');
-            this.saveAndRender();
+      extractColors() {
+        const colorSet = new Set();
+        const colorMap = new Map();
+        const allElements = this.state.svgDOM.querySelectorAll('*');
+
+        const normalizeColor = (colorStr) => {
+            if (!colorStr || colorStr.toLowerCase() === 'none' || colorStr.toLowerCase() === 'transparent') return null;
+            const tempDiv = document.createElement('div');
+            tempDiv.style.color = colorStr;
+            document.body.appendChild(tempDiv);
+            const rgb = window.getComputedStyle(tempDiv).color;
+            document.body.removeChild(tempDiv);
+            const match = rgb.match(/rgba?\((\d+), (\d+), (\d+)/);
+            if (!match) return null;
+            const [, r, g, b] = match;
+            const toHex = (c) => ('0' + parseInt(c).toString(16)).slice(-2);
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+        };
+
+        // 1. Extract from <style> tag
+        const styleTag = this.state.svgDOM.querySelector('style');
+        if (styleTag) {
+            const cssText = styleTag.textContent;
+            const colorRegex = /(?:fill|stroke)\s*:\s*(#[0-9a-fA-F]{3,8}|rgba?\([^\)]+\)|[a-zA-Z]+)/g;
+            let match;
+            while ((match = colorRegex.exec(cssText)) !== null) {
+                const normalized = normalizeColor(match[1]);
+                if (normalized) colorSet.add(normalized);
+            }
         }
+        
+        // 2. Extract from inline attributes and styles
+        allElements.forEach(el => {
+            const checkAndAdd = (colorVal, prop, element) => {
+                const normalized = normalizeColor(colorVal);
+                if (normalized) {
+                    colorSet.add(normalized);
+                    if (!colorMap.has(normalized)) colorMap.set(normalized, { fill: [], stroke: [] });
+                    colorMap.get(normalized)[prop].push(element);
+                }
+            };
+            
+            checkAndAdd(el.getAttribute('fill'), 'fill', el);
+            checkAndAdd(el.getAttribute('stroke'), 'stroke', el);
+
+            const style = el.getAttribute('style');
+            if (style) {
+                const fillMatch = style.match(/fill:\s*([^;]+)/);
+                if (fillMatch) checkAndAdd(fillMatch[1], 'fill', el);
+                const strokeMatch = style.match(/stroke:\s*([^;]+)/);
+                if (strokeMatch) checkAndAdd(strokeMatch[1], 'stroke', el);
+            }
+        });
+
+        this.state.colorToElementsMap = colorMap;
+        this.state.ungroupedColors = [...colorSet].sort();
       },
 
       render() {
-        this.el.boardTitle.value = this.state.title;
-        
-        this.el.colorPalette.innerHTML = '';
-        this.state.colors.forEach((color, index) => {
-            const circle = document.createElement('div');
-            circle.className = 'color-circle';
-            circle.style.backgroundColor = color;
-            circle.title = `Edit ${color}`;
-            circle.dataset.index = index;
-            this.el.colorPalette.appendChild(circle);
-        });
-
-        this.el.logoUploadContainer.innerHTML = this.state.logo ? `<img src="${this.state.logo}" alt="Client Logo">` : `<span>Upload Logo</span>`;
-        
-        const canvas = this.el.moodboardCanvas;
-        const existingCardIds = new Set(Array.from(canvas.children).map(c => c.dataset.id));
-        const stateImageIds = new Set(this.state.images.map(i => i.id.toString()));
-        existingCardIds.forEach(id => {
-            if (!stateImageIds.has(id)) {
-                canvas.querySelector(`[data-id="${id}"]`)?.remove();
-            }
-        });
-
-        this.state.images.forEach(image => {
-            let card = canvas.querySelector(`[data-id="${image.id}"]`);
-            if (!card) {
-                card = this.createImageCard(image);
-                canvas.appendChild(card);
-            }
-        });
-      },
-      
-      createImageCard(image) {
-          const card = document.createElement('div');
-          card.className = 'moodboard-card';
-          card.dataset.id = image.id;
-          card.draggable = true;
-
-          card.addEventListener('dragstart', (e) => this.handleItemDragStart(e));
-          card.addEventListener('dragend', (e) => this.handleItemDragEnd(e));
-          card.addEventListener('dragover', (e) => this.handleItemDragOver(e));
-          card.addEventListener('drop', (e) => this.handleItemDrop(e));
-
-          const spinner = document.createElement('div');
-          spinner.className = 'spinner';
-          
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = image.src;
-          img.alt = "Moodboard image";
-          img.onload = () => {
-              spinner.remove();
-              img.classList.add('loaded');
-          };
-
-          card.innerHTML = `<button class="delete-btn" title="Remove image">×</button>`;
-          card.prepend(spinner);
-          card.prepend(img);
-          return card;
+        this.renderOriginalColors();
+        this.renderColorGroups();
+        this.el.createGroupBtn.disabled = this.state.selectedColors.size === 0;
       },
 
-      openModal(modalId) { this.el[modalId].classList.add('show'); },
-      closeModal(modalId) { this.el[modalId].classList.remove('show'); },
-      
-      openColorPickerModal(index) { /* ... (Código sin cambios) ... */ },
-      saveColorFromModal() { /* ... (Código sin cambios) ... */ },
-      syncColorInputs(source) { /* ... (Código sin cambios) ... */ },
-      
-      handleFileUploads(files, isLogo = false) {
-        if (!files || files.length === 0) return;
+      renderOriginalColors() {
+        const grid = this.el.originalColorsGrid;
+        grid.innerHTML = '';
+        if (this.state.ungroupedColors.length === 0 && this.state.colorGroups.length > 0) {
+            grid.innerHTML = `<p class="placeholder-text" style="grid-column: 1 / -1;">All colors have been grouped.</p>`;
+        } else if (this.state.ungroupedColors.length === 0) {
+             grid.innerHTML = `<p class="placeholder-text" style="grid-column: 1 / -1;">Load an SVG to see its colors.</p>`;
+        }
+        
+        this.state.ungroupedColors.forEach(hex => {
+            const swatch = document.createElement('div');
+            swatch.className = 'swatch';
+            swatch.style.backgroundColor = hex;
+            swatch.title = hex;
+            if (this.state.selectedColors.has(hex)) {
+                swatch.classList.add('selected');
+            }
+            swatch.addEventListener('click', () => this.toggleColorSelection(hex));
+            grid.appendChild(swatch);
+        });
+      },
 
-        if (isLogo) {
-            const file = files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.state.logo = e.target.result;
-                this.saveAndRender();
-            };
-            reader.readAsDataURL(file);
+      renderColorGroups() {
+        const list = this.el.colorGroupsList;
+        list.innerHTML = '';
+        if (this.state.colorGroups.length === 0) {
+            list.innerHTML = `<p class="placeholder-text">Your created groups will appear here.</p>`;
+            return;
+        }
+
+        this.state.colorGroups.forEach(group => {
+            const groupEl = document.createElement('div');
+            groupEl.className = 'group-item';
+
+            const colorPicker = document.createElement('input');
+            colorPicker.type = 'color';
+            colorPicker.value = group.masterColor;
+            colorPicker.addEventListener('input', (e) => this.updateGroupColor(group.id, e.target.value));
+            
+            const originalsContainer = document.createElement('div');
+            originalsContainer.className = 'group-original-colors';
+            group.originalColors.forEach(hex => {
+                const swatch = document.createElement('div');
+                swatch.className = 'swatch';
+                swatch.style.backgroundColor = hex;
+                swatch.title = hex;
+                originalsContainer.appendChild(swatch);
+            });
+            
+            groupEl.appendChild(colorPicker);
+            groupEl.appendChild(originalsContainer);
+            list.appendChild(groupEl);
+        });
+      },
+
+      toggleColorSelection(hex) {
+        if (this.state.selectedColors.has(hex)) {
+            this.state.selectedColors.delete(hex);
         } else {
-            const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-            
-            const newImages = imageFiles.map(file => ({
-                id: Date.now() + Math.random(),
-                src: URL.createObjectURL(file),
-            }));
-            
-            this.state.images.push(...newImages);
-            this.render(); 
-            this.regeneratePalette();
+            this.state.selectedColors.add(hex);
         }
-      },
-      
-      addImage() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.multiple = true;
-        input.onchange = (e) => this.handleFileUploads(e.target.files);
-        input.click();
-      },
-
-      removeImage(id) {
-        const idToRemove = parseFloat(id);
-        const imageToRemove = this.state.images.find(img => img.id === idToRemove);
-        if (imageToRemove && imageToRemove.src.startsWith('blob:')) {
-            URL.revokeObjectURL(imageToRemove.src);
-        }
-        this.state.images = this.state.images.filter(img => img.id !== idToRemove);
-        this.regeneratePalette();
-      },
-      
-      handleDragOver(e) { e.preventDefault(); this.el.mainPanel.classList.add('drag-over'); },
-      handleDragLeave(e) { this.el.mainPanel.classList.remove('drag-over'); },
-      handleFileDrop(e) {
-        e.preventDefault();
-        this.el.mainPanel.classList.remove('drag-over');
-        this.handleFileUploads(e.dataTransfer.files);
-      },
-
-      handleItemDragStart(e) {
-        this.draggedItemId = e.target.dataset.id;
-        e.target.classList.add('dragging');
-      },
-      handleItemDragEnd(e) {
-        e.target.classList.remove('dragging');
-        this.draggedItemId = null;
-      },
-      handleItemDragOver(e) { e.preventDefault(); },
-      handleItemDrop(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        const targetCard = e.target.closest('.moodboard-card');
-        if (!targetCard || targetCard.dataset.id === this.draggedItemId) return;
-
-        const draggedIndex = this.state.images.findIndex(img => img.id == this.draggedItemId);
-        const targetIndex = this.state.images.findIndex(img => img.id == targetCard.dataset.id);
-
-        const [draggedItem] = this.state.images.splice(draggedIndex, 1);
-        this.state.images.splice(targetIndex, 0, draggedItem);
         this.render();
       },
 
-      async regeneratePalette() {
-          if (this.state.images.length === 0) {
-              this.state.colors = [];
-              this.saveAndRender();
-              return;
-          }
-          const colorPromises = this.state.images.map(image => this.extractColorsFromImage(image.src));
-          const colorSets = await Promise.all(colorPromises);
-          
-          const colorCounts = new Map();
-          colorSets.flat().forEach(color => {
-              colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
-          });
-          
-          const sortedColors = Array.from(colorCounts.entries())
-              .sort((a, b) => b[1] - a[1])
-              .map(entry => entry[0]);
+      createGroup() {
+        if (this.state.selectedColors.size === 0) return;
+        
+        const newGroup = {
+            id: Date.now(),
+            masterColor: this.state.selectedColors.values().next().value,
+            originalColors: [...this.state.selectedColors]
+        };
 
-          this.state.colors = sortedColors.slice(0, 6);
-          this.saveAndRender();
-      },
+        this.state.colorGroups.push(newGroup);
+        this.state.ungroupedColors = this.state.ungroupedColors.filter(c => !this.state.selectedColors.has(c));
+        this.state.selectedColors.clear();
 
-      extractColorsFromImage(imageSrc) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 100;
-                const scale = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scale;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                const colorCounts = {};
-                for (let i = 0; i < imageData.length; i += 4) {
-                    const r = imageData[i]; const g = imageData[i + 1]; const b = imageData[i + 2]; const a = imageData[i + 3];
-                    if (a < 125) continue;
-                    const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-                    if (l > 245 || l < 10) continue; 
-                    const key = [r, g, b].join(',');
-                    colorCounts[key] = (colorCounts[key] || 0) + 1;
-                }
-                const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]);
-                const topColors = sortedColors.slice(0, 10).map(key => {
-                    const [r, g, b] = key.split(',');
-                    return `#${(+r).toString(16).padStart(2,'0')}${(+g).toString(16).padStart(2,'0')}${(+b).toString(16).padStart(2,'0')}`;
-                });
-                resolve(topColors);
-            };
-            img.onerror = () => resolve([]);
-            img.src = imageSrc;
-        });
+        this.updateSvgColors(newGroup.originalColors, newGroup.masterColor);
+        this.render();
       },
       
-      async exportToImage(button) {
-        button.textContent = 'Generating...'; button.disabled = true;
-        const exportContainer = document.createElement('div');
-        const themeStyles = getComputedStyle(document.documentElement);
-        
-        const logoHtml = this.state.logo ? `<img src="${this.state.logo}" style="height: 40px; max-width: 120px; object-fit: contain; margin-left: 24px;">` : '';
-        const colorsHtml = this.state.colors.map(c => `<div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${c};"></div>`).join('');
-        const imagesHtml = this.state.images.map(img => `<img src="${img.src}" style="width: 100%; display: block; break-inside: avoid; margin-bottom: 16px; border-radius: 8px;">`).join('');
-        exportContainer.style.cssText = `position: absolute; left: -9999px; width: 1200px; padding: 40px; background-color: ${themeStyles.getPropertyValue('--surface-alt').trim()}; color: ${themeStyles.getPropertyValue('--ink').trim()}; font-family: ${themeStyles.getPropertyValue('--font-family-sans').trim()};`;
-        exportContainer.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${themeStyles.getPropertyValue('--border-color').trim()}; padding-bottom: 24px; margin-bottom: 24px;"><h1 style="font-size: 32px; font-weight: 600; margin: 0;">${this.state.title}</h1><div style="display: flex; gap: 12px; align-items: center;">${colorsHtml}${logoHtml}</div></div><div style="column-count: 4; column-gap: 16px;">${imagesHtml}</div>`;
-        document.body.appendChild(exportContainer);
-        try {
-            const canvas = await html2canvas(exportContainer, { scale: 2, useCORS: true, allowTaint: true });
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = `${this.state.title.replace(/\s+/g, '-')}-moodboard.png`;
-            link.click();
-        } catch(error) {
-            console.error("Error exporting to image:", error);
-            alert("An error occurred while generating the image.");
-        } finally {
-            document.body.removeChild(exportContainer);
-            button.textContent = 'Download'; button.disabled = false;
+      updateGroupColor(groupId, newColor) {
+        const group = this.state.colorGroups.find(g => g.id === groupId);
+        if (group) {
+            const oldMaster = group.masterColor;
+            group.masterColor = newColor.toUpperCase();
+            this.updateSvgColors(group.originalColors, group.masterColor);
+            this.render();
         }
+      },
+
+      updateSvgColors(originalHexArray, newHex) {
+        // 1. Update inline attributes and styles
+        originalHexArray.forEach(hex => {
+            const elements = this.state.colorToElementsMap.get(hex);
+            if(elements) {
+                elements.fill.forEach(el => {
+                    if(el.getAttribute('fill')?.toUpperCase() === hex) el.setAttribute('fill', newHex);
+                    if(el.style.fill) el.style.fill = newHex;
+                });
+                elements.stroke.forEach(el => {
+                    if(el.getAttribute('stroke')?.toUpperCase() === hex) el.setAttribute('stroke', newHex);
+                    if(el.style.stroke) el.style.stroke = newHex;
+                });
+            }
+        });
+        
+        // 2. Update the <style> tag
+        const styleTag = this.state.svgDOM.querySelector('style');
+        if (styleTag) {
+            let cssText = styleTag.textContent;
+            originalHexArray.forEach(hex => {
+                // Regex to find the hex code, case-insensitive, but keep the rest of the rule
+                const regex = new RegExp(hex, 'gi');
+                cssText = cssText.replace(regex, newHex);
+            });
+            styleTag.textContent = cssText;
+        }
+
+        // 3. Refresh the live preview
+        this.el.svgHost.innerHTML = '';
+        this.el.svgHost.appendChild(this.state.svgDOM.cloneNode(true));
+      },
+
+      downloadSVG() {
+        if (!this.state.svgDOM) return;
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(this.state.svgDOM);
+        const blob = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'colorizer.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       },
       
       initTheme() {
@@ -682,71 +513,54 @@
           if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
         });
       },
-
       setTheme(theme, save = true) {
         if (save) localStorage.setItem('creative-toolkit-theme', theme);
         this.el.themeToggle.textContent = this.THEME_ICONS[theme];
         this.applyTheme(theme);
       },
-
       cycleTheme() {
         const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
         this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
       },
-
       applyTheme(theme) {
         const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
         document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
       },
-      
       openWiki() {
-          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.innerHTML = `
-                  <div class="wiki-header">
-                    <h3 id="wiki-title">Info</h3>
-                    <button id="wiki-close-btn" title="Close">×</button>
-                  </div>
-                  <div id="wiki-content"></div>`;
-              this.el.wikiOverlay.appendChild(wikiModal);
-              wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
-          }
-
-          if (!this.state.isWikiLoaded) {
-              const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-              const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-              titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div'); col1.className = 'wiki-column';
-              const col2 = document.createElement('div'); col2.className = 'wiki-column';
-
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                  if (index < WIKI_DATA.sections.length / 2) {
-                      col1.appendChild(sectionContainer);
-                  } else {
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              contentEl.innerHTML = '';
-              contentEl.appendChild(col1);
-              contentEl.appendChild(col2);
-
-              this.state.isWikiLoaded = true;
-          }
-          this.el.wikiOverlay.classList.add('show');
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+            const wikiModal = document.createElement('div');
+            wikiModal.className = 'wiki-modal-content';
+            wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content"></div>`;
+            this.el.wikiOverlay.appendChild(wikiModal);
+            wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
+        if (!this.state.isWikiLoaded) {
+            const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+            const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+            titleEl.textContent = WIKI_DATA.title;
+            const col1 = document.createElement('div'); col1.className = 'wiki-column';
+            const col2 = document.createElement('div'); col2.className = 'wiki-column';
+            WIKI_DATA.sections.forEach((s, index) => {
+                const sectionContainer = document.createElement('div');
+                const h4 = document.createElement('h4'); h4.textContent = s.title;
+                sectionContainer.appendChild(h4);
+                s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+                if (index < Math.ceil(WIKI_DATA.sections.length / 2)) {
+                    col1.appendChild(sectionContainer);
+                } else {
+                    col2.appendChild(sectionContainer);
+                }
+            });
+            contentEl.innerHTML = '';
+            contentEl.appendChild(col1);
+            contentEl.appendChild(col2);
+            this.state.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
       },
-      closeWiki(){ this.el.wikiOverlay.classList.remove('show'); },
-    };
-
-    window.App = App;
-    window.handleGoogleResultsRendered = () => {
-        window.App.interceptGoogleResults();
+      closeWiki() {
+        this.el.wikiOverlay.classList.remove('show');
+      },
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
