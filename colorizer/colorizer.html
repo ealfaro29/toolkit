@@ -195,13 +195,18 @@
         "title": "SVG Colorizer Info",
         "sections":[
             {
+                "title": "About",
+                "content": [
+                    "This tool allows you to load an SVG file, group its colors, and remap entire palettes in real-time.",
+                    "It works entirely in your browser, so your files are never uploaded to a server."
+                ]
+            },
+            {
                 "title":"How to Use",
                 "content":[
-                    "<b>1. Load SVG:</b> Click the button to select an SVG file from your computer.",
-                    "<b>2. Select Colors:</b> All unique colors from your SVG will appear in the 'Original Colors' panel. Click on one or more color swatches to select them.",
-                    "<b>3. Create Group:</b> Click the 'Group Selected Colors' button. This will create a new group in the panel below, containing the colors you selected.",
-                    "<b>4. Change Color:</b> Use the color picker for any group to choose a new master color. You will see all instances of the original colors change instantly in the live preview.",
-                    "<b>5. Download:</b> Once you're happy with your new color scheme, click 'Download SVG' to save your work."
+                    "<b>1. Load SVG:</b> Drag and drop an SVG file onto the main panel.",
+                    "<b>2. Group Colors:</b> Select colors from the original colors list to form a group.",
+                    "<b>3. Remap Colors:</b> Choose a new color for the group. All instances of the original colors will be updated in the SVG.",
                 ]
             },
             {
@@ -210,9 +215,10 @@
                    "<b>Live Preview:</b> All color changes are reflected instantly on the main SVG canvas.",
                    "<b>Intelligent Color Parsing:</b> The tool finds colors in `fill`, `stroke`, inline `style` attributes, and now from `<style>` tags.",
                    "<b>Non-Destructive:</b> You can continue to create new groups from the remaining original colors.",
-                   "<b>Client-Side & Private:</b> Your SVG files are processed entirely in your browser and are never uploaded to a server.",
+                   "<b>Client-Side & Private:</b> Your SVG files are processed entirely in your browser and are never uploaded to a server."
                 ]
-            } 
+            }
+        ]
     };
 
     const App = {
