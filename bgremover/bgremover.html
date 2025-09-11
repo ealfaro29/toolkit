@@ -550,7 +550,7 @@
                 messageInterval = setInterval(() => {
                     messageIndex = (messageIndex + 1) % messages.length;
                     this.showLoader(messages[messageIndex]);
-                }, 2000);
+                }, 5000);
 
                 const finalBitmap = await this.processImageForBackgroundRemoval(bmp);
                 
@@ -596,5 +596,3 @@
   </script>
 </body>
 </html>
-
-
