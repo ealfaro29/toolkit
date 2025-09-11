@@ -6,7 +6,7 @@
   <title>Creative Toolkit</title>
   <style>
     :root {
-      --accent-color: #4f46e5; /* Using the purple from Locator/Colors as a neutral default */
+      --accent-color: #4f46e5;
       --accent-color-tint: #c7d2fe;
       --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
       --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
@@ -27,111 +27,54 @@
     html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
     body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
-
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 25px; }
     .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-
-    header.panel {
-      height: 65px;
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: 0 var(--space-4);
-    }
+    header.panel { height: 65px; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-4); }
     header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
     header .sub { color: var(--muted); }
     .theme-switcher { margin-left: auto; }
     #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
     #theme-toggle:hover { background-color: var(--surface-alt); }
 
-    .app-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-    }
+    .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+    .app-card { text-decoration: none; color: var(--ink); background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); transition: transform var(--duration-standard) ease, box-shadow var(--duration-standard) ease; border-top: 4px solid var(--card-accent-color); cursor: grab; }
+    .app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-floating-3); }
+    .app-card.dragging { opacity: 0.5; cursor: grabbing; }
+    .app-card-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: var(--radius-md); background-color: var(--card-icon-bg-color-transparent); color: var(--color-accent-text, #FFF); font-size: 28px; }
+    .app-card-title { font-size: 18px; font-weight: var(--font-weight-emphasis); margin: 0; }
+    .app-card-description { margin: 0; color: var(--muted); line-height: 1.6; }
 
-    .app-card {
-      text-decoration: none;
-      color: var(--ink);
-      background: var(--surface-alt);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--panel-shadow);
-      padding: var(--space-5);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-      transition: transform var(--duration-standard) ease, box-shadow var(--duration-standard) ease;
-      border-top: 4px solid var(--card-accent-color);
-      cursor: grab;
-    }
-
-    .app-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-floating-3);
-    }
-
-    .app-card.dragging {
-      opacity: 0.5;
-      cursor: grabbing;
-    }
-
-    .app-card-icon {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      border-radius: var(--radius-md);
-      background-color: var(--card-icon-bg-color-transparent);
-      color: var(--color-accent-text, #FFF);
-      font-size: 28px;
-    }
-
-    .app-card-title {
-      font-size: 18px;
-      font-weight: var(--font-weight-emphasis);
-      margin: 0;
-    }
-
-    .app-card-description {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    
-    /* Konami Code Sparkle Effect */
-    .sparkle {
+    /* Konami Spaceship Game Styles */
+    #konami-ship {
         position: fixed;
-        width: 10px;
-        height: 10px;
-        background-color: #ffd700;
-        border-radius: 50%;
+        bottom: 20px;
+        width: 0;
+        height: 0;
+        border-left: 15px solid transparent;
+        border-right: 15px solid transparent;
+        border-bottom: 30px solid var(--accent-color);
+        transition: transform 0.1s linear;
         pointer-events: none;
-        animation: sparkle-animation 0.8s forwards;
+        z-index: 10000;
+        filter: drop-shadow(0 0 5px var(--accent-color));
+    }
+    .konami-laser {
+        position: fixed;
+        width: 4px;
+        height: 15px;
+        background-color: #ff4500;
+        box-shadow: 0 0 10px #ff4500;
+        border-radius: 2px;
+        pointer-events: none;
         z-index: 9999;
     }
-
-    @keyframes sparkle-animation {
-        0% {
-            transform: scale(0);
-            opacity: 1;
-        }
-        50% {
-            transform: scale(1.5);
-            opacity: 0.7;
-        }
-        100% {
-            transform: scale(0);
-            opacity: 0;
-        }
+    .konami-explosion {
+        animation: konami-explode 0.3s forwards;
     }
-
+    @keyframes konami-explode {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -146,79 +89,66 @@
 
     <main>
       <div class="app-grid" id="app-grid">
-
         <a href="moodboards/moodboards.html" class="app-card" style="--card-accent-color: #FFD300; --card-icon-bg-color-transparent: rgba(255, 211, 0, 0.15);" data-id="moodboards" draggable="true">
           <div class="app-card-icon">🖼️</div>
           <h2 class="app-card-title">Moodboard Studio</h2>
           <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding, colors, and images.</p>
         </a>
-        
         <a href="blobs/blobs.html" class="app-card" style="--card-accent-color: #800080; --card-icon-bg-color-transparent: rgba(128, 0, 128, 0.15);" data-id="blobs" draggable="true">
             <div class="app-card-icon">💧</div>
             <h2 class="app-card-title">Blob Studio</h2>
             <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Tweak points, variance, and smoothness.</p>
         </a>
-
         <a href="jigsaws/jigsaws.html" class="app-card" style="--card-accent-color: #00B5AD; --card-icon-bg-color-transparent: rgba(0, 181, 173, 0.15);" data-id="jigsaws" draggable="true">
           <div class="app-card-icon">🧩</div>
           <h2 class="app-card-title">Jigsaw Generator</h2>
           <p class="app-card-description">Design and export custom vector jigsaw puzzle grids with control over rows, columns, and tab size.</p>
         </a>
-
         <a href="iconfactory/iconfactory.html" class="app-card" style="--card-accent-color: #3B4352; --card-icon-bg-color-transparent: rgba(59, 67, 82, 0.15);" data-id="iconfactory" draggable="true">
           <div class="app-card-icon">🛠️</div>
           <h2 class="app-card-title">Icon Factory</h2>
           <p class="app-card-description">Combine shapes to create custom icons. Build your collection and download them as a ZIP file.</p>
         </a>
-
         <a href="qrcodes/qrcodes.html" class="app-card" style="--card-accent-color: #2CA02C; --card-icon-bg-color-transparent: rgba(44, 160, 44, 0.15);" data-id="qrcodes" draggable="true">
             <div class="app-card-icon">📱</div>
             <h2 class="app-card-title">QR Code Generator</h2>
             <p class="app-card-description">Create custom QR codes for URLs, WiFi, and more. All data is generated locally in your browser.</p>
         </a>
-
         <a href="palettes/palettes.html" class="app-card" style="--card-accent-color: #FF7F00; --card-icon-bg-color-transparent: rgba(255, 127, 0, 0.15);" data-id="colors" draggable="true">
             <div class="app-card-icon">🌈</div>
             <h2 class="app-card-title">Color Mixer</h2>
             <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a single base color.</p>
         </a>
-
         <a href="notes/notes.html" class="app-card" style="--card-accent-color: #FF1493; --card-icon-bg-color-transparent: rgba(255, 20, 147, 0.15);" data-id="notes" draggable="true">
             <div class="app-card-icon">📝</div>
             <h2 class="app-card-title">Notepad & Kanban</h2>
             <p class="app-card-description">Capture ideas, then drag them into your workflow. Your data is saved automatically in the browser.</p>
         </a>
-
         <a href="locator/locator.html" class="app-card" style="--card-accent-color: #4B0082; --card-icon-bg-color-transparent: rgba(75, 0, 130, 0.15);" data-id="locator" draggable="true">
             <div class="app-card-icon">📍</div>
             <h2 class="app-card-title">Locator</h2>
             <p class="app-card-description">Geocode a list of locations and visualize the results on an interactive world map. Export as SVG.</p>
         </a>
-        
         <a href="signatures/signatures.html" class="app-card" style="--card-accent-color: #002493; --card-icon-bg-color-transparent: rgba(80, 96, 126, 0.15);" data-id="signatures" draggable="true">
             <div class="app-card-icon">✍️</div>
             <h2 class="app-card-title">Signature to SVG</h2>
             <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with adjustable settings.</p>
         </a>
-
         <a href="any2svg/any2svg.html" class="app-card" style="--card-accent-color: #A4C639; --card-icon-bg-color-transparent: rgba(164, 198, 57, 0.15);" data-id="any2svg" draggable="true">
             <div class="app-card-icon">🪄</div>
             <h2 class="app-card-title">Any2SVG</h2>
             <p class="app-card-description">Convert AI, PSD, PDF, and more to SVG. All files are processed locally in your browser.</p>
         </a>
-
         <a href="bgremover/bgremover.html" class="app-card" style="--card-accent-color: #E63946; --card-icon-bg-color-transparent: rgba(230, 57, 70, 0.15);" data-id="bgremover" draggable="true">
           <div class="app-card-icon">✂️</div>
           <h2 class="app-card-title">Background Remover</h2>
           <p class="app-card-description">Client-side AI cutout. Click, drop or paste an image to automatically remove the background.</p>
         </a>
-        
         <a href="colorizer/colorizer.html" class="app-card" style="--card-accent-color: #0077B6; --card-icon-bg-color-transparent: rgba(0, 119, 182, 0.15);" data-id="colorizer" draggable="true">
           <div class="app-card-icon">🎨</div>
           <h2 class="app-card-title">SVG Color Grouper (BETA)</h2>
           <p class="app-card-description">Upload an SVG, define color groups, and drag-and-drop to remap the entire palette.</p>
         </a>
-
       </div>
     </main>
   </div>
@@ -228,17 +158,11 @@
       el: {},
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
-      DRAG_STATE: {
-        dragged: null,
-        over: null
-      },
+      DRAG_STATE: { dragged: null, over: null },
 
-      konamiCode: [
-        'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-        'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
-        'b', 'a', 'Enter'
-      ],
+      konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'],
       konamiIndex: 0,
+      isGameActive: false,
 
       init() {
         this.cacheDOMElements();
@@ -271,10 +195,16 @@
       },
 
       handleKonamiCode(e) {
-          if (e.key === this.konamiCode[this.konamiIndex]) {
+          if (this.isGameActive) {
+              if (e.key === 'Escape') {
+                  this.deactivateGame();
+              }
+              return;
+          }
+          if (e.key.toLowerCase() === this.konamiCode[this.konamiIndex].toLowerCase()) {
               this.konamiIndex++;
               if (this.konamiIndex === this.konamiCode.length) {
-                  this.triggerSparkles();
+                  this.activateGame();
                   this.konamiIndex = 0;
               }
           } else {
@@ -282,22 +212,77 @@
           }
       },
 
-      triggerSparkles() {
-          const sparkleContainer = document.createElement('div');
-          document.body.appendChild(sparkleContainer);
+      activateGame() {
+          if (this.isGameActive) return;
+          this.isGameActive = true;
 
-          for (let i = 0; i < 30; i++) {
-              const sparkle = document.createElement('span');
-              sparkle.className = 'sparkle';
-              sparkle.style.top = `${Math.random() * 100}%`;
-              sparkle.style.left = `${Math.random() * 100}%`;
-              sparkle.style.animationDelay = `${Math.random() * 0.5}s`;
-              sparkleContainer.appendChild(sparkle);
+          const ship = document.createElement('div');
+          ship.id = 'konami-ship';
+          document.body.appendChild(ship);
+
+          this.el.ship = ship;
+
+          this.moveShip = (e) => {
+              const x = e.clientX;
+              ship.style.transform = `translateX(${x - window.innerWidth / 2}px)`;
+          };
+          this.shootLaser = (e) => {
+              this.createLaser();
+          };
+
+          window.addEventListener('mousemove', this.moveShip);
+          window.addEventListener('click', this.shootLaser);
+      },
+
+      deactivateGame() {
+          if (!this.isGameActive) return;
+          this.isGameActive = false;
+
+          if (this.el.ship) {
+              this.el.ship.remove();
           }
 
-          setTimeout(() => {
-              sparkleContainer.remove();
-          }, 1000);
+          window.removeEventListener('mousemove', this.moveShip);
+          window.removeEventListener('click', this.shootLaser);
+      },
+
+      createLaser() {
+          const laser = document.createElement('div');
+          laser.className = 'konami-laser';
+          document.body.appendChild(laser);
+
+          const shipRect = this.el.ship.getBoundingClientRect();
+          let laserX = shipRect.left + (shipRect.width / 2) - 2;
+          let laserY = shipRect.top;
+
+          laser.style.left = `${laserX}px`;
+          laser.style.top = `${laserY}px`;
+
+          const animateLaser = () => {
+              laserY -= 15;
+              laser.style.top = `${laserY}px`;
+              
+              if (laserY < 0) {
+                  laser.remove();
+                  return;
+              }
+              
+              laser.style.visibility = 'hidden';
+              const elementHit = document.elementFromPoint(laserX, laserY);
+              laser.style.visibility = 'visible';
+
+              if (elementHit && elementHit.closest('.app-card')) {
+                  const card = elementHit.closest('.app-card');
+                  if (!card.classList.contains('konami-explosion')) {
+                    card.classList.add('konami-explosion');
+                    laser.remove();
+                    setTimeout(() => card.remove(), 300);
+                  }
+              } else {
+                  requestAnimationFrame(animateLaser);
+              }
+          };
+          requestAnimationFrame(animateLaser);
       },
 
       initTheme() {
