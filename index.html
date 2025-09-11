@@ -26,7 +26,7 @@
     html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
     html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
     body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -36,7 +36,7 @@
     }
 
     .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    
+
     header.panel {
       height: 65px;
       display: flex;
@@ -76,12 +76,12 @@
       transform: translateY(-5px);
       box-shadow: var(--shadow-floating-3);
     }
-    
+
     .app-card.dragging {
       opacity: 0.5;
       cursor: grabbing;
     }
-    
+
     .app-card-icon {
       width: 48px;
       height: 48px;
@@ -92,17 +92,44 @@
       color: var(--color-accent-text, #FFF);
       font-size: 28px;
     }
-    
+
     .app-card-title {
       font-size: 18px;
       font-weight: var(--font-weight-emphasis);
       margin: 0;
     }
-    
+
     .app-card-description {
       margin: 0;
       color: var(--muted);
       line-height: 1.6;
+    }
+    
+    /* Konami Code Sparkle Effect */
+    .sparkle {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background-color: #ffd700;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: sparkle-animation 0.8s forwards;
+        z-index: 9999;
+    }
+
+    @keyframes sparkle-animation {
+        0% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.5);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(0);
+            opacity: 0;
+        }
     }
 
   </style>
@@ -206,6 +233,13 @@
         over: null
       },
 
+      konamiCode: [
+        'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+        'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+        'b', 'a', 'Enter'
+      ],
+      konamiIndex: 0,
+
       init() {
         this.cacheDOMElements();
         this.initTheme();
@@ -232,6 +266,38 @@
         this.el.appGrid.addEventListener('dragleave', this.handleDragLeave.bind(this));
         this.el.appGrid.addEventListener('drop', this.handleDrop.bind(this));
         this.el.appGrid.addEventListener('dragend', this.handleDragEnd.bind(this));
+
+        window.addEventListener('keyup', this.handleKonamiCode.bind(this));
+      },
+
+      handleKonamiCode(e) {
+          if (e.key === this.konamiCode[this.konamiIndex]) {
+              this.konamiIndex++;
+              if (this.konamiIndex === this.konamiCode.length) {
+                  this.triggerSparkles();
+                  this.konamiIndex = 0;
+              }
+          } else {
+              this.konamiIndex = 0;
+          }
+      },
+
+      triggerSparkles() {
+          const sparkleContainer = document.createElement('div');
+          document.body.appendChild(sparkleContainer);
+
+          for (let i = 0; i < 30; i++) {
+              const sparkle = document.createElement('span');
+              sparkle.className = 'sparkle';
+              sparkle.style.top = `${Math.random() * 100}%`;
+              sparkle.style.left = `${Math.random() * 100}%`;
+              sparkle.style.animationDelay = `${Math.random() * 0.5}s`;
+              sparkleContainer.appendChild(sparkle);
+          }
+
+          setTimeout(() => {
+              sparkleContainer.remove();
+          }, 1000);
       },
 
       initTheme() {
