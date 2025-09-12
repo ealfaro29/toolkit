@@ -44,37 +44,6 @@
     .app-card-title { font-size: 18px; font-weight: var(--font-weight-emphasis); margin: 0; }
     .app-card-description { margin: 0; color: var(--muted); line-height: 1.6; }
 
-    /* Konami Spaceship Game Styles */
-    #konami-ship {
-        position: fixed;
-        bottom: 20px;
-        width: 0;
-        height: 0;
-        border-left: 15px solid transparent;
-        border-right: 15px solid transparent;
-        border-bottom: 30px solid var(--accent-color);
-        transition: transform 0.1s linear;
-        pointer-events: none;
-        z-index: 10000;
-        filter: drop-shadow(0 0 5px var(--accent-color));
-    }
-    .konami-laser {
-        position: fixed;
-        width: 4px;
-        height: 15px;
-        background-color: #ff4500;
-        box-shadow: 0 0 10px #ff4500;
-        border-radius: 2px;
-        pointer-events: none;
-        z-index: 9999;
-    }
-    .konami-explosion {
-        animation: konami-explode 0.3s forwards;
-    }
-    @keyframes konami-explode {
-        0% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(0); opacity: 0; }
-    }
   </style>
 </head>
 <body>
@@ -162,8 +131,7 @@
 
       konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'],
       konamiIndex: 0,
-      isGameActive: false,
-
+      
       init() {
         this.cacheDOMElements();
         this.initTheme();
@@ -195,12 +163,6 @@
       },
 
       handleKonamiCode(e) {
-          if (this.isGameActive) {
-              if (e.key === 'Escape') {
-                  this.deactivateGame();
-              }
-              return;
-          }
           if (e.key.toLowerCase() === this.konamiCode[this.konamiIndex].toLowerCase()) {
               this.konamiIndex++;
               if (this.konamiIndex === this.konamiCode.length) {
@@ -211,78 +173,204 @@
               this.konamiIndex = 0;
           }
       },
-
+      
       activateGame() {
-          if (this.isGameActive) return;
-          this.isGameActive = true;
+        if (window.KICKASS) { return; }
 
-          const ship = document.createElement('div');
-          ship.id = 'konami-ship';
-          document.body.appendChild(ship);
+        const KICKASS = {
+            init: function() {
+                this.canvas = document.createElement('canvas');
+                this.canvas.id = 'kickass-canvas';
+                this.canvas.style.position = 'fixed';
+                this.canvas.style.top = '0';
+                this.canvas.style.left = '0';
+                this.canvas.style.zIndex = '10000';
+                this.canvas.style.pointerEvents = 'none';
+                document.body.appendChild(this.canvas);
+                this.ctx = this.canvas.getContext('2d');
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
 
-          this.el.ship = ship;
+                this.score = 0;
+                this.scoreEl = document.createElement('div');
+                this.scoreEl.style.position = 'fixed';
+                this.scoreEl.style.top = '10px';
+                this.scoreEl.style.left = '10px';
+                this.scoreEl.style.color = 'white';
+                this.scoreEl.style.font = 'bold 24px sans-serif';
+                this.scoreEl.style.textShadow = '0 0 5px black';
+                this.scoreEl.style.zIndex = '10001';
+                document.body.appendChild(this.scoreEl);
 
-          this.moveShip = (e) => {
-              const x = e.clientX;
-              ship.style.transform = `translateX(${x - window.innerWidth / 2}px)`;
-          };
-          this.shootLaser = (e) => {
-              this.createLaser();
-          };
+                this.ship = {
+                    x: this.width / 2,
+                    y: this.height - 50,
+                    vx: 0,
+                    vy: 0,
+                    angle: -Math.PI / 2,
+                    rotation: 0,
+                    thrust: 0,
+                    size: 20
+                };
+                this.bullets = [];
+                this.enemies = [];
 
-          window.addEventListener('mousemove', this.moveShip);
-          window.addEventListener('click', this.shootLaser);
-      },
+                this.keys = {};
+                this.boundKeyDown = this.handleKeyDown.bind(this);
+                this.boundKeyUp = this.handleKeyUp.bind(this);
+                window.addEventListener('keydown', this.boundKeyDown);
+                window.addEventListener('keyup', this.boundKeyUp);
 
-      deactivateGame() {
-          if (!this.isGameActive) return;
-          this.isGameActive = false;
+                this.populateEnemies();
+                this.lastTime = Date.now();
+                this.loop();
+            },
+            
+            populateEnemies: function() {
+                const els = document.querySelectorAll('.app-card, header.panel');
+                for (let i = 0; i < els.length; i++) {
+                    const el = els[i];
+                    const rect = el.getBoundingClientRect();
+                    this.enemies.push({
+                        el: el,
+                        x: rect.left + rect.width / 2,
+                        y: rect.top + rect.height / 2,
+                        size: Math.max(rect.width, rect.height) / 2
+                    });
+                }
+            },
 
-          if (this.el.ship) {
-              this.el.ship.remove();
-          }
+            handleKeyDown: function(e) {
+                this.keys[e.keyCode] = true;
+                if (e.keyCode === 32) { // space
+                    e.preventDefault();
+                    this.fireBullet();
+                }
+                if (e.keyCode === 27) { // esc
+                    e.preventDefault();
+                    this.destroy();
+                }
+            },
+            handleKeyUp: function(e) {
+                this.keys[e.keyCode] = false;
+            },
 
-          window.removeEventListener('mousemove', this.moveShip);
-          window.removeEventListener('click', this.shootLaser);
-      },
+            fireBullet: function() {
+                this.bullets.push({
+                    x: this.ship.x + Math.cos(this.ship.angle) * this.ship.size,
+                    y: this.ship.y + Math.sin(this.ship.angle) * this.ship.size,
+                    vx: Math.cos(this.ship.angle) * 10,
+                    vy: Math.sin(this.ship.angle) * 10,
+                    life: 80
+                });
+            },
 
-      createLaser() {
-          const laser = document.createElement('div');
-          laser.className = 'konami-laser';
-          document.body.appendChild(laser);
+            update: function(dt) {
+                // Ship movement
+                if (this.keys[37]) this.ship.rotation = -5; // left
+                else if (this.keys[39]) this.ship.rotation = 5; // right
+                else this.ship.rotation = 0;
 
-          const shipRect = this.el.ship.getBoundingClientRect();
-          let laserX = shipRect.left + (shipRect.width / 2) - 2;
-          let laserY = shipRect.top;
+                if (this.keys[38]) this.ship.thrust = 0.1; // up
+                else this.ship.thrust = 0;
 
-          laser.style.left = `${laserX}px`;
-          laser.style.top = `${laserY}px`;
+                this.ship.angle += this.ship.rotation * dt * (Math.PI / 180);
+                this.ship.vx += Math.cos(this.ship.angle) * this.ship.thrust;
+                this.ship.vy += Math.sin(this.ship.angle) * this.ship.thrust;
 
-          const animateLaser = () => {
-              laserY -= 15;
-              laser.style.top = `${laserY}px`;
-              
-              if (laserY < 0) {
-                  laser.remove();
-                  return;
-              }
-              
-              laser.style.visibility = 'hidden';
-              const elementHit = document.elementFromPoint(laserX, laserY);
-              laser.style.visibility = 'visible';
+                this.ship.vx *= 0.99;
+                this.ship.vy *= 0.99;
 
-              if (elementHit && elementHit.closest('.app-card')) {
-                  const card = elementHit.closest('.app-card');
-                  if (!card.classList.contains('konami-explosion')) {
-                    card.classList.add('konami-explosion');
-                    laser.remove();
-                    setTimeout(() => card.remove(), 300);
-                  }
-              } else {
-                  requestAnimationFrame(animateLaser);
-              }
-          };
-          requestAnimationFrame(animateLaser);
+                this.ship.x += this.ship.vx;
+                this.ship.y += this.ship.vy;
+
+                // Screen wrap
+                if (this.ship.x < 0) this.ship.x = this.width;
+                if (this.ship.x > this.width) this.ship.x = 0;
+                if (this.ship.y < 0) this.ship.y = this.height;
+                if (this.ship.y > this.height) this.ship.y = 0;
+
+                // Bullets
+                for (let i = this.bullets.length - 1; i >= 0; i--) {
+                    const b = this.bullets[i];
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    b.life--;
+                    if (b.life <= 0) {
+                        this.bullets.splice(i, 1);
+                        continue;
+                    }
+                    // Collision
+                    for (let j = this.enemies.length - 1; j >= 0; j--) {
+                        const enemy = this.enemies[j];
+                        const dx = enemy.x - b.x;
+                        const dy = enemy.y - b.y;
+                        if (Math.sqrt(dx * dx + dy * dy) < enemy.size) {
+                            this.enemies.splice(j, 1);
+                            this.bullets.splice(i, 1);
+                            this.score++;
+                            const deadEl = enemy.el;
+                            deadEl.style.transition = 'all 0.2s';
+                            deadEl.style.transform = 'scale(0)';
+                            setTimeout(function(){
+                                if(deadEl.parentNode)
+                                    deadEl.parentNode.removeChild(deadEl);
+                            }, 200);
+                            break;
+                        }
+                    }
+                }
+                this.scoreEl.innerHTML = this.score + " KILLED";
+            },
+
+            draw: function() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                // Ship
+                this.ctx.save();
+                this.ctx.translate(this.ship.x, this.ship.y);
+                this.ctx.rotate(this.ship.angle + Math.PI / 2);
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, -this.ship.size / 2);
+                this.ctx.lineTo(this.ship.size / 2, this.ship.size / 2);
+                this.ctx.lineTo(-this.ship.size / 2, this.ship.size / 2);
+                this.ctx.closePath();
+                this.ctx.fillStyle = 'white';
+                this.ctx.fill();
+                this.ctx.restore();
+                
+                // Bullets
+                this.ctx.fillStyle = 'lime';
+                for (let i = 0; i < this.bullets.length; i++) {
+                    const b = this.bullets[i];
+                    this.ctx.beginPath();
+                    this.ctx.arc(b.x, b.y, 2, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+            },
+
+            loop: function() {
+                const now = Date.now();
+                const dt = (now - this.lastTime) / 16.666; // 60fps
+                this.lastTime = now;
+                this.update(dt);
+                this.draw();
+                this.raf = requestAnimationFrame(this.loop.bind(this));
+            },
+            
+            destroy: function() {
+                window.removeEventListener('keydown', this.boundKeyDown);
+                window.removeEventListener('keyup', this.boundKeyUp);
+                cancelAnimationFrame(this.raf);
+                if (this.canvas.parentNode) document.body.removeChild(this.canvas);
+                if (this.scoreEl.parentNode) document.body.removeChild(this.scoreEl);
+                window.KICKASS = null;
+            }
+        };
+        window.KICKASS = KICKASS;
+        KICKASS.init();
       },
 
       initTheme() {
