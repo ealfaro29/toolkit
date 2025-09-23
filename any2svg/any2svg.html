@@ -322,7 +322,36 @@
   <iframe id="photopea" style="width:0;height:0;border:0;position:absolute;left:-9999px;top:-9999px" aria-hidden="true"></iframe>
 
   <script type="module">
-    const WIKI_DATA = { /* ... Contenido del Wiki ... */ };
+    const WIKI_DATA = {
+        "title": "Any2SVG Information",
+        "sections": [
+            {
+                "title": "How to Use",
+                "content": [
+                    "<b>1. Select a File:</b> Click the file input to select a supported file from your device (AI, PSD, PDF, etc.).",
+                    "<b>2. Preview:</b> A preview of your file will be generated.",
+                    "<b>3. Convert:</b> Click the 'Convert to SVG' button.",
+                    "<b>4. Download:</b> Your SVG will be automatically downloaded."
+                ]
+            },
+            {
+                "title": "Supported Files",
+                "content": [
+                    "This tool supports a wide variety of file types, including:",
+                    "Adobe Illustrator (.ai)",
+                    "Adobe Photoshop (.psd)",
+                    "Portable Document Format (.pdf)",
+                    "And many other image formats."
+                ]
+            },
+            {
+                "title": "Privacy",
+                "content": [
+                    "All file processing is done directly in your browser. Your files are never uploaded to a server, ensuring your privacy and data security."
+                ]
+            }
+        ]
+    };
   
     const App = {
       el: {}, 
@@ -343,7 +372,6 @@
         this.initTheme();
         this.bind();
         
-        // MODIFICADO: Lógica de carga del Iframe
         this.loadEngine();
         
         window.addEventListener('message', (e) => this.onMessage(e));
@@ -352,11 +380,9 @@
 
       loadEngine() {
         const iframe = document.getElementById('photopea');
-        // Este es el script que se le pasa a Photopea en la URL
         const config = {
           script: "parent.postMessage('done','*')"
         };
-        // La URL se construye con el script codificado
         iframe.src = `https://www.photopea.com#${encodeURIComponent(JSON.stringify(config))}`;
         this.pp = iframe.contentWindow;
       },
@@ -422,7 +448,6 @@
         this.el.engineStatus.classList.remove('error-note');
         this.el.reloadEngineBtn.style.display = 'none';
         
-        // La recarga ahora se hace con el método de la API
         this.loadEngine();
         
         this.state.engineReady = false;
@@ -439,7 +464,6 @@
                 this.el.engineStatus.innerHTML = "";
                 this.el.engineStatus.classList.remove('error-note');
                 this.el.reloadEngineBtn.style.display = 'none';
-                setTimeout(() => this.hideSplashScreen(), 500);
                 return; 
             }
             if (this.state.isOpening) {
@@ -461,42 +485,28 @@
         }
       },
       
-      initTheme() { /* ... (código completo abajo) ... */ },
-      setTheme(t, save=true){ /* ... (código completo abajo) ... */ },
-      cycleTheme(){ /* ... (código completo abajo) ... */ },
-      applyTheme(t){ /* ... (código completo abajo) ... */ },
-      async handleFilePick(e){ /* ... (código completo abajo) ... */ },
-      resetState() { /* ... (código completo abajo) ... */ },
-      convert(){ /* ... (código completo abajo) ... */ },
-      renderPreview(ab){ /* ... (código completo abajo) ... */ },
-      autoDownload(ab, filename, mime){ /* ... (código completo abajo) ... */ },
-      prettyBytes(n){ /* ... (código completo abajo) ... */ },
-      openWiki() { /* ... (código completo abajo) ... */ },
-      closeWiki() { /* ... (código completo abajo) ... */ },
-    };
-
-    App.initTheme = function(){
+      initTheme() {
         const saved = localStorage.getItem('creative-toolkit-theme') || 'system';
         this.setTheme(saved, false);
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
           if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') this.applyTheme('system');
         });
-    };
-    App.setTheme = function(t, save=true){ 
+      },
+      setTheme(t, save=true){
         if(save) localStorage.setItem('creative-toolkit-theme', t); 
         this.el.themeToggle.textContent = this.THEME_ICONS[t]; 
         this.applyTheme(t); 
-    };
-    App.cycleTheme = function(){ 
+      },
+      cycleTheme(){
         const cur = localStorage.getItem('creative-toolkit-theme') || 'system'; 
         const i = (this.THEMES.indexOf(cur) + 1) % this.THEMES.length; 
         this.setTheme(this.THEMES[i]); 
-    };
-    App.applyTheme = function(t){ 
+      },
+      applyTheme(t){
         const isDark = (t === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark'; 
         document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; 
-    };
-    App.handleFilePick = async function(e){
+      },
+      async handleFilePick(e){
         const file = e.target.files && e.target.files[0];
         if(!file || !this.state.engineReady) return;
         
@@ -508,23 +518,23 @@
         this.state.isOpening = true;
         this.state.isExpectingPreview = true;
         this.pp.postMessage(buffer, '*', [buffer]);
-    };
-    App.resetState = function() {
+      },
+      resetState() {
         this.state.isOpening = false;
         this.state.isExpectingPreview = false;
         this.el.convertBtn.disabled = true;
         this.el.ph.style.display = 'block';
         this.el.preview.style.display = 'none';
         this.el.fileMeta.textContent = '';
-    };
-    App.convert = function(){
+      },
+      convert(){
         if(!this.state.engineReady) return;
         this.state.isExpectingPreview = false;
         this.el.convertBtn.disabled = true;
         this.el.convertBtn.textContent = 'Converting...';
         this.pp.postMessage('app.activeDocument.saveToOE("svg");', '*');
-    };
-    App.renderPreview = function(ab){
+      },
+      renderPreview(ab){
         const blob = new Blob([ab], {type:'image/png'});
         const url = URL.createObjectURL(blob);
         const img = new Image();
@@ -543,8 +553,8 @@
           URL.revokeObjectURL(url);
         };
         img.src = url;
-    };
-    App.autoDownload = function(ab, filename, mime){
+      },
+      autoDownload(ab, filename, mime){
         const blob = new Blob([ab], {type:mime});
         const url = URL.createObjectURL(blob);
         const a = Object.assign(document.createElement('a'), { href:url, download:filename });
@@ -553,14 +563,14 @@
         
         this.el.convertBtn.textContent = 'Convert to SVG';
         this.resetState();
-    };
-    App.prettyBytes = function(n){
+      },
+      prettyBytes(n){
         if(n < 1024) return n + ' B';
         const u=['KB','MB','GB','TB']; let i=-1;
         do { n/=1024; i++; } while (n>=1024 && i<u.length-1);
         return n.toFixed(1) + ' ' + u[i];
-    };
-    App.openWiki = function() {
+      },
+      openWiki() {
         if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
             const wikiModal = document.createElement('div');
             wikiModal.className = 'wiki-modal-content';
@@ -600,9 +610,10 @@
             this.isWikiLoaded = true;
         }
         this.el.wikiOverlay.classList.add('show');
-    };
-    App.closeWiki = function() { 
+      },
+      closeWiki() { 
         if(this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show'); 
+      },
     };
     
     document.addEventListener('DOMContentLoaded', ()=>App.init());
