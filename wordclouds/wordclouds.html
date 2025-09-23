@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Word Cloud Generator</title> 
+  
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+
+  <style>
+    /* Global CSS Variables */
+    :root {
+      --accent-color: #4f46e5; /* Default Toolkit Purple */
+      --accent-color-tint: #c7d2fe;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF;
+      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    /* Theme Application */
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    
+    /* Base Styles */
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
+    
+    /* Layout Container */
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
+    .container.loading { filter: blur(5px); pointer-events: none; }
+    
+    /* Panel Styles */
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    
+    /* Header Specifics */
+    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    
+    /* Theme Switcher & Wiki Button */
+    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
+    
+    /* Back to Home Button */
+    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
+    .back-to-home:hover { background-color: var(--surface-alt); }
+    .back-to-home svg { width: 18px; height: 18px; }
+
+    /* Aside Controls Layout */
+    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
+    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
+    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
+    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
+    
+    /* Form Elements & Buttons */
+    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
+    .form-group label { font-weight: var(--font-weight-medium); }
+    .form-control, .select-wrapper select, input[type="color"], input[type="number"], textarea { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; resize: vertical; min-height: 40px; }
+    textarea.form-control { min-height: 120px; }
+    input[type="number"] { text-align: right; }
+    
+    .select-wrapper { position: relative; }
+    .select-wrapper select { -webkit-appearance: none; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
+    
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
+    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background-color: var(--surface); border-color: var(--border-color); color: var(--ink); }
+    .btn-secondary:hover { background-color: var(--surface-alt); }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
+
+    /* Main Canvas/Content Area */
+    main.panel { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; }
+    #wordCloudOutput { width: 100%; height: 100%; }
+
+    /* App-specific Styles */
+    .hidden { display: none !important; }
+    #dataTable { width: 100%; border-collapse: collapse; }
+    #dataTable td { border: 1px solid var(--border-color); padding: var(--space-2); background-color: var(--surface); }
+    #dataTable tr:nth-child(even) td { background-color: var(--surface-alt); }
+
+    /* Popups & Modals */
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
+    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
+    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    .wiki-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); flex-shrink: 0; position: relative; height: 80px; color: white; background-image: url('modal.png'); background-size: cover; background-position: center bottom; }
+    .wiki-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 1; }
+    .wiki-header h3, #wiki-close-btn { position: relative; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    #wiki-close-btn { background: none; border: none; font-size: 24px; line-height: 1; padding: 0; width: 36px; height: 36px; border-radius: 50%; color: var(--color-accent-text); cursor: pointer; transition: background-color 0.2s ease; }
+    #wiki-close-btn:hover { background-color: rgba(255,255,255,0.1); }
+    #wiki-content { padding: var(--space-5); overflow: hidden; flex-grow: 1; display: flex; gap: var(--space-5); }
+    .wiki-column { flex: 1; min-width: 0; }
+    #wiki-content h4 { margin-top: 0; margin-bottom: var(--space-3); font-weight: var(--font-weight-emphasis); color: var(--accent-color); }
+    
+    /* Splash Screen Modal */
+    .splash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.1); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.5s ease-out; cursor: pointer; }
+    .splash-overlay.hidden { opacity: 0; pointer-events: none; }
+    .splash-content { display: flex; width: 800px; height: 450px; max-width: 90vw; max-height: 80vh; background: var(--surface-alt); border-radius: var(--radius-md); box-shadow: var(--shadow-floating-3); overflow: hidden; cursor: default; position: relative; }
+    #splash-close-btn { position: absolute; top: var(--space-3); right: var(--space-3); width: 32px; height: 32px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 24px; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; z-index: 10; }
+    #splash-close-btn:hover { background-color: var(--surface-alt); color: var(--ink); transform: scale(1.1); }
+    .splash-info { flex: 0 0 300px; padding: var(--space-5); display: flex; flex-direction: column; background-color: var(--surface-alt); color: var(--ink); border-left: 4px solid var(--accent-color); }
+    .splash-icon { font-size: 32px; margin-bottom: var(--space-4); }
+    .splash-title { font-size: 24px; font-weight: var(--font-weight-emphasis); color: var(--accent-color); margin-bottom: var(--space-5); }
+    .splash-tech { margin: 0; color: var(--muted); line-height: 1.6; }
+    .splash-credits { margin-top: auto; font-size: var(--font-size-caption); color: var(--muted); }
+    .splash-image { flex: 1; background-color: var(--surface); }
+    .splash-image img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Responsive Adjustments */
+    @media (max-width: 800px) { 
+        body { padding: var(--space-4); } 
+        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
+        aside.controls { position: static; max-height: none; } 
+        main.panel { min-height: 50vh; } 
+        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
+        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
+        .splash-image { width: 100%; height: 200px; }
+        #wiki-content { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-overlay" id="splash-screen">
+    <div class="splash-content">
+      <button id="splash-close-btn" title="Close">&times;</button>
+      <div class="splash-info">
+        <span class="splash-icon">☁️</span>
+        <h2 class="splash-title">Word Cloud Generator</h2>
+        <p class="splash-tech">Generates a visual word cloud from text or a frequency table using D3.js.</p>
+        <p class="splash-credits">2025. Toolkit by e</p>
+      </div>
+      <div class="splash-image">
+        <img src="modal.png" alt="App Splash Image">
+      </div>
+    </div>
+  </div>
+
+  <div class="container loading" id="app-container">
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+      </a>
+      <h1>Word Cloud Generator</h1>
+      <div class="sub">Visualize Text Frequency</div>
+      <div class="theme-switcher">
+        <button id="wiki-open-btn" title="Info">ⓘ</button>
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls" id="controls">
+      <div class="control-group">
+          <div class="form-group">
+              <label for="inputType">Input Type</label>
+              <div class="select-wrapper">
+                <select id="inputType">
+                    <option value="text">Full Text</option>
+                    <option value="table">Word/Size Table</option>
+                </select>
+              </div>
+          </div>
+      </div>
+      <div class="control-group" id="textInputContainer">
+          <div class="form-group">
+              <label for="fullText">Paste Text</label>
+              <textarea id="fullText" class="form-control" placeholder="Paste a large block of text here..."></textarea>
+          </div>
+          <div class="form-group">
+              <label for="maxWords">Number of Words</label>
+              <input type="number" id="maxWords" value="100" min="10" max="300" step="10">
+          </div>
+      </div>
+      <div class="control-group hidden" id="tableInputContainer">
+          <div class="form-group">
+              <label>Paste from Spreadsheet</label>
+              <div style="height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                   <table id="dataTable" contenteditable="true">
+                       <tbody></tbody>
+                   </table>
+              </div>
+          </div>
+      </div>
+      <div class="control-group">
+          <button id="generateBtn" class="btn btn-primary">Generate Cloud</button>
+          <button id="exportBtn" class="btn btn-secondary hidden">Export as SVG</button>
+      </div>
+      <div class="note">Tip: For table input, copy two columns (word and size) from a spreadsheet and paste directly into the table area.</div>
+    </aside>
+
+    <main class="panel" id="main-panel">
+      <div id="wordCloudOutput">
+        <div style="text-align: center; color: var(--muted);">
+          <h2>Your Word Cloud Will Appear Here</h2>
+          <p>Enter some data on the left and click "Generate Cloud" to begin.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="wiki-overlay" class="popup-overlay"></div>
+  
+  <script type="module">
+    const WIKI_DATA = {
+      "title": "Word Cloud Generator",
+      "sections": [
+        {
+          "title": "How to Use",
+          "content": [
+            "This tool creates a visual representation of word frequencies from your text.",
+            "<b>1. Choose Input Type:</b> Select 'Full Text' to paste a large block of text, or 'Word/Size Table' to provide specific words and their weights.",
+            "<b>2. Provide Data:</b> Paste your content into the appropriate field. For the table, you can paste directly from a spreadsheet.",
+            "<b>3. Generate:</b> Click the 'Generate Cloud' button to create the visualization.",
+            "<b>4. Export:</b> Once the cloud is generated, an 'Export as SVG' button will appear, allowing you to save your creation."
+          ]
+        },
+        {
+          "title": "Input Modes",
+          "content": [
+            "<b>Full Text:</b> The app automatically counts word frequencies, removes common 'stopwords' (like 'the', 'a', 'is'), and displays the most frequent words. You can control how many words are shown.",
+            "<b>Word/Size Table:</b> This mode gives you direct control. Provide a list of words in the first column and a numeric size (or weight) in the second. The size determines how large the word appears in the cloud."
+          ]
+        }
+      ]
+    };
+
+    const App = {
+      el: {},
+      state: { splashHidden: false, isWikiLoaded: false },
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+      stopwords: new Set(["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can", "cannot", "could", "did", "do", "does", "doing", "down", "during", "each", "few", "for", "from", "further", "had", "has", "have", "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "it", "it's", "its", "itself", "let's", "me", "more", "most", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "she", "she'd", "she'll", "she's", "should", "so", "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "we", "we'd", "we'll", "we're", "we've", "were", "what", "what's", "when", "when's", "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "would", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"]),
+
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.bindEvents();
+        this.addEmptyTableRows(10);
+      },
+
+      cacheDOMElements() {
+        const ids = ['theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen', 'app-container', 'splash-close-btn', 'inputType', 'textInputContainer', 'tableInputContainer', 'fullText', 'maxWords', 'dataTable', 'generateBtn', 'exportBtn', 'wordCloudOutput'];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          this.el[key] = document.getElementById(id);
+        });
+        this.el.dataTableBody = this.el.dataTable.querySelector('tbody');
+      },
+
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+        this.el.splashScreen.addEventListener('click', (e) => { if (e.target === this.el.splashScreen) this.hideSplashScreen(); });
+        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+
+        // App-specific events
+        this.el.inputType.addEventListener('change', () => this.handleInputTypeChange());
+        this.el.generateBtn.addEventListener('click', () => this.handleGenerate());
+        this.el.exportBtn.addEventListener('click', () => this.handleExport());
+        this.el.dataTable.addEventListener('paste', (e) => this.handlePaste(e));
+      },
+      
+      handleInputTypeChange() {
+        const isText = this.el.inputType.value === 'text';
+        this.el.textInputContainer.classList.toggle('hidden', !isText);
+        this.el.tableInputContainer.classList.toggle('hidden', isText);
+      },
+
+      handleGenerate() {
+        let words;
+        if (this.el.inputType.value === 'text') {
+            if (!this.el.fullText.value) { alert("Please enter some text."); return; }
+            words = this.processText(this.el.fullText.value);
+        } else {
+            words = this.processTable();
+            if (words.length === 0) { alert("Please provide valid data in the table."); return; }
+        }
+        if (words.length > 0) this.generateCloud(words);
+        else alert("No valid words found to generate a cloud.");
+      },
+
+      handleExport() {
+        const svgElement = this.el.wordCloudOutput.querySelector('svg');
+        if (svgElement) this.exportSVG(svgElement);
+        else alert("No word cloud to export. Please generate one first.");
+      },
+
+      handlePaste(e) {
+        e.preventDefault();
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+        const rows = pastedText.split(/\r?\n/).filter(row => row.trim() !== '');
+        this.el.dataTableBody.innerHTML = '';
+        rows.forEach(rowText => {
+            const cells = rowText.split('\t');
+            const newRow = this.el.dataTableBody.insertRow();
+            newRow.insertCell().textContent = cells[0] || '';
+            newRow.insertCell().textContent = cells[1] || '';
+        });
+        this.addEmptyTableRows(5);
+      },
+
+      addEmptyTableRows(count) {
+        for (let i = 0; i < count; i++) {
+            const row = this.el.dataTableBody.insertRow();
+            row.insertCell();
+            row.insertCell();
+        }
+      },
+
+      processText(text) {
+        const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+        const freqMap = words.reduce((map, word) => {
+            if (word.length > 1 && !this.stopwords.has(word) && isNaN(word)) {
+                map[word] = (map[word] || 0) + 1;
+            }
+            return map;
+        }, {});
+        let sortedWords = Object.keys(freqMap).map(key => ({ text: key, size: freqMap[key] }));
+        sortedWords.sort((a, b) => b.size - a.size);
+        const maxWords = parseInt(this.el.maxWords.value, 10) || 100;
+        return sortedWords.slice(0, maxWords);
+      },
+
+      processTable() {
+        const data = [];
+        this.el.dataTable.querySelectorAll('tbody tr').forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 2) {
+                const word = cells[0].innerText.trim();
+                const size = parseInt(cells[1].innerText.trim(), 10);
+                if (word && !isNaN(size)) data.push({ text: word, size: size });
+            }
+        });
+        return data;
+      },
+      
+      generateCloud(words) {
+        this.el.wordCloudOutput.innerHTML = '<p style="color: var(--muted);">Generating...</p>';
+        const width = this.el.wordCloudOutput.clientWidth;
+        const height = this.el.wordCloudOutput.clientHeight > 50 ? this.el.wordCloudOutput.clientHeight : 500;
+
+        const minSize = d3.min(words, d => d.size);
+        const maxSize = d3.max(words, d => d.size);
+        const fontScale = d3.scale.sqrt().domain([minSize, maxSize]).range([15, 90]);
+        
+        d3.layout.cloud().size([width, height])
+            .words(words.map(d => ({ text: d.text, size: fontScale(d.size) })))
+            .padding(5).rotate(0).font("Arial")
+            .fontSize(d => d.size)
+            .on("end", (drawnWords) => this.drawCloud(drawnWords, width, height))
+            .start();
+      },
+
+      drawCloud(words, width, height) {
+        this.el.wordCloudOutput.innerHTML = '';
+        const fillColor = d3.scale.category20();
+        const svg = d3.select(this.el.wordCloudOutput).append("svg")
+            .attr("width", width).attr("height", height)
+            .append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        svg.selectAll("text").data(words).enter().append("text")
+            .style("font-size", d => d.size + "px")
+            .style("font-family", "Arial")
+            .style("fill", (d, i) => fillColor(i))
+            .attr("text-anchor", "middle")
+            .attr("transform", d => `translate(${d.x}, ${d.y})rotate(${d.rotate})`)
+            .text(d => d.text);
+        
+        this.el.exportBtn.classList.remove('hidden');
+      },
+
+      exportSVG(svgEl) {
+        const svgData = new XMLSerializer().serializeToString(svgEl);
+        const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+        const svgUrl = URL.createObjectURL(svgBlob);
+        const downloadLink = document.createElement("a");
+        downloadLink.href = svgUrl;
+        downloadLink.download = "wordcloud.svg";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      },
+
+      hideSplashScreen() {
+          if (!this.state.splashHidden) {
+              this.state.splashHidden = true;
+              this.el.splashScreen.classList.add('hidden');
+              this.el.appContainer.classList.remove('loading');
+          }
+      },
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+        });
+      },
+      setTheme(theme, save = true) {
+        if (save) localStorage.setItem('creative-toolkit-theme', theme);
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
+      },
+      applyTheme(theme) {
+        const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      },
+      openWiki() {
+          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+              const wikiModal = document.createElement('div');
+              wikiModal.className = 'wiki-modal-content';
+              wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content"></div>`;
+              this.el.wikiOverlay.appendChild(wikiModal);
+              wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+          }
+          if (!this.state.isWikiLoaded) {
+              const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+              this.el.wikiOverlay.querySelector('#wiki-title').textContent = WIKI_DATA.title;
+              const col1 = document.createElement('div'); col1.className = 'wiki-column';
+              const col2 = document.createElement('div'); col2.className = 'wiki-column';
+              WIKI_DATA.sections.forEach((s, index) => {
+                  const sectionContainer = document.createElement('div');
+                  sectionContainer.innerHTML = `<h4>${s.title}</h4>${s.content.map(c => `<p>${c}</p>`).join('')}`;
+                  if (index < Math.ceil(WIKI_DATA.sections.length / 2)) col1.appendChild(sectionContainer);
+                  else col2.appendChild(sectionContainer);
+              });
+              contentEl.append(col1, col2);
+              this.state.isWikiLoaded = true;
+          }
+          this.el.wikiOverlay.classList.add('show');
+      },
+      closeWiki() { this.el.wikiOverlay.classList.remove('show'); }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>
