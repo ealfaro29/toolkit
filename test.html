@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Workslop Impact — Mini Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    .card { border-radius: 1rem; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+    .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+    .muted { color: rgb(113, 113, 122); }
+  </style>
+</head>
+<body class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+  <div class="max-w-6xl mx-auto p-6">
+    <header class="mb-6">
+      <h1 class="text-3xl font-extrabold tracking-tight">AI “Workslop” Impact</h1>
+      <p class="muted mt-1 text-sm">Harvard Business Review survey of 1,150 US desk workers.</p>
+    </header>
+
+    <section class="grid-auto mb-6">
+      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
+        <div class="text-sm muted">Prevalence</div>
+        <div class="mt-1 text-3xl font-bold">40%</div>
+        <div class="text-xs muted mt-1">Encountered workslop in the past month</div>
+      </div>
+      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
+        <div class="text-sm muted">Time lost</div>
+        <div class="mt-1 text-3xl font-bold">~2 hrs</div>
+        <div class="text-xs muted mt-1">Per instance of workslop</div>
+      </div>
+      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
+        <div class="text-sm muted">Cost per employee</div>
+        <div class="mt-1 text-3xl font-bold">$186</div>
+        <div class="text-xs muted mt-1">Per month, average estimate</div>
+      </div>
+      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
+        <div class="text-sm muted">Senders</div>
+        <div class="mt-1 text-3xl font-bold">18%</div>
+        <div class="text-xs muted mt-1">Admit sending AI-generated content</div>
+      </div>
+    </section>
+
+    <section class="grid-auto mb-6">
+      <div class="card p-5 bg-white dark:bg-zinc-800/60 flex flex-col">
+        <h2 class="text-lg font-semibold mb-3">At-a-glance metrics</h2>
+        <div class="relative h-72">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card p-5 bg-white dark:bg-zinc-800/60 flex flex-col">
+        <h2 class="text-lg font-semibold mb-3">Perception of Workslop Senders</h2>
+        <p class="text-xs muted -mt-2 mb-2">Share of respondents who view senders as less capable, creative, and reliable.</p>
+        <div class="relative h-72">
+          <canvas id="doughnutChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card p-5 bg-white dark:bg-zinc-800/60 flex flex-col">
+        <h2 class="text-lg font-semibold mb-3">Scale it up</h2>
+        <p class="text-xs muted -mt-2 mb-2">Illustrative annual cost using $186 per employee per month.</p>
+        <div class="relative h-72">
+          <canvas id="costChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-8 text-xs muted">
+      Source: Harvard Business Review, “AI Workslop” survey. Figures rounded. This file loads charts from public CDNs.
+    </footer>
+  </div>
+
+<script>
+  // Data constants
+  const prevalence = 40;
+  const timeLostHours = 2;
+  const costPerEmployee = 186;
+  const sendersAdmit = 18;
+  const negativePerception = 50;
+
+  // ✅ FIX: Detect dark mode to set colors dynamically
+  const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const textColor = isDarkMode ? 'rgba(244, 244, 245, 0.9)' : 'rgba(39, 39, 42, 0.9)';
+  const gridColor = isDarkMode ? 'rgba(82, 82, 90, 0.5)' : 'rgba(228, 228, 231, 0.7)';
+  
+  // Register plugin
+  Chart.register(ChartDataLabels);
+
+  // Common chart options
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: true },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        formatter: (v, ctx) => {
+          const label = ctx.chart.data.labels[ctx.dataIndex];
+          if (label.includes('$')) return '$' + v.toLocaleString();
+          if (label.includes('hrs')) return v + ' hrs';
+          if (label.includes('%') || ctx.chart.config.type === 'doughnut') return v + '%';
+          return v;
+        },
+        clamp: true,
+        offset: 4,
+        color: textColor, // Use dynamic text color
+        font: { weight: '600' }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: textColor } // Use dynamic text color
+      },
+      y: {
+        grid: { color: gridColor }, // Use dynamic grid color
+        ticks: { color: textColor } // Use dynamic text color
+      }
+    }
+  };
+
+  // Bar chart
+  const barCtx = document.getElementById('barChart');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Prevalence %', 'Time lost hrs', 'Cost $/month', 'Admit sending %'],
+      datasets: [{
+        data: [prevalence, timeLostHours, costPerEmployee, sendersAdmit],
+        borderWidth: 0,
+        backgroundColor: [
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 159, 64, 0.7)',
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(75, 192, 192, 0.7)'
+        ]
+      }]
+    },
+    options: {
+      ...commonOptions,
+      // ✅ FIX: Add layout padding to prevent labels from being cropped
+      layout: {
+        padding: {
+          top: 24
+        }
+      },
+      scales: {
+        ...commonOptions.scales,
+        y: {
+          ...commonOptions.scales.y,
+          type: 'logarithmic',
+          ticks: {
+            ...commonOptions.scales.y.ticks,
+            callback: function (value) {
+              if ([1, 10, 100, 200].includes(value)) {
+                return value;
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Doughnut chart
+  const doughnutCtx = document.getElementById('doughnutChart');
+  new Chart(doughnutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Negative perception', 'Neutral/positive perception'],
+      datasets: [{
+        data: [negativePerception, 100 - negativePerception],
+        backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(201, 203, 207, 0.7)'],
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          display: true, 
+          position: 'bottom',
+          labels: { color: textColor } // Use dynamic text color for legend
+        },
+        datalabels: {
+          formatter: (v) => v + '%',
+          // Use a high-contrast color for labels inside the doughnut
+          color: isDarkMode ? '#18181b' : '#f9fafb',
+          font: { weight: '700' }
+        }
+      },
+      cutout: '55%'
+    }
+  });
+
+  // Cost scaling line chart
+  const costCtx = document.getElementById('costChart');
+  const sizes = [100, 1000, 5000, 10000, 20000, 50000];
+  const annualCosts = sizes.map(n => n * costPerEmployee * 12);
+  new Chart(costCtx, {
+    type: 'line',
+    data: {
+      labels: sizes.map(n => n.toLocaleString() + ' employees'),
+      datasets: [{
+        label: 'Annual cost (USD)',
+        data: annualCosts,
+        fill: false,
+        tension: 0.25,
+        pointRadius: 3,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.7)'
+      }]
+    },
+    options: {
+      ...commonOptions, // Use common options for colors and scales
+      plugins: {
+        ...commonOptions.plugins,
+        tooltip: {
+          callbacks: {
+            label: ctx => '$' + ctx.parsed.y.toLocaleString()
+          }
+        },
+        datalabels: {
+          ...commonOptions.plugins.datalabels,
+          formatter: (v, ctx) => {
+            if (ctx.dataIndex === ctx.dataset.data.length - 1) {
+              return '$' + v.toLocaleString();
+            }
+            return '';
+          },
+          align: 'top',
+          anchor: 'end',
+        }
+      },
+      scales: {
+        ...commonOptions.scales,
+        y: {
+          ...commonOptions.scales.y,
+          ticks: {
+            ...commonOptions.scales.y.ticks,
+            callback: (v) => '$' + Number(v).toLocaleString()
+          },
+        }
+      }
+    }
+  });
+</script>
+</body>
+</html>

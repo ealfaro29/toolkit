@@ -43,6 +43,11 @@
     .app-card-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: var(--radius-md); background-color: var(--card-icon-bg-color-transparent); color: var(--color-accent-text, #FFF); font-size: 28px; }
     .app-card-title { font-size: 18px; font-weight: var(--font-weight-emphasis); margin: 0; }
     .app-card-description { margin: 0; color: var(--muted); line-height: 1.6; }
+    
+    /* Easter Egg Styles */
+    .kickass-target { transition: opacity 0.2s, transform 0.2s; display: inline-block; }
+    .kickass-destroyed { opacity: 0; transform: scale(0.5); }
+    .kickass-card-hittable { box-shadow: 0 0 15px var(--accent-color) !important; border-color: var(--accent-color) !important; }
 
   </style>
 </head>
@@ -113,10 +118,10 @@
           <h2 class="app-card-title">Background Remover</h2>
           <p class="app-card-description">Client-side AI cutout. Click, drop or paste an image to automatically remove the background.</p>
         </a>
-        <a href="wordclouds/wordclouds.html" class="app-card" style="--card-accent-color: #294c5f; --card-icon-bg-color-transparent: rgba(0, 119, 182, 0.15);" data-id="colorizer" draggable="true">
+        <a href="wordclouds/wordclouds.html" class="app-card" style="--card-accent-color: #20B2AA; --card-icon-bg-color-transparent: rgba(32, 178, 170, 0.15);" data-id="wordclouds" draggable="true">
           <div class="app-card-icon">☁️</div>
-          <h2 class="app-card-title">Wordclouds</h2>
-          <p class="app-card-description">Create SVG wordclouds, editable in PowerPoint.</p>
+          <h2 class="app-card-title">Word Cloud Generator</h2>
+          <p class="app-card-description">Generate beautiful and customizable word clouds from any text source.</p>
         </a>
       </div>
     </main>
@@ -129,7 +134,7 @@
       THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
       DRAG_STATE: { dragged: null, over: null },
 
-      konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'],
+      konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
       konamiIndex: 0,
       
       init() {
@@ -159,10 +164,11 @@
         this.el.appGrid.addEventListener('drop', this.handleDrop.bind(this));
         this.el.appGrid.addEventListener('dragend', this.handleDragEnd.bind(this));
 
-        window.addEventListener('keyup', this.handleKonamiCode.bind(this));
+        window.addEventListener('keydown', this.handleKonamiCode.bind(this));
       },
 
       handleKonamiCode(e) {
+          if (window.KICKASS_GAME) return;
           if (e.key.toLowerCase() === this.konamiCode[this.konamiIndex].toLowerCase()) {
               this.konamiIndex++;
               if (this.konamiIndex === this.konamiCode.length) {
@@ -175,114 +181,119 @@
       },
       
       activateGame() {
-        if (window.KICKASS) { return; }
+        if (window.KICKASS_GAME) return;
 
-        const KICKASS = {
+        const KICKASS_GAME = {
             init: function() {
                 this.canvas = document.createElement('canvas');
-                this.canvas.id = 'kickass-canvas';
-                this.canvas.style.position = 'fixed';
-                this.canvas.style.top = '0';
-                this.canvas.style.left = '0';
-                this.canvas.style.zIndex = '10000';
-                this.canvas.style.pointerEvents = 'none';
+                this.canvas.style.cssText = 'position:fixed; top:0; left:0; z-index:10000; pointer-events:none;';
                 document.body.appendChild(this.canvas);
                 this.ctx = this.canvas.getContext('2d');
-                this.width = window.innerWidth;
-                this.height = window.innerHeight;
-                this.canvas.width = this.width;
-                this.canvas.height = this.height;
-
+                
                 this.score = 0;
+                this.lastPowerUpScore = 0;
                 this.scoreEl = document.createElement('div');
-                this.scoreEl.style.position = 'fixed';
-                this.scoreEl.style.top = '10px';
-                this.scoreEl.style.left = '10px';
-                this.scoreEl.style.color = 'white';
-                this.scoreEl.style.font = 'bold 24px sans-serif';
-                this.scoreEl.style.textShadow = '0 0 5px black';
-                this.scoreEl.style.zIndex = '10001';
+                this.scoreEl.style.cssText = 'position:fixed; top:10px; left:10px; color:white; font:bold 24px sans-serif; text-shadow:0 0 5px black; z-index:10001;';
+                this.statusEl = document.createElement('div');
+                this.statusEl.style.cssText = 'position:fixed; top:40px; left:10px; color:lime; font:bold 16px sans-serif; text-shadow:0 0 5px black; z-index:10001;';
                 document.body.appendChild(this.scoreEl);
+                document.body.appendChild(this.statusEl);
 
-                this.ship = {
-                    x: this.width / 2,
-                    y: this.height - 50,
-                    vx: 0,
-                    vy: 0,
-                    angle: -Math.PI / 2,
-                    rotation: 0,
-                    thrust: 0,
-                    size: 20
-                };
+                this.resize();
+                
+                this.ship = { x: this.width / 2, y: this.height / 2, vx: 0, vy: 0, angle: -Math.PI / 2, rotation: 0, thrust: 0, size: 20 };
                 this.bullets = [];
-                this.enemies = [];
+                this.explosions = [];
+                this.targets = [];
+                this.specialBullet = null; // Can be 'bomb' or 'superbomb'
 
                 this.keys = {};
                 this.boundKeyDown = this.handleKeyDown.bind(this);
                 this.boundKeyUp = this.handleKeyUp.bind(this);
+                this.boundResize = this.resize.bind(this);
                 window.addEventListener('keydown', this.boundKeyDown);
                 window.addEventListener('keyup', this.boundKeyUp);
+                window.addEventListener('resize', this.boundResize);
 
-                this.populateEnemies();
-                this.lastTime = Date.now();
+                this.prepareTargets();
                 this.loop();
             },
             
-            populateEnemies: function() {
-                const els = document.querySelectorAll('.app-card, header.panel');
-                for (let i = 0; i < els.length; i++) {
-                    const el = els[i];
-                    const rect = el.getBoundingClientRect();
-                    this.enemies.push({
-                        el: el,
-                        x: rect.left + rect.width / 2,
-                        y: rect.top + rect.height / 2,
-                        size: Math.max(rect.width, rect.height) / 2
+            resize: function() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+            },
+
+            prepareTargets: function() {
+                const elementsToTarget = document.querySelectorAll('.app-card h2, .app-card p, header.panel h1, header.panel .sub');
+                elementsToTarget.forEach(el => {
+                    const parentCard = el.closest('.app-card');
+                    const text = el.innerText;
+                    el.innerHTML = '';
+                    text.split(/(\s+)/).forEach(word => {
+                        if (word.trim().length > 0) {
+                            const span = document.createElement('span');
+                            span.className = 'kickass-target';
+                            span.textContent = word;
+                            el.appendChild(span);
+                            this.targets.push({ el: span, parentCard: parentCard, active: true });
+                        } else {
+                            el.appendChild(document.createTextNode(word));
+                        }
                     });
-                }
+                });
             },
 
             handleKeyDown: function(e) {
-                this.keys[e.keyCode] = true;
-                if (e.keyCode === 32) { // space
-                    e.preventDefault();
-                    this.fireBullet();
-                }
-                if (e.keyCode === 27) { // esc
-                    e.preventDefault();
-                    this.destroy();
-                }
+                this.keys[e.code] = true;
+                if (e.code === 'Space' || e.code === 'ArrowUp') e.preventDefault();
+                if (e.code === 'Space') this.fireBullet();
+                if (e.code === 'Escape') this.destroy();
             },
+            
             handleKeyUp: function(e) {
-                this.keys[e.keyCode] = false;
+                this.keys[e.code] = false;
             },
 
             fireBullet: function() {
+                const bulletType = this.specialBullet || 'normal';
                 this.bullets.push({
                     x: this.ship.x + Math.cos(this.ship.angle) * this.ship.size,
                     y: this.ship.y + Math.sin(this.ship.angle) * this.ship.size,
                     vx: Math.cos(this.ship.angle) * 10,
                     vy: Math.sin(this.ship.angle) * 10,
-                    life: 80
+                    life: 80,
+                    type: bulletType
                 });
+                this.specialBullet = null; // Consume the special bullet
+            },
+            
+            createExplosion: function(x, y, radius, color) {
+                this.explosions.push({x, y, radius, color, life: 30});
             },
 
-            update: function(dt) {
+            checkCardStatus: function(card) {
+                if (!card) return;
+                const remainingTargets = this.targets.some(t => t.parentCard === card && t.active);
+                if (!remainingTargets) {
+                    card.classList.add('kickass-card-hittable');
+                    this.targets.push({ el: card, parentCard: null, active: true, isCard: true });
+                }
+            },
+
+            update: function() {
                 // Ship movement
-                if (this.keys[37]) this.ship.rotation = -5; // left
-                else if (this.keys[39]) this.ship.rotation = 5; // right
-                else this.ship.rotation = 0;
+                if (this.keys['ArrowLeft']) this.ship.angle -= 0.1;
+                if (this.keys['ArrowRight']) this.ship.angle += 0.1;
 
-                if (this.keys[38]) this.ship.thrust = 0.1; // up
-                else this.ship.thrust = 0;
-
-                this.ship.angle += this.ship.rotation * dt * (Math.PI / 180);
-                this.ship.vx += Math.cos(this.ship.angle) * this.ship.thrust;
-                this.ship.vy += Math.sin(this.ship.angle) * this.ship.thrust;
-
-                this.ship.vx *= 0.99;
-                this.ship.vy *= 0.99;
-
+                if (this.keys['ArrowUp']) {
+                    this.ship.vx += Math.cos(this.ship.angle) * 0.2;
+                    this.ship.vy += Math.sin(this.ship.angle) * 0.2;
+                }
+                this.ship.vx *= 0.98;
+                this.ship.vy *= 0.98;
                 this.ship.x += this.ship.vx;
                 this.ship.y += this.ship.vy;
 
@@ -292,37 +303,83 @@
                 if (this.ship.y < 0) this.ship.y = this.height;
                 if (this.ship.y > this.height) this.ship.y = 0;
 
-                // Bullets
+                // Bullets and Collision
                 for (let i = this.bullets.length - 1; i >= 0; i--) {
                     const b = this.bullets[i];
                     b.x += b.vx;
                     b.y += b.vy;
                     b.life--;
-                    if (b.life <= 0) {
+
+                    if (b.life <= 0 || b.x < 0 || b.x > this.width || b.y < 0 || b.y > this.height) {
                         this.bullets.splice(i, 1);
                         continue;
                     }
-                    // Collision
-                    for (let j = this.enemies.length - 1; j >= 0; j--) {
-                        const enemy = this.enemies[j];
-                        const dx = enemy.x - b.x;
-                        const dy = enemy.y - b.y;
-                        if (Math.sqrt(dx * dx + dy * dy) < enemy.size) {
-                            this.enemies.splice(j, 1);
+
+                    for (let j = this.targets.length - 1; j >= 0; j--) {
+                        const target = this.targets[j];
+                        if (!target.active) continue;
+                        
+                        const rect = target.el.getBoundingClientRect();
+                        if (b.x > rect.left && b.x < rect.right && b.y > rect.top && b.y < rect.bottom) {
+                            
+                            if (b.type === 'normal') {
+                                target.el.classList.add('kickass-destroyed');
+                                target.active = false;
+                                this.score++;
+                                this.checkCardStatus(target.parentCard);
+                            } else if (b.type === 'bomb' || b.type === 'superbomb') {
+                                const radius = b.type === 'bomb' ? 75 : 150;
+                                const color = b.type === 'bomb' ? 'orange' : 'red';
+                                this.createExplosion(b.x, b.y, radius, color);
+                                this.targets.forEach(t => {
+                                    if (t.active) {
+                                        const tRect = t.el.getBoundingClientRect();
+                                        const tCenterX = tRect.left + tRect.width / 2;
+                                        const tCenterY = tRect.top + tRect.height / 2;
+                                        const dist = Math.sqrt(Math.pow(tCenterX - b.x, 2) + Math.pow(tCenterY - b.y, 2));
+                                        if (dist < radius) {
+                                            t.el.classList.add('kickass-destroyed');
+                                            t.active = false;
+                                            this.score++;
+                                            this.checkCardStatus(t.parentCard);
+                                        }
+                                    }
+                                });
+                            }
+                            
                             this.bullets.splice(i, 1);
-                            this.score++;
-                            const deadEl = enemy.el;
-                            deadEl.style.transition = 'all 0.2s';
-                            deadEl.style.transform = 'scale(0)';
-                            setTimeout(function(){
-                                if(deadEl.parentNode)
-                                    deadEl.parentNode.removeChild(deadEl);
-                            }, 200);
-                            break;
+                            break; 
                         }
                     }
                 }
-                this.scoreEl.innerHTML = this.score + " KILLED";
+                
+                // Explosions
+                for (let i = this.explosions.length - 1; i >= 0; i--) {
+                    const exp = this.explosions[i];
+                    exp.life--;
+                    if (exp.life <= 0) {
+                        this.explosions.splice(i, 1);
+                    }
+                }
+
+                // Score and Power-ups
+                if (Math.floor(this.score / 100) > Math.floor(this.lastPowerUpScore / 100)) {
+                    this.specialBullet = 'superbomb';
+                } else if (Math.floor(this.score / 10) > Math.floor(this.lastPowerUpScore / 10)) {
+                    this.specialBullet = 'bomb';
+                }
+                this.lastPowerUpScore = this.score;
+
+                this.scoreEl.innerHTML = this.score + " DESTROYED";
+                if(this.specialBullet === 'superbomb') {
+                    this.statusEl.innerHTML = 'MEGA BOMB LOADED!';
+                    this.statusEl.style.color = 'red';
+                } else if (this.specialBullet === 'bomb') {
+                    this.statusEl.innerHTML = 'BOMB LOADED';
+                    this.statusEl.style.color = 'orange';
+                } else {
+                    this.statusEl.innerHTML = '';
+                }
             },
 
             draw: function() {
@@ -338,24 +395,37 @@
                 this.ctx.lineTo(-this.ship.size / 2, this.ship.size / 2);
                 this.ctx.closePath();
                 this.ctx.fillStyle = 'white';
+                this.ctx.strokeStyle = '#4f46e5';
+                this.ctx.lineWidth = 2;
                 this.ctx.fill();
+                this.ctx.stroke();
                 this.ctx.restore();
                 
                 // Bullets
-                this.ctx.fillStyle = 'lime';
                 for (let i = 0; i < this.bullets.length; i++) {
                     const b = this.bullets[i];
+                    if(b.type === 'normal') this.ctx.fillStyle = 'lime';
+                    if(b.type === 'bomb') this.ctx.fillStyle = 'orange';
+                    if(b.type === 'superbomb') this.ctx.fillStyle = 'red';
                     this.ctx.beginPath();
-                    this.ctx.arc(b.x, b.y, 2, 0, Math.PI * 2);
+                    this.ctx.arc(b.x, b.y, b.type === 'normal' ? 3 : 6, 0, Math.PI * 2);
                     this.ctx.fill();
+                }
+                
+                // Explosions
+                for (const exp of this.explosions) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(exp.x, exp.y, exp.radius * (1 - exp.life / 30), 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${exp.life / 30})`;
+                    this.ctx.fill();
+                    this.ctx.strokeStyle = `${exp.color}`;
+                    this.ctx.lineWidth = 3;
+                    this.ctx.stroke();
                 }
             },
 
             loop: function() {
-                const now = Date.now();
-                const dt = (now - this.lastTime) / 16.666; // 60fps
-                this.lastTime = now;
-                this.update(dt);
+                this.update();
                 this.draw();
                 this.raf = requestAnimationFrame(this.loop.bind(this));
             },
@@ -363,14 +433,26 @@
             destroy: function() {
                 window.removeEventListener('keydown', this.boundKeyDown);
                 window.removeEventListener('keyup', this.boundKeyUp);
+                window.removeEventListener('resize', this.boundResize);
                 cancelAnimationFrame(this.raf);
                 if (this.canvas.parentNode) document.body.removeChild(this.canvas);
                 if (this.scoreEl.parentNode) document.body.removeChild(this.scoreEl);
-                window.KICKASS = null;
+                if (this.statusEl.parentNode) document.body.removeChild(this.statusEl);
+                
+                document.querySelectorAll('.kickass-target').forEach(span => {
+                    if (span.parentNode) {
+                        const parent = span.parentNode;
+                        parent.replaceChild(document.createTextNode(span.textContent), span);
+                        parent.normalize();
+                    }
+                });
+                document.querySelectorAll('.kickass-card-hittable').forEach(card => card.classList.remove('kickass-card-hittable'));
+                
+                window.KICKASS_GAME = null;
             }
         };
-        window.KICKASS = KICKASS;
-        KICKASS.init();
+        window.KICKASS_GAME = KICKASS_GAME;
+        KICKASS_GAME.init();
       },
 
       initTheme() {
@@ -414,49 +496,30 @@
         e.preventDefault();
         const targetCard = e.target.closest('.app-card');
         if (targetCard && targetCard !== this.DRAG_STATE.dragged) {
-          if (this.DRAG_STATE.over && this.DRAG_STATE.over !== targetCard) {
-            this.DRAG_STATE.over.classList.remove('drag-over');
-          }
           this.DRAG_STATE.over = targetCard;
-          targetCard.classList.add('drag-over');
-
-          const draggedRect = this.DRAG_STATE.dragged.getBoundingClientRect();
-          const targetRect = targetCard.getBoundingClientRect();
-          const targetCenterY = targetRect.top + targetRect.height / 2;
-
-          if (e.clientY > targetCenterY) {
-            this.el.appGrid.insertBefore(this.DRAG_STATE.dragged, targetCard.nextSibling);
+          
+          const bounding = targetCard.getBoundingClientRect();
+          const offset = bounding.y + bounding.height / 2;
+          
+          if (e.clientY - offset > 0) {
+            targetCard.parentNode.insertBefore(this.DRAG_STATE.dragged, targetCard.nextSibling);
           } else {
-            this.el.appGrid.insertBefore(this.DRAG_STATE.dragged, targetCard);
+            targetCard.parentNode.insertBefore(this.DRAG_STATE.dragged, targetCard);
           }
         }
       },
 
-      handleDragLeave(e) {
-        const targetCard = e.target.closest('.app-card');
-        if (targetCard && targetCard === this.DRAG_STATE.over) {
-          targetCard.classList.remove('drag-over');
-          this.DRAG_STATE.over = null;
-        }
-      },
+      handleDragLeave(e) { /* Can be empty for this logic */ },
 
       handleDrop(e) {
         e.preventDefault();
-        if (this.DRAG_STATE.over) {
-          this.DRAG_STATE.over.classList.remove('drag-over');
-        }
-        this.saveCardOrder();
       },
 
       handleDragEnd(e) {
         if (this.DRAG_STATE.dragged) {
           this.DRAG_STATE.dragged.classList.remove('dragging');
         }
-        if (this.DRAG_STATE.over) {
-          this.DRAG_STATE.over.classList.remove('drag-over');
-        }
         this.DRAG_STATE.dragged = null;
-        this.DRAG_STATE.over = null;
         this.saveCardOrder();
       },
 
