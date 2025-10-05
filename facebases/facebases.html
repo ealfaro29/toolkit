@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Code Gallery</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to match the new design */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* A soft gradient background as seen in the mockup */
+            background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        }
+        .title-fancy {
+            font-family: 'Playfair Display', serif;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .card-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .copied {
+            background-color: #22c55e !important; /* Green-500 */
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <div class="bg-white/90 rounded-xl shadow-lg p-3 md:p-4 mb-6 backdrop-blur-sm">
+            <h1 class="text-2xl md:text-3xl font-bold text-center title-fancy text-gray-900">Fashion Muse Doll Base Collection</h1>
+        </div>
+        
+        <div id="imageGallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+            <!-- Image cards will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gallery = document.getElementById('imageGallery');
+            
+            let images = JSON.parse(localStorage.getItem('imageGalleryDataV2')) || [];
+
+            const copyIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
+            const copiedIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
+
+            const saveImages = () => {
+                localStorage.setItem('imageGalleryDataV2', JSON.stringify(images));
+            };
+
+            const createImageCard = (imageData) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 card-fade-in relative';
+                card.dataset.id = imageData.id;
+
+                const filenameHeader = document.createElement('div');
+                filenameHeader.className = 'text-xs text-gray-500 truncate px-1';
+                filenameHeader.textContent = imageData.filename;
+
+                const img = document.createElement('img');
+                img.src = imageData.src;
+                img.className = 'w-full h-auto object-cover aspect-square rounded';
+                img.alt = imageData.filename;
+                
+                const footer = document.createElement('div');
+                footer.className = 'flex items-center space-x-2';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = imageData.codeId || '';
+                input.placeholder = '...';
+                input.className = 'flex-grow p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-0';
+                
+                input.addEventListener('input', (e) => {
+                    const imageToUpdate = images.find(img => img.id === imageData.id);
+                    if (imageToUpdate) {
+                        imageToUpdate.codeId = e.target.value;
+                        saveImages();
+                    }
+                });
+                
+                const copyButton = document.createElement('button');
+                copyButton.innerHTML = copyIconSVG;
+                copyButton.className = 'p-2.5 bg-gray-200 text-gray-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors duration-200';
+
+                copyButton.addEventListener('click', () => {
+                    navigator.clipboard.writeText(input.value).then(() => {
+                        copyButton.innerHTML = copiedIconSVG;
+                        copyButton.classList.add('copied');
+                        setTimeout(() => {
+                            copyButton.innerHTML = copyIconSVG;
+                            copyButton.classList.remove('copied');
+                        }, 1500);
+                    });
+                });
+
+                footer.appendChild(input);
+                footer.appendChild(copyButton);
+                
+                card.appendChild(filenameHeader);
+                card.appendChild(img);
+                card.appendChild(footer);
+
+                return card;
+            };
+            
+            const createAdderCard = () => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/70 rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 cursor-pointer hover:bg-white transition-colors';
+                const filenamePlaceholder = document.createElement('div');
+                filenamePlaceholder.className = 'text-xs text-gray-500 truncate px-1';
+                filenamePlaceholder.innerHTML = '&nbsp;';
+                const imagePlaceholder = document.createElement('div');
+                imagePlaceholder.className = 'w-full bg-gray-300/80 aspect-square rounded flex items-center justify-center';
+                const plusIcon = document.createElement('div');
+                plusIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="currentColor" class="bi bi-plus text-white" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>`;
+                plusIcon.className = 'w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center';
+                imagePlaceholder.appendChild(plusIcon);
+                const footer = document.createElement('div');
+                footer.className = 'flex items-center space-x-2';
+                const inputPlaceholder = document.createElement('div');
+                inputPlaceholder.className = 'flex-grow h-10 bg-gray-300/80 rounded-md';
+                const buttonPlaceholder = document.createElement('div');
+                buttonPlaceholder.className = 'w-10 h-10 bg-gray-300/80 rounded-md';
+                footer.appendChild(inputPlaceholder);
+                footer.appendChild(buttonPlaceholder);
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                fileInput.multiple = true;
+                fileInput.className = 'hidden';
+                card.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', (event) => {
+                    const files = event.target.files;
+                    if (!files || files.length === 0) return;
+                    const filesToProcess = Array.from(files).filter(file => file.type.startsWith('image/'));
+                    if (filesToProcess.length === 0) return;
+                    
+                    let processedCount = 0;
+                    filesToProcess.forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const fullFilename = file.name;
+                            const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
+                            let displayName = baseFilename;
+                            let idCode = '';
+                            const underscoreIndex = baseFilename.lastIndexOf('_');
+                            if (underscoreIndex > -1) {
+                                const potentialCode = baseFilename.substring(underscoreIndex + 1);
+                                if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
+                                    displayName = baseFilename.substring(0, underscoreIndex);
+                                    idCode = potentialCode;
+                                }
+                            }
+                            images.push({
+                                id: Date.now() + Math.random().toString(36).substr(2, 9),
+                                src: e.target.result,
+                                codeId: idCode,
+                                filename: displayName
+                            });
+                            processedCount++;
+                            if (processedCount === filesToProcess.length) {
+                                saveImages();
+                                renderGallery();
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    event.target.value = null;
+                });
+                card.appendChild(filenamePlaceholder);
+                card.appendChild(imagePlaceholder);
+                card.appendChild(footer);
+                card.appendChild(fileInput);
+                return card;
+            };
+
+            const renderGallery = () => {
+                gallery.innerHTML = '';
+                images.forEach(imageData => {
+                    const card = createImageCard(imageData);
+                    gallery.appendChild(card);
+                });
+                gallery.appendChild(createAdderCard());
+            };
+            
+            const preloadDefaultImages = async () => {
+                // --- PRELOAD YOUR DEFAULT IMAGES HERE ---
+                // For security reasons, a browser CANNOT automatically read a folder's contents.
+                // You MUST manually list the file paths for any images you want to preload
+                // from your 'photos' folder. The path must be relative to this index.html file.
+                const defaultImagePaths = [
+                    // EXAMPLE: If you have an image at 'photos/my-doll_123.png', add it like this:
+                    'photos/namename_123890712073219223.png',
+                    'photos/Albania_108425743040128.png',
+                    // 'photos/fashion-pose-1_1122334455.jpg',
+                    // 'photos/doll-base-alpha_9988776655.png',
+                    // Add all your image paths here...
+                ];
+
+                const newImages = [];
+                for (const path of defaultImagePaths) {
+                    try {
+                        const response = await fetch(path);
+                        if (!response.ok) throw new Error(`Image not found: ${path}`);
+                        const blob = await response.blob();
+                        const src = URL.createObjectURL(blob);
+                        const fullFilename = path.split('/').pop();
+                        const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
+                        let displayName = baseFilename;
+                        let idCode = '';
+                        const underscoreIndex = baseFilename.lastIndexOf('_');
+                        if (underscoreIndex > -1) {
+                            const potentialCode = baseFilename.substring(underscoreIndex + 1);
+                            if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
+                                displayName = baseFilename.substring(0, underscoreIndex);
+                                idCode = potentialCode;
+                            }
+                        }
+                        newImages.push({ id: Date.now() + Math.random().toString(36).substr(2, 9), src, codeId: idCode, filename: displayName });
+                    } catch (error) { console.error(`Failed to preload image: ${path}`, error); }
+                }
+
+                if (newImages.length > 0) {
+                    images = newImages;
+                    saveImages();
+                }
+                renderGallery();
+            };
+
+            // Initial Load Logic
+            if (images.length === 0) {
+                preloadDefaultImages();
+            } else {
+                renderGallery();
+            }
+        });
+    </script>
+</body>
+</html>
+
