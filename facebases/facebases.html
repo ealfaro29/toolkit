@@ -6,15 +6,13 @@
     <title>Image Code Gallery</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter & Playfair Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles to match the new design */
         body {
             font-family: 'Inter', sans-serif;
-            /* A soft gradient background as seen in the mockup */
             background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
         }
         .title-fancy {
@@ -40,7 +38,7 @@
         </div>
         
         <div id="imageGallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-            <!-- Image cards will be inserted here -->
+            <!-- Image cards will be inserted here by JavaScript -->
         </div>
     </div>
 
@@ -48,20 +46,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             const gallery = document.getElementById('imageGallery');
             
-            let images = JSON.parse(localStorage.getItem('imageGalleryDataV2')) || [];
+            // The 'images' array will now be populated fresh on every page load.
+            let images = [];
 
             const copyIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
             const copiedIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
 
-            const saveImages = () => {
-                localStorage.setItem('imageGalleryDataV2', JSON.stringify(images));
-            };
+            // The saveImages function is no longer needed as the app is stateless.
 
             const createImageCard = (imageData) => {
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 card-fade-in relative';
-                card.dataset.id = imageData.id;
-
+                
                 const filenameHeader = document.createElement('div');
                 filenameHeader.className = 'text-xs text-gray-500 truncate px-1';
                 filenameHeader.textContent = imageData.filename;
@@ -80,11 +76,11 @@
                 input.placeholder = '...';
                 input.className = 'flex-grow p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-0';
                 
+                // Input changes are now temporary for the session only.
                 input.addEventListener('input', (e) => {
-                    const imageToUpdate = images.find(img => img.id === imageData.id);
+                    const imageToUpdate = images.find(imgObj => imgObj.id === imageData.id);
                     if (imageToUpdate) {
                         imageToUpdate.codeId = e.target.value;
-                        saveImages();
                     }
                 });
                 
@@ -105,11 +101,9 @@
 
                 footer.appendChild(input);
                 footer.appendChild(copyButton);
-                
                 card.appendChild(filenameHeader);
                 card.appendChild(img);
                 card.appendChild(footer);
-
                 return card;
             };
             
@@ -169,7 +163,7 @@
                             });
                             processedCount++;
                             if (processedCount === filesToProcess.length) {
-                                saveImages();
+                                // No longer saving, just re-rendering for the session.
                                 renderGallery();
                             }
                         };
@@ -194,17 +188,10 @@
             };
             
             const preloadDefaultImages = async () => {
-                // --- PRELOAD YOUR DEFAULT IMAGES HERE ---
-                // For security reasons, a browser CANNOT automatically read a folder's contents.
-                // You MUST manually list the file paths for any images you want to preload
-                // from your 'photos' folder. The path must be relative to this index.html file.
                 const defaultImagePaths = [
-                    // EXAMPLE: If you have an image at 'photos/my-doll_123.png', add it like this:
                     'photos/Barbados_118338759805073.png',
                     'photos/Albania_108425743040128.png',
-                    // 'photos/fashion-pose-1_1122334455.jpg',
-                    // 'photos/doll-base-alpha_9988776655.png',
-                    // Add all your image paths here...
+                    // Add more image paths here...
                 ];
 
                 const newImages = [];
@@ -213,7 +200,15 @@
                         const response = await fetch(path);
                         if (!response.ok) throw new Error(`Image not found: ${path}`);
                         const blob = await response.blob();
-                        const src = URL.createObjectURL(blob);
+                        
+                        // CORRECTED: Convert blob to a permanent base64 Data URL.
+                        const src = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+
                         const fullFilename = path.split('/').pop();
                         const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
                         let displayName = baseFilename;
@@ -232,17 +227,12 @@
 
                 if (newImages.length > 0) {
                     images = newImages;
-                    saveImages();
                 }
                 renderGallery();
             };
 
-            // Initial Load Logic
-            if (images.length === 0) {
-                preloadDefaultImages();
-            } else {
-                renderGallery();
-            }
+            // Simplified Initial Load Logic: Always preload.
+            preloadDefaultImages();
         });
     </script>
 </body>
