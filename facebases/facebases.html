@@ -16,85 +16,147 @@
     .copied { background-color: #22c55e !important; }
   </style>
 </head>
-<body class="min-h-screen">
-  <div class="container mx-auto p-4 md:p-8">
+<body class="min-h-screen relative overflow-x-hidden">
 
-    <!-- Time Converter: Event time → SJO -->
-    <div class="bg-white/90 rounded-xl shadow-lg p-4 md:p-5 mb-6 backdrop-blur-sm">
-      <h2 class="text-xl md:text-2xl font-semibold title-fancy text-gray-900 mb-3">Time converter to SJO</h2>
-      <div class="grid md:grid-cols-[1fr_auto_1fr_auto] gap-3 items-end">
-        <label class="block">
-          <span class="text-sm text-gray-700">Event time, browser local</span>
-          <input id="eventDateTime" type="datetime-local"
-                 class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        </label>
+  <!-- Right Sidebar: Time Converter -->
+  <aside class="fixed top-0 right-0 w-full md:w-96 h-full bg-white/90 backdrop-blur-sm shadow-xl border-l border-gray-200 p-5 flex flex-col z-40">
+    <h2 class="text-xl md:text-2xl font-semibold title-fancy text-gray-900 mb-3">Time converter to SJO</h2>
 
-        <button id="convertBtn"
-                class="h-10 md:h-[42px] px-4 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">
-          Convert
-        </button>
+    <div class="flex flex-col gap-3 flex-grow overflow-y-auto">
+      <label class="block">
+        <span class="text-sm text-gray-700">Event date & time</span>
+        <input id="eventDateTime" type="datetime-local"
+               class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </label>
 
-        <label class="block">
-          <span class="text-sm text-gray-700">Converted to SJO, Costa Rica</span>
-          <input id="sjoOutput" type="text" readonly
-                 class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                 placeholder="yyyy-mm-dd hh:mm, SJO">
-        </label>
+      <label class="block">
+        <span class="text-sm text-gray-700">Event timezone</span>
+        <select id="eventTimeZone"
+                class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <!-- Condensed list, label format "ABBR (+offset)" -->
+          <option value="Etc/GMT+12">IDLW (-12)</option>
+          <option value="Pacific/Honolulu">HST (-10)</option>
+          <option value="America/Anchorage">AKST (-9)</option>
+          <option value="America/Los_Angeles">PST (-8)</option>
+          <option value="America/Denver">MST (-7)</option>
+          <option value="America/Chicago">CST (-6)</option>
+          <option value="America/Mexico_City">CST-MX (-6)</option>
+          <option value="America/New_York">EST (-5)</option>
+          <option value="America/Bogota">COT (-5)</option>
+          <option value="America/Lima">PET (-5)</option>
+          <option value="America/Caracas">VET (-4)</option>
+          <option value="America/Santiago">CLT (-3)</option>
+          <option value="America/Sao_Paulo">BRT (-3)</option>
+          <option value="Atlantic/Azores">AZOT (-1)</option>
+          <option value="Europe/London">GMT (+0)</option>
+          <option value="Europe/Paris">CET (+1)</option>
+          <option value="Europe/Berlin">CET-DE (+1)</option>
+          <option value="Europe/Athens">EET (+2)</option>
+          <option value="Africa/Johannesburg">SAST (+2)</option>
+          <option value="Asia/Dubai">GST (+4)</option>
+          <option value="Asia/Karachi">PKT (+5)</option>
+          <option value="Asia/Kolkata">IST (+5:30)</option>
+          <option value="Asia/Bangkok">ICT (+7)</option>
+          <option value="Asia/Hong_Kong">HKT (+8)</option>
+          <option value="Asia/Singapore">SGT (+8)</option>
+          <option value="Asia/Manila">PHT (+8)</option>
+          <option value="Asia/Tokyo">JST (+9)</option>
+          <option value="Asia/Seoul">KST (+9)</option>
+          <option value="Australia/Sydney">AEST (+10)</option>
+          <option value="Pacific/Auckland">NZST (+12)</option>
+        </select>
+      </label>
 
-        <button id="copySjoBtn"
-                class="h-10 md:h-[42px] px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors">
-          Copy
-        </button>
-      </div>
-      <p class="mt-2 text-xs text-gray-500">Input interpreted in your device time zone, output uses America/Costa_Rica.</p>
+      <button id="convertBtn"
+              class="h-10 px-4 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">
+        Convert
+      </button>
+
+      <label class="block">
+        <span class="text-sm text-gray-700">Converted to SJO, Costa Rica</span>
+        <input id="sjoOutput" type="text" readonly
+               class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               placeholder="dd/mm/yyyy, HH:MM AM/PM">
+      </label>
+
+      <button id="copySjoBtn"
+              class="h-10 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors">
+        Copy
+      </button>
+
+      <p class="mt-1 text-xs text-gray-500">Input uses the selected timezone, output uses America/Costa_Rica.</p>
     </div>
+  </aside>
 
+  <!-- Main Content -->
+  <main class="container mx-auto p-4 md:p-8 md:pr-[26rem]">
     <div class="bg-white/90 rounded-xl shadow-lg p-3 md:p-4 mb-6 backdrop-blur-sm">
       <h1 class="text-2xl md:text-3xl font-bold text-center title-fancy text-gray-900">Fashion Muse Doll Base Collection</h1>
     </div>
 
     <div id="imageGallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"></div>
-  </div>
+  </main>
 
   <script>
-    // === Time Converter → SJO ===
-    const toIsoLike = (date, timeZone) => {
-      const pad = n => String(n).padStart(2, '0');
-      const parts = new Intl.DateTimeFormat('en-CA', {
-        timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', hour12: false
-      }).formatToParts(date).reduce((acc, p) => (acc[p.type] = p.value, acc), {});
-      return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}`;
-    };
+    /* ========= Time Converter (dd/mm/yyyy, HH:MM AM/PM) ========= */
+    const SJO_TZ = 'America/Costa_Rica';
 
-    const tzAbbrev = (date, timeZone) => {
-      const parts = new Intl.DateTimeFormat('en', { timeZone, timeZoneName: 'short' }).formatToParts(date);
-      const tz = parts.find(p => p.type === 'timeZoneName');
-      return tz ? tz.value : 'SJO';
-    };
+    // Format a UTC Date in given TZ to "dd/mm/yyyy, HH:MM AM/PM"
+    function formatInTZ_ddmmyyyy_12h(dateUTC, timeZone) {
+      const parts = new Intl.DateTimeFormat('en-GB', {
+        timeZone,
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).formatToParts(dateUTC).reduce((a, p) => (a[p.type] = p.value, a), {});
+      // en-GB gives day, month, year already; ensure AM/PM uppercase
+      const ampm = (parts.dayPeriod || '').toUpperCase();
+      return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${ampm}`;
+    }
 
-    const sjoTZ = 'America/Costa_Rica';
+    // Convert wall time in IANA zone to UTC Date (DST-safe with one correction)
+    function wallInTZ_toUTC(y,m,d,H,M, tz) {
+      let t = Date.UTC(y, m-1, d, H, M);
+      const partsAtGuess = new Intl.DateTimeFormat('en-CA', {
+        timeZone: tz,
+        year:'numeric', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit', hour12:false
+      }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
+      const guessMin = Date.UTC(+partsAtGuess.year, +partsAtGuess.month-1, +partsAtGuess.day, +partsAtGuess.hour, +partsAtGuess.minute) / 60000;
+      const intendedMin = Date.UTC(y, m-1, d, H, M) / 60000;
+      const diffMin = guessMin - intendedMin;
+      t -= diffMin * 60000;
+      return new Date(t);
+    }
+
     const eventEl = document.getElementById('eventDateTime');
+    const tzSel = document.getElementById('eventTimeZone');
     const outEl = document.getElementById('sjoOutput');
-    const convertBtn = document.getElementById('convertBtn');
-    const copySjoBtn = document.getElementById('copySjoBtn');
+
+    document.getElementById('convertBtn').addEventListener('click', convertToSJO);
+    document.getElementById('copySjoBtn').addEventListener('click', () => {
+      if (!outEl.value) return;
+      navigator.clipboard.writeText(outEl.value).catch(()=>{});
+    });
 
     function convertToSJO() {
       const val = eventEl.value;
+      const tz = tzSel.value || 'UTC';
       if (!val) { outEl.value = ''; return; }
-      const dt = new Date(val);
-      if (Number.isNaN(dt.getTime())) { outEl.value = 'Invalid date'; return; }
-      const isoLike = toIsoLike(dt, sjoTZ);
-      const abbr = tzAbbrev(dt, sjoTZ);
-      outEl.value = `${isoLike}, ${abbr}`;
+      const [datePart, timePart] = val.split('T');
+      if (!datePart || !timePart) { outEl.value = 'Invalid date'; return; }
+      const [y,m,d] = datePart.split('-').map(Number);
+      const [H,Mi] = timePart.split(':').map(Number);
+      if ([y,m,d,H,Mi].some(n => Number.isNaN(n))) { outEl.value = 'Invalid date'; return; }
+
+      const utcInstant = wallInTZ_toUTC(y,m,d,H,Mi,tz);
+      outEl.value = formatInTZ_ddmmyyyy_12h(utcInstant, SJO_TZ);
     }
 
-    convertBtn?.addEventListener('click', convertToSJO);
-    eventEl?.addEventListener('change', convertToSJO);
-    eventEl?.addEventListener('input', () => { if (outEl.value) convertToSJO(); });
-    copySjoBtn?.addEventListener('click', () => { if (!outEl.value) return; navigator.clipboard.writeText(outEl.value).catch(() => {}); });
-
-    // === Gallery ===
+    /* ========= Gallery ========= */
     document.addEventListener('DOMContentLoaded', () => {
       const gallery = document.getElementById('imageGallery');
       let images = [];
@@ -125,7 +187,7 @@
         input.className = 'flex-grow p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-0';
         input.addEventListener('input', (e) => {
           const imageToUpdate = images.find(imgObj => imgObj.id === imageData.id);
-          if (imageToUpdate) { imageToUpdate.codeId = e.target.value; }
+          if (imageToUpdate) imageToUpdate.codeId = e.target.value;
         });
 
         const copyButton = document.createElement('button');
@@ -141,83 +203,64 @@
 
         footer.appendChild(input);
         footer.appendChild(copyButton);
-        card.appendChild(filenameHeader);
-        card.appendChild(img);
-        card.appendChild(footer);
+        card.append(filenameHeader, img, footer);
         return card;
       };
 
       const createAdderCard = () => {
         const card = document.createElement('div');
         card.className = 'bg-white/70 rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 cursor-pointer hover:bg-white transition-colors';
+
         const filenamePlaceholder = document.createElement('div');
         filenamePlaceholder.className = 'text-xs text-gray-500 truncate px-1';
         filenamePlaceholder.innerHTML = '&nbsp;';
+
         const imagePlaceholder = document.createElement('div');
         imagePlaceholder.className = 'w-full bg-gray-300/80 aspect-square rounded flex items-center justify-center';
         const plusIcon = document.createElement('div');
         plusIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="currentColor" class="bi bi-plus text-white" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>`;
         plusIcon.className = 'w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center';
         imagePlaceholder.appendChild(plusIcon);
+
         const footer = document.createElement('div');
         footer.className = 'flex items-center space-x-2';
-        const inputPlaceholder = document.createElement('div');
-        inputPlaceholder.className = 'flex-grow h-10 bg-gray-300/80 rounded-md';
-        const buttonPlaceholder = document.createElement('div');
-        buttonPlaceholder.className = 'w-10 h-10 bg-gray-300/80 rounded-md';
-        footer.appendChild(inputPlaceholder);
-        footer.appendChild(buttonPlaceholder);
+        footer.innerHTML = `<div class='flex-grow h-10 bg-gray-300/80 rounded-md'></div><div class='w-10 h-10 bg-gray-300/80 rounded-md'></div>`;
+
         const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = 'image/*';
-        fileInput.multiple = true;
-        fileInput.className = 'hidden';
+        fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.multiple = true; fileInput.className = 'hidden';
         card.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (event) => {
           const files = event.target.files;
           if (!files || files.length === 0) return;
-          const filesToProcess = Array.from(files).filter(file => file.type.startsWith('image/'));
-          if (filesToProcess.length === 0) return;
-
+          const filesToProcess = Array.from(files).filter(f => f.type.startsWith('image/'));
           let processedCount = 0;
           filesToProcess.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
               const fullFilename = file.name;
               const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
-              let displayName = baseFilename;
-              let idCode = '';
+              let displayName = baseFilename, idCode = '';
               const underscoreIndex = baseFilename.lastIndexOf('_');
               if (underscoreIndex > -1) {
                 const potentialCode = baseFilename.substring(underscoreIndex + 1);
                 if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
-                  displayName = baseFilename.substring(0, underscoreIndex);
-                  idCode = potentialCode;
+                  displayName = baseFilename.substring(0, underscoreIndex); idCode = potentialCode;
                 }
               }
-              images.push({
-                id: Date.now() + Math.random().toString(36).substr(2, 9),
-                src: e.target.result,
-                codeId: idCode,
-                filename: displayName
-              });
-              processedCount++;
-              if (processedCount === filesToProcess.length) { renderGallery(); }
+              images.push({ id: Date.now() + Math.random().toString(36).substr(2,9), src: e.target.result, codeId: idCode, filename: displayName });
+              if (++processedCount === filesToProcess.length) renderGallery();
             };
             reader.readAsDataURL(file);
           });
-          event.target.value = null;
         });
-        card.appendChild(filenamePlaceholder);
-        card.appendChild(imagePlaceholder);
-        card.appendChild(footer);
-        card.appendChild(fileInput);
+
+        card.append(filenamePlaceholder, imagePlaceholder, footer, fileInput);
         return card;
       };
 
       const renderGallery = () => {
         gallery.innerHTML = '';
-        images.forEach(imageData => { gallery.appendChild(createImageCard(imageData)); });
+        images.forEach(imageData => gallery.appendChild(createImageCard(imageData)));
         gallery.appendChild(createAdderCard());
       };
 
@@ -227,7 +270,6 @@
           'photos/UnitedKingdom-B_124837307393411.png',
           'photos/UnitedKingdom-C_102656913832746.png'
         ];
-
         const newImages = [];
         for (const path of defaultImagePaths) {
           try {
@@ -240,24 +282,20 @@
               reader.onerror = reject;
               reader.readAsDataURL(blob);
             });
-
             const fullFilename = path.split('/').pop();
             const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
-            let displayName = baseFilename;
-            let idCode = '';
+            let displayName = baseFilename, idCode = '';
             const underscoreIndex = baseFilename.lastIndexOf('_');
             if (underscoreIndex > -1) {
               const potentialCode = baseFilename.substring(underscoreIndex + 1);
               if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
-                displayName = baseFilename.substring(0, underscoreIndex);
-                idCode = potentialCode;
+                displayName = baseFilename.substring(0, underscoreIndex); idCode = potentialCode;
               }
             }
-            newImages.push({ id: Date.now() + Math.random().toString(36).substr(2, 9), src, codeId: idCode, filename: displayName });
+            newImages.push({ id: Date.now() + Math.random().toString(36).substr(2,9), src, codeId: idCode, filename: displayName });
           } catch (error) { console.error(`Failed to preload image: ${path}`, error); }
         }
-
-        if (newImages.length > 0) { images = newImages; }
+        if (newImages.length > 0) images = newImages;
         renderGallery();
       };
 
