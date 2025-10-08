@@ -4,160 +4,110 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Image Code Gallery</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  
   <style>
     body { font-family: 'Inter', sans-serif; background-image: linear-gradient(to right, #fbc2eb, #a6c1ee); }
     .title-fancy { font-family: 'Playfair Display', serif; }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    .card-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .card-fade-in { animation: zoomIn 0.3s ease-out forwards; }
+    .modal-fade-in { animation: fadeIn 0.2s ease-out forwards; }
+    .modal-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
     .copied { background-color: #22c55e !important; }
+
+    /* Custom styles for the Swiper card stack */
+    .swiper {
+      width: 260px; /* Adjust width as needed */
+      height: 340px; /* Adjust height as needed */
+      overflow: visible; /* Important for seeing the stack effect */
+    }
+    .swiper-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+    }
+    .swiper-slide .card-container {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body class="min-h-screen relative overflow-x-hidden">
 
-  <!-- Right Sidebar: Time Converter -->
-  <aside class="fixed top-0 right-0 w-full md:w-96 h-full bg-white/90 backdrop-blur-sm shadow-xl border-l border-gray-200 p-5 flex flex-col z-40">
-    <h2 class="text-xl md:text-2xl font-semibold title-fancy text-gray-900 mb-3">Time converter to SJO</h2>
+  <button id="openTimeConverterBtn" class="fixed top-4 right-4 z-40 bg-white/80 backdrop-blur-sm text-indigo-600 p-3 rounded-full shadow-lg hover:bg-white transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+      <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+      <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+    </svg>
+  </button>
 
-    <div class="flex flex-col gap-3 flex-grow overflow-y-auto">
-      <label class="block">
-        <span class="text-sm text-gray-700">Event date & time</span>
-        <input id="eventDateTime" type="datetime-local"
-               class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      </label>
-
-      <label class="block">
-        <span class="text-sm text-gray-700">Event timezone</span>
-        <select id="eventTimeZone"
-                class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <!-- Condensed list, label format "ABBR (+offset)" -->
-          <option value="Etc/GMT+12">IDLW (-12)</option>
-          <option value="Pacific/Honolulu">HST (-10)</option>
-          <option value="America/Anchorage">AKST (-9)</option>
-          <option value="America/Los_Angeles">PST (-8)</option>
-          <option value="America/Denver">MST (-7)</option>
-          <option value="America/Chicago">CST (-6)</option>
-          <option value="America/Mexico_City">CST-MX (-6)</option>
-          <option value="America/New_York">EST (-5)</option>
-          <option value="America/Bogota">COT (-5)</option>
-          <option value="America/Lima">PET (-5)</option>
-          <option value="America/Caracas">VET (-4)</option>
-          <option value="America/Santiago">CLT (-3)</option>
-          <option value="America/Sao_Paulo">BRT (-3)</option>
-          <option value="Atlantic/Azores">AZOT (-1)</option>
-          <option value="Europe/London">GMT (+0)</option>
-          <option value="Europe/Paris">CET (+1)</option>
-          <option value="Europe/Berlin">CET-DE (+1)</option>
-          <option value="Europe/Athens">EET (+2)</option>
-          <option value="Africa/Johannesburg">SAST (+2)</option>
-          <option value="Asia/Dubai">GST (+4)</option>
-          <option value="Asia/Karachi">PKT (+5)</option>
-          <option value="Asia/Kolkata">IST (+5:30)</option>
-          <option value="Asia/Bangkok">ICT (+7)</option>
-          <option value="Asia/Hong_Kong">HKT (+8)</option>
-          <option value="Asia/Singapore">SGT (+8)</option>
-          <option value="Asia/Manila">PHT (+8)</option>
-          <option value="Asia/Tokyo">JST (+9)</option>
-          <option value="Asia/Seoul">KST (+9)</option>
-          <option value="Australia/Sydney">AEST (+10)</option>
-          <option value="Pacific/Auckland">NZST (+12)</option>
-        </select>
-      </label>
-
-      <button id="convertBtn"
-              class="h-10 px-4 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">
-        Convert
-      </button>
-
-      <label class="block">
-        <span class="text-sm text-gray-700">Converted to SJO, Costa Rica</span>
-        <input id="sjoOutput" type="text" readonly
-               class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-               placeholder="dd/mm/yyyy, HH:MM AM/PM">
-      </label>
-
-      <button id="copySjoBtn"
-              class="h-10 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors">
-        Copy
-      </button>
-
-      <p class="mt-1 text-xs text-gray-500">Input uses the selected timezone, output uses America/Costa_Rica.</p>
+  <div id="timeConverterModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 modal-fade-in">
+    <div class="bg-white rounded-xl shadow-2xl p-6 pt-8 relative w-full max-w-md modal-zoom-in">
+      <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-gray-400 hover:text-gray-800 text-3xl leading-none font-bold">&times;</button>
+      
+      <h2 class="text-xl md:text-2xl font-semibold title-fancy text-gray-900 mb-4">Time converter to SJO</h2>
+      <div class="flex flex-col gap-3">
+        <label class="block">
+          <span class="text-sm text-gray-700">Event date & time</span>
+          <input id="eventDateTime" type="datetime-local" class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </label>
+        <label class="block">
+          <span class="text-sm text-gray-700">Event timezone</span>
+          <select id="eventTimeZone" class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="Etc/GMT+12">IDLW (-12)</option><option value="Pacific/Honolulu">HST (-10)</option><option value="America/Anchorage">AKST (-9)</option><option value="America/Los_Angeles">PST (-8)</option><option value="America/Denver">MST (-7)</option><option value="America/Chicago">CST (-6)</option><option value="America/Mexico_City">CST-MX (-6)</option><option value="America/New_York">EST (-5)</option><option value="America/Bogota">COT (-5)</option><option value="America/Lima">PET (-5)</option><option value="America/Caracas">VET (-4)</option><option value="America/Santiago">CLT (-3)</option><option value="America/Sao_Paulo">BRT (-3)</option><option value="Atlantic/Azores">AZOT (-1)</option><option value="Europe/London">GMT (+0)</option><option value="Europe/Paris">CET (+1)</option><option value="Europe/Berlin">CET-DE (+1)</option><option value="Europe/Athens">EET (+2)</option><option value="Africa/Johannesburg">SAST (+2)</option><option value="Asia/Dubai">GST (+4)</option><option value="Asia/Karachi">PKT (+5)</option><option value="Asia/Kolkata">IST (+5:30)</option><option value="Asia/Bangkok">ICT (+7)</option><option value="Asia/Hong_Kong">HKT (+8)</option><option value="Asia/Singapore">SGT (+8)</option><option value="Asia/Manila">PHT (+8)</option><option value="Asia/Tokyo">JST (+9)</option><option value="Asia/Seoul">KST (+9)</option><option value="Australia/Sydney">AEST (+10)</option><option value="Pacific/Auckland">NZST (+12)</option>
+          </select>
+        </label>
+        <button id="convertBtn" class="h-10 px-4 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">Convert</button>
+        <label class="block">
+          <span class="text-sm text-gray-700">Converted to SJO, Costa Rica</span>
+          <input id="sjoOutput" type="text" readonly class="mt-1 w-full p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="dd/mm/yyyy, HH:MM AM/PM">
+        </label>
+        <button id="copySjoBtn" class="h-10 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors">Copy</button>
+        <p class="mt-1 text-xs text-gray-500">Input uses the selected timezone, output uses America/Costa_Rica.</p>
+      </div>
     </div>
-  </aside>
+  </div>
 
-  <!-- Main Content -->
-  <main class="container mx-auto p-4 md:p-8 md:pr-[26rem]">
-    <div class="bg-white/90 rounded-xl shadow-lg p-3 md:p-4 mb-6 backdrop-blur-sm">
-      <h1 class="text-2xl md:text-3xl font-bold text-center title-fancy text-gray-900">Fashion Muse Doll Base Collection</h1>
+  <main class="container mx-auto p-4 md:p-8">
+    <div class="bg-white/90 rounded-xl shadow-lg p-3 md:p-4 mb-8 backdrop-blur-sm">
+      <h1 class="text-2xl md:text-4xl font-bold text-center title-fancy text-gray-900">Fashion Muse Doll Base Collection</h1>
     </div>
-
-    <div id="imageGallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6"></div>
+    <div id="imageGallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16"></div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
   <script>
-    /* ========= Time Converter (dd/mm/yyyy, HH:MM AM/PM) ========= */
+    /* ========= Time Converter & Modal Logic ========= */
+    const openTimeConverterBtn = document.getElementById('openTimeConverterBtn');
+    const closeTimeConverterBtn = document.getElementById('closeTimeConverterBtn');
+    const timeConverterModal = document.getElementById('timeConverterModal');
+
+    openTimeConverterBtn.addEventListener('click', () => { timeConverterModal.classList.remove('hidden'); });
+    closeTimeConverterBtn.addEventListener('click', () => { timeConverterModal.classList.add('hidden'); });
+    timeConverterModal.addEventListener('click', (event) => { if (event.target === timeConverterModal) { timeConverterModal.classList.add('hidden'); } });
     const SJO_TZ = 'America/Costa_Rica';
-
-    // Format a UTC Date in given TZ to "dd/mm/yyyy, HH:MM AM/PM"
-    function formatInTZ_ddmmyyyy_12h(dateUTC, timeZone) {
-      const parts = new Intl.DateTimeFormat('en-GB', {
-        timeZone,
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }).formatToParts(dateUTC).reduce((a, p) => (a[p.type] = p.value, a), {});
-      // en-GB gives day, month, year already; ensure AM/PM uppercase
-      const ampm = (parts.dayPeriod || '').toUpperCase();
-      return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${ampm}`;
-    }
-
-    // Convert wall time in IANA zone to UTC Date (DST-safe with one correction)
-    function wallInTZ_toUTC(y,m,d,H,M, tz) {
-      let t = Date.UTC(y, m-1, d, H, M);
-      const partsAtGuess = new Intl.DateTimeFormat('en-CA', {
-        timeZone: tz,
-        year:'numeric', month:'2-digit', day:'2-digit',
-        hour:'2-digit', minute:'2-digit', hour12:false
-      }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
-      const guessMin = Date.UTC(+partsAtGuess.year, +partsAtGuess.month-1, +partsAtGuess.day, +partsAtGuess.hour, +partsAtGuess.minute) / 60000;
-      const intendedMin = Date.UTC(y, m-1, d, H, M) / 60000;
-      const diffMin = guessMin - intendedMin;
-      t -= diffMin * 60000;
-      return new Date(t);
-    }
-
-    const eventEl = document.getElementById('eventDateTime');
-    const tzSel = document.getElementById('eventTimeZone');
-    const outEl = document.getElementById('sjoOutput');
-
-    document.getElementById('convertBtn').addEventListener('click', convertToSJO);
-    document.getElementById('copySjoBtn').addEventListener('click', () => {
-      if (!outEl.value) return;
-      navigator.clipboard.writeText(outEl.value).catch(()=>{});
-    });
-
-    function convertToSJO() {
-      const val = eventEl.value;
-      const tz = tzSel.value || 'UTC';
-      if (!val) { outEl.value = ''; return; }
-      const [datePart, timePart] = val.split('T');
-      if (!datePart || !timePart) { outEl.value = 'Invalid date'; return; }
-      const [y,m,d] = datePart.split('-').map(Number);
-      const [H,Mi] = timePart.split(':').map(Number);
-      if ([y,m,d,H,Mi].some(n => Number.isNaN(n))) { outEl.value = 'Invalid date'; return; }
-
-      const utcInstant = wallInTZ_toUTC(y,m,d,H,Mi,tz);
-      outEl.value = formatInTZ_ddmmyyyy_12h(utcInstant, SJO_TZ);
-    }
+    function formatInTZ_ddmmyyyy_12h(dateUTC, timeZone) { const parts = new Intl.DateTimeFormat('en-GB', { timeZone, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).formatToParts(dateUTC).reduce((a, p) => (a[p.type] = p.value, a), {}); const ampm = (parts.dayPeriod || '').toUpperCase(); return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${ampm}`; }
+    function wallInTZ_toUTC(y,m,d,H,M, tz) { let t = Date.UTC(y, m-1, d, H, M); const partsAtGuess = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{}); const guessMin = Date.UTC(+partsAtGuess.year, +partsAtGuess.month-1, +partsAtGuess.day, +partsAtGuess.hour, +partsAtGuess.minute) / 60000; const intendedMin = Date.UTC(y, m-1, d, H, M) / 60000; const diffMin = guessMin - intendedMin; t -= diffMin * 60000; return new Date(t); }
+    const eventEl = document.getElementById('eventDateTime'); const tzSel = document.getElementById('eventTimeZone'); const outEl = document.getElementById('sjoOutput');
+    document.getElementById('convertBtn').addEventListener('click', convertToSJO); document.getElementById('copySjoBtn').addEventListener('click', () => { if (!outEl.value) return; navigator.clipboard.writeText(outEl.value).catch(()=>{}); });
+    function convertToSJO() { const val = eventEl.value; const tz = tzSel.value || 'UTC'; if (!val) { outEl.value = ''; return; } const [datePart, timePart] = val.split('T'); if (!datePart || !timePart) { outEl.value = 'Invalid date'; return; } const [y,m,d] = datePart.split('-').map(Number); const [H,Mi] = timePart.split(':').map(Number); if ([y,m,d,H,Mi].some(n => Number.isNaN(n))) { outEl.value = 'Invalid date'; return; } const utcInstant = wallInTZ_toUTC(y,m,d,H,Mi,tz); outEl.value = formatInTZ_ddmmyyyy_12h(utcInstant, SJO_TZ); }
 
     /* ========= Gallery ========= */
     document.addEventListener('DOMContentLoaded', () => {
+      // CONFIGURATION
+      const imageBasenames = ['Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','India-Bronze_83588150632830','Lebanon-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295',];
+      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb', };
+
       const gallery = document.getElementById('imageGallery');
       let images = [];
 
@@ -166,113 +116,86 @@
 
       const createImageCard = (imageData) => {
         const card = document.createElement('div');
-        card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 card-fade-in relative';
-
+        card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 card-fade-in relative card-container';
         const filenameHeader = document.createElement('div');
-        filenameHeader.className = 'text-xs text-gray-500 truncate px-1';
+        // CHANGED: Font size class updated from 'text-xs' to 'text-base'
+        filenameHeader.className = 'text-base text-gray-600 font-medium truncate px-1 text-center';
         filenameHeader.textContent = imageData.filename;
-
         const img = document.createElement('img');
         img.src = imageData.src;
         img.className = 'w-full h-auto object-cover aspect-square rounded';
         img.alt = imageData.filename;
-
         const footer = document.createElement('div');
         footer.className = 'flex items-center space-x-2';
-
         const input = document.createElement('input');
         input.type = 'text';
         input.value = imageData.codeId || '';
         input.placeholder = '...';
         input.className = 'flex-grow p-2 text-sm bg-gray-100 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-0';
-        input.addEventListener('input', (e) => {
-          const imageToUpdate = images.find(imgObj => imgObj.id === imageData.id);
-          if (imageToUpdate) imageToUpdate.codeId = e.target.value;
-        });
-
+        input.addEventListener('input', (e) => { const imageToUpdate = images.find(imgObj => imgObj.id === imageData.id); if (imageToUpdate) imageToUpdate.codeId = e.target.value; });
         const copyButton = document.createElement('button');
         copyButton.innerHTML = copyIconSVG;
         copyButton.className = 'p-2.5 bg-gray-200 text-gray-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors duration-200';
-        copyButton.addEventListener('click', () => {
-          navigator.clipboard.writeText(input.value).then(() => {
-            copyButton.innerHTML = copiedIconSVG;
-            copyButton.classList.add('copied');
-            setTimeout(() => { copyButton.innerHTML = copyIconSVG; copyButton.classList.remove('copied'); }, 1500);
-          });
-        });
-
+        copyButton.addEventListener('click', () => { navigator.clipboard.writeText(input.value).then(() => { copyButton.innerHTML = copiedIconSVG; copyButton.classList.add('copied'); setTimeout(() => { copyButton.innerHTML = copyIconSVG; copyButton.classList.remove('copied'); }, 1500); }); });
         footer.appendChild(input);
         footer.appendChild(copyButton);
         card.append(filenameHeader, img, footer);
         return card;
       };
 
-      const createAdderCard = () => {
-        const card = document.createElement('div');
-        card.className = 'bg-white/70 rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 cursor-pointer hover:bg-white transition-colors';
-
-        const filenamePlaceholder = document.createElement('div');
-        filenamePlaceholder.className = 'text-xs text-gray-500 truncate px-1';
-        filenamePlaceholder.innerHTML = '&nbsp;';
-
-        const imagePlaceholder = document.createElement('div');
-        imagePlaceholder.className = 'w-full bg-gray-300/80 aspect-square rounded flex items-center justify-center';
-        const plusIcon = document.createElement('div');
-        plusIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="currentColor" class="bi bi-plus text-white" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>`;
-        plusIcon.className = 'w-16 h-16 bg-gray-400 rounded-full flex items-center justify-center';
-        imagePlaceholder.appendChild(plusIcon);
-
-        const footer = document.createElement('div');
-        footer.className = 'flex items-center space-x-2';
-        footer.innerHTML = `<div class='flex-grow h-10 bg-gray-300/80 rounded-md'></div><div class='w-10 h-10 bg-gray-300/80 rounded-md'></div>`;
-
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file'; fileInput.accept = 'image/*'; fileInput.multiple = true; fileInput.className = 'hidden';
-        card.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (event) => {
-          const files = event.target.files;
-          if (!files || files.length === 0) return;
-          const filesToProcess = Array.from(files).filter(f => f.type.startsWith('image/'));
-          let processedCount = 0;
-          filesToProcess.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const fullFilename = file.name;
-              const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
-              let displayName = baseFilename, idCode = '';
-              const underscoreIndex = baseFilename.lastIndexOf('_');
-              if (underscoreIndex > -1) {
-                const potentialCode = baseFilename.substring(underscoreIndex + 1);
-                if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
-                  displayName = baseFilename.substring(0, underscoreIndex); idCode = potentialCode;
-                }
-              }
-              images.push({ id: Date.now() + Math.random().toString(36).substr(2,9), src: e.target.result, codeId: idCode, filename: displayName });
-              if (++processedCount === filesToProcess.length) renderGallery();
-            };
-            reader.readAsDataURL(file);
-          });
-        });
-
-        card.append(filenamePlaceholder, imagePlaceholder, footer, fileInput);
-        return card;
-      };
-
       const renderGallery = () => {
         gallery.innerHTML = '';
-        images.forEach(imageData => gallery.appendChild(createImageCard(imageData)));
-        gallery.appendChild(createAdderCard());
-      };
+        const groupedImages = images.reduce((acc, image) => {
+          const groupKey = image.group || 'Uncategorized';
+          if (!acc[groupKey]) acc[groupKey] = [];
+          acc[groupKey].push(image);
+          return acc;
+        }, {});
+        
+        Object.keys(groupedImages).sort().forEach(groupName => {
+            const groupBlock = document.createElement('div');
+            groupBlock.className = 'flex flex-col items-center justify-start space-y-3';
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'flex items-center gap-3';
+            const countryCode = countryCodeMap[groupName];
+            if (countryCode) {
+              groupHeader.innerHTML += `<img src="https://flagcdn.com/w40/${countryCode}.png" alt="${groupName} flag" class="h-6 rounded-md shadow-sm">`;
+            }
+            groupHeader.innerHTML += `<h2 class="text-2xl font-bold title-fancy text-gray-800">${groupName}</h2>`;
+            
+            const swiperContainer = document.createElement('div');
+            swiperContainer.className = 'swiper';
+            const swiperWrapper = document.createElement('div');
+            swiperWrapper.className = 'swiper-wrapper';
 
-      const preloadDefaultImages = async () => {
-        const defaultImagePaths = [
-          'photos/UnitedKingdom-A_71573260575660.png',
-          'photos/UnitedKingdom-B_124837307393411.png',
-          'photos/UnitedKingdom-C_102656913832746.png'
-        ];
+            groupedImages[groupName].forEach(imageData => {
+              const swiperSlide = document.createElement('div');
+              swiperSlide.className = 'swiper-slide';
+              swiperSlide.appendChild(createImageCard(imageData));
+              swiperWrapper.appendChild(swiperSlide);
+            });
+            
+            swiperContainer.appendChild(swiperWrapper);
+            groupBlock.appendChild(groupHeader);
+            groupBlock.appendChild(swiperContainer);
+            gallery.appendChild(groupBlock);
+        });
+        
+        document.querySelectorAll('.swiper').forEach(el => {
+          new Swiper(el, {
+            effect: 'cards',
+            grabCursor: true,
+            rewind: true,
+            cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, slideShadows: false },
+          });
+        });
+      };
+      
+      const processAndLoadImages = async () => {
         const newImages = [];
-        for (const path of defaultImagePaths) {
+        for (const basename of imageBasenames) {
           try {
+            const path = `photos/${basename}.png`;
             const response = await fetch(path);
             if (!response.ok) throw new Error(`Image not found: ${path}`);
             const blob = await response.blob();
@@ -282,24 +205,28 @@
               reader.onerror = reject;
               reader.readAsDataURL(blob);
             });
-            const fullFilename = path.split('/').pop();
-            const baseFilename = fullFilename.substring(0, fullFilename.lastIndexOf('.')) || fullFilename;
-            let displayName = baseFilename, idCode = '';
-            const underscoreIndex = baseFilename.lastIndexOf('_');
+            let namePart = basename; let idCode = '';
+            const underscoreIndex = basename.lastIndexOf('_');
             if (underscoreIndex > -1) {
-              const potentialCode = baseFilename.substring(underscoreIndex + 1);
+              const potentialCode = basename.substring(underscoreIndex + 1);
               if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
-                displayName = baseFilename.substring(0, underscoreIndex); idCode = potentialCode;
+                namePart = basename.substring(0, underscoreIndex);
+                idCode = potentialCode;
               }
             }
-            newImages.push({ id: Date.now() + Math.random().toString(36).substr(2,9), src, codeId: idCode, filename: displayName });
-          } catch (error) { console.error(`Failed to preload image: ${path}`, error); }
+            const group = namePart.split('-')[0] || 'Uncategorized';
+            // CHANGED: Logic to remove the group prefix from the display name
+            const nameWithoutGroup = namePart.startsWith(group + '-') ? namePart.substring(group.length + 1) : namePart;
+            const displayName = nameWithoutGroup.replace(/-/g, ' ');
+            
+            newImages.push({ id: Date.now() + Math.random().toString(36).substr(2, 9), src, codeId: idCode, filename: displayName, group: group });
+          } catch (error) { console.error(`Failed to load image: ${basename}`, error); }
         }
         if (newImages.length > 0) images = newImages;
         renderGallery();
       };
 
-      preloadDefaultImages();
+      processAndLoadImages();
     });
   </script>
 </body>
