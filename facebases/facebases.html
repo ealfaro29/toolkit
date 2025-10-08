@@ -105,8 +105,8 @@
     /* ========= Gallery ========= */
     document.addEventListener('DOMContentLoaded', () => {
       // CONFIGURATION
-      const imageBasenames = ['Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','India-Bronze_83588150632830','Lebanon-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295',];
-      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb', };
+      const imageBasenames = ['Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746', 'CostaRica-Emerald_113383284965134','India-Bronze_83588150632830','Lebanon-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295',];
+      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb','CostaRica':'cr', };
 
       const gallery = document.getElementById('imageGallery');
       let images = [];
@@ -118,7 +118,6 @@
         const card = document.createElement('div');
         card.className = 'bg-white rounded-lg shadow-md overflow-hidden flex flex-col p-2 space-y-2 card-fade-in relative card-container';
         const filenameHeader = document.createElement('div');
-        // CHANGED: Font size class updated from 'text-xs' to 'text-base'
         filenameHeader.className = 'text-base text-gray-600 font-medium truncate px-1 text-center';
         filenameHeader.textContent = imageData.filename;
         const img = document.createElement('img');
@@ -161,7 +160,9 @@
             if (countryCode) {
               groupHeader.innerHTML += `<img src="https://flagcdn.com/w40/${countryCode}.png" alt="${groupName} flag" class="h-6 rounded-md shadow-sm">`;
             }
-            groupHeader.innerHTML += `<h2 class="text-2xl font-bold title-fancy text-gray-800">${groupName}</h2>`;
+            // Add a space to "CostaRica" for display
+            const displayGroupName = groupName.replace(/([A-Z])/g, ' $1').trim();
+            groupHeader.innerHTML += `<h2 class="text-2xl font-bold title-fancy text-gray-800">${displayGroupName}</h2>`;
             
             const swiperContainer = document.createElement('div');
             swiperContainer.className = 'swiper';
@@ -193,8 +194,13 @@
       
       const processAndLoadImages = async () => {
         const newImages = [];
-        for (const basename of imageBasenames) {
+        for (let basename of imageBasenames) {
           try {
+            // Remove .png if it exists
+            if (basename.endsWith('.png')) {
+                basename = basename.slice(0, -4);
+            }
+            
             const path = `photos/${basename}.png`;
             const response = await fetch(path);
             if (!response.ok) throw new Error(`Image not found: ${path}`);
@@ -215,7 +221,6 @@
               }
             }
             const group = namePart.split('-')[0] || 'Uncategorized';
-            // CHANGED: Logic to remove the group prefix from the display name
             const nameWithoutGroup = namePart.startsWith(group + '-') ? namePart.substring(group.length + 1) : namePart;
             const displayName = nameWithoutGroup.replace(/-/g, ' ');
             
