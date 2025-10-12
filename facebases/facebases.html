@@ -21,7 +21,7 @@
     .card-fade-in { animation: zoomIn 0.3s ease-out forwards; }
     .modal-fade-in { animation: fadeIn 0.2s ease-out forwards; }
     .modal-zoom-in { animation: zoomIn 0.2s ease-out forwards; }
-    .copied { background-color: #22c55e !important; }
+    .copied { background-color: #22c55e !important; color: white !important; }
 
     /* Custom styles for the Swiper card stack */
     .swiper {
@@ -108,7 +108,7 @@
     <div class="bg-white/90 rounded-xl shadow-lg p-3 md:p-4 mb-8 backdrop-blur-sm">
       <h1 class="text-2xl md:text-4xl font-bold text-center title-fancy text-gray-900">Fashion Muse Doll Base Collection</h1>
     </div>
-    <div id="imageGallery" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16"></div>
+    <div id="imageGallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 justify-items-center"></div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -131,18 +131,38 @@
     openTimeConverterBtn.addEventListener('click', () => { timeConverterModal.classList.remove('hidden'); });
     closeTimeConverterBtn.addEventListener('click', () => { timeConverterModal.classList.add('hidden'); });
     timeConverterModal.addEventListener('click', (event) => { if (event.target === timeConverterModal) { timeConverterModal.classList.add('hidden'); } });
+    
     const SJO_TZ = 'America/Costa_Rica';
     function formatInTZ_ddmmyyyy_12h(dateUTC, timeZone) { const parts = new Intl.DateTimeFormat('en-GB', { timeZone, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).formatToParts(dateUTC).reduce((a, p) => (a[p.type] = p.value, a), {}); const ampm = (parts.dayPeriod || '').toUpperCase(); return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${ampm}`; }
     function wallInTZ_toUTC(y,m,d,H,M, tz) { let t = Date.UTC(y, m-1, d, H, M); const partsAtGuess = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{}); const guessMin = Date.UTC(+partsAtGuess.year, +partsAtGuess.month-1, +partsAtGuess.day, +partsAtGuess.hour, +partsAtGuess.minute) / 60000; const intendedMin = Date.UTC(y, m-1, d, H, M) / 60000; const diffMin = guessMin - intendedMin; t -= diffMin * 60000; return new Date(t); }
-    const eventEl = document.getElementById('eventDateTime'); const tzSel = document.getElementById('eventTimeZone'); const outEl = document.getElementById('sjoOutput');
-    document.getElementById('convertBtn').addEventListener('click', convertToSJO); document.getElementById('copySjoBtn').addEventListener('click', () => { if (!outEl.value) return; navigator.clipboard.writeText(outEl.value).catch(()=>{}); });
+    
+    const eventEl = document.getElementById('eventDateTime'); 
+    const tzSel = document.getElementById('eventTimeZone'); 
+    const outEl = document.getElementById('sjoOutput');
+    const copySjoBtn = document.getElementById('copySjoBtn');
+
+    document.getElementById('convertBtn').addEventListener('click', convertToSJO); 
+    
+    copySjoBtn.addEventListener('click', () => { 
+        if (!outEl.value) return; 
+        navigator.clipboard.writeText(outEl.value).then(() => {
+            const originalText = copySjoBtn.textContent;
+            copySjoBtn.textContent = 'Copied!';
+            copySjoBtn.classList.add('copied');
+            setTimeout(() => {
+                copySjoBtn.textContent = originalText;
+                copySjoBtn.classList.remove('copied');
+            }, 1500);
+        }).catch(err => { console.error("Failed to copy text.", err); }); 
+    });
+
     function convertToSJO() { const val = eventEl.value; const tz = tzSel.value || 'UTC'; if (!val) { outEl.value = ''; return; } const [datePart, timePart] = val.split('T'); if (!datePart || !timePart) { outEl.value = 'Invalid date'; return; } const [y,m,d] = datePart.split('-').map(Number); const [H,Mi] = timePart.split(':').map(Number); if ([y,m,d,H,Mi].some(n => Number.isNaN(n))) { outEl.value = 'Invalid date'; return; } const utcInstant = wallInTZ_toUTC(y,m,d,H,Mi,tz); outEl.value = formatInTZ_ddmmyyyy_12h(utcInstant, SJO_TZ); }
 
     /* ========= Gallery ========= */
     document.addEventListener('DOMContentLoaded', () => {
       // CONFIGURATION
-      const imageBasenames = ['Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746', 'Brazil-Earth_130516089719062', 'Brazil-Carnaval_125408725754854', 'Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295',];
-      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb','CostaRica':'cr', 'Nicaragua':'ni', 'Brazil':'br'};
+      const imageBasenames = ['Drag-ByPro_94539837555073', 'Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746', 'Brazil-Earth_130516089719062', 'Brazil-Carnaval_125408725754854', 'Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295',];
+      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb','CostaRica':'cr', 'Nicaragua':'ni', 'Brazil':'br', 'Drag': 'hk' };
 
       const gallery = document.getElementById('imageGallery');
       let images = [];
@@ -194,11 +214,18 @@
             groupHeader.className = 'flex items-center gap-3';
             const countryCode = countryCodeMap[groupName];
             if (countryCode) {
-              groupHeader.innerHTML += `<img src="https://flagcdn.com/w40/${countryCode}.png" alt="${groupName} flag" class="h-6 rounded-md shadow-sm">`;
+                // FIX: Wrapper div to constrain the flag's aspect ratio
+                const flagContainer = document.createElement('div');
+                flagContainer.className = 'w-9 h-6 overflow-hidden rounded-md shadow-sm inline-flex justify-center items-center bg-gray-100';
+                flagContainer.innerHTML = `<img src="https://flagcdn.com/h24/${countryCode}.png" alt="${groupName} flag" class="h-6">`;
+                groupHeader.appendChild(flagContainer);
             }
-            // Add a space to "CostaRica" for display
-            const displayGroupName = groupName.replace(/([A-Z])/g, ' $1').trim();
-            groupHeader.innerHTML += `<h2 class="text-2xl font-bold title-fancy text-gray-800">${displayGroupName}</h2>`;
+            // FIX: Regex to correctly add spaces to names like "CostaRica" without breaking "UK"
+            const displayGroupName = groupName.replace(/([a-z])([A-Z])/g, '$1 $2');
+            const titleEl = document.createElement('h2');
+            titleEl.className = 'text-2xl font-bold title-fancy text-gray-800';
+            titleEl.textContent = displayGroupName;
+            groupHeader.appendChild(titleEl);
             
             const swiperContainer = document.createElement('div');
             swiperContainer.className = 'swiper';
@@ -232,7 +259,6 @@
         const newImages = [];
         for (let basename of imageBasenames) {
           try {
-            // Remove .png if it exists
             if (basename.endsWith('.png')) {
                 basename = basename.slice(0, -4);
             }
