@@ -162,7 +162,9 @@
     document.addEventListener('DOMContentLoaded', () => {
       // CONFIGURATION
       const imageBasenames = ['Brazil-Peacock_99890684900396', 'Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463', 'Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746', 'Brazil-Earth_130516089719062', 'Brazil-Carnaval_125408725754854', 'Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295',];
-      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb','CostaRica':'cr', 'Nicaragua':'ni', 'Brazil':'br', 'Drag': 'hk' };
+      // FIX START: Removed 'Drag' from this map.
+      const countryCodeMap = { 'UK': 'gb','Albania': 'al','India': 'in','Lebanon': 'lb','CostaRica':'cr', 'Nicaragua':'ni', 'Brazil':'br' };
+      // FIX END
 
       const gallery = document.getElementById('imageGallery');
       let images = [];
@@ -198,6 +200,7 @@
         return card;
       };
 
+      // FIX START: Replaced the entire renderGallery function with a more robust version.
       const renderGallery = () => {
         gallery.innerHTML = '';
         const groupedImages = images.reduce((acc, image) => {
@@ -207,20 +210,34 @@
           return acc;
         }, {});
         
-        Object.keys(groupedImages).sort().forEach(groupName => {
+        // Get all group names, sort them alphabetically, but ensure 'Drag' is always last.
+        const groupOrder = Object.keys(groupedImages).sort((a, b) => {
+            if (a === 'Drag') return 1;  // Move 'Drag' to the end of the sort order.
+            if (b === 'Drag') return -1; // Keep other items before 'Drag'.
+            return a.localeCompare(b);   // Alphabetical sort for all other items.
+        });
+
+        groupOrder.forEach(groupName => {
             const groupBlock = document.createElement('div');
             groupBlock.className = 'flex flex-col items-center justify-start space-y-3';
             const groupHeader = document.createElement('div');
             groupHeader.className = 'flex items-center gap-3';
-            const countryCode = countryCodeMap[groupName];
-            if (countryCode) {
-                // FIX: Wrapper div to constrain the flag's aspect ratio
-                const flagContainer = document.createElement('div');
-                flagContainer.className = 'w-9 h-6 overflow-hidden rounded-md shadow-sm inline-flex justify-center items-center bg-gray-100';
-                flagContainer.innerHTML = `<img src="https://flagcdn.com/h24/${countryCode}.png" alt="${groupName} flag" class="h-6">`;
+            
+            const flagContainer = document.createElement('div');
+            flagContainer.className = 'w-9 h-6 overflow-hidden rounded-md shadow-sm inline-flex justify-center items-center bg-gray-100';
+
+            // Special logic: If the group is 'Drag', use the local flag. Otherwise, use flagcdn.
+            if (groupName === 'Drag') {
+                flagContainer.innerHTML = `<img src="photos/drag-flag.png" alt="Drag flag" class="h-6">`;
                 groupHeader.appendChild(flagContainer);
+            } else {
+                const countryCode = countryCodeMap[groupName];
+                if (countryCode) {
+                    flagContainer.innerHTML = `<img src="https://flagcdn.com/h24/${countryCode}.png" alt="${groupName} flag" class="h-6">`;
+                    groupHeader.appendChild(flagContainer);
+                }
             }
-            // FIX: Regex to correctly add spaces to names like "CostaRica" without breaking "UK"
+
             const displayGroupName = groupName.replace(/([a-z])([A-Z])/g, '$1 $2');
             const titleEl = document.createElement('h2');
             titleEl.className = 'text-2xl font-bold title-fancy text-gray-800';
@@ -254,6 +271,7 @@
           });
         });
       };
+      // FIX END
       
       const processAndLoadImages = async () => {
         const newImages = [];
