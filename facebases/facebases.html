@@ -5,391 +5,341 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fashion Muse Doll Base Collection</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 
-  <!-- Fonts: Inter for UI, Playfair only for top titles -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
 
-  <!-- Swiper -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-
   <style>
     :root {
-      --bg-from: #fbc2eb;
-      --bg-to:   #a6c1ee;
-      --ink:     #0f172a;      /* slate-900 */
-      --muted:   #475569;      /* slate-600 */
-      --ring:    #6366f1;      /* indigo-500 */
-      --card:    #ffffff;
-      --border:  #e5e7eb;
-      --shadow:  0 10px 25px rgba(2,6,23,0.08);
+      --ink: #e5e7eb; --muted: #a1a1aa;
+      --card: #121317; --border: #2a2b31;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --gold1: #9b7b25; --gold2: #d5b85a; --gold3: #9b7b25;
+      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --space-4: 16px; --space-5: 24px;
+      --radius-md: 8px; --radius-xl: 16px;
     }
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"; background-image: linear-gradient(to right, var(--bg-from), var(--bg-to)); color: var(--ink); }
+
+    html, body {
+      font-family: var(--font-family-sans);
+      background-color: #12111700;
+      color: var(--ink);
+      margin: 0;
+      padding: var(--space-4);
+      overflow-x: hidden;
+    }
+    
+    #particle-canvas {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; pointer-events: none;
+    }
+
     .title-fancy { font-family: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
+    .gold-title {
+      background-image: linear-gradient(90deg, var(--gold1), var(--gold2), var(--gold3));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+      text-shadow: 0 0 18px rgba(227,199,102,.25);
+    }
+    
+    .container {
+      max-width: 1600px; margin: 0 auto;
+      display: flex; flex-direction: column;
+      gap: var(--space-4); height: calc(100vh - (var(--space-4) * 2));
+      transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
+      opacity: 0; filter: blur(4px);
+    }
+    .container.loaded { opacity: 1; filter: blur(0); }
 
-    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
-    @keyframes zoomIn { from { opacity: 0; transform: scale(.98) } to { opacity: 1; transform: scale(1) } }
-    .card-fade-in { animation: zoomIn .2s ease-out forwards }
-    .modal-fade-in { animation: fadeIn .15s ease-out forwards }
-    .modal-zoom-in { animation: zoomIn .15s ease-out forwards }
-    .copied { background-color: #22c55e !important; color: white !important }
+    .panel {
+      background: rgba(0, 0, 0, 0.848); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); box-shadow: var(--shadow); backdrop-filter: blur(12px);
+    }
+    
+    header.panel {
+      height: 100px; display: flex; align-items: center; justify-content: center;
+      gap: var(--space-4); padding: 0 var(--space-5);
+    }
 
-    /* Swiper cards stack sizing with responsive constraints */
-    .swiper { width: 100%; max-width: 320px; height: 380px; overflow: visible }
-    .swiper-slide { display: flex; align-items: center; justify-content: center; border-radius: 18px }
-    .swiper-slide .card-container { width: 100%; height: 100% }
-      /* Ghost slide to simulate stack for single items */
-    .ghost-slide { pointer-events: none; }
-    .ghost-slide .card-container { width: 100%; height: 100%; opacity: .55; filter: blur(.2px); }
+    main.panel {
+      padding: var(--space-4); overflow-y: auto; flex-grow: 1;
+      display: flex; flex-direction: column; gap: var(--space-4);
+    }
+    
+    main.panel::-webkit-scrollbar { width: 8px; }
+    main.panel::-webkit-scrollbar-track { background: transparent; }
+    main.panel::-webkit-scrollbar-thumb { background-color: rgba(213, 184, 90, 0.3); border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
+    main.panel::-webkit-scrollbar-thumb:hover { background-color: rgba(213, 184, 90, 0.5); }
+    
+    .dark-input { background:#0f1115; color:#e7e7ea; border:1px solid #2a2d36; }
+    
+    .swiper { width: 100%; max-width: 190px; height: 250px; overflow: visible; }
+    .swiper-slide { display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+    .country-card { background: rgba(18,19,23,.92); border:1px solid var(--border); border-radius: 1rem; padding: 0.75rem; }
+    .flag-aesthetic { height: 24px; border-radius: .4rem; object-fit: cover; }
+    .copied { background-color: #22c55e !important; color: white !important; }
+    
+    #countryGrid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    }
+    
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: none;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: #121317; border-radius: var(--radius-xl); box-shadow: var(--shadow);
+      width: 90vw; max-width: 480px; border: 1px solid var(--border);
+    }
+    #loginOverlay { z-index: 5000; }
+
+    .tab-nav-button {
+      padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500;
+      color: var(--muted); background-color: transparent; border: 1px solid transparent;
+      transition: all 0.2s ease; white-space: nowrap;
+    }
+    .tab-nav-button:hover { color: var(--ink); background-color: rgba(255,255,255,0.05); }
+    .tab-nav-button.active {
+      color: var(--gold2);
+      background-color: rgba(213,184,90,0.1);
+      border-color: rgba(213,184,90,0.25);
+    }
   </style>
 </head>
-<body class="min-h-screen relative overflow-x-hidden">
+<body>
 
-  <!-- Login Overlay -->
-  <div id="loginOverlay" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white/95 rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-sm text-center">
-      <h2 class="text-2xl font-bold title-fancy text-slate-900 mb-4">Enter Password</h2>
-      <input id="passwordInput" type="password" class="w-full h-11 px-3 text-center bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••" aria-label="Password">
-      <button id="loginBtn" class="mt-4 w-full h-11 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">Unlock</button>
-      <p id="errorMessage" class="mt-2 text-sm text-red-600 h-4" aria-live="polite"></p>
+  <div id="particle-canvas"></div>
+
+  <div id="loginOverlay" class="modal-overlay show">
+    <div class="modal-content p-8 text-center">
+      <h2 class="text-2xl font-bold title-fancy gold-title mb-4">Enter Password</h2>
+      <input id="passwordInput" type="password" class="w-full h-11 px-3 text-center dark-input rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold2)]" placeholder="••••••••">
+      <button id="loginBtn" class="mt-4 h-11 w-full flex items-center justify-center rounded-md bg-[var(--gold2)] text-black font-semibold hover:brightness-110">Unlock</button>
+      <p id="errorMessage" class="mt-2 text-sm text-red-400 h-4"></p>
     </div>
   </div>
 
-  <!-- Floating Actions -->
-  <!-- Actions moved into title card -->
-<!-- Photos Modal -->
-  <div id="photosModal" class="hidden fixed inset-0 z-[55] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 modal-fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 pt-8 relative w-full max-w-md modal-zoom-in">
-      <button id="closePhotosBtn" aria-label="Close" class="absolute top-2 right-2 text-gray-400 hover:text-gray-800 text-3xl leading-none font-bold">&times;</button>
-      <h2 class="text-xl md:text-2xl font-semibold title-fancy text-slate-900 mb-4">Fotos para Descargar</h2>
-      <div class="flex flex-col gap-4">
-        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
-          <div class="flex items-center gap-3">
-            <img src="photos/UK.png" alt="UK Base" class="w-16 h-16 object-cover rounded-md"/>
-            <span class="font-medium text-slate-800">UK.png</span>
-          </div>
-          <a href="photos/UK.png" download="UK.png" class="h-10 px-4 inline-flex items-center bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">Descargar</a>
-        </div>
+  <div id="photosModal" class="modal-overlay">
+    <div class="modal-content p-6 pt-8 relative">
+      <button id="closePhotosBtn" class="absolute top-2 right-2 text-zinc-300 hover:text-zinc-100 text-3xl">&times;</button>
+      <h2 class="text-xl font-semibold title-fancy gold-title mb-4">Downloadable Photos</h2>
+      <div class="flex items-center justify-between bg-[#151722] p-3 rounded-lg border border-[var(--border)]">
+        <div class="flex items-center gap-3"><img src="photos/UK.png" alt="UK Base" class="w-16 h-16 object-cover rounded-md border border-[var(--border)]"/><span class="font-medium">UK.png</span></div>
+        <a href="photos/UK.png" download="UK.png" class="h-10 px-4 inline-flex items-center bg-[var(--gold2)] text-black text-sm rounded-md hover:brightness-110">Download</a>
       </div>
     </div>
   </div>
 
-  <!-- Time Converter Modal -->
-  <div id="timeConverterModal" class="hidden fixed inset-0 z-[55] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 modal-fade-in">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 pt-8 relative w-full max-w-md modal-zoom-in">
-      <button id="closeTimeConverterBtn" aria-label="Close" class="absolute top-2 right-2 text-gray-400 hover:text-gray-800 text-3xl leading-none font-bold">&times;</button>
-      <h2 class="text-xl md:text-2xl font-semibold title-fancy text-slate-900 mb-4">Time converter to SJO</h2>
+  <div id="timeConverterModal" class="modal-overlay">
+    <div class="modal-content p-6 pt-8 relative">
+      <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-zinc-300 hover:text-zinc-100 text-3xl">&times;</button>
+      <h2 class="text-xl font-semibold title-fancy gold-title mb-4">Time Converter to SJO</h2>
       <div class="flex flex-col gap-3">
-        <label class="block">
-          <span class="text-sm text-slate-700">Event date & time</span>
-          <input id="eventDateTime" type="datetime-local" class="mt-1 w-full h-11 px-3 text-sm bg-gray-100 text-slate-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
-        </label>
-        <label class="block">
-          <span class="text-sm text-slate-700">Event timezone</span>
-          <select id="eventTimeZone" class="mt-1 w-full h-11 px-3 text-sm bg-gray-100 text-slate-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="Etc/GMT+12">IDLW (-12)</option><option value="Pacific/Honolulu">HST (-10)</option><option value="America/Anchorage">AKST (-9)</option><option value="America/Los_Angeles">PST (-8)</option><option value="America/Denver">MST (-7)</option><option value="America/Chicago">CST (-6)</option><option value="America/Mexico_City">CST-MX (-6)</option><option value="America/New_York">EST (-5)</option><option value="America/Bogota">COT (-5)</option><option value="America/Lima">PET (-5)</option><option value="America/Caracas">VET (-4)</option><option value="America/Santiago">CLT (-3)</option><option value="America/Sao_Paulo">BRT (-3)</option><option value="Atlantic/Azores">AZOT (-1)</option><option value="Europe/London">GMT (+0)</option><option value="Europe/Paris">CET (+1)</option><option value="Europe/Berlin">CET-DE (+1)</option><option value="Europe/Athens">EET (+2)</option><option value="Africa/Johannesburg">SAST (+2)</option><option value="Asia/Dubai">GST (+4)</option><option value="Asia/Karachi">PKT (+5)</option><option value="Asia/Kolkata">IST (+5:30)</option><option value="Asia/Bangkok">ICT (+7)</option><option value="Asia/Hong_Kong">HKT (+8)</option><option value="Asia/Singapore">SGT (+8)</option><option value="Asia/Manila">PHT (+8)</option><option value="Asia/Tokyo">JST (+9)</option><option value="Asia/Seoul">KST (+9)</option><option value="Australia/Sydney">AEST (+10)</option><option value="Pacific/Auckland">NZST (+12)</option>
-          </select>
-        </label>
-        <button id="convertBtn" class="h-11 px-4 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700">Convert</button>
-        <label class="block">
-          <span class="text-sm text-slate-700">Converted to SJO, Costa Rica</span>
-          <input id="sjoOutput" type="text" readonly class="mt-1 w-full h-11 px-3 text-sm bg-gray-100 text-slate-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="dd/mm/yyyy, HH:MM AM/PM"/>
-        </label>
-        <button id="copySjoBtn" class="h-11 px-4 bg-gray-200 text-slate-700 rounded-md hover:bg-indigo-500 hover:text-white">Copy</button>
-        <p class="mt-1 text-xs text-slate-500">Input uses the selected timezone, output uses America/Costa_Rica.</p>
+        <label><span class="text-sm text-zinc-300">Event date & time</span><input id="eventDateTime" type="datetime-local" class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md"/></label>
+        <label><span class="text-sm text-zinc-300">Event timezone</span><select id="eventTimeZone" class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md"><option value="Etc/GMT+12">IDLW (-12)</option><option value="Pacific/Honolulu">HST (-10)</option><option value="America/Anchorage">AKST (-9)</option><option value="America/Los_Angeles">PST (-8)</option><option value="America/Denver">MST (-7)</option><option value="America/Chicago">CST (-6)</option><option value="America/Mexico_City">CST-MX (-6)</option><option value="America/New_York">EST (-5)</option><option value="America/Bogota">COT (-5)</option><option value="America/Lima">PET (-5)</option><option value="America/Caracas">VET (-4)</option><option value="America/Santiago">CLT (-3)</option><option value="America/Sao_Paulo">BRT (-3)</option><option value="Atlantic/Azores">AZOT (-1)</option><option value="Europe/London">GMT (+0)</option><option value="Europe/Paris">CET (+1)</option><option value="Europe/Berlin">CET-DE (+1)</option><option value="Europe/Athens">EET (+2)</option><option value="Africa/Johannesburg">SAST (+2)</option><option value="Asia/Dubai">GST (+4)</option><option value="Asia/Karachi">PKT (+5)</option><option value="Asia/Kolkata">IST (+5:30)</option><option value="Asia/Bangkok">ICT (+7)</option><option value="Asia/Hong_Kong">HKT (+8)</option><option value="Asia/Singapore">SGT (+8)</option><option value="Asia/Manila">PHT (+8)</option><option value="Asia/Tokyo">JST (+9)</option><option value="Asia/Seoul">KST (+9)</option><option value="Australia/Sydney">AEST (+10)</option><option value="Pacific/Auckland">NZST (+12)</option></select></label>
+        <button id="convertBtn" class="h-11 px-4 bg-[var(--gold2)] text-black text-sm rounded-md hover:brightness-110">Convert</button>
+        <label><span class="text-sm text-zinc-300">Converted to SJO, Costa Rica</span><input id="sjoOutput" type="text" readonly class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md" placeholder="dd/mm/yyyy, HH:MM AM/PM"/></label>
+        <button id="copySjoBtn" class="h-11 px-4 bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533]">Copy</button>
       </div>
     </div>
   </div>
 
-  <!-- Main -->
-  <main id="mainContent" class="container mx-auto p-4 md:p-8 hidden">
-    <div class="bg-white/90 rounded-2xl shadow-lg p-4 md:p-6 mb-8 backdrop-blur-sm">
-      <div class="flex items-center justify-between">
-        <h1 class="text-3xl md:text-5xl font-bold title-fancy text-slate-900 tracking-tight">Fashion Muse Doll Base Collection</h1>
-        <div class="flex items-center gap-2">
-          <button id="openPhotosBtn" aria-label="Open photos" class="bg-white/80 backdrop-blur-sm text-indigo-600 p-2.5 rounded-full shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg>
-          </button>
-          <button id="openTimeConverterBtn" aria-label="Open time converter" class="bg-white/80 backdrop-blur-sm text-indigo-600 p-2.5 rounded-full shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
-          </button>
-        </div>
+  <div class="container" id="app-container">
+    
+    <header class="panel text-center">
+      <div class="w-full">
+        <h1 class="text-4xl title-fancy gold-title">Fashion Muse Collection</h1>
       </div>
-    </div>
+    </header>
 
-    <div id="imageGallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 justify-items-center"></div>
-  </main>
+    <nav class="panel flex flex-col sm:flex-row items-center justify-between p-2">
+      <div class="flex items-center gap-1 sm:gap-2">
+        <button class="tab-nav-button active" data-tab="facebases">Facebases</button>
+        <button class="tab-nav-button" data-tab="clothing">Clothing</button>
+        <button class="tab-nav-button" data-tab="music">Music Codes</button>
+        <button class="tab-nav-button" data-tab="other">Other</button>
+      </div>
+      <div class="flex items-center gap-2 pr-2 mt-2 sm:mt-0">
+        <button id="openPhotosBtn" title="Download Photos" class="w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-[var(--gold2)] rounded-full border border-[var(--border)] hover:brightness-125"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg></button>
+        <button id="openTimeConverterBtn" title="Time Converter" class="w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-[var(--gold2)] rounded-full border border-[var(--border)] hover:brightness-125"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/></svg></button>
+      </div>
+    </nav>
 
+    <main class="panel">
+      <div id="content-facebases" class="tab-content flex flex-col gap-4">
+        <div class="relative w-full">
+          <input type="search" id="search-bar" placeholder="Search by country or name..." class="w-full h-12 pl-10 pr-4 text-sm dark-input rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold2)]">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+        </div>
+        <div id="countryGrid"></div>
+      </div>
+      <div id="content-clothing" class="tab-content hidden h-full flex items-center justify-center text-center text-zinc-500">
+        <p>Clothing content will be shown here.</p>
+      </div>
+      <div id="content-music" class="tab-content hidden h-full flex items-center justify-center text-center text-zinc-500">
+        <p>Music Codes content will be shown here.</p>
+      </div>
+      <div id="content-other" class="tab-content hidden h-full flex items-center justify-center text-center text-zinc-500">
+        <p>Other content will be shown here.</p>
+      </div>
+    </main>
+  </div>
+  
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      /* Auth */
-      const SECRET_B64 = 'bWFuY2hpdGFz'; // "manchitas"
+      const SECRET_B64 = 'bWFuY2hpdGFz';
       const loginOverlay = document.getElementById('loginOverlay');
-      const mainContent  = document.getElementById('mainContent');
-      const passwordInput = document.getElementById('passwordInput');
-      const loginBtn = document.getElementById('loginBtn');
-      const errorMessage = document.getElementById('errorMessage');
+      const appContainer = document.getElementById('app-container');
+      let galleryInitialized = false;
+      let allItems = []; // <-- Store all items here
 
       const authenticate = () => {
-        if (passwordInput.value === atob(SECRET_B64)) {
+        if (document.getElementById('passwordInput').value === atob(SECRET_B64)) {
           sessionStorage.setItem('isAuthenticated', 'true');
-          loginOverlay.classList.add('hidden');
-          mainContent.classList.remove('hidden');
+          loginOverlay.classList.remove('show');
+          appContainer.classList.add('loaded');
           initializeGallery();
         } else {
-          errorMessage.textContent = 'Incorrect password.';
-          passwordInput.value = '';
+          document.getElementById('errorMessage').textContent = 'Incorrect password.';
         }
       };
 
       if (sessionStorage.getItem('isAuthenticated') === 'true') {
-        loginOverlay.classList.add('hidden');
-        mainContent.classList.remove('hidden');
+        loginOverlay.classList.remove('show');
+        appContainer.classList.add('loaded');
         initializeGallery();
+      } else {
+        loginOverlay.classList.add('show');
       }
 
-      loginBtn.addEventListener('click', authenticate);
-      passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authenticate(); });
+      document.getElementById('loginBtn').addEventListener('click', authenticate);
+      document.getElementById('passwordInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') authenticate(); });
 
-      /* Gallery */
-      function initializeGallery() {
-        // Data
-        const imageBasenames = [
-          'Brazil-Putana_131247169320314','Brazil-Peacock_99890684900396','Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463','Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','Brazil-Earth_130516089719062','Brazil-Carnaval_125408725754854','Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295'
-        ];
-        const countryCodeMap = { UK: 'gb', Albania: 'al', India: 'in', Lebanon: 'lb', CostaRica: 'cr', Nicaragua: 'ni', Brazil: 'br' };
-        const gallery = document.getElementById('imageGallery');
-        let images = [];
-
-        const copyIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
-        const copiedIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
-
-        const createImageCard = (imageData) => {
-          const card = document.createElement('div');
-          card.className = 'bg-white rounded-2xl shadow-xl ring-1 ring-gray-100 overflow-hidden flex flex-col p-2 space-y-2 card-fade-in relative card-container transition-transform hover:scale-[1.02]';
-
-          const filenameHeader = document.createElement('div');
-          filenameHeader.className = 'text-sm text-slate-600 font-medium truncate px-1 text-center';
-          filenameHeader.textContent = imageData.filename;
-          filenameHeader.title = imageData.filename;
-
-          const img = document.createElement('img');
-          img.src = imageData.src;
-          img.className = 'w-full h-auto object-cover aspect-square rounded-lg';
-          img.alt = imageData.filename;
-          img.loading = 'lazy';
-
-          const footer = document.createElement('div');
-          footer.className = 'flex items-center gap-2';
-
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.value = imageData.codeId || '';
-          input.placeholder = '…';
-          input.className = 'flex-grow h-10 px-3 text-sm bg-gray-100 text-slate-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 w-0';
-          input.addEventListener('input', (e) => {
-            const imageToUpdate = images.find(imgObj => imgObj.id === imageData.id);
-            if (imageToUpdate) imageToUpdate.codeId = e.target.value;
-          });
-
-          const copyButton = document.createElement('button');
-          copyButton.innerHTML = copyIconSVG;
-          copyButton.setAttribute('aria-label', 'Copy code');
-          copyButton.className = 'p-2.5 bg-gray-200 text-slate-700 rounded-md hover:bg-indigo-500 hover:text-white transition-colors duration-200';
-          copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(input.value).then(() => {
-              copyButton.innerHTML = copiedIconSVG;
-              copyButton.classList.add('copied');
-              setTimeout(() => { copyButton.innerHTML = copyIconSVG; copyButton.classList.remove('copied'); }, 1200);
-            });
-          });
-
-          footer.appendChild(input);
-          footer.appendChild(copyButton);
-          card.append(filenameHeader, img, footer);
-          return card;
-        };
-
-        const renderGallery = () => {
-          gallery.innerHTML = '';
-
-          const groupedImages = images.reduce((acc, image) => {
-            const groupKey = image.group || 'Uncategorized';
-            (acc[groupKey] ||= []).push(image);
-            return acc;
-          }, {});
-
-          const groupOrder = Object.keys(groupedImages).sort((a, b) => {
-            if (a === 'Drag') return 1;
-            if (b === 'Drag') return -1;
-            return a.localeCompare(b);
-          });
-
-          groupOrder.forEach(groupName => {
-            const groupBlock = document.createElement('section');
-            groupBlock.className = 'flex flex-col items-center justify-start gap-4';
-
-            const groupHeader = document.createElement('div');
-            groupHeader.className = 'flex items-center gap-3';
-
-            const flagContainer = document.createElement('div');
-            flagContainer.className = 'w-9 h-6 overflow-hidden rounded-md shadow-sm inline-flex justify-center items-center bg-gray-100 border border-gray-200';
-
-            if (groupName === 'Drag') {
-              flagContainer.innerHTML = `<img src="photos/drag-flag.png" alt="Drag flag" class="h-6"/>`;
-              groupHeader.appendChild(flagContainer);
-            } else {
-              const countryCode = countryCodeMap[groupName];
-              if (countryCode) {
-                flagContainer.innerHTML = `<img src="https://flagcdn.com/h24/${countryCode}.png" alt="${groupName} flag" class="h-6"/>`;
-                groupHeader.appendChild(flagContainer);
-              }
-            }
-
-            const displayGroupName = groupName.replace(/([a-z])([A-Z])/g, '$1 $2');
-            const titleEl = document.createElement('h2');
-            titleEl.className = 'text-2xl font-semibold title-fancy text-slate-800';
-            titleEl.textContent = displayGroupName;
-
-            groupHeader.appendChild(titleEl);
-
-            const swiperContainer = document.createElement('div');
-            swiperContainer.className = 'swiper mt-2';
-
-            const swiperWrapper = document.createElement('div');
-            swiperWrapper.className = 'swiper-wrapper';
-
-            groupedImages[groupName].forEach(imageData => {
-              const slide = document.createElement('div');
-              slide.className = 'swiper-slide';
-              slide.appendChild(createImageCard(imageData));
-              swiperWrapper.appendChild(slide);
-            });
-
-            // If only one image, add ghost slides to mimic stack
-            if (groupedImages[groupName].length === 1) {
-              for (let i = 0; i < 2; i++) {
-                const ghost = document.createElement('div');
-                ghost.className = 'swiper-slide ghost-slide';
-                const ghostInner = document.createElement('div');
-                ghostInner.className = 'card-container bg-white rounded-2xl ring-1 ring-gray-100 shadow-xl';
-                ghost.appendChild(ghostInner);
-                swiperWrapper.appendChild(ghost);
-              }
-            }
-
-            swiperContainer.appendChild(swiperWrapper);
-            groupBlock.appendChild(groupHeader);
-            groupBlock.appendChild(swiperContainer);
-            gallery.appendChild(groupBlock);
-          });
-
-          document.querySelectorAll('.swiper').forEach(el => {
-            new Swiper(el, {
-              effect: 'cards',
-              grabCursor: true,
-              rewind: true,
-              cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, slideShadows: false },
-            });
-          });
-        };
-
-        const processAndLoadImages = async () => {
-          const newImages = [];
-          for (let basename of imageBasenames) {
-            try {
-              if (basename.endsWith('.png')) basename = basename.slice(0, -4);
-              const path = `photos/${basename}.png`;
-              // Use direct URL for performance and caching
-              const src = path;
-
-              let namePart = basename; let idCode = '';
-              const underscoreIndex = basename.lastIndexOf('_');
-              if (underscoreIndex > -1) {
-                const potentialCode = basename.substring(underscoreIndex + 1);
-                if (!isNaN(potentialCode) && potentialCode.trim() !== '') {
-                  namePart = basename.substring(0, underscoreIndex);
-                  idCode = potentialCode;
-                }
-              }
-              const group = namePart.split('-')[0] || 'Uncategorized';
-              const nameWithoutGroup = namePart.startsWith(group + '-') ? namePart.substring(group.length + 1) : namePart;
-              const displayName = nameWithoutGroup.replace(/-/g, ' ');
-              newImages.push({ id: Date.now() + Math.random().toString(36).slice(2, 9), src, codeId: idCode, filename: displayName, group });
-            } catch (err) {
-              console.error(`Failed to load image: ${basename}`, err);
-            }
-          }
-          if (newImages.length) images = newImages;
-          renderGallery();
-        };
-
-        processAndLoadImages();
-      }
-
-      /* Modals */
-      const openPhotosBtn = document.getElementById('openPhotosBtn');
-      const closePhotosBtn = document.getElementById('closePhotosBtn');
-      const photosModal = document.getElementById('photosModal');
-      openPhotosBtn.addEventListener('click', () => { photosModal.classList.remove('hidden'); });
-      closePhotosBtn.addEventListener('click', () => { photosModal.classList.add('hidden'); });
-      photosModal.addEventListener('click', (event) => { if (event.target === photosModal) photosModal.classList.add('hidden'); });
-
-      const openTimeConverterBtn = document.getElementById('openTimeConverterBtn');
-      const closeTimeConverterBtn = document.getElementById('closeTimeConverterBtn');
-      const timeConverterModal = document.getElementById('timeConverterModal');
-      openTimeConverterBtn.addEventListener('click', () => { timeConverterModal.classList.remove('hidden'); });
-      closeTimeConverterBtn.addEventListener('click', () => { timeConverterModal.classList.add('hidden'); });
-      timeConverterModal.addEventListener('click', (event) => { if (event.target === timeConverterModal) timeConverterModal.classList.add('hidden'); });
-
-      /* Time conversion */
-      const SJO_TZ = 'America/Costa_Rica';
-      function formatInTZ_ddmmyyyy_12h(dateUTC, timeZone) {
-        const parts = new Intl.DateTimeFormat('en-GB', { timeZone, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }).formatToParts(dateUTC).reduce((a, p) => (a[p.type] = p.value, a), {});
-        const ampm = (parts.dayPeriod || '').toUpperCase();
-        return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${ampm}`;
-      }
-      function wallInTZ_toUTC(y, m, d, H, M, tz) {
-        let t = Date.UTC(y, m-1, d, H, M);
-        const partsAtGuess = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
-        const guessMin = Date.UTC(+partsAtGuess.year, +partsAtGuess.month-1, +partsAtGuess.day, +partsAtGuess.hour, +partsAtGuess.minute) / 60000;
-        const intendedMin = Date.UTC(y, m-1, d, H, M) / 60000;
-        const diffMin = guessMin - intendedMin;
-        t -= diffMin * 60000;
-        return new Date(t);
-      }
-      const eventEl = document.getElementById('eventDateTime');
-      const tzSel = document.getElementById('eventTimeZone');
-      const outEl = document.getElementById('sjoOutput');
-      const copySjoBtn = document.getElementById('copySjoBtn');
-      document.getElementById('convertBtn').addEventListener('click', convertToSJO);
-      copySjoBtn.addEventListener('click', () => {
-        if (!outEl.value) return;
-        navigator.clipboard.writeText(outEl.value).then(() => {
-          const originalText = copySjoBtn.textContent;
-          copySjoBtn.textContent = 'Copied!';
-          copySjoBtn.classList.add('copied');
-          setTimeout(() => { copySjoBtn.textContent = originalText; copySjoBtn.classList.remove('copied'); }, 1200);
-        }).catch(err => { console.error('Failed to copy text.', err); });
+      const tabs = document.querySelectorAll('.tab-nav-button');
+      const contentAreas = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const target = tab.dataset.tab;
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          contentAreas.forEach(area => area.classList.toggle('hidden', area.id !== `content-${target}`));
+        });
       });
-      function convertToSJO() {
-        const val = eventEl.value;
-        const tz = tzSel.value || 'UTC';
-        if (!val) { outEl.value = ''; return }
-        const [datePart, timePart] = val.split('T');
-        if (!datePart || !timePart) { outEl.value = 'Invalid date'; return }
-        const [y, m, d] = datePart.split('-').map(Number);
-        const [H, Mi] = timePart.split(':').map(Number);
-        if ([y, m, d, H, Mi].some(n => Number.isNaN(n))) { outEl.value = 'Invalid date'; return }
-        const utcInstant = wallInTZ_toUTC(y, m, d, H, Mi, tz);
-        outEl.value = formatInTZ_ddmmyyyy_12h(utcInstant, SJO_TZ);
+
+      function renderGallery(itemsToRender) {
+        const grid = document.getElementById('countryGrid');
+        const countryCodeMap = { UK: 'gb', Albania: 'al', India: 'in', Brazil: 'br' };
+        
+        const byCountry = itemsToRender.reduce((acc, it) => { (acc[it.group] ||= []).push(it); return acc; }, {});
+        const countries = Object.keys(byCountry).sort((a,b)=>{ if(a==='Drag') return 1; if(b==='Drag') return -1; return a.localeCompare(b); });
+        
+        grid.innerHTML = '';
+        countries.forEach(country => {
+          const card = document.createElement('section'); card.className = 'country-card flex flex-col items-center';
+          const header = document.createElement('div'); header.className = 'flex items-center gap-3 justify-center mb-3 pb-3 border-b border-[var(--border)] w-full';
+          const flag = document.createElement('img'); flag.src = country === 'Drag' ? 'photos/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`; flag.alt = `${country} flag`; flag.className = 'flag-aesthetic';
+          const h2 = document.createElement('h2'); h2.className = 'text-lg font-bold title-fancy gold-title'; h2.textContent = country.replace(/([a-z])([A-Z])/g,'$1 $2');
+          header.append(flag, h2);
+          const swiperEl = document.createElement('div'); swiperEl.className = 'swiper';
+          const wrapper = document.createElement('div'); wrapper.className = 'swiper-wrapper';
+          byCountry[country].forEach(it => {
+            const slide = document.createElement('div'); slide.className = 'swiper-slide';
+            const cardInner = document.createElement('div'); cardInner.className = 'bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1 space-y-1 w-full h-full';
+            const nameEl = document.createElement('div'); nameEl.className = 'text-xs text-zinc-200 font-medium px-1 text-center h-7 flex items-center justify-center'; nameEl.textContent = it.displayName;
+            const img = document.createElement('img'); img.src = it.src; img.alt = it.displayName; img.loading = 'lazy'; img.className = 'w-full h-auto object-cover aspect-square rounded-md';
+            const footer = document.createElement('div'); footer.className = 'flex items-center gap-1.5';
+            const input = document.createElement('input'); input.type = 'text'; input.value = it.codeId || ''; input.placeholder = '…'; input.className = 'flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md';
+            const copyBtn = document.createElement('button'); copyBtn.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533]';
+            copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
+            copyBtn.addEventListener('click', () => { navigator.clipboard.writeText(input.value || '').then(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`; copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`; copyBtn.classList.remove('copied'); }, 1200); }); });
+            footer.append(input, copyBtn); cardInner.append(nameEl, img, footer); slide.appendChild(cardInner); wrapper.appendChild(slide);
+          });
+          if (byCountry[country].length === 1) { for (let i = 0; i < 2; i++) { const ghost = document.createElement('div'); ghost.className = 'swiper-slide ghost-slide'; const ghostInner = document.createElement('div'); ghostInner.className = 'card-container bg-[#151722] rounded-xl ring-1 ring-[var(--border)]'; ghost.appendChild(ghostInner); wrapper.appendChild(ghost); } }
+          swiperEl.appendChild(wrapper); card.append(header, swiperEl); grid.appendChild(card);
+        });
+        document.querySelectorAll('.swiper').forEach(el => new Swiper(el, { effect: 'cards', grabCursor: true, rewind: true, cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, slideShadows: false }}));
       }
+
+      function initializeGallery() {
+        if (galleryInitialized) return;
+        galleryInitialized = true;
+        const imageBasenames = ['Brazil-Putana_131247169320314','Brazil-Peacock_99890684900396','Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463','Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','Brazil-Earth_130516089719062','Brazil-Carnaval_125408725754854','Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295'];
+        
+        allItems = imageBasenames.map(basename => {
+          const name = basename.replace(/\.png$/,''), lastUnderscore = name.lastIndexOf('_');
+          let label = name, codeId = '';
+          if (lastUnderscore > -1) { const maybeId = name.slice(lastUnderscore+1); if (!isNaN(maybeId) && maybeId.trim() !== '') { label = name.slice(0,lastUnderscore); codeId = maybeId; } }
+          const group = label.split('-')[0] || 'Uncategorized';
+          const displayName = label.replace(new RegExp('^' + group + '-'), '').replace(/-/g,' ');
+          return { id: name, group, displayName, codeId, src: `photos/${name}.png` };
+        });
+
+        renderGallery(allItems);
+        
+        document.getElementById('search-bar').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            if (searchTerm === '') {
+                renderGallery(allItems);
+                return;
+            }
+            const filteredItems = allItems.filter(item => 
+                item.group.toLowerCase().includes(searchTerm) || 
+                item.displayName.toLowerCase().includes(searchTerm)
+            );
+            renderGallery(filteredItems);
+        });
+      }
+
+      const setupModal = (openBtnId, closeBtnId, modalId) => {
+        const openBtn = document.getElementById(openBtnId), closeBtn = document.getElementById(closeBtnId), modal = document.getElementById(modalId);
+        openBtn.addEventListener('click', () => modal.classList.add('show'));
+        closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+      };
+      setupModal('openPhotosBtn', 'closePhotosBtn', 'photosModal');
+      setupModal('openTimeConverterBtn', 'closeTimeConverterBtn', 'timeConverterModal');
+      const eventEl = document.getElementById('eventDateTime'), tzSel = document.getElementById('eventTimeZone'), outEl = document.getElementById('sjoOutput'), copySjoBtn = document.getElementById('copySjoBtn');
+      document.getElementById('convertBtn')?.addEventListener('click', () => {
+        const val = eventEl.value, tz = tzSel.value || 'UTC', SJO_TZ = 'America/Costa_Rica'; if (!val) { outEl.value = ''; return }
+        const [datePart, timePart] = val.split('T'); if (!datePart || !timePart) { outEl.value = 'Invalid date'; return }
+        const [y, m, d] = datePart.split('-').map(Number), [H, Mi] = timePart.split(':').map(Number); if ([y, m, d, H, Mi].some(isNaN)) { outEl.value = 'Invalid date'; return }
+        let t = Date.UTC(y, m-1, d, H, Mi); const p = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
+        t -= (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute) - t);
+        const parts = new Intl.DateTimeFormat('en-GB', { timeZone: SJO_TZ, day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true }).formatToParts(new Date(t)).reduce((a, p)=>(a[p.type]=p.value, a),{});
+        outEl.value = `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${parts.dayPeriod.toUpperCase()}`;
+      });
+      copySjoBtn?.addEventListener('click', () => { if (outEl.value) navigator.clipboard.writeText(outEl.value).catch(console.error); });
     });
+  </script>
+
+  <script>
+    let raindrops = [];
+    const PARTICLE_COUNT = 15; 
+    function setup() {
+      let canvas = createCanvas(windowWidth, windowHeight); canvas.parent('particle-canvas'); 
+      for (let i = 0; i < PARTICLE_COUNT; i++) { raindrops.push(new Raindrop()); }
+    }
+    function draw() {
+      background(0, 0, 0, 5); 
+      for (let drop of raindrops) { drop.fall(); drop.show(); }
+    }
+    function windowResized() { resizeCanvas(windowWidth, windowHeight); }
+    class Raindrop {
+      constructor() { this.x = random(width); this.y = random(-500, -50); this.z = random(0, 20); this.len = map(this.z, 0, 20, 15, 30); this.ySpeed = map(this.z, 0, 20, 1, 4); }
+      fall() { this.y += this.ySpeed; this.ySpeed += 0.02; if (this.y > height) { this.x = random(width); this.y = random(-200, -100); this.ySpeed = map(this.z, 0, 20, 1, 4); } }
+      show() { let thick = map(this.z, 0, 20, 1, 2.5); strokeWeight(thick); stroke('rgba(213, 184, 90, 0.5)'); line(this.x, this.y, this.x, this.y + this.len); }
+    }
   </script>
 </body>
 </html>
