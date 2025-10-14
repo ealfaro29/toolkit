@@ -19,9 +19,11 @@
       --card: #121317; --border: #2a2b31;
       --shadow: 0 18px 50px rgba(0,0,0,.45);
       --gold1: #9b7b25; --gold2: #d5b85a; --gold3: #9b7b25;
-      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-family-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-family-serif: 'Playfair Display', ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
       --space-4: 16px; --space-5: 24px;
       --radius-md: 8px; --radius-xl: 16px;
+      --swiper-navigation-color: var(--gold2);
     }
 
     html, body {
@@ -30,14 +32,14 @@
       color: var(--ink);
       margin: 0;
       padding: var(--space-4);
-      overflow-x: hidden;
+      overflow: hidden;
     }
     
     #particle-canvas {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -10; pointer-events: none;
     }
 
-    .title-fancy { font-family: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif; }
+    .title-fancy { font-family: var(--font-family-serif); }
     .gold-title {
       background-image: linear-gradient(90deg, var(--gold1), var(--gold2), var(--gold3));
       -webkit-background-clip:text; background-clip:text; color:transparent;
@@ -54,15 +56,10 @@
     .container.loaded { opacity: 1; filter: blur(0); }
 
     .panel {
-      background: rgba(18,19,23,.75); border: 1px solid var(--border);
+      background: rgba(18, 19, 23, 0.925); border: 1px solid var(--border);
       border-radius: var(--radius-xl); box-shadow: var(--shadow); backdrop-filter: blur(12px);
     }
     
-    header.panel {
-      height: 100px; display: flex; align-items: center; justify-content: center;
-      gap: var(--space-4); padding: 0 var(--space-5);
-    }
-
     main.panel {
       padding: var(--space-4); flex-grow: 1;
       display: flex; flex-direction: column; min-height: 0;
@@ -74,22 +71,24 @@
     .scrollable-content::-webkit-scrollbar-thumb { background-color: rgba(213, 184, 90, 0.3); border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
     .scrollable-content::-webkit-scrollbar-thumb:hover { background-color: rgba(213, 184, 90, 0.5); }
     
-    .dark-input { background:#0f1115; color:#e7e7ea; border:1px solid #2a2d36; }
+    .dark-input { background:#0f1115; color:#e7e7ea; border:1px solid #2a2d36; transition: all 0.2s ease; }
+    .dark-input:focus { outline: none; border-color: var(--gold2); box-shadow: 0 0 0 1px var(--gold2); }
     
-    .swiper { width: 100%; max-width: 190px; height: 250px; overflow: visible; }
-    .swiper-slide { display: flex; align-items: center; justify-content: center; border-radius: 12px; }
-    .country-card { background: rgba(18,19,23,.92); border:1px solid var(--border); border-radius: 1rem; padding: 0.75rem; }
-    .flag-aesthetic { height: 24px; border-radius: .4rem; object-fit: cover; }
+    /* Carousel Styles */
+    .swiper { width: 100%; height: auto; padding-left: 4px; padding-right: 4px;}
+    .swiper-slide { width: auto; }
+    .facebase-card { width: 180px; transition: all 0.2s ease; }
+    .facebase-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    .swiper-button-next, .swiper-button-prev { top: 50%; transform: translateY(-50%); }
+
+    .country-row { border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+    .country-row:last-child { border-bottom: none; }
+    .flag-aesthetic { height: 32px; border-radius: .4rem; object-fit: cover; }
     .copied { background-color: #22c55e !important; color: white !important; }
     
-    #countryGrid {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    }
-    
+    /* Modal Styles */
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      position: fixed; inset: 0;
       background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
       z-index: 2000; display: flex; align-items: center; justify-content: center;
       opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: none;
@@ -101,6 +100,7 @@
     }
     #loginOverlay { z-index: 5000; }
 
+    /* Tab Navigation */
     .tab-nav-button {
       padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500;
       color: var(--muted); background-color: transparent; border: 1px solid transparent;
@@ -112,6 +112,17 @@
       background-color: rgba(213,184,90,0.1);
       border-color: rgba(213,184,90,0.25);
     }
+    
+    /* Music Card Styles */
+    .music-card {
+        background: #151722;
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    .music-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(213, 184, 90, 0.4);
+    }
   </style>
 </head>
 <body>
@@ -121,87 +132,88 @@
   <div id="loginOverlay" class="modal-overlay show">
     <div class="modal-content p-8 text-center">
       <h2 class="text-2xl font-bold title-fancy gold-title mb-4">Enter Password</h2>
-      <input id="passwordInput" type="password" class="w-full h-11 px-3 text-center dark-input rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold2)]" placeholder="••••••••">
-      <button id="loginBtn" class="mt-4 h-11 w-full flex items-center justify-center rounded-md bg-[var(--gold2)] text-black font-semibold hover:brightness-110">Unlock</button>
+      <input id="passwordInput" type="password" class="w-full h-11 px-3 text-center dark-input rounded-md" placeholder="••••••••">
+      <button id="loginBtn" class="mt-4 h-11 w-full flex items-center justify-center rounded-md bg-[var(--gold2)] text-black font-semibold hover:brightness-110 transition-transform hover:scale-105">Unlock</button>
       <p id="errorMessage" class="mt-2 text-sm text-red-400 h-4"></p>
     </div>
   </div>
 
   <div id="photosModal" class="modal-overlay">
     <div class="modal-content p-6 pt-8 relative">
-      <button id="closePhotosBtn" class="absolute top-2 right-2 text-zinc-300 hover:text-zinc-100 text-3xl">&times;</button>
-      <h2 class="text-xl font-semibold title-fancy gold-title mb-4">Downloadable Photos</h2>
-      <div class="flex items-center justify-between bg-[#151722] p-3 rounded-lg border border-[var(--border)]">
+      <button id="closePhotosBtn" class="absolute top-2 right-2 text-zinc-400 hover:text-white transition text-3xl">&times;</button>
+      <h2 class="text-xl text-center font-semibold title-fancy gold-title mb-4">Downloadable Photos</h2>
+      <div class="flex items-center justify-between bg-[#0f1115] p-3 rounded-lg border border-[var(--border)]">
         <div class="flex items-center gap-3"><img src="photos/UK.png" alt="UK Base" class="w-16 h-16 object-cover rounded-md border border-[var(--border)]"/><span class="font-medium">UK.png</span></div>
-        <a href="photos/UK.png" download="UK.png" class="h-10 px-4 inline-flex items-center bg-[var(--gold2)] text-black text-sm rounded-md hover:brightness-110">Download</a>
+        <a href="photos/UK.png" download="UK.png" class="h-10 px-4 inline-flex items-center bg-[var(--gold2)] text-black text-sm font-semibold rounded-md hover:brightness-110 transition-transform hover:scale-105">Download</a>
       </div>
     </div>
   </div>
 
   <div id="timeConverterModal" class="modal-overlay">
     <div class="modal-content p-6 pt-8 relative">
-      <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-zinc-300 hover:text-zinc-100 text-3xl">&times;</button>
-      <h2 class="text-xl font-semibold title-fancy gold-title mb-4">Time Converter to SJO</h2>
+      <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-zinc-400 hover:text-white transition text-3xl">&times;</button>
+      <h2 class="text-xl text-center font-semibold title-fancy gold-title mb-4">Time Converter to SJO</h2>
       <div class="flex flex-col gap-3">
         <label><span class="text-sm text-zinc-300">Event date & time</span><input id="eventDateTime" type="datetime-local" class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md"/></label>
         <label><span class="text-sm text-zinc-300">Event timezone</span><select id="eventTimeZone" class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md"><option value="Etc/GMT+12">IDLW (-12)</option><option value="Pacific/Honolulu">HST (-10)</option><option value="America/Anchorage">AKST (-9)</option><option value="America/Los_Angeles">PST (-8)</option><option value="America/Denver">MST (-7)</option><option value="America/Chicago">CST (-6)</option><option value="America/Mexico_City">CST-MX (-6)</option><option value="America/New_York">EST (-5)</option><option value="America/Bogota">COT (-5)</option><option value="America/Lima">PET (-5)</option><option value="America/Caracas">VET (-4)</option><option value="America/Santiago">CLT (-3)</option><option value="America/Sao_Paulo">BRT (-3)</option><option value="Atlantic/Azores">AZOT (-1)</option><option value="Europe/London">GMT (+0)</option><option value="Europe/Paris">CET (+1)</option><option value="Europe/Berlin">CET-DE (+1)</option><option value="Europe/Athens">EET (+2)</option><option value="Africa/Johannesburg">SAST (+2)</option><option value="Asia/Dubai">GST (+4)</option><option value="Asia/Karachi">PKT (+5)</option><option value="Asia/Kolkata">IST (+5:30)</option><option value="Asia/Bangkok">ICT (+7)</option><option value="Asia/Hong_Kong">HKT (+8)</option><option value="Asia/Singapore">SGT (+8)</option><option value="Asia/Manila">PHT (+8)</option><option value="Asia/Tokyo">JST (+9)</option><option value="Asia/Seoul">KST (+9)</option><option value="Australia/Sydney">AEST (+10)</option><option value="Pacific/Auckland">NZST (+12)</option></select></label>
-        <button id="convertBtn" class="h-11 px-4 bg-[var(--gold2)] text-black text-sm rounded-md hover:brightness-110">Convert</button>
+        <button id="convertBtn" class="h-11 px-4 bg-[var(--gold2)] text-black text-sm font-semibold rounded-md hover:brightness-110 transition-transform hover:scale-105">Convert</button>
         <label><span class="text-sm text-zinc-300">Converted to SJO, Costa Rica</span><input id="sjoOutput" type="text" readonly class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md" placeholder="dd/mm/yyyy, HH:MM AM/PM"/></label>
-        <button id="copySjoBtn" class="h-11 px-4 bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533]">Copy</button>
+        <button id="copySjoBtn" class="h-11 px-4 bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">Copy</button>
       </div>
     </div>
   </div>
 
   <div class="container" id="app-container">
-    
-    <header class="panel text-center">
-      <div class="w-full">
-        <h1 class="text-4xl title-fancy gold-title">Fashion Muse Collection</h1>
-      </div>
+    <header class="panel flex flex-col md:flex-row items-center justify-between p-4 gap-4">
+        <h1 class="text-3xl lg:text-4xl title-fancy gold-title">Fashion Muse Collection</h1>
+        <nav class="flex items-center justify-center flex-wrap gap-2">
+            <button class="tab-nav-button active" data-tab="facebases">Facebases</button>
+            <button class="tab-nav-button" data-tab="music">Music Codes</button>
+            <button class="tab-nav-button" data-tab="clothing">Clothing</button>
+            <button class="tab-nav-button" data-tab="other">Other</button>
+        </nav>
+        <div class="flex items-center gap-2">
+            <button id="openPhotosBtn" title="Download Photos" class="w-10 h-10 flex items-center justify-center bg-black/20 text-[var(--gold2)] rounded-full border border-transparent hover:border-[var(--border)] hover:scale-110 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg></button>
+            <button id="openTimeConverterBtn" title="Time Converter" class="w-10 h-10 flex items-center justify-center bg-black/20 text-[var(--gold2)] rounded-full border border-transparent hover:border-[var(--border)] hover:scale-110 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/></svg></button>
+        </div>
     </header>
 
-    <nav class="panel flex flex-col sm:flex-row items-center justify-between p-2">
-      <div class="flex items-center gap-1 sm:gap-2">
-        <button class="tab-nav-button active" data-tab="facebases">Facebases</button>
-        <button class="tab-nav-button" data-tab="clothing">Clothing</button>
-        <button class="tab-nav-button" data-tab="music">Music Codes</button>
-        <button class="tab-nav-button" data-tab="other">Other</button>
-      </div>
-      <div class="flex items-center gap-2 pr-2 mt-2 sm:mt-0">
-        <button id="openPhotosBtn" title="Download Photos" class="w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-[var(--gold2)] rounded-full border border-[var(--border)] hover:brightness-125"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/><path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1h12z"/></svg></button>
-        <button id="openTimeConverterBtn" title="Time Converter" class="w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-[var(--gold2)] rounded-full border border-[var(--border)] hover:brightness-125"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/></svg></button>
-      </div>
-    </nav>
-
     <main class="panel">
-      <div id="content-facebases" class="tab-content scrollable-content pr-2">
-        <div class="relative w-full mb-4">
-          <input type="search" id="search-bar" placeholder="Search by country or name..." class="w-full h-12 pl-10 pr-4 text-sm dark-input rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold2)]">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          </div>
-        </div>
-        <div id="countryGrid"></div>
-      </div>
-      <div id="content-clothing" class="tab-content hidden h-full flex items-center justify-center text-center text-zinc-500">
-        <p>Clothing content will be shown here.</p>
-      </div>
-      <div id="content-music" class="tab-content hidden h-full flex flex-col gap-4">
-        <div class="flex-shrink-0 flex flex-col sm:flex-row gap-4">
+      <!-- Controles unificados de búsqueda -->
+      <div id="search-controls" class="flex-shrink-0 flex flex-col sm:flex-row gap-4 mb-4 pb-4 border-b border-[var(--border)]">
           <div class="relative flex-grow">
-            <input type="search" id="music-search-input" placeholder="Search by artist, title, or marker..." class="w-full h-12 pl-10 pr-4 text-sm dark-input rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold2)]">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </div>
+              <input type="search" id="search-bar" placeholder="Search..." class="w-full h-12 pl-10 pr-4 text-sm dark-input rounded-md">
+              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
           </div>
-          <select id="music-category-filter" class="h-12 px-3 text-sm dark-input rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--gold2)] sm:w-64">
-            <option value="all">All Categories</option>
+          <select id="music-category-filter" class="h-12 px-3 text-sm dark-input rounded-md sm:w-64" style="display: none;">
+              <option value="all">All Categories</option>
           </select>
-        </div>
-        <div id="music-results-container" class="scrollable-content pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
       </div>
-      <div id="content-other" class="tab-content hidden h-full flex items-center justify-center text-center text-zinc-500">
-        <p>Other content will be shown here.</p>
+      
+      <!-- Contenedor para el contenido de las pestañas -->
+      <div id="tab-content-wrapper" class="flex-grow relative min-h-0">
+          <div id="content-facebases" class="tab-content absolute inset-0 scrollable-content">
+              <div id="gallery-container" class="flex flex-col gap-8 pr-2"></div>
+          </div>
+          <div id="content-music" class="tab-content absolute inset-0 hidden scrollable-content">
+              <div id="music-results-container" class="pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+          </div>
+          <div id="content-clothing" class="tab-content absolute inset-0 hidden">
+              <div class="h-full flex flex-col items-center justify-center text-center text-zinc-500 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-4" viewBox="0 0 16 16"><path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/></svg>
+                <h3 class="text-xl font-semibold text-zinc-300">Coming Soon</h3>
+                <p>The clothing collection will be available here.</p>
+              </div>
+          </div>
+          <div id="content-other" class="tab-content absolute inset-0 hidden">
+              <div class="h-full flex flex-col items-center justify-center text-center text-zinc-500 p-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-4" viewBox="0 0 16 16"><path d="M9.405 1.05c.412-1.4.786-2.532 1.14-3.464.354-.933.648-1.768.868-2.52C11.595 2.296 11.838 3 12 3c.162 0 .405-.704.587-1.448.22-.932.514-1.767.868-2.52.354.932.728 2.064 1.14 3.464.412 1.4.638 2.57.638 3.585 0 1.83-1.076 3.215-2.88 3.215-1.045 0-1.748-.6-2.21-1.168-.462-.567-.822-1.353-1.06-2.212-.238-.86-.36-1.755-.36-2.658 0-1.015.226-2.185.638-3.585zM8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/></svg>
+                <h3 class="text-xl font-semibold text-zinc-300">Coming Soon</h3>
+                <p>Other resources will be available here.</p>
+              </div>
+          </div>
       </div>
     </main>
   </div>
@@ -214,16 +226,21 @@
       const loginOverlay = document.getElementById('loginOverlay');
       const appContainer = document.getElementById('app-container');
       let galleryInitialized = false;
-      let musicTabInitialized = false; // <-- Flag para la música
+      let musicTabInitialized = false;
       let allItems = []; 
+      let allMusicCodes = [];
+
+      const startApp = () => {
+        if (!galleryInitialized) initializeGallery();
+        if (!musicTabInitialized) initializeMusicTab();
+      };
 
       const authenticate = () => {
         if (document.getElementById('passwordInput').value === atob(SECRET_B64)) {
           sessionStorage.setItem('isAuthenticated', 'true');
           loginOverlay.classList.remove('show');
           appContainer.classList.add('loaded');
-          initializeGallery();
-          initializeMusicTab(); // <-- Llamada a la función de música
+          setTimeout(startApp, 500); 
         } else {
           document.getElementById('errorMessage').textContent = 'Incorrect password.';
         }
@@ -232,8 +249,7 @@
       if (sessionStorage.getItem('isAuthenticated') === 'true') {
         loginOverlay.classList.remove('show');
         appContainer.classList.add('loaded');
-        initializeGallery();
-        initializeMusicTab(); // <-- Llamada a la función de música
+        setTimeout(startApp, 500);
       } else {
         loginOverlay.classList.add('show');
       }
@@ -243,46 +259,78 @@
 
       const tabs = document.querySelectorAll('.tab-nav-button');
       const contentAreas = document.querySelectorAll('.tab-content');
+      const searchBar = document.getElementById('search-bar');
+      const musicCategoryFilter = document.getElementById('music-category-filter');
+      
+      const updateSearchUI = (activeTab) => {
+          searchBar.value = '';
+          if (activeTab === 'facebases') {
+              searchBar.placeholder = 'Search by country or name...';
+              musicCategoryFilter.style.display = 'none';
+          } else if (activeTab === 'music') {
+              searchBar.placeholder = 'Search by artist, title, or marker...';
+              musicCategoryFilter.style.display = 'block';
+          } else {
+              searchBar.placeholder = 'Search...';
+              musicCategoryFilter.style.display = 'none';
+          }
+      }
+
       tabs.forEach(tab => {
         tab.addEventListener('click', () => {
           const target = tab.dataset.tab;
           tabs.forEach(t => t.classList.remove('active'));
           tab.classList.add('active');
           contentAreas.forEach(area => area.classList.toggle('hidden', area.id !== `content-${target}`));
+          updateSearchUI(target);
+          searchBar.dispatchEvent(new Event('input')); 
         });
       });
 
       function renderGallery(itemsToRender) {
-        const grid = document.getElementById('countryGrid');
+        const galleryContainer = document.getElementById('gallery-container');
         const countryCodeMap = { UK: 'gb', Albania: 'al', India: 'in', Brazil: 'br' };
         
         const byCountry = itemsToRender.reduce((acc, it) => { (acc[it.group] ||= []).push(it); return acc; }, {});
         const countries = Object.keys(byCountry).sort((a,b)=>{ if(a==='Drag') return 1; if(b==='Drag') return -1; return a.localeCompare(b); });
         
-        grid.innerHTML = '';
+        galleryContainer.innerHTML = '';
         countries.forEach(country => {
-          const card = document.createElement('section'); card.className = 'country-card flex flex-col items-center';
-          const header = document.createElement('div'); header.className = 'flex items-center gap-3 justify-center mb-3 pb-3 border-b border-[var(--border)] w-full';
-          const flag = document.createElement('img'); flag.src = country === 'Drag' ? 'photos/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`; flag.alt = `${country} flag`; flag.className = 'flag-aesthetic';
-          const h2 = document.createElement('h2'); h2.className = 'text-lg font-bold title-fancy gold-title'; h2.textContent = country.replace(/([a-z])([A-Z])/g,'$1 $2');
-          header.append(flag, h2);
-          const swiperEl = document.createElement('div'); swiperEl.className = 'swiper';
-          const wrapper = document.createElement('div'); wrapper.className = 'swiper-wrapper';
-          byCountry[country].forEach(it => {
-            const slide = document.createElement('div'); slide.className = 'swiper-slide';
-            const cardInner = document.createElement('div'); cardInner.className = 'bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1 space-y-1 w-full h-full';
-            const nameEl = document.createElement('div'); nameEl.className = 'text-xs text-zinc-200 font-medium px-1 text-center h-7 flex items-center justify-center'; nameEl.textContent = it.displayName;
-            const img = document.createElement('img'); img.src = it.src; img.alt = it.displayName; img.loading = 'lazy'; img.className = 'w-full h-auto object-cover aspect-square rounded-md';
-            const footer = document.createElement('div'); footer.className = 'flex items-center gap-1.5';
-            const input = document.createElement('input'); input.type = 'text'; input.value = it.codeId || ''; input.placeholder = '…'; input.className = 'flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md';
-            const copyBtn = document.createElement('button'); copyBtn.className = 'flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533]';
-            copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
-            copyBtn.addEventListener('click', () => { navigator.clipboard.writeText(input.value || '').then(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`; copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`; copyBtn.classList.remove('copied'); }, 1200); }); });
-            footer.append(input, copyBtn); cardInner.append(nameEl, img, footer); slide.appendChild(cardInner); wrapper.appendChild(slide);
-          });
-          swiperEl.appendChild(wrapper); card.append(header, swiperEl); grid.appendChild(card);
+          const rowHTML = `
+            <section class="country-row">
+              <div class="flex items-center gap-3 mb-4">
+                <img src="${country === 'Drag' ? 'photos/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`}" alt="${country} flag" class="flag-aesthetic">
+                <h2 class="text-2xl font-bold title-fancy gold-title">${country.replace(/([a-z])([A-Z])/g,'$1 $2')}</h2>
+              </div>
+              <div class="swiper relative">
+                <div class="swiper-wrapper">
+                  ${byCountry[country].map(it => `
+                    <div class="swiper-slide">
+                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">${it.displayName}</div>
+                        <img src="${it.src}" alt="${it.displayName}" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                        <div class="flex items-center gap-1.5 p-1">
+                          <input readonly type="text" value="${it.codeId || ''}" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+            </section>
+          `;
+          galleryContainer.innerHTML += rowHTML;
         });
-        document.querySelectorAll('.swiper').forEach(el => new Swiper(el, { effect: 'cards', grabCursor: true, rewind: true, cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, slideShadows: false }}));
+        
+        document.querySelectorAll('.swiper').forEach(el => new Swiper(el, { 
+          slidesPerView: 'auto', spaceBetween: 16, grabCursor: true,
+          navigation: { nextEl: el.querySelector('.swiper-button-next'), prevEl: el.querySelector('.swiper-button-prev'), },
+        }));
       }
 
       function initializeGallery() {
@@ -301,122 +349,81 @@
 
         renderGallery(allItems);
         
-        document.getElementById('search-bar').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            const filteredItems = (searchTerm === '') ? allItems : allItems.filter(item => 
-                item.group.toLowerCase().includes(searchTerm) || 
-                item.displayName.toLowerCase().includes(searchTerm)
-            );
-            renderGallery(filteredItems);
+        document.getElementById('gallery-container').addEventListener('click', (event) => {
+            const copyBtn = event.target.closest('.copy-btn');
+            if (!copyBtn) return;
+            const input = copyBtn.previousElementSibling; 
+            navigator.clipboard.writeText(input.value || '').then(() => {
+                copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`;
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
+                    copyBtn.classList.remove('copied');
+                }, 1200);
+            });
         });
       }
 
-      // --- INICIO DE LA FUNCIÓN DE MÚSICA ---
       function initializeMusicTab() {
         if (musicTabInitialized) return;
         musicTabInitialized = true;
-
-        const searchInput = document.getElementById('music-search-input');
-        const categoryFilter = document.getElementById('music-category-filter');
+        
         const resultsContainer = document.getElementById('music-results-container');
-        let allMusicCodes = [];
-
+        
         fetch('music.json')
           .then(response => { if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); return response.json(); })
-          .then(data => { allMusicCodes = data; populateCategories(allMusicCodes); renderCodes(allMusicCodes); })
-          .catch(error => {
-            console.error('Error loading music codes:', error);
-            resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full">Failed to load music codes.</p>`;
-          });
+          .then(data => { allMusicCodes = data; populateCategories(allMusicCodes); renderMusicCodes(allMusicCodes); })
+          .catch(error => { console.error('Error loading music codes:', error); resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full">Failed to load music codes.</p>`; });
+        
+        const populateCategories = (codes) => { const categories = [...new Set(codes.map(code => code.category))].filter(Boolean); categories.sort().forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; musicCategoryFilter.appendChild(option); }); };
+        const renderMusicCodes = (codes) => { resultsContainer.innerHTML = ''; if (codes.length === 0) { resultsContainer.innerHTML = `<p class="text-zinc-500 text-center col-span-full">No results found.</p>`; return; } codes.forEach(code => { const cardHTML = ` <div class="music-card rounded-lg p-4 flex flex-col justify-between gap-3"> <div class="flex-grow"> <h3 class="font-semibold text-zinc-100 truncate" title="${code.title}">${code.title} ${ (code.pitch && code.pitch !== 0) ? `<span class="ml-2 text-xs font-semibold text-cyan-400" title="Pitch: ${code.pitch}">[PITCH]</span>` : ''}</h3> <p class="text-sm text-zinc-400 truncate" title="${code.artist}">${code.artist || 'Unknown Artist'}</p> <p class="text-xs text-[var(--gold2)] opacity-80 mt-2">${code.category || 'Uncategorized'}</p> ${ (code.markers && code.markers.length > 0) ? `<div class="flex flex-wrap gap-1.5 mt-2">${code.markers.map(marker => `<span class="text-xs font-medium bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">${marker}</span>`).join('')}</div>` : ''} </div> <div class="flex items-center gap-2 mt-2"> <input readonly type="text" value="${code.id}" class="flex-grow w-0 h-9 px-2 text-xs dark-input rounded-md font-mono"> <button class="copy-btn flex-shrink-0 w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition" data-id="${code.id}" title="Copy ID"> <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> </button> </div> </div>`; resultsContainer.innerHTML += cardHTML; }); };
 
-        const populateCategories = (codes) => {
-          const categories = [...new Set(codes.map(code => code.category))].filter(Boolean);
-          categories.sort().forEach(category => {
-            const option = document.createElement('option');
-            option.value = category;
-            option.textContent = category;
-            categoryFilter.appendChild(option);
-          });
-        }
-
-        const renderCodes = (codes) => {
-          resultsContainer.innerHTML = '';
-          if (codes.length === 0) {
+        resultsContainer.addEventListener('click', (event) => { const copyBtn = event.target.closest('.copy-btn'); if (copyBtn) { const idToCopy = copyBtn.dataset.id; navigator.clipboard.writeText(idToCopy).then(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`; copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`; copyBtn.classList.remove('copied'); }, 1500); }); } });
+      }
+      
+      const filterContent = () => {
+          const activeTab = document.querySelector('.tab-nav-button.active').dataset.tab;
+          const searchTerm = searchBar.value.toLowerCase().trim();
+          
+          if (activeTab === 'facebases') {
+              const filteredItems = (searchTerm === '') ? allItems : allItems.filter(item => 
+                  item.group.toLowerCase().includes(searchTerm) || 
+                  item.displayName.toLowerCase().includes(searchTerm)
+              );
+              renderGallery(filteredItems);
+          } else if (activeTab === 'music') {
+              const selectedCategory = musicCategoryFilter.value;
+              const filteredCodes = allMusicCodes.filter(code => {
+                  const matchesCategory = selectedCategory === 'all' || code.category === selectedCategory;
+                  const searchCorpus = `${code.title.toLowerCase()} ${code.artist ? code.artist.toLowerCase() : ''} ${(code.markers || []).join(' ')}`;
+                  return matchesCategory && searchCorpus.includes(searchTerm);
+              });
+              renderMusicCodes(filteredCodes);
+          }
+      };
+      
+      // Separate renderMusicCodes function for filtering
+      const renderMusicCodes = (codes) => {
+        const resultsContainer = document.getElementById('music-results-container');
+        resultsContainer.innerHTML = '';
+        if (codes.length === 0) {
             resultsContainer.innerHTML = `<p class="text-zinc-500 text-center col-span-full">No results found.</p>`;
             return;
-          }
-          codes.forEach(code => {
-            const card = document.createElement('div');
-            card.className = 'bg-[#151722] p-4 rounded-lg border border-[var(--border)] flex flex-col justify-between gap-3';
-            const pitchIndicator = (code.pitch && code.pitch !== 0) ? `<span class="ml-2 text-xs font-semibold text-cyan-400" title="Pitch: ${code.pitch}">[PITCH]</span>` : '';
-            const markersHTML = (code.markers && code.markers.length > 0)
-              ? `<div class="flex flex-wrap gap-1.5 mt-2">${code.markers.map(marker => `<span class="text-xs font-medium bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">${marker}</span>`).join('')}</div>` : '';
-            card.innerHTML = `
-              <div class="flex-grow">
-                <h3 class="font-semibold text-zinc-100 truncate" title="${code.title}">${code.title} ${pitchIndicator}</h3>
-                <p class="text-sm text-zinc-400 truncate" title="${code.artist}">${code.artist || 'Unknown Artist'}</p>
-                <p class="text-xs text-[var(--gold2)] opacity-80 mt-2">${code.category || 'Uncategorized'}</p>
-                ${markersHTML}
-              </div>
-              <div class="flex items-center gap-2 mt-2">
-                <input readonly type="text" value="${code.id}" class="flex-grow w-0 h-9 px-2 text-xs dark-input rounded-md font-mono">
-                <button class="copy-btn flex-shrink-0 w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533]" data-id="${code.id}" title="Copy ID">
-                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
-                </button>
-              </div>`;
-            resultsContainer.appendChild(card);
-          });
         }
-
-        const filterAndSearch = () => {
-          const searchTerm = searchInput.value.toLowerCase();
-          const selectedCategory = categoryFilter.value;
-          const filteredCodes = allMusicCodes.filter(code => {
-            const matchesCategory = selectedCategory === 'all' || code.category === selectedCategory;
-            const searchCorpus = `${code.title.toLowerCase()} ${code.artist ? code.artist.toLowerCase() : ''} ${(code.markers || []).join(' ')}`;
-            return matchesCategory && searchCorpus.includes(searchTerm);
-          });
-          renderCodes(filteredCodes);
-        }
-
-        searchInput.addEventListener('input', filterAndSearch);
-        categoryFilter.addEventListener('change', filterAndSearch);
-
-        resultsContainer.addEventListener('click', (event) => {
-          const copyBtn = event.target.closest('.copy-btn');
-          if (copyBtn) {
-            const idToCopy = copyBtn.dataset.id;
-            navigator.clipboard.writeText(idToCopy).then(() => {
-              copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`;
-              copyBtn.classList.add('copied');
-              setTimeout(() => {
-                copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`;
-                copyBtn.classList.remove('copied');
-              }, 1500);
-            }).catch(err => console.error('Error copying ID:', err));
-          }
+        codes.forEach(code => {
+            const cardHTML = ` <div class="music-card rounded-lg p-4 flex flex-col justify-between gap-3"> <div class="flex-grow"> <h3 class="font-semibold text-zinc-100 truncate" title="${code.title}">${code.title} ${ (code.pitch && code.pitch !== 0) ? `<span class="ml-2 text-xs font-semibold text-cyan-400" title="Pitch: ${code.pitch}">[PITCH]</span>` : ''}</h3> <p class="text-sm text-zinc-400 truncate" title="${code.artist}">${code.artist || 'Unknown Artist'}</p> <p class="text-xs text-[var(--gold2)] opacity-80 mt-2">${code.category || 'Uncategorized'}</p> ${ (code.markers && code.markers.length > 0) ? `<div class="flex flex-wrap gap-1.5 mt-2">${code.markers.map(marker => `<span class="text-xs font-medium bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">${marker}</span>`).join('')}</div>` : ''} </div> <div class="flex items-center gap-2 mt-2"> <input readonly type="text" value="${code.id}" class="flex-grow w-0 h-9 px-2 text-xs dark-input rounded-md font-mono"> <button class="copy-btn flex-shrink-0 w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition" data-id="${code.id}" title="Copy ID"> <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> </button> </div> </div>`;
+            resultsContainer.innerHTML += cardHTML;
         });
-      }
-      // --- FIN DE LA FUNCIÓN DE MÚSICA ---
-
-      const setupModal = (openBtnId, closeBtnId, modalId) => {
-        const openBtn = document.getElementById(openBtnId), closeBtn = document.getElementById(closeBtnId), modal = document.getElementById(modalId);
-        openBtn.addEventListener('click', () => modal.classList.add('show'));
-        closeBtn.addEventListener('click', () => modal.classList.remove('show'));
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
       };
+
+      searchBar.addEventListener('input', filterContent);
+      musicCategoryFilter.addEventListener('change', filterContent);
+
+      const setupModal = (openBtnId, closeBtnId, modalId) => { const openBtn = document.getElementById(openBtnId), closeBtn = document.getElementById(closeBtnId), modal = document.getElementById(modalId); openBtn.addEventListener('click', () => modal.classList.add('show')); closeBtn.addEventListener('click', () => modal.classList.remove('show')); modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); }); };
       setupModal('openPhotosBtn', 'closePhotosBtn', 'photosModal');
       setupModal('openTimeConverterBtn', 'closeTimeConverterBtn', 'timeConverterModal');
       const eventEl = document.getElementById('eventDateTime'), tzSel = document.getElementById('eventTimeZone'), outEl = document.getElementById('sjoOutput'), copySjoBtn = document.getElementById('copySjoBtn');
-      document.getElementById('convertBtn')?.addEventListener('click', () => {
-        const val = eventEl.value, tz = tzSel.value || 'UTC', SJO_TZ = 'America/Costa_Rica'; if (!val) { outEl.value = ''; return }
-        const [datePart, timePart] = val.split('T'); if (!datePart || !timePart) { outEl.value = 'Invalid date'; return }
-        const [y, m, d] = datePart.split('-').map(Number), [H, Mi] = timePart.split(':').map(Number); if ([y, m, d, H, Mi].some(isNaN)) { outEl.value = 'Invalid date'; return }
-        let t = Date.UTC(y, m-1, d, H, Mi); const p = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
-        t -= (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute) - t);
-        const parts = new Intl.DateTimeFormat('en-GB', { timeZone: SJO_TZ, day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true }).formatToParts(new Date(t)).reduce((a, p)=>(a[p.type]=p.value, a),{});
-        outEl.value = `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${parts.dayPeriod.toUpperCase()}`;
-      });
+      document.getElementById('convertBtn')?.addEventListener('click', () => { const val = eventEl.value, tz = tzSel.value || 'UTC', SJO_TZ = 'America/Costa_Rica'; if (!val) { outEl.value = ''; return } const [datePart, timePart] = val.split('T'); if (!datePart || !timePart) { outEl.value = 'Invalid date'; return } const [y, m, d] = datePart.split('-').map(Number), [H, Mi] = timePart.split(':').map(Number); if ([y, m, d, H, Mi].some(isNaN)) { outEl.value = 'Invalid date'; return } let t = Date.UTC(y, m-1, d, H, Mi); const p = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{}); t -= (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute) - t); const parts = new Intl.DateTimeFormat('en-GB', { timeZone: SJO_TZ, day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true }).formatToParts(new Date(t)).reduce((a, p)=>(a[p.type]=p.value, a),{}); outEl.value = `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${parts.dayPeriod.toUpperCase()}`; });
       copySjoBtn?.addEventListener('click', () => { if (outEl.value) navigator.clipboard.writeText(outEl.value).catch(console.error); });
     });
   </script>
@@ -441,3 +448,5 @@
   </script>
 </body>
 </html>
+"
+
