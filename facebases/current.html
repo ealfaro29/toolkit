@@ -89,9 +89,9 @@
     /* Modal Styles */
     .modal-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(12px);
       z-index: 2000; display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s ease-in-out; pointer-events: none;
     }
     .modal-overlay.show { opacity: 1; pointer-events: auto; }
     .modal-content {
@@ -99,6 +99,26 @@
       width: 90vw; max-width: 480px; border: 1px solid var(--border);
     }
     #loginOverlay { z-index: 5000; }
+    
+    /* Photos Modal Specific Styles */
+    #photosModal .modal-content {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        width: auto;
+        max-width: 85vw;
+        max-height: 85vh;
+    }
+    #photosModal .swiper-slide { position: relative; }
+    #photosModal .swiper-slide img { display: block; width: 100%; height: auto; max-height: 85vh; object-fit: contain; border-radius: var(--radius-xl); }
+    #photosModal .download-button { position: absolute; bottom: 16px; right: 16px; z-index: 10; }
+    #photosModal .swiper-button-next, #photosModal .swiper-button-prev {
+        width: 44px; height: 44px;
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+    #photosModal .swiper-button-next:hover, #photosModal .swiper-button-prev:hover { opacity: 1; }
+    #photosModal .swiper-button-next::after, #photosModal .swiper-button-prev::after { font-size: 24px; font-weight: bold; }
 
     /* Tab Navigation */
     .tab-nav-button {
@@ -138,6 +158,7 @@
 
   <div id="loginOverlay" class="modal-overlay show">
     <div class="modal-content p-8 text-center">
+      <img src="photos/app/logo.svg" alt="Fashion Muse Logo" class="w-56 h-auto mx-auto mb-6">
       <h2 class="text-2xl font-bold title-fancy gold-title mb-4">Enter Password</h2>
       <input id="passwordInput" type="password" class="w-full h-11 px-3 text-center dark-input rounded-md" placeholder="••••••••">
       <button id="loginBtn" class="mt-4 h-11 w-full flex items-center justify-center rounded-md bg-[var(--gold2)] text-black font-semibold hover:brightness-110 transition-transform hover:scale-105">Unlock</button>
@@ -146,12 +167,14 @@
   </div>
 
   <div id="photosModal" class="modal-overlay">
-    <div class="modal-content p-6 pt-8 relative">
-      <button id="closePhotosBtn" class="absolute top-2 right-2 text-zinc-400 hover:text-white transition text-3xl">&times;</button>
-      <h2 class="text-xl text-center font-semibold title-fancy gold-title mb-4">Downloadable Photos</h2>
-      <div class="flex items-center justify-between bg-[#0f1115] p-3 rounded-lg border border-[var(--border)]">
-        <div class="flex items-center gap-3"><img src="photos/UK.png" alt="UK Base" class="w-16 h-16 object-cover rounded-md border border-[var(--border)]"/><span class="font-medium">UK.png</span></div>
-        <a href="photos/UK.png" download="UK.png" class="h-10 px-4 inline-flex items-center bg-[var(--gold2)] text-black text-sm font-semibold rounded-md hover:brightness-110 transition-transform hover:scale-105">Download</a>
+    <div class="modal-content">
+      <button id="closePhotosBtn" class="absolute top-4 right-4 text-white/50 hover:text-white transition text-4xl z-20">&times;</button>
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          <!-- Slides will be injected by JavaScript -->
+        </div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
       </div>
     </div>
   </div>
@@ -192,7 +215,7 @@
         <nav class="flex items-center justify-center flex-wrap gap-2">
             <button class="tab-nav-button active" data-tab="facebases">Facebases</button>
             <button class="tab-nav-button" data-tab="music">Music Codes</button>
-            <button class="tab-nav-button" data-tab="clothing">Clothing</button>
+            <button class="tab-nav-button" data-tab="avatar">Avatar</button>
             <button class="tab-nav-button" data-tab="other">Other</button>
         </nav>
         <div class="flex items-center gap-2">
@@ -223,11 +246,11 @@
           <div id="content-music" class="tab-content absolute inset-0 hidden scrollable-content">
               <div id="music-results-container" class="pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
           </div>
-          <div id="content-clothing" class="tab-content absolute inset-0 hidden">
+          <div id="content-avatar" class="tab-content absolute inset-0 hidden">
               <div class="h-full flex flex-col items-center justify-center text-center text-zinc-500 p-4">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-4" viewBox="0 0 16 16"><path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/></svg>
                 <h3 class="text-xl font-semibold text-zinc-300">Coming Soon</h3>
-                <p>The clothing collection will be available here.</p>
+                <p>The Avatar collection will be available here.</p>
               </div>
           </div>
           <div id="content-other" class="tab-content absolute inset-0 hidden">
@@ -251,6 +274,7 @@
       let galleryInitialized = false;
       let musicTabInitialized = false;
       let timeConverterInitialized = false;
+      let photosModalInitialized = false;
       let allItems = []; 
       let allMusicCodes = [];
 
@@ -352,7 +376,7 @@
           galleryContainer.innerHTML += rowHTML;
         });
         
-        document.querySelectorAll('.swiper').forEach(el => new Swiper(el, { 
+        document.querySelectorAll('#gallery-container .swiper').forEach(el => new Swiper(el, { 
           slidesPerView: 'auto', spaceBetween: 16, grabCursor: true,
           navigation: { nextEl: el.querySelector('.swiper-button-next'), prevEl: el.querySelector('.swiper-button-prev'), },
         }));
@@ -361,7 +385,7 @@
       function initializeGallery() {
         if (galleryInitialized) return;
         galleryInitialized = true;
-        const imageBasenames = ['Brazil-Putana_131247169320314','Brazil-Peacock_99890684900396','Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463','Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','Brazil-Earth_130516089719062','Brazil-Carnaval_125408725754854','Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295'];
+        const imageBasenames = ['India-Natural_128586628387033', 'India-Green_89459981542643', 'India-Drag_105955462028585', 'India-Cyan_84991426964751', 'India-Clean_129924320013385', 'India-Bindi_116471445261411', 'Brazil-Smokey_87998683947973', 'Brazil-Green_133933500490066', 'Brazil-Cyan_93898667008722','Brazil-Putana_131247169320314','Brazil-Peacock_99890684900396','Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463','Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','Brazil-Earth_130516089719062','Brazil-Carnaval_125408725754854','Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295'];
         
         allItems = imageBasenames.map(basename => {
           const name = basename.replace(/\.png$/,''), lastUnderscore = name.lastIndexOf('_');
@@ -443,9 +467,64 @@
       searchBar.addEventListener('input', filterContent);
       musicCategoryFilter.addEventListener('change', filterContent);
 
-      const setupModal = (openBtnId, closeBtnId, modalId) => { const openBtn = document.getElementById(openBtnId), closeBtn = document.getElementById(closeBtnId), modal = document.getElementById(modalId); openBtn.addEventListener('click', () => modal.classList.add('show')); closeBtn.addEventListener('click', () => modal.classList.remove('show')); modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); }); };
-      setupModal('openPhotosBtn', 'closePhotosBtn', 'photosModal');
+      const setupModal = (openBtnId, closeBtnId, modalId) => { 
+        const openBtn = document.getElementById(openBtnId);
+        const closeBtn = document.getElementById(closeBtnId);
+        const modal = document.getElementById(modalId);
+        if (openBtn) openBtn.addEventListener('click', () => modal.classList.add('show'));
+        if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+        if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+      };
+
+      // Specific setup for Photos Modal
+      const openPhotosBtn = document.getElementById('openPhotosBtn');
+      const closePhotosBtn = document.getElementById('closePhotosBtn');
+      const photosModal = document.getElementById('photosModal');
+      
+      openPhotosBtn.addEventListener('click', () => {
+          if (!photosModalInitialized) {
+              initializePhotosModal();
+          }
+          photosModal.classList.add('show');
+      });
+      closePhotosBtn.addEventListener('click', () => photosModal.classList.remove('show'));
+      photosModal.addEventListener('click', (e) => {
+          if (e.target.id === 'photosModal') {
+              photosModal.classList.remove('show');
+          }
+      });
+
       setupModal('openTimeConverterBtn', 'closeTimeConverterBtn', 'timeConverterModal');
+
+      function initializePhotosModal() {
+        if (photosModalInitialized) return;
+        photosModalInitialized = true;
+
+        const downloadablePhotos = [
+            { src: 'photos/UK.png', filename: 'UK.png' }
+            // Puedes añadir más fotos aquí
+        ];
+
+        const swiperWrapper = document.querySelector('#photosModal .swiper-wrapper');
+        if (!swiperWrapper) return;
+
+        swiperWrapper.innerHTML = downloadablePhotos.map(photo => `
+            <div class="swiper-slide">
+                <img src="${photo.src}" alt="${photo.filename}">
+                <a href="${photo.src}" download="${photo.filename}" class="download-button w-10 h-10 flex items-center justify-center bg-black/40 text-white rounded-full hover:bg-black/60 transition-all hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                </a>
+            </div>
+        `).join('');
+
+        new Swiper('#photosModal .swiper', {
+            loop: downloadablePhotos.length > 1,
+            navigation: {
+                nextEl: '#photosModal .swiper-button-next',
+                prevEl: '#photosModal .swiper-button-prev',
+            },
+        });
+      }
 
       function initializeTimeConverter() {
         if (timeConverterInitialized) return;
@@ -512,27 +591,21 @@
           clearTimeout(scrollTimeout); 
           scrollTimeout = setTimeout(updateConversion, 150); 
         });
-
+        
         hourScroller.addEventListener('wheel', (event) => {
             event.preventDefault();
             const itemHeight = 40;
             const currentIndex = Math.round(hourScroller.scrollTop / itemHeight);
             let nextIndex = currentIndex + Math.sign(event.deltaY);
-            
             const maxIndex = 47;
             nextIndex = Math.max(0, Math.min(nextIndex, maxIndex));
-
-            hourScroller.scrollTo({
-                top: nextIndex * itemHeight,
-                behavior: 'smooth'
-            });
+            hourScroller.scrollTo({ top: nextIndex * itemHeight, behavior: 'smooth' });
         });
 
         tzSelect.addEventListener('change', updateConversion);
         dateSelect.addEventListener('change', updateConversion);
         updateConversion();
       }
-
     });
   </script>
 
