@@ -156,7 +156,6 @@
     </div>
   </div>
   
-  <!-- Time Converter Modal Rediseñado -->
   <div id="timeConverterModal" class="modal-overlay">
     <div class="modal-content p-6 pt-8 relative">
       <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-zinc-400 hover:text-white transition text-3xl z-10">&times;</button>
@@ -473,17 +472,32 @@
           dateSelect.appendChild(option);
         }
 
-        hourScroller.innerHTML = `<div class="h-[80px]"></div>` + Array.from({length: 24}, (_, i) => `<div class="hour-scroller-item" data-hour="${i}">${String(i).padStart(2,'0')}:00</div>`).join('') + `<div class="h-[80px]"></div>`;
+        let scrollerHTML = '<div class="h-[80px]"></div>';
+        for (let i = 0; i < 48; i++) {
+            const hour = Math.floor(i / 2);
+            const minute = (i % 2) * 30;
+            const timeString = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+            scrollerHTML += `<div class="hour-scroller-item" data-index="${i}">${timeString}</div>`;
+        }
+        scrollerHTML += '<div class="h-[80px]"></div>';
+        hourScroller.innerHTML = scrollerHTML;
+
         const hourItems = hourScroller.querySelectorAll('.hour-scroller-item');
-        hourScroller.scrollTop = new Date().getHours() * 40;
+        const now = new Date();
+        const initialIndex = now.getHours() * 2 + Math.floor(now.getMinutes() / 30);
+        hourScroller.scrollTop = initialIndex * 40;
 
         function updateConversion() {
           const tz = tzSelect.value;
           const [y,m,d] = dateSelect.value.split('-').map(Number);
-          const hour = Math.round(hourScroller.scrollTop / 40);
-          hourItems.forEach((item, index) => item.classList.toggle('active', index === hour));
           
-          let t = Date.UTC(y, m-1, d, hour, 0);
+          const selectedIndex = Math.round(hourScroller.scrollTop / 40);
+          const hour = Math.floor(selectedIndex / 2);
+          const minute = (selectedIndex % 2) * 30;
+
+          hourItems.forEach((item, index) => item.classList.toggle('active', index === selectedIndex));
+          
+          let t = Date.UTC(y, m-1, d, hour, minute);
           const p = new Intl.DateTimeFormat('en-CA', {timeZone: tz, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
           t -= (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute) - t);
           
@@ -496,8 +510,24 @@
         let scrollTimeout;
         hourScroller.addEventListener('scroll', () => { 
           clearTimeout(scrollTimeout); 
-          scrollTimeout = setTimeout(updateConversion, 50); 
+          scrollTimeout = setTimeout(updateConversion, 150); 
         });
+
+        hourScroller.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            const itemHeight = 40;
+            const currentIndex = Math.round(hourScroller.scrollTop / itemHeight);
+            let nextIndex = currentIndex + Math.sign(event.deltaY);
+            
+            const maxIndex = 47;
+            nextIndex = Math.max(0, Math.min(nextIndex, maxIndex));
+
+            hourScroller.scrollTo({
+                top: nextIndex * itemHeight,
+                behavior: 'smooth'
+            });
+        });
+
         tzSelect.addEventListener('change', updateConversion);
         dateSelect.addEventListener('change', updateConversion);
         updateConversion();
