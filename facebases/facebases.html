@@ -28,7 +28,7 @@
 
     html, body {
       font-family: var(--font-family-sans);
-      background-color: #12111700;
+      background-color: #121117;
       color: var(--ink);
       margin: 0;
       padding: var(--space-4);
@@ -56,7 +56,7 @@
     .container.loaded { opacity: 1; filter: blur(0); }
 
     .panel {
-      background: rgba(18, 19, 23, 0.925); border: 1px solid var(--border);
+      background: rgba(18,19,23,.75); border: 1px solid var(--border);
       border-radius: var(--radius-xl); box-shadow: var(--shadow); backdrop-filter: blur(12px);
     }
     
@@ -123,6 +123,13 @@
         transform: translateY(-4px);
         border-color: rgba(213, 184, 90, 0.4);
     }
+
+    /* Time Converter Scroller Styles */
+    .hour-scroller { height:200px; overflow-y:scroll; scroll-snap-type:y mandatory; -ms-overflow-style:none; scrollbar-width:none; position:relative; }
+    .hour-scroller::-webkit-scrollbar { display:none; }
+    .hour-scroller-item { height:40px; display:flex; align-items:center; justify-content:center; scroll-snap-align:center; font-size:1.25rem; color:var(--muted); opacity:.5; transform:scale(.8); transition: all .2s ease; }
+    .hour-scroller-item.active { color:var(--ink); opacity:1; transform:scale(1); font-weight:600; }
+    .scroller-selection-indicator { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100px; height:40px; border-radius:var(--radius-md); border:2px solid var(--gold2); pointer-events:none; }
   </style>
 </head>
 <body>
@@ -148,17 +155,34 @@
       </div>
     </div>
   </div>
-
+  
+  <!-- Time Converter Modal Rediseñado -->
   <div id="timeConverterModal" class="modal-overlay">
     <div class="modal-content p-6 pt-8 relative">
-      <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-zinc-400 hover:text-white transition text-3xl">&times;</button>
-      <h2 class="text-xl text-center font-semibold title-fancy gold-title mb-4">Time Converter to SJO</h2>
-      <div class="flex flex-col gap-3">
-        <label><span class="text-sm text-zinc-300">Event date & time</span><input id="eventDateTime" type="datetime-local" class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md"/></label>
-        <label><span class="text-sm text-zinc-300">Event timezone</span><select id="eventTimeZone" class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md"><option value="Etc/GMT+12">IDLW (-12)</option><option value="Pacific/Honolulu">HST (-10)</option><option value="America/Anchorage">AKST (-9)</option><option value="America/Los_Angeles">PST (-8)</option><option value="America/Denver">MST (-7)</option><option value="America/Chicago">CST (-6)</option><option value="America/Mexico_City">CST-MX (-6)</option><option value="America/New_York">EST (-5)</option><option value="America/Bogota">COT (-5)</option><option value="America/Lima">PET (-5)</option><option value="America/Caracas">VET (-4)</option><option value="America/Santiago">CLT (-3)</option><option value="America/Sao_Paulo">BRT (-3)</option><option value="Atlantic/Azores">AZOT (-1)</option><option value="Europe/London">GMT (+0)</option><option value="Europe/Paris">CET (+1)</option><option value="Europe/Berlin">CET-DE (+1)</option><option value="Europe/Athens">EET (+2)</option><option value="Africa/Johannesburg">SAST (+2)</option><option value="Asia/Dubai">GST (+4)</option><option value="Asia/Karachi">PKT (+5)</option><option value="Asia/Kolkata">IST (+5:30)</option><option value="Asia/Bangkok">ICT (+7)</option><option value="Asia/Hong_Kong">HKT (+8)</option><option value="Asia/Singapore">SGT (+8)</option><option value="Asia/Manila">PHT (+8)</option><option value="Asia/Tokyo">JST (+9)</option><option value="Asia/Seoul">KST (+9)</option><option value="Australia/Sydney">AEST (+10)</option><option value="Pacific/Auckland">NZST (+12)</option></select></label>
-        <button id="convertBtn" class="h-11 px-4 bg-[var(--gold2)] text-black text-sm font-semibold rounded-md hover:brightness-110 transition-transform hover:scale-105">Convert</button>
-        <label><span class="text-sm text-zinc-300">Converted to SJO, Costa Rica</span><input id="sjoOutput" type="text" readonly class="mt-1 w-full h-11 px-3 text-sm dark-input rounded-md" placeholder="dd/mm/yyyy, HH:MM AM/PM"/></label>
-        <button id="copySjoBtn" class="h-11 px-4 bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">Copy</button>
+      <button id="closeTimeConverterBtn" class="absolute top-2 right-2 text-zinc-400 hover:text-white transition text-3xl z-10">&times;</button>
+      <h2 class="text-center text-xl font-semibold title-fancy gold-title mb-6">Time Converter</h2>
+      
+      <div class="grid grid-cols-[1fr_auto_1fr] items-center text-center px-4 pb-4">
+        <div class="flex flex-col gap-2">
+          <select id="eventTimeZone" class="w-full h-10 px-3 text-sm dark-input rounded-md"></select>
+          <select id="eventDate" class="w-full h-10 px-3 text-sm dark-input rounded-md"></select>
+        </div>
+        <div class="text-3xl text-[var(--gold2)] px-4">▶</div>
+        <div class="flex flex-col gap-2">
+          <div class="font-bold text-lg text-zinc-100">SJO Time</div>
+          <div id="sjoDate" class="text-sm text-zinc-300">-</div>
+        </div>
+      </div>
+
+      <div class="border-t border-[var(--border)] pt-4">
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center">
+          <div class="relative">
+            <div id="hour-scroller-input" class="hour-scroller"></div>
+            <div class="scroller-selection-indicator"></div>
+          </div>
+          <div></div>
+          <div id="sjoTime" class="text-3xl font-bold text-center text-zinc-100">-</div>
+        </div>
       </div>
     </div>
   </div>
@@ -227,12 +251,14 @@
       const appContainer = document.getElementById('app-container');
       let galleryInitialized = false;
       let musicTabInitialized = false;
+      let timeConverterInitialized = false;
       let allItems = []; 
       let allMusicCodes = [];
 
       const startApp = () => {
         if (!galleryInitialized) initializeGallery();
         if (!musicTabInitialized) initializeMusicTab();
+        if (!timeConverterInitialized) initializeTimeConverter();
       };
 
       const authenticate = () => {
@@ -402,7 +428,6 @@
           }
       };
       
-      // Separate renderMusicCodes function for filtering
       const renderMusicCodes = (codes) => {
         const resultsContainer = document.getElementById('music-results-container');
         resultsContainer.innerHTML = '';
@@ -422,9 +447,62 @@
       const setupModal = (openBtnId, closeBtnId, modalId) => { const openBtn = document.getElementById(openBtnId), closeBtn = document.getElementById(closeBtnId), modal = document.getElementById(modalId); openBtn.addEventListener('click', () => modal.classList.add('show')); closeBtn.addEventListener('click', () => modal.classList.remove('show')); modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); }); };
       setupModal('openPhotosBtn', 'closePhotosBtn', 'photosModal');
       setupModal('openTimeConverterBtn', 'closeTimeConverterBtn', 'timeConverterModal');
-      const eventEl = document.getElementById('eventDateTime'), tzSel = document.getElementById('eventTimeZone'), outEl = document.getElementById('sjoOutput'), copySjoBtn = document.getElementById('copySjoBtn');
-      document.getElementById('convertBtn')?.addEventListener('click', () => { const val = eventEl.value, tz = tzSel.value || 'UTC', SJO_TZ = 'America/Costa_Rica'; if (!val) { outEl.value = ''; return } const [datePart, timePart] = val.split('T'); if (!datePart || !timePart) { outEl.value = 'Invalid date'; return } const [y, m, d] = datePart.split('-').map(Number), [H, Mi] = timePart.split(':').map(Number); if ([y, m, d, H, Mi].some(isNaN)) { outEl.value = 'Invalid date'; return } let t = Date.UTC(y, m-1, d, H, Mi); const p = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{}); t -= (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute) - t); const parts = new Intl.DateTimeFormat('en-GB', { timeZone: SJO_TZ, day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', hour12:true }).formatToParts(new Date(t)).reduce((a, p)=>(a[p.type]=p.value, a),{}); outEl.value = `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}:${parts.minute} ${parts.dayPeriod.toUpperCase()}`; });
-      copySjoBtn?.addEventListener('click', () => { if (outEl.value) navigator.clipboard.writeText(outEl.value).catch(console.error); });
+
+      function initializeTimeConverter() {
+        if (timeConverterInitialized) return;
+        timeConverterInitialized = true;
+        const SJO_TZ = 'America/Costa_Rica';
+        const tzSelect = document.getElementById('eventTimeZone');
+        const dateSelect = document.getElementById('eventDate');
+        const hourScroller = document.getElementById('hour-scroller-input');
+        const sjoDateEl = document.getElementById('sjoDate');
+        const sjoTimeEl = document.getElementById('sjoTime');
+        
+        const timezones = { 'Etc/GMT+12':'IDLW (-12)','Pacific/Honolulu':'HST (-10)','America/Anchorage':'AKST (-9)','America/Los_Angeles':'PST (-8)','America/Denver':'MST (-7)','America/Chicago':'CST (-6)','America/Mexico_City':'CST-MX (-6)','America/New_York':'EST (-5)','America/Bogota':'COT (-5)','America/Lima':'PET (-5)','America/Caracas':'VET (-4)','America/Santiago':'CLT (-3)','America/Sao_Paulo':'BRT (-3)','Atlantic/Azores':'AZOT (-1)','Europe/London':'GMT (+0)','Europe/Paris':'CET (+1)','Europe/Berlin':'CET-DE (+1)','Europe/Athens':'EET (+2)','Africa/Johannesburg':'SAST (+2)','Asia/Dubai':'GST (+4)','Asia/Karachi':'PKT (+5)','Asia/Kolkata':'IST (+5:30)','Asia/Bangkok':'ICT (+7)','Asia/Hong_Kong':'HKT (+8)','Asia/Singapore':'SGT (+8)','Asia/Manila':'PHT (+8)','Asia/Tokyo':'JST (+9)','Asia/Seoul':'KST (+9)','Australia/Sydney':'AEST (+10)','Pacific/Auckland':'NZST (+12)' };
+        tzSelect.innerHTML = Object.entries(timezones).map(([val, text]) => `<option value="${val}">${text}</option>`).join('');
+        tzSelect.value = 'America/New_York';
+
+        const today = new Date();
+        for (let i = -7; i <= 7; i++) {
+          const date = new Date(today);
+          date.setDate(today.getDate() + i);
+          const option = document.createElement('option');
+          option.value = date.toISOString().split('T')[0];
+          option.textContent = date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+          if (i === 0) option.selected = true;
+          dateSelect.appendChild(option);
+        }
+
+        hourScroller.innerHTML = `<div class="h-[80px]"></div>` + Array.from({length: 24}, (_, i) => `<div class="hour-scroller-item" data-hour="${i}">${String(i).padStart(2,'0')}:00</div>`).join('') + `<div class="h-[80px]"></div>`;
+        const hourItems = hourScroller.querySelectorAll('.hour-scroller-item');
+        hourScroller.scrollTop = new Date().getHours() * 40;
+
+        function updateConversion() {
+          const tz = tzSelect.value;
+          const [y,m,d] = dateSelect.value.split('-').map(Number);
+          const hour = Math.round(hourScroller.scrollTop / 40);
+          hourItems.forEach((item, index) => item.classList.toggle('active', index === hour));
+          
+          let t = Date.UTC(y, m-1, d, hour, 0);
+          const p = new Intl.DateTimeFormat('en-CA', {timeZone: tz, year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date(t)).reduce((a,p)=>(a[p.type]=p.value,a),{});
+          t -= (Date.UTC(+p.year, +p.month-1, +p.day, +p.hour, +p.minute) - t);
+          
+          const sjoDate = new Date(t).toLocaleDateString('en-US', {timeZone: SJO_TZ, weekday: 'long', month: 'short', day: 'numeric'});
+          const sjoTime = new Date(t).toLocaleTimeString('en-US', {timeZone: SJO_TZ, hour: '2-digit', minute: '2-digit', hour12: false });
+          sjoDateEl.textContent = sjoDate; 
+          sjoTimeEl.textContent = sjoTime;
+        }
+
+        let scrollTimeout;
+        hourScroller.addEventListener('scroll', () => { 
+          clearTimeout(scrollTimeout); 
+          scrollTimeout = setTimeout(updateConversion, 50); 
+        });
+        tzSelect.addEventListener('change', updateConversion);
+        dateSelect.addEventListener('change', updateConversion);
+        updateConversion();
+      }
+
     });
   </script>
 
