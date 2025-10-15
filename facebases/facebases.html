@@ -15,6 +15,7 @@
 
   <style>
     :root {
+      /* Variables de color y tamaño */
       --ink: #e5e7eb; --muted: #a1a1aa;
       --card: #121317; --border: #2a2b31;
       --shadow: 0 18px 50px rgba(0,0,0,.45);
@@ -86,7 +87,7 @@
     .flag-aesthetic { height: 32px; border-radius: .4rem; object-fit: cover; }
     .copied { background-color: #22c55e !important; color: white !important; }
     
-    /* Modal Styles */
+    /* Estilos de Modales */
     .modal-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.8); backdrop-filter: blur(12px);
@@ -100,27 +101,69 @@
     }
     #loginOverlay { z-index: 5000; }
     
-    /* Photos Modal Specific Styles */
+    /* Estilos Específicos del Modal de Fotos (Adaptados a la versión simple) */
     #photosModal .modal-content {
         background: transparent;
         border: none;
         box-shadow: none;
         width: auto;
-        max-width: 85vw;
-        max-height: 85vh;
+        max-width: 90vw;
+        max-height: 90vh;
     }
-    #photosModal .swiper-slide { position: relative; }
-    #photosModal .swiper-slide img { display: block; width: 100%; height: auto; max-height: 85vh; object-fit: contain; border-radius: var(--radius-xl); }
-    #photosModal .download-button { position: absolute; bottom: 16px; right: 16px; z-index: 10; }
-    #photosModal .swiper-button-next, #photosModal .swiper-button-prev {
-        width: 44px; height: 44px;
-        opacity: 0.6;
-        transition: opacity 0.2s ease;
+    /* NUEVOS ESTILOS PARA LA GALERÍA SIMPLE */
+    #photo-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      max-width: 700px; /* Ancho máximo para que se vea bien */
+      margin: 0 auto;
     }
-    #photosModal .swiper-button-next:hover, #photosModal .swiper-button-prev:hover { opacity: 1; }
-    #photosModal .swiper-button-next::after, #photosModal .swiper-button-prev::after { font-size: 24px; font-weight: bold; }
+    #photo-container .photo-slide {
+      position: absolute;
+      width: 100%;
+      max-width: 100%;
+      /* Usamos display: none / flex para el control simple de visibilidad */
+      display: none; 
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding-top: 20px;
+    }
+    #photo-container .photo-slide.active {
+      display: flex; /* Muestra solo la imagen activa */
+    }
+    #photo-container img {
+      max-height: 65vh;
+      object-fit: contain;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      max-width: 95%; /* Ajuste de tamaño para móviles */
+    }
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background: rgba(18,19,23,.75);
+      border: 1px solid var(--border);
+      color: var(--gold2);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover { background: rgba(18,19,23,1); }
 
-    /* Tab Navigation */
+    /* Estilos de Navegación por Pestañas */
     .tab-nav-button {
       padding: 8px 16px; border-radius: var(--radius-md); font-weight: 500;
       color: var(--muted); background-color: transparent; border: 1px solid transparent;
@@ -133,7 +176,7 @@
       border-color: rgba(213,184,90,0.25);
     }
     
-    /* Music Card Styles */
+    /* Estilos de Tarjetas de Música */
     .music-card {
         background: #151722;
         border: 1px solid var(--border);
@@ -144,7 +187,7 @@
         border-color: rgba(213, 184, 90, 0.4);
     }
 
-    /* Time Converter Scroller Styles */
+    /* Estilos de Desplazador de Conversor de Tiempo */
     .hour-scroller { height:200px; overflow-y:scroll; scroll-snap-type:y mandatory; -ms-overflow-style:none; scrollbar-width:none; position:relative; }
     .hour-scroller::-webkit-scrollbar { display:none; }
     .hour-scroller-item { height:40px; display:flex; align-items:center; justify-content:center; scroll-snap-align:center; font-size:1.25rem; color:var(--muted); opacity:.5; transform:scale(.8); transition: all .2s ease; }
@@ -166,15 +209,17 @@
     </div>
   </div>
 
-  <div id="photosModal" class="modal-overlay">
-    <div class="modal-content">
+  <div id="photosModal" class="modal-overlay overflow-y-auto">
+    <div id="photosModalContent" class="modal-content !max-w-[90vw] !max-h-[90vh] !bg-transparent !border-none !shadow-none p-0 relative">
       <button id="closePhotosBtn" class="absolute top-4 right-4 text-white/50 hover:text-white transition text-4xl z-20">&times;</button>
-      <div class="swiper">
-        <div class="swiper-wrapper">
-          <!-- Slides will be injected by JavaScript -->
-        </div>
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-button-next"></div>
+      
+      <div id="photo-container" class="py-10" style="min-height: 400px; min-width: 300px;">
+        <button id="prevPhotoBtn" class="nav-btn left-4 hidden">
+          &lsaquo;
+        </button>
+        <button id="nextPhotoBtn" class="nav-btn right-4 hidden">
+          &rsaquo;
+        </button>
       </div>
     </div>
   </div>
@@ -225,7 +270,6 @@
     </header>
 
     <main class="panel">
-      <!-- Controles unificados de búsqueda -->
       <div id="search-controls" class="flex-shrink-0 flex flex-col sm:flex-row gap-4 mb-4 pb-4 border-b border-[var(--border)]">
           <div class="relative flex-grow">
               <input type="search" id="search-bar" placeholder="Search..." class="w-full h-12 pl-10 pr-4 text-sm dark-input rounded-md">
@@ -238,7 +282,6 @@
           </select>
       </div>
       
-      <!-- Contenedor para el contenido de las pestañas -->
       <div id="tab-content-wrapper" class="flex-grow relative min-h-0">
           <div id="content-facebases" class="tab-content absolute inset-0 scrollable-content">
               <div id="gallery-container" class="flex flex-col gap-8 pr-2"></div>
@@ -268,25 +311,59 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // Configuraciones y Elementos Iniciales
       const SECRET_B64 = 'bWFuY2hpdGFz';
+      const AUTH_KEY = 'isAuthenticated';
+      const LAST_AUTH_KEY = 'lastAuthTime';
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+      
       const loginOverlay = document.getElementById('loginOverlay');
+      const passwordInput = document.getElementById('passwordInput');
       const appContainer = document.getElementById('app-container');
+      
       let galleryInitialized = false;
       let musicTabInitialized = false;
       let timeConverterInitialized = false;
-      let photosModalInitialized = false;
       let allItems = []; 
       let allMusicCodes = [];
+      
+      // *** ARREGLO 1: Asegurar que el campo de contraseña esté vacío al cargar ***
+      passwordInput.value = '';
 
+      // Función de inicio de la aplicación
       const startApp = () => {
         if (!galleryInitialized) initializeGallery();
         if (!musicTabInitialized) initializeMusicTab();
         if (!timeConverterInitialized) initializeTimeConverter();
       };
 
+      // *** ARREGLO 2: Lógica de autenticación con caducidad de 30 días ***
+      const checkAuthentication = () => {
+          const isAuthenticated = localStorage.getItem(AUTH_KEY) === 'true';
+          const lastAuthTime = localStorage.getItem(LAST_AUTH_KEY);
+          const now = Date.now();
+          
+          if (isAuthenticated && lastAuthTime && (now - lastAuthTime < THIRTY_DAYS_MS)) {
+              // Autenticado y dentro del período de 30 días
+              loginOverlay.classList.remove('show');
+              appContainer.classList.add('loaded');
+              setTimeout(startApp, 500);
+          } else {
+              // No autenticado o la sesión ha caducado
+              localStorage.removeItem(AUTH_KEY);
+              localStorage.removeItem(LAST_AUTH_KEY);
+              loginOverlay.classList.add('show');
+          }
+      };
+
+      // Lógica de Autenticación
       const authenticate = () => {
-        if (document.getElementById('passwordInput').value === atob(SECRET_B64)) {
-          sessionStorage.setItem('isAuthenticated', 'true');
+        if (passwordInput.value === atob(SECRET_B64)) {
+          // Autenticación exitosa: guarda el estado y el tiempo actual en localStorage
+          localStorage.setItem(AUTH_KEY, 'true');
+          localStorage.setItem(LAST_AUTH_KEY, Date.now());
+          
+          document.getElementById('errorMessage').textContent = '';
           loginOverlay.classList.remove('show');
           appContainer.classList.add('loaded');
           setTimeout(startApp, 500); 
@@ -294,17 +371,12 @@
           document.getElementById('errorMessage').textContent = 'Incorrect password.';
         }
       };
-
-      if (sessionStorage.getItem('isAuthenticated') === 'true') {
-        loginOverlay.classList.remove('show');
-        appContainer.classList.add('loaded');
-        setTimeout(startApp, 500);
-      } else {
-        loginOverlay.classList.add('show');
-      }
+      
+      // Llamar a la función de chequeo al inicio
+      checkAuthentication(); 
 
       document.getElementById('loginBtn').addEventListener('click', authenticate);
-      document.getElementById('passwordInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') authenticate(); });
+      passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') authenticate(); });
 
       const tabs = document.querySelectorAll('.tab-nav-button');
       const contentAreas = document.querySelectorAll('.tab-content');
@@ -336,6 +408,7 @@
         });
       });
 
+      // Lógica de la Galería de Facebases
       function renderGallery(itemsToRender) {
         const galleryContainer = document.getElementById('gallery-container');
         const countryCodeMap = { UK: 'gb', Albania: 'al', India: 'in', Brazil: 'br' };
@@ -343,12 +416,12 @@
         const byCountry = itemsToRender.reduce((acc, it) => { (acc[it.group] ||= []).push(it); return acc; }, {});
         const countries = Object.keys(byCountry).sort((a,b)=>{ if(a==='Drag') return 1; if(b==='Drag') return -1; return a.localeCompare(b); });
         
-        galleryContainer.innerHTML = '';
+        let galleryHTML = '';
         countries.forEach(country => {
-          const rowHTML = `
+          galleryHTML += `
             <section class="country-row">
               <div class="flex items-center gap-3 mb-4">
-                <img src="${country === 'Drag' ? 'photos/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`}" alt="${country} flag" class="flag-aesthetic">
+                <img src="${country === 'Drag' ? 'photos/app/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`}" alt="${country} flag" class="flag-aesthetic">
                 <h2 class="text-2xl font-bold title-fancy gold-title">${country.replace(/([a-z])([A-Z])/g,'$1 $2')}</h2>
               </div>
               <div class="swiper relative">
@@ -373,8 +446,8 @@
               </div>
             </section>
           `;
-          galleryContainer.innerHTML += rowHTML;
         });
+        galleryContainer.innerHTML = galleryHTML;
         
         document.querySelectorAll('#gallery-container .swiper').forEach(el => new Swiper(el, { 
           slidesPerView: 'auto', spaceBetween: 16, grabCursor: true,
@@ -393,7 +466,7 @@
           if (lastUnderscore > -1) { const maybeId = name.slice(lastUnderscore+1); if (!isNaN(maybeId) && maybeId.trim() !== '') { label = name.slice(0,lastUnderscore); codeId = maybeId; } }
           const group = label.split('-')[0] || 'Uncategorized';
           const displayName = label.replace(new RegExp('^' + group + '-'), '').replace(/-/g,' ');
-          return { id: name, group, displayName, codeId, src: `photos/${name}.png` };
+          return { id: name, group, displayName, codeId, src: `photos/faces/${name}.png` };
         });
 
         renderGallery(allItems);
@@ -413,22 +486,71 @@
         });
       }
 
+      // Lógica de la Pestaña de Música
       function initializeMusicTab() {
         if (musicTabInitialized) return;
         musicTabInitialized = true;
         
         const resultsContainer = document.getElementById('music-results-container');
         
-        fetch('music.json')
-          .then(response => { if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); return response.json(); })
-          .then(data => { allMusicCodes = data; populateCategories(allMusicCodes); renderMusicCodes(allMusicCodes); })
-          .catch(error => { console.error('Error loading music codes:', error); resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full">Failed to load music codes.</p>`; });
+        const populateCategories = (codes) => { 
+          const categories = [...new Set(codes.map(code => code.category))].filter(Boolean); 
+          categories.sort().forEach(category => { 
+            const option = document.createElement('option'); 
+            option.value = category; 
+            option.textContent = category; 
+            musicCategoryFilter.appendChild(option); 
+          }); 
+        };
         
-        const populateCategories = (codes) => { const categories = [...new Set(codes.map(code => code.category))].filter(Boolean); categories.sort().forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; musicCategoryFilter.appendChild(option); }); };
-        const renderMusicCodes = (codes) => { resultsContainer.innerHTML = ''; if (codes.length === 0) { resultsContainer.innerHTML = `<p class="text-zinc-500 text-center col-span-full">No results found.</p>`; return; } codes.forEach(code => { const cardHTML = ` <div class="music-card rounded-lg p-4 flex flex-col justify-between gap-3"> <div class="flex-grow"> <h3 class="font-semibold text-zinc-100 truncate" title="${code.title}">${code.title} ${ (code.pitch && code.pitch !== 0) ? `<span class="ml-2 text-xs font-semibold text-cyan-400" title="Pitch: ${code.pitch}">[PITCH]</span>` : ''}</h3> <p class="text-sm text-zinc-400 truncate" title="${code.artist}">${code.artist || 'Unknown Artist'}</p> <p class="text-xs text-[var(--gold2)] opacity-80 mt-2">${code.category || 'Uncategorized'}</p> ${ (code.markers && code.markers.length > 0) ? `<div class="flex flex-wrap gap-1.5 mt-2">${code.markers.map(marker => `<span class="text-xs font-medium bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">${marker}</span>`).join('')}</div>` : ''} </div> <div class="flex items-center gap-2 mt-2"> <input readonly type="text" value="${code.id}" class="flex-grow w-0 h-9 px-2 text-xs dark-input rounded-md font-mono"> <button class="copy-btn flex-shrink-0 w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition" data-id="${code.id}" title="Copy ID"> <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> </button> </div> </div>`; resultsContainer.innerHTML += cardHTML; }); };
-
-        resultsContainer.addEventListener('click', (event) => { const copyBtn = event.target.closest('.copy-btn'); if (copyBtn) { const idToCopy = copyBtn.dataset.id; navigator.clipboard.writeText(idToCopy).then(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`; copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`; copyBtn.classList.remove('copied'); }, 1500); }); } });
+        // Cargar music.json
+        fetch('music.json')
+          .then(response => { 
+            if (!response.ok) {
+              console.warn('music.json not found or failed to load. Using empty data for music tab.');
+              return []; 
+            }
+            return response.json(); 
+          })
+          .then(data => { 
+            allMusicCodes = data; 
+            if (data.length > 0) {
+              musicCategoryFilter.innerHTML = '<option value="all">All Categories</option>';
+              populateCategories(allMusicCodes); 
+              renderMusicCodes(allMusicCodes); 
+            }
+          })
+          .catch(error => { 
+            console.error('Error loading music codes:', error); 
+            resultsContainer.innerHTML = `<p class="text-red-400 text-center col-span-full">Failed to load music codes.</p>`; 
+          });
+        
+        // Manejo de copia de códigos de música
+        resultsContainer.addEventListener('click', (event) => { 
+          const copyBtn = event.target.closest('.copy-btn'); 
+          if (copyBtn) { 
+            const idToCopy = copyBtn.dataset.id; 
+            navigator.clipboard.writeText(idToCopy).then(() => { 
+              copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/></svg>`; 
+              copyBtn.classList.add('copied'); 
+              setTimeout(() => { 
+                copyBtn.innerHTML = `<svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>`; 
+                copyBtn.classList.remove('copied'); 
+              }, 1500); 
+            }); 
+          } 
+        });
       }
+
+      // Funciones de Búsqueda y Filtro
+      const debounce = (func, delay) => {
+          let timeout;
+          return function(...args) {
+              const context = this;
+              clearTimeout(timeout);
+              timeout = setTimeout(() => func.apply(context, args), delay);
+          };
+      };
       
       const filterContent = () => {
           const activeTab = document.querySelector('.tab-nav-button.active').dataset.tab;
@@ -464,9 +586,10 @@
         });
       };
 
-      searchBar.addEventListener('input', filterContent);
+      searchBar.addEventListener('input', debounce(filterContent, 300));
       musicCategoryFilter.addEventListener('change', filterContent);
 
+      // Función genérica para configurar modales simples (usada para Time Converter)
       const setupModal = (openBtnId, closeBtnId, modalId) => { 
         const openBtn = document.getElementById(openBtnId);
         const closeBtn = document.getElementById(closeBtnId);
@@ -476,55 +599,118 @@
         if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
       };
 
-      // Specific setup for Photos Modal
+      // *******************************************************************
+      // BLOQUE: LÓGICA DEL MODAL DE FOTOS (VERSIÓN HORIZONTAL SIMPLE CON LOOP)
+      // *******************************************************************
+      
       const openPhotosBtn = document.getElementById('openPhotosBtn');
       const closePhotosBtn = document.getElementById('closePhotosBtn');
       const photosModal = document.getElementById('photosModal');
+      const photoContainer = document.getElementById('photo-container');
+      const prevPhotoBtn = document.getElementById('prevPhotoBtn');
+      const nextPhotoBtn = document.getElementById('nextPhotoBtn');
       
-      openPhotosBtn.addEventListener('click', () => {
-          if (!photosModalInitialized) {
-              initializePhotosModal();
+      let currentPhotoIndex = 0;
+      
+      // Fotos disponibles
+      const downloadablePhotos = [
+          { src: 'photos/modal/UK.png', filename: 'UK.png', title: 'UK Collection' },
+          { src: 'photos/modal/Brazil.png', filename: 'Brazil.png', title: 'Brazil Collection' }
+      ];
+
+      function renderSimpleGallery() {
+          if (!photoContainer) return;
+          
+          // 1. Crear el HTML de las slides
+          const slidesHTML = downloadablePhotos.map((photo, index) => `
+              <div id="slide-${index}" class="photo-slide">
+                  <h3 class="text-xl font-semibold text-zinc-100 mb-4">${photo.title}</h3>
+                  <img src="${photo.src}" alt="${photo.title}">
+                  
+                  <a href="${photo.src}" download="${photo.filename}" class="mt-6 px-4 py-2 bg-[var(--gold2)] text-black font-semibold rounded-md hover:brightness-110 transition-all">
+                      Descargar ${photo.filename}
+                  </a>
+              </div>
+          `).join('');
+
+          // 2. Limpiamos solo los elementos que son slides (para no borrar los botones)
+          Array.from(photoContainer.children).forEach(child => {
+              if (child.id.startsWith('slide-')) {
+                  child.remove();
+              }
+          });
+
+          // 3. Insertamos las nuevas slides
+          photoContainer.insertAdjacentHTML('afterbegin', slidesHTML);
+
+          currentPhotoIndex = 0; // Resetear al inicio al renderizar
+          updateGalleryDisplay(currentPhotoIndex, false); // Forzar la visualización de la primera foto
+      }
+
+      function updateGalleryDisplay(newIndex, isNavigation = true) {
+          const slides = photoContainer.querySelectorAll('.photo-slide');
+          
+          if (slides.length === 0) return;
+
+          // 1. Calcular el nuevo índice con loop infinito
+          if (isNavigation) {
+            if (newIndex >= slides.length) {
+                newIndex = 0; // Loop al inicio
+            } else if (newIndex < 0) {
+                newIndex = slides.length - 1; // Loop al final
+            }
           }
+          
+          // 2. Ocultar todas las slides y mostrar la activa
+          slides.forEach((slide, index) => {
+              slide.classList.remove('active');
+              if (index === newIndex) {
+                  slide.classList.add('active');
+              }
+          });
+          
+          currentPhotoIndex = newIndex;
+          
+          // 3. Mostrar u ocultar botones (si hay más de 1 foto)
+          if (slides.length <= 1) {
+              prevPhotoBtn.classList.add('hidden');
+              nextPhotoBtn.classList.add('hidden');
+          } else {
+              prevPhotoBtn.classList.remove('hidden');
+              nextPhotoBtn.classList.remove('hidden');
+          }
+      }
+
+      // Event Listeners para la navegación de la galería (solo se añaden una vez)
+      nextPhotoBtn.addEventListener('click', () => {
+          updateGalleryDisplay(currentPhotoIndex + 1);
+      });
+      
+      prevPhotoBtn.addEventListener('click', () => {
+          updateGalleryDisplay(currentPhotoIndex - 1);
+      });
+
+
+      // Abrir Modal de Fotos
+      openPhotosBtn.addEventListener('click', () => {
+          renderSimpleGallery();
           photosModal.classList.add('show');
       });
+      
+      // Cerrar Modal de Fotos
       closePhotosBtn.addEventListener('click', () => photosModal.classList.remove('show'));
+      
+      // Cerrar al hacer clic en el overlay (fondo)
       photosModal.addEventListener('click', (e) => {
-          if (e.target.id === 'photosModal') {
+          if (e.target === photosModal) {
               photosModal.classList.remove('show');
           }
       });
-
+      
+      // *******************************************************************
+      
+      // Inicialización del Conversor de Tiempo
       setupModal('openTimeConverterBtn', 'closeTimeConverterBtn', 'timeConverterModal');
-
-      function initializePhotosModal() {
-        if (photosModalInitialized) return;
-        photosModalInitialized = true;
-
-        const downloadablePhotos = [
-            { src: 'photos/UK.png', filename: 'UK.png' }
-            // Puedes añadir más fotos aquí
-        ];
-
-        const swiperWrapper = document.querySelector('#photosModal .swiper-wrapper');
-        if (!swiperWrapper) return;
-
-        swiperWrapper.innerHTML = downloadablePhotos.map(photo => `
-            <div class="swiper-slide">
-                <img src="${photo.src}" alt="${photo.filename}">
-                <a href="${photo.src}" download="${photo.filename}" class="download-button w-10 h-10 flex items-center justify-center bg-black/40 text-white rounded-full hover:bg-black/60 transition-all hover:scale-110">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                </a>
-            </div>
-        `).join('');
-
-        new Swiper('#photosModal .swiper', {
-            loop: downloadablePhotos.length > 1,
-            navigation: {
-                nextEl: '#photosModal .swiper-button-next',
-                prevEl: '#photosModal .swiper-button-prev',
-            },
-        });
-      }
 
       function initializeTimeConverter() {
         if (timeConverterInitialized) return;
@@ -629,4 +815,3 @@
   </script>
 </body>
 </html>
-
