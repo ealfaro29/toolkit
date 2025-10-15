@@ -1,259 +1,745 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI Workslop Impact — Mini Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-  <style>
-    :root { color-scheme: light dark; }
-    html, body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    .card { border-radius: 1rem; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
-    .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-    .muted { color: rgb(113, 113, 122); }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Circular Maze Creator</title>
+  <style>
+    /*
+     * CSS EXTREMADAMENTE SIMPLIFICADO:
+     * Se han eliminado todos los degradados (linear-gradient, radial-gradient)
+     * para satisfacer el linter estricto y evitar errores de sintaxis.
+     */
+
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      /* Fondo simple y sólido */
+      background: #0b0f14; 
+      color: #e6edf3;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 14px 16px 0 16px;
+      align-items: end;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(18px, 2.6vw, 28px);
+      letter-spacing: 0.4px;
+      font-weight: 650;
+    }
+    .controls {
+      margin: 0 16px 0 16px;
+      background: #111720; /* Color de panel sólido */
+      border: 1px solid #1e2733;
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    fieldset {
+      border: 1px solid #223142;
+      border-radius: 12px;
+      padding: 10px;
+      min-width: 0;
+    }
+    legend {
+      color: #9fb2c3; 
+      font-size: 12px;
+      padding: 0 6px;
+    }
+    label { 
+      display: grid; 
+      gap: 6px; 
+      font-size: 12px; 
+      color: #9fb2c3; 
+    }
+    input[type="number"], input[type="text"], select {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #0f1621;
+      color: #e6edf3; 
+      border: 1px solid #233246;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+    }
+    input[type="checkbox"] { transform: translateY(1px); }
+    button {
+      /* Fondo de botón sólido simple */
+      background: #172433; 
+      color: #e6edf3; 
+      border: 1px solid #2a3b52;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { border-color: #355176; }
+    button.primary { 
+      background: #1a2b3d; /* Tono primario sólido */
+      border-color: #3a5e87; 
+    }
+    button.accent { 
+      background: #0b2330; /* Tono acento sólido */
+      border-color: #147da1; 
+      color: #5dd6ff; 
+    }
+    .canvas-wrap {
+      margin: 4px 16px 16px;
+      /* Fondo de canvas simple y sólido */
+      background: #0b0f14; 
+      border: 1px solid #1b2533;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      min-height: 420px;
+    }
+    canvas { 
+      width: 100%; 
+      height: 100%; 
+      max-width: 950px; 
+      max-height: 950px; 
+      aspect-ratio: 1; 
+      display: block; 
+    }
+    footer {
+      padding: 8px 16px 16px;
+      color: #9fb2c3; 
+      font-size: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .row { 
+      display: flex; 
+      gap: 8px; 
+      flex-wrap: wrap; 
+    }
+    .grow { flex: 1; }
+    .hint { 
+      color: #9fb2c3; 
+      font-size: 12px; 
+    }
+    .badge { 
+      color: #a5ff5d; 
+      font-weight: 600; 
+    }
+    .mono { 
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; 
+    }
+  </style>
 </head>
-<body class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
-  <div class="max-w-6xl mx-auto p-6">
-    <header class="mb-6">
-      <h1 class="text-3xl font-extrabold tracking-tight">AI “Workslop” Impact</h1>
-      <p class="muted mt-1 text-sm">Harvard Business Review survey of 1,150 US desk workers.</p>
-    </header>
+<body>
+  <header>
+    <h1>Circular Maze Creator</h1>
+    <div class="row">
+      <button id="btn-generate" class="primary">Generate</button>
+      <button id="btn-randseed" title="Randomize seed">New Seed</button>
+      <button id="btn-solve" title="Show a shortest path solution">Solve</button>
+      <button id="btn-clear" title="Clear solution">Clear</button>
+      <button id="btn-export" class="accent" title="Download PNG">Export PNG</button>
+    </div>
+  </header>
 
-    <section class="grid-auto mb-6">
-      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
-        <div class="text-sm muted">Prevalence</div>
-        <div class="mt-1 text-3xl font-bold">40%</div>
-        <div class="text-xs muted mt-1">Encountered workslop in the past month</div>
-      </div>
-      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
-        <div class="text-sm muted">Time lost</div>
-        <div class="mt-1 text-3xl font-bold">~2 hrs</div>
-        <div class="text-xs muted mt-1">Per instance of workslop</div>
-      </div>
-      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
-        <div class="text-sm muted">Cost per employee</div>
-        <div class="mt-1 text-3xl font-bold">$186</div>
-        <div class="text-xs muted mt-1">Per month, average estimate</div>
-      </div>
-      <div class="card p-5 bg-zinc-50 dark:bg-zinc-800/60">
-        <div class="text-sm muted">Senders</div>
-        <div class="mt-1 text-3xl font-bold">18%</div>
-        <div class="text-xs muted mt-1">Admit sending AI-generated content</div>
-      </div>
-    </section>
+  <section class="controls">
+    <fieldset>
+      <legend>Structure</legend>
+      <label> Rings
+        <input type="number" id="rings" min="3" max="400" step="1" value="32" />
+      </label>
+      <label> Base cells on ring 1
+        <input type="number" id="baseCells" min="3" max="128" step="1" value="8" />
+      </label>
+      <label> Wall thickness (px)
+        <input type="number" id="wall" min="1" max="12" step="1" value="2" />
+      </label>
+    </fieldset>
 
-    <section class="grid-auto mb-6">
-      <div class="card p-5 bg-white dark:bg-zinc-800/60 flex flex-col">
-        <h2 class="text-lg font-semibold mb-3">At-a-glance metrics</h2>
-        <div class="relative h-72">
-          <canvas id="barChart"></canvas>
-        </div>
-      </div>
+    <fieldset>
+      <legend>Geometry</legend>
+      <label> Size (px)
+        <input type="number" id="size" min="200" max="2400" step="10" value="900" />
+      </label>
+      <label> Center radius (%)
+        <input type="number" id="core" min="0" max="25" step="1" value="7" />
+      </label>
+      <label> Equalize cell aspect
+        <select id="equalize">
+          <option value="balanced" selected>Balanced</option>
+          <option value="fixed">Fixed per ring</option>
+        </select>
+      </label>
+    </fieldset>
 
-      <div class="card p-5 bg-white dark:bg-zinc-800/60 flex flex-col">
-        <h2 class="text-lg font-semibold mb-3">Perception of Workslop Senders</h2>
-        <p class="text-xs muted -mt-2 mb-2">Share of respondents who view senders as less capable, creative, and reliable.</p>
-        <div class="relative h-72">
-          <canvas id="doughnutChart"></canvas>
-        </div>
-      </div>
+    <fieldset>
+      <legend>Randomness</legend>
+      <label> Seed
+        <input type="text" id="seed" value="auto" class="mono" />
+      </label>
+      <label> Bias
+        <select id="bias">
+          <option value="none" selected>None</option>
+          <option value="cw">Clockwise</option>
+          <option value="ccw">Counterclockwise</option>
+          <option value="in">Inward</option>
+          <option value="out">Outward</option>
+        </select>
+      </label>
+      <label>
+        <span>Weave dead-ends (rare)</span>
+        <input type="checkbox" id="braid" />
+      </label>
+    </fieldset>
 
-      <div class="card p-5 bg-white dark:bg-zinc-800/60 flex flex-col">
-        <h2 class="text-lg font-semibold mb-3">Scale it up</h2>
-        <p class="text-xs muted -mt-2 mb-2">Illustrative annual cost using $186 per employee per month.</p>
-        <div class="relative h-72">
-          <canvas id="costChart"></canvas>
-        </div>
-      </div>
-    </section>
+    <fieldset>
+      <legend>Goal</legend>
+      <label> Entrance ring
+        <input type="number" id="entrRing" min="0" step="1" value="0" />
+      </label>
+      <label> Exit ring
+        <input type="number" id="exitRing" min="1" step="1" value="31" />
+      </label>
+      <label> Exit arc index
+        <input type="number" id="exitArc" min="0" step="1" value="0" />
+      </label>
+    </fieldset>
 
-    <footer class="mt-8 text-xs muted">
-      Source: Harvard Business Review, “AI Workslop” survey. Figures rounded. This file loads charts from public CDNs.
-    </footer>
-  </div>
+    <fieldset>
+      <legend>Style</legend>
+      <label> Wall color
+        <input type="text" id="color" value="#e6edf3" />
+      </label>
+      <label> Background
+        <input type="text" id="bg" value="#0b0f14" />
+      </label>
+      <label>
+        <span>Show polar grid</span>
+        <input type="checkbox" id="showGrid" />
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Info</legend>
+      <div class="hint">Seed <span class="mono" id="seedEcho">auto</span></div>
+      <div class="hint">Cells <span class="mono" id="cellEcho">0</span></div>
+      <div class="hint">Edges <span class="mono" id="edgeEcho">0</span></div>
+    </fieldset>
+  </section>
+
+  <section class="canvas-wrap">
+    <canvas id="maze" width="900" height="900"></canvas>
+  </section>
+
+  <footer>
+    <div class="hint">Algorithm: polar grid, recursive backtracker, optional dead-end braiding. Aspect equalization doubles cells per ring when circumference warrants, keeping arc length near radial height. Entrance defaults to center, exit on outer ring. <span class="badge">Single-file</span>.</div>
+    <div class="row">
+      <button id="btn-copy-json" title="Copy maze JSON">Copy JSON</button>
+    </div>
+  </footer>
 
 <script>
-  // Data constants
-  const prevalence = 40;
-  const timeLostHours = 2;
-  const costPerEmployee = 186;
-  const sendersAdmit = 18;
-  const negativePerception = 50;
+// Utility: deterministic PRNG (xorshift32) from 32-bit seed derived from string
+function hash32(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function XorShift32(seed) {
+  let x = seed >>> 0 || 1;
+  return function() {
+    x ^= x << 13; x >>>= 0;
+    x ^= x >>> 17; x >>>= 0;
+    x ^= x << 5;  x >>>= 0;
+    return (x >>> 0) / 0x100000000;
+  };
+}
+function choice(rng, arr) { return arr[(rng()*arr.length)|0]; }
+function shuffle(rng, arr) { for (let i = arr.length - 1; i > 0; i--) { const j = (rng()*(i+1))|0; [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
 
-  // ✅ FIX: Detect dark mode to set colors dynamically
-  const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const textColor = isDarkMode ? 'rgba(244, 244, 245, 0.9)' : 'rgba(39, 39, 42, 0.9)';
-  const gridColor = isDarkMode ? 'rgba(82, 82, 90, 0.5)' : 'rgba(228, 228, 231, 0.7)';
-  
-  // Register plugin
-  Chart.register(ChartDataLabels);
+// Polar grid cell
+class Cell {
+  constructor(r, c) {
+    this.r = r;      // ring index
+    this.c = c;      // cell index within ring
+    this.links = new Set(); // linked neighbor ids
+  }
+  id() { return `${this.r}:${this.c}`; }
+}
 
-  // Common chart options
-  const commonOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: true },
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-        formatter: (v, ctx) => {
-          const label = ctx.chart.data.labels[ctx.dataIndex];
-          if (label.includes('$')) return '$' + v.toLocaleString();
-          if (label.includes('hrs')) return v + ' hrs';
-          if (label.includes('%') || ctx.chart.config.type === 'doughnut') return v + '%';
-          return v;
-        },
-        clamp: true,
-        offset: 4,
-        color: textColor, // Use dynamic text color
-        font: { weight: '600' }
-      }
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: { color: textColor } // Use dynamic text color
-      },
-      y: {
-        grid: { color: gridColor }, // Use dynamic grid color
-        ticks: { color: textColor } // Use dynamic text color
-      }
-    }
-  };
+// Build polar grid with aspect-equalized arcs
+function buildPolarGrid(rings, baseCells, equalize) {
+  const ringCounts = new Array(rings+1).fill(0);
+  ringCounts[0] = 1; // center cell
+  ringCounts[1] = Math.max(3, baseCells|0);
+  const ringThickness = 1; // abstract units
+  for (let r = 2; r <= rings; r++) {
+    if (equalize === 'fixed') { ringCounts[r] = ringCounts[r-1]; continue; }
+    const prev = ringCounts[r-1];
+    const outerCircum = 2 * Math.PI * r;
+    // target arc length near ring height
+    const targetCells = Math.round(outerCircum / ringThickness);
+    // keep stable unless doubling reduces arc length significantly
+    ringCounts[r] = (targetCells > prev * 1.5) ? prev * 2 : prev;
+  }
 
-  // Bar chart
-  const barCtx = document.getElementById('barChart');
-  new Chart(barCtx, {
-    type: 'bar',
-    data: {
-      labels: ['Prevalence %', 'Time lost hrs', 'Cost $/month', 'Admit sending %'],
-      datasets: [{
-        data: [prevalence, timeLostHours, costPerEmployee, sendersAdmit],
-        borderWidth: 0,
-        backgroundColor: [
-          'rgba(54, 162, 235, 0.7)',
-          'rgba(255, 159, 64, 0.7)',
-          'rgba(255, 99, 132, 0.7)',
-          'rgba(75, 192, 192, 0.7)'
-        ]
-      }]
-    },
-    options: {
-      ...commonOptions,
-      // ✅ FIX: Add layout padding to prevent labels from being cropped
-      layout: {
-        padding: {
-          top: 24
-        }
-      },
-      scales: {
-        ...commonOptions.scales,
-        y: {
-          ...commonOptions.scales.y,
-          type: 'logarithmic',
-          ticks: {
-            ...commonOptions.scales.y.ticks,
-            callback: function (value) {
-              if ([1, 10, 100, 200].includes(value)) {
-                return value;
-              }
-            }
-          }
-        }
-      }
-    }
-  });
+  // cells map
+  const cells = new Map();
+  for (let r = 0; r <= rings; r++) {
+    for (let c = 0; c < ringCounts[r]; c++) cells.set(`${r}:${c}`, new Cell(r, c));
+  }
 
-  // Doughnut chart
-  const doughnutCtx = document.getElementById('doughnutChart');
-  new Chart(doughnutCtx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Negative perception', 'Neutral/positive perception'],
-      datasets: [{
-        data: [negativePerception, 100 - negativePerception],
-        backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(201, 203, 207, 0.7)'],
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { 
-          display: true, 
-          position: 'bottom',
-          labels: { color: textColor } // Use dynamic text color for legend
-        },
-        datalabels: {
-          formatter: (v) => v + '%',
-          // Use a high-contrast color for labels inside the doughnut
-          color: isDarkMode ? '#18181b' : '#f9fafb',
-          font: { weight: '700' }
-        }
-      },
-      cutout: '55%'
-    }
-  });
+  // neighbor function for polar topology
+  function neighbors(cell) {
+    const r = cell.r, c = cell.c;
+    const arr = [];
+    // same ring neighbors
+    if (r > 0) {
+      const count = ringCounts[r];
+      arr.push(`${r}:${(c-1+count)%count}`);
+      arr.push(`${r}:${(c+1)%count}`);
+    }
+    // inward neighbors
+    if (r > 0) {
+      const inwardCount = ringCounts[r-1];
+      const ratio = inwardCount / ringCounts[r];
+      // one or two inward neighbors depending on subdivision
+      const inwardIndex = Math.floor(c * ratio);
+      arr.push(`${r-1}:${inwardIndex}`);
+      // if this ring has more cells than inward ring, some cells straddle two inward
+      if (Math.floor((c+1) * ratio) !== inwardIndex) {
+        arr.push(`${r-1}:${(inwardIndex+1)%inwardCount}`);
+      }
+    }
+    // outward neighbors
+    if (r < rings) {
+      const outwardCount = ringCounts[r+1];
+      const ratio = outwardCount / ringCounts[r];
+      const start = Math.floor(c * ratio);
+      const end   = Math.floor((c+1) * ratio);
+      for (let k = start; k <= end; k++) arr.push(`${r+1}:${k % outwardCount}`);
+    }
+    return arr;
+  }
 
-  // Cost scaling line chart
-  const costCtx = document.getElementById('costChart');
-  const sizes = [100, 1000, 5000, 10000, 20000, 50000];
-  const annualCosts = sizes.map(n => n * costPerEmployee * 12);
-  new Chart(costCtx, {
-    type: 'line',
-    data: {
-      labels: sizes.map(n => n.toLocaleString() + ' employees'),
-      datasets: [{
-        label: 'Annual cost (USD)',
-        data: annualCosts,
-        fill: false,
-        tension: 0.25,
-        pointRadius: 3,
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.7)'
-      }]
-    },
-    options: {
-      ...commonOptions, // Use common options for colors and scales
-      plugins: {
-        ...commonOptions.plugins,
-        tooltip: {
-          callbacks: {
-            label: ctx => '$' + ctx.parsed.y.toLocaleString()
-          }
-        },
-        datalabels: {
-          ...commonOptions.plugins.datalabels,
-          formatter: (v, ctx) => {
-            if (ctx.dataIndex === ctx.dataset.data.length - 1) {
-              return '$' + v.toLocaleString();
-            }
-            return '';
-          },
-          align: 'top',
-          anchor: 'end',
-        }
-      },
-      scales: {
-        ...commonOptions.scales,
-        y: {
-          ...commonOptions.scales.y,
-          ticks: {
-            ...commonOptions.scales.y.ticks,
-            callback: (v) => '$' + Number(v).toLocaleString()
-          },
-        }
-      }
-    }
-  });
+  return { ringCounts, cells, neighbors };
+}
+
+// Maze generation: recursive backtracker
+function generateMaze(cfg) {
+  const { rings, baseCells, equalize, rng, bias, braid } = cfg;
+  const grid = buildPolarGrid(rings, baseCells, equalize);
+  const { cells, neighbors, ringCounts } = grid;
+
+  // pick start at center by default
+  const start = cells.get('0:0');
+  const stack = [start];
+  const visited = new Set([start.id()]);
+
+  function biasedOrder(list, cell) {
+    if (bias === 'none') return shuffle(rng, list.slice());
+    // reorder list by bias preferences
+    const scored = list.map(id => {
+      const [r2, c2] = id.split(':').map(Number);
+      let score = 0;
+      if (bias === 'in')  score -= r2;
+      if (bias === 'out') score += r2;
+      if (bias === 'cw')  score += c2 / ringCounts[r2];
+      if (bias === 'ccw') score -= c2 / ringCounts[r2];
+      return { id, s: score + rng() * 0.1 };
+    });
+    scored.sort((a,b) => b.s - a.s);
+    return scored.map(o => o.id);
+  }
+
+  while (stack.length) {
+    const current = stack[stack.length-1];
+    const neigh = neighbors(current).filter(id => !visited.has(id));
+    if (neigh.length === 0) { stack.pop(); continue; }
+    const order = biasedOrder(neigh, current);
+    const nextId = order[0];
+    const next = cells.get(nextId);
+    // link cells both ways
+    current.links.add(nextId);
+    next.links.add(current.id());
+    visited.add(nextId);
+    stack.push(next);
+  }
+
+  // optional braiding: remove some dead-ends by adding an extra link
+  if (braid) {
+    const deadEnds = Array.from(cells.values()).filter(c => c.links.size === 1 && c.r > 0);
+    for (const c of deadEnds) {
+      if (rng() < 0.18) {
+        // link to a non-linked neighbor if available
+        const opts = buildPolarGridNeighborsOnly(c, neighbors).filter(id => !c.links.has(id));
+        if (opts.length) {
+          const pick = choice(rng, opts);
+          c.links.add(pick);
+          const other = cells.get(pick);
+          other.links.add(c.id());
+        }
+      }
+    }
+  }
+
+  function buildPolarGridNeighborsOnly(cell, neighborsFn) { return neighborsFn(cell); }
+
+  return { grid, start: '0:0' };
+}
+
+// Convert links to drawable wall segments on canvas
+function drawMaze(ctx, maze, drawCfg) {
+  const { grid } = maze;
+  const { cells, ringCounts } = grid;
+  const { size, wall, color, bg, showGrid, corePct } = drawCfg;
+
+  ctx.save();
+  ctx.clearRect(0,0,size,size);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,size,size);
+  ctx.translate(size/2, size/2);
+  ctx.lineWidth = wall;
+  ctx.strokeStyle = color;
+  ctx.lineCap = 'round';
+
+  const rings = ringCounts.length - 1;
+  const maxRadius = size * 0.48;
+  const r0 = maxRadius * (corePct / 100);
+  const dr = (maxRadius - r0) / rings;
+
+  // helpers
+  function arcPath(radius, a0, a1) { ctx.beginPath(); ctx.arc(0,0,radius,a0,a1); ctx.stroke(); }
+  function spokePath(radius0, radius1, ang) { ctx.beginPath(); ctx.moveTo(radius0*Math.cos(ang), radius0*Math.sin(ang)); ctx.lineTo(radius1*Math.cos(ang), radius1*Math.sin(ang)); ctx.stroke(); }
+
+  // precompute start angle per cell
+  const startAngles = [];
+  for (let r = 0; r <= rings; r++) {
+    startAngles[r] = [];
+    const count = ringCounts[r];
+    for (let c = 0; c < count; c++) startAngles[r][c] = (2*Math.PI) * (c / count);
+  }
+
+  // 1. Draw walls related to the center cell (ring 0) and ring 1
+  const ring1Count = ringCounts[1];
+  const rOuter = r0 + dr;
+
+  // The wall separating ring 0 and ring 1 is at rOuter (when r=1)
+  const centerCell = cells.get('0:0');
+  for (let c1 = 0; c1 < ring1Count; c1++) {
+    // Wall/Opening between center (0:0) and cell (1:c1)
+    if (!centerCell.links.has(`1:${c1}`)) {
+      const aS = startAngles[1][c1];
+      const aE = startAngles[1][(c1+1)%ring1Count];
+      arcPath(rOuter, aS, aE);
+    }
+  }
+
+  // 2. Draw walls for rings 1 to maxRings
+  for (const cell of cells.values()) {
+    const r = cell.r;
+
+    // Ring 0 is handled above. We start the main loop from Ring 1 (r=1).
+    if (r === 0) continue; 
+
+    const c = cell.c;
+    const count = ringCounts[r];
+    const a0 = startAngles[r][c];
+    const a1 = startAngles[r][(c+1)%count];
+    
+    // The radial walls (spokes) span from r's inner radius to r's outer radius
+    const r_inner_wall = r0 + r * dr;
+    const r_outer_wall = r0 + (r+1) * dr;
+    
+    // Inner wall (connection to r-1) - Only for rings r >= 2
+    if (r > 1) { 
+      const inwardIds = [];
+      const inwardCount = ringCounts[r-1];
+      const ratioIn = inwardCount / ringCounts[r];
+      const inwardIndex = Math.floor(c * ratioIn);
+      inwardIds.push(`${r-1}:${inwardIndex}`);
+      if (Math.floor((c+1) * ratioIn) !== inwardIndex) inwardIds.push(`${r-1}:${(inwardIndex+1)%inwardCount}`);
+
+      const hasInnerLink = inwardIds.some(id => cell.links.has(id));
+      if (!hasInnerLink) arcPath(r_inner_wall, a0, a1);
+    }
+
+
+    // Outer wall (connection to r+1)
+    if (r < rings) {
+      const outerCount = ringCounts[r+1];
+      const ratioOut = outerCount / ringCounts[r];
+      const start = Math.floor(c * ratioOut);
+      const end = Math.floor((c+1) * ratioOut);
+      let hasOuterLink = false;
+      for (let k = start; k <= end; k++) if (cell.links.has(`${r+1}:${k%outerCount}`)) { hasOuterLink = true; break; }
+      if (!hasOuterLink) arcPath(r_outer_wall, a0, a1);
+    } else {
+      // outer boundary of the maze (last ring)
+      arcPath(r_outer_wall, a0, a1);
+    }
+
+    // Left radial wall (spoke)
+    const leftId = `${r}:${(c-1+count)%count}`;
+    if (!cell.links.has(leftId)) spokePath(r_inner_wall, r_outer_wall, a0);
+
+    // Right radial wall (spoke)
+    const rightId = `${r}:${(c+1)%count}`;
+    if (!cell.links.has(rightId)) spokePath(r_inner_wall, r_outer_wall, a1);
+
+    // optional grid overlay
+    if (showGrid) {
+      ctx.save();
+      ctx.globalAlpha = 0.08;
+      ctx.strokeStyle = '#71b7ff';
+      // Draw a faint grid line for the inner boundary of this cell
+      if (r > 0) arcPath(r_inner_wall, 0, 2*Math.PI);
+      ctx.restore();
+    }
+  }
+
+  ctx.restore();
+}
+
+// Shortest path solver using BFS on cell graph
+function solveMaze(maze, startId, targetId) {
+  const { cells } = maze.grid;
+  const queue = [startId];
+  const prev = new Map([[startId, null]]);
+  while (queue.length) {
+    const id = queue.shift();
+    if (id === targetId) break;
+    const cell = cells.get(id);
+    for (const nid of cell.links) if (!prev.has(nid)) { prev.set(nid, id); queue.push(nid); }
+  }
+  if (!prev.has(targetId)) return [];
+  const path = [];
+  for (let at = targetId; at != null; at = prev.get(at)) path.push(at);
+  return path.reverse();
+}
+
+function drawSolution(ctx, maze, drawCfg, path) {
+  if (!path || path.length === 0) return;
+  const { ringCounts } = maze.grid;
+  const { size, bg, corePct } = drawCfg;
+  const rings = ringCounts.length - 1;
+  const maxRadius = size * 0.48;
+  const r0 = maxRadius * (corePct / 100);
+  const dr = (maxRadius - r0) / rings;
+
+  ctx.save();
+  ctx.translate(size/2, size/2);
+  ctx.lineWidth = Math.max(2, drawCfg.wall * 1.6);
+  ctx.strokeStyle = '#5dd6ff';
+  ctx.lineCap = 'round';
+  ctx.globalCompositeOperation = 'lighter';
+
+  function centerOfCell(id) {
+    const [r, c] = id.split(':').map(Number);
+    const count = ringCounts[r];
+    const theta = 2*Math.PI * (c + 0.5) / count;
+    const radius = r0 + (r + 0.5) * dr;
+    return [radius*Math.cos(theta), radius*Math.sin(theta)];
+  }
+
+  ctx.beginPath();
+  const [x0, y0] = centerOfCell(path[0]);
+  ctx.moveTo(x0, y0);
+  for (let i = 1; i < path.length; i++) {
+    const [x, y] = centerOfCell(path[i]);
+    ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Wire UI
+(function main(){
+  const el = id => document.getElementById(id);
+  const rings = el('rings');
+  const baseCells = el('baseCells');
+  const wall = el('wall');
+  const size = el('size');
+  const core = el('core');
+  const equalize = el('equalize');
+  const seed = el('seed');
+  const bias = el('bias');
+  const braid = el('braid');
+  const color = el('color');
+  const bg = el('bg');
+  const showGrid = el('showGrid');
+  const entrRing = el('entrRing');
+  const exitRing = el('exitRing');
+  const exitArc = el('exitArc');
+
+  const seedEcho = el('seedEcho');
+  const cellEcho = el('cellEcho');
+  const edgeEcho = el('edgeEcho');
+
+  const cvs = el('maze');
+  const ctx = cvs.getContext('2d');
+  let lastMaze = null;
+  let lastDrawCfg = null;
+  let lastPath = null;
+
+  function makeRNG() {
+    let s = seed.value.trim();
+    if (s === '' || s.toLowerCase() === 'auto') s = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    seedEcho.textContent = s;
+    return XorShift32(hash32(s));
+  }
+  function buildCfg() {
+    const ringsVal = Math.max(3, Number(rings.value)|0);
+    const baseVal  = Math.max(3, Number(baseCells.value)|0);
+    const sz = Math.max(200, Math.min(2400, Number(size.value)|0));
+    const wl = Math.max(1, Math.min(20, Number(wall.value)|0));
+    const corePct = Math.max(0, Math.min(25, Number(core.value)|0));
+
+    const rng = makeRNG();
+    const cfg = {
+      rings: ringsVal,
+      baseCells: baseVal,
+      equalize: equalize.value,
+      rng,
+      bias: bias.value,
+      braid: braid.checked
+    };
+    cvs.width = sz; cvs.height = sz;
+    lastDrawCfg = {
+      size: sz,
+      wall: wl,
+      color: color.value,
+      bg: bg.value,
+      showGrid: showGrid.checked,
+      corePct
+    };
+    return cfg;
+  }
+
+  function countCellsEdges(grid) {
+    const cells = grid.cells.size;
+    let edges = 0;
+    for (const cell of grid.cells.values()) edges += cell.links.size;
+    return { cells, edges: edges/2 };
+  }
+
+  function regenerate() {
+    lastPath = null;
+    const cfg = buildCfg();
+    lastMaze = generateMaze(cfg);
+    const stats = countCellsEdges(lastMaze.grid);
+    cellEcho.textContent = stats.cells.toString();
+    edgeEcho.textContent = stats.edges.toString();
+    
+    // Update max values for inputs based on new maze structure
+    const maxRings = cfg.rings;
+    exitRing.max = String(maxRings);
+    entrRing.max = String(maxRings);
+
+    // Clamp current values if they exceed the new max
+    if (Number(exitRing.value) > maxRings) exitRing.value = String(maxRings);
+    if (Number(entrRing.value) > maxRings) entrRing.value = String(maxRings);
+    
+    // Update max value for exitArc
+    const exitR = Math.min(maxRings, Number(exitRing.value));
+    const ringCount = lastMaze.grid.ringCounts[exitR];
+    if (ringCount) {
+      exitArc.max = String(ringCount - 1);
+      if (Number(exitArc.value) >= ringCount) exitArc.value = '0';
+    }
+
+    drawMaze(ctx, lastMaze, lastDrawCfg);
+  }
+
+  function solve() {
+    if (!lastMaze) return;
+    // choose entrance and exit cells
+    const ringCounts = lastMaze.grid.ringCounts;
+    const maxRings = ringCounts.length - 1;
+
+    // Validate and set entrance ring
+    const erVal = Number(entrRing.value)|0;
+    const er = Math.max(0, Math.min(maxRings, erVal));
+    entrRing.value = String(er);
+
+    // Validate and set exit ring
+    const xrVal = Number(exitRing.value)|0;
+    const xr = Math.max(1, Math.min(maxRings, xrVal)); 
+    exitRing.value = String(xr);
+
+    // Validate and set exit arc index
+    const ringCountAtExit = ringCounts[xr];
+    exitArc.max = String(ringCountAtExit - 1);
+    const xcVal = Number(exitArc.value)|0;
+    const xc = ((xcVal % ringCountAtExit) + ringCountAtExit) % ringCountAtExit;
+    exitArc.value = String(xc);
+
+    // Entrance defaults to cell 0 of its ring.
+    const startId = `${er}:0`;
+    const endId = `${xr}:${xc}`;
+    lastPath = solveMaze(lastMaze, startId, endId);
+    drawMaze(ctx, lastMaze, lastDrawCfg);
+    drawSolution(ctx, lastMaze, lastDrawCfg, lastPath);
+  }
+
+  function clearSolution() {
+    if (!lastMaze) return;
+    lastPath = null;
+    drawMaze(ctx, lastMaze, lastDrawCfg);
+  }
+
+  function exportPNG() {
+    if (!lastMaze) regenerate();
+    const link = document.createElement('a');
+    link.download = `circular-maze-${Date.now()}.png`;
+    link.href = cvs.toDataURL('image/png');
+    link.click();
+  }
+
+  function copyJSON() {
+    if (!lastMaze) return;
+    const payload = {
+      ringCounts: lastMaze.grid.ringCounts,
+      links: Array.from(lastMaze.grid.cells.values()).map(c => ({ id: c.id(), links: Array.from(c.links) }))
+    };
+    const text = JSON.stringify(payload);
+    navigator.clipboard.writeText(text).then(() => {
+      // no toast; keep UI minimal
+    });
+  }
+
+  // Bindings
+  document.getElementById('btn-generate').addEventListener('click', regenerate);
+  document.getElementById('btn-randseed').addEventListener('click', () => { seed.value = 'auto'; regenerate(); });
+  document.getElementById('btn-solve').addEventListener('click', solve);
+  document.getElementById('btn-clear').addEventListener('click', clearSolution);
+  document.getElementById('btn-export').addEventListener('click', exportPNG);
+  document.getElementById('btn-copy-json').addEventListener('click', copyJSON);
+  exitRing.addEventListener('change', () => {
+    if (!lastMaze) return;
+    const ringCount = lastMaze.grid.ringCounts[Number(exitRing.value)];
+    if (ringCount) exitArc.max = String(ringCount - 1);
+    if (Number(exitArc.value) >= ringCount) exitArc.value = '0';
+  });
+
+  // Auto-generate on load
+  regenerate();
+})();
 </script>
 </body>
 </html>
