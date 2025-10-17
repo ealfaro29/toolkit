@@ -110,7 +110,6 @@
         max-width: 90vw;
         max-height: 90vh;
     }
-    /* NUEVOS ESTILOS PARA LA GALERÍA SIMPLE */
     #photo-container {
       position: relative;
       display: flex;
@@ -118,14 +117,13 @@
       justify-content: center;
       width: 100%;
       height: 100%;
-      max-width: 700px; /* Ancho máximo para que se vea bien */
+      max-width: 700px;
       margin: 0 auto;
     }
     #photo-container .photo-slide {
       position: absolute;
       width: 100%;
       max-width: 100%;
-      /* Usamos display: none / flex para el control simple de visibilidad */
       display: none; 
       flex-direction: column;
       align-items: center;
@@ -134,14 +132,14 @@
       padding-top: 20px;
     }
     #photo-container .photo-slide.active {
-      display: flex; /* Muestra solo la imagen activa */
+      display: flex;
     }
     #photo-container img {
       max-height: 65vh;
       object-fit: contain;
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      max-width: 95%; /* Ajuste de tamaño para móviles */
+      max-width: 95%;
     }
     .nav-btn {
       position: absolute;
@@ -322,10 +320,12 @@
       let musicTabInitialized = false;
       let timeConverterInitialized = false;
       let avatarTabInitialized = false;
+      let photosModalInitialized = false;
       
       let allFacebaseItems = [];
       let allAvatarItems = [];
       let allMusicCodes = [];
+      let downloadablePhotos = [];
       
       passwordInput.value = '';
 
@@ -333,7 +333,8 @@
         if (!facebasesTabInitialized) initializeFacebasesTab();
         if (!musicTabInitialized) initializeMusicTab();
         if (!timeConverterInitialized) initializeTimeConverter();
-        if (!avatarTabInitialized) initializeAvatarTab(); // Initialize avatar tab data
+        if (!avatarTabInitialized) initializeAvatarTab();
+        if (!photosModalInitialized) initializePhotosModal();
       };
 
       const checkAuthentication = () => {
@@ -424,7 +425,6 @@
         });
       });
       
-      // Generic function to parse item names
       const parseItemName = (basename, pathPrefix) => {
           const name = basename.replace(/\.png$/,'');
           const lastUnderscore = name.lastIndexOf('_');
@@ -490,10 +490,13 @@
       function initializeFacebasesTab() {
         if (facebasesTabInitialized) return;
         facebasesTabInitialized = true;
-        const imageBasenames = ['Italy-Purple_133032969154063', 'Italy-Clean_116626528835377', 'Italy-Pink_80018469234096','India-Natural_128586628387033', 'India-Green_89459981542643', 'India-Drag_105955462028585', 'India-Cyan_84991426964751', 'India-Clean_129924320013385', 'India-Bindi_116471445261411', 'Brazil-Smokey_87998683947973', 'Brazil-Green_133933500490066', 'Brazil-Cyan_93898667008722','Brazil-Putana_131247169320314','Brazil-Peacock_99890684900396','Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463','Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','Brazil-Earth_130516089719062','Brazil-Carnaval_125408725754854','Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295'];
-        
-        allFacebaseItems = imageBasenames.map(basename => parseItemName(basename, 'photos/facebases'));
-        renderFacebasesGallery(allFacebaseItems);
+        fetch('photos/facebases/facebases.json')
+          .then(response => response.ok ? response.json() : [])
+          .then(imageBasenames => {
+            allFacebaseItems = imageBasenames.map(basename => parseItemName(basename, 'photos/facebases'));
+            renderFacebasesGallery(allFacebaseItems);
+          })
+          .catch(error => console.error('Error loading facebases:', error));
       }
       
       // --- Avatar Tab Logic ---
@@ -534,7 +537,6 @@
           });
           galleryContainer.innerHTML = galleryHTML;
 
-          // Initialize Swiper for the newly created carousels
           document.querySelectorAll('#avatar-gallery-container .swiper').forEach(el => new Swiper(el, {
               slidesPerView: 'auto',
               spaceBetween: 16,
@@ -549,18 +551,14 @@
       function initializeAvatarTab() {
           if (avatarTabInitialized) return;
           avatarTabInitialized = true;
-          
-          const avatarBasenames = [
-              'Hair-Nicki SL Black_14507337010',
-              'Hair-Nicki SL Blonde_14507259815',
-              'Hair-Nicki SL Brunette_14507761707',
-              'Chest-Boobs code_11259731773'
-          ];
-          
-          allAvatarItems = avatarBasenames.map(basename => parseItemName(basename, 'photos/items'));
-          renderAvatarGallery(allAvatarItems);
+          fetch('photos/items/items.json')
+            .then(response => response.ok ? response.json() : [])
+            .then(avatarBasenames => {
+                allAvatarItems = avatarBasenames.map(basename => parseItemName(basename, 'photos/items'));
+                renderAvatarGallery(allAvatarItems);
+            })
+            .catch(error => console.error('Error loading avatar items:', error));
       }
-
 
       // --- Music Tab Logic ---
       function initializeMusicTab() {
@@ -664,13 +662,20 @@
       const prevPhotoBtn = document.getElementById('prevPhotoBtn');
       const nextPhotoBtn = document.getElementById('nextPhotoBtn');
       let currentPhotoIndex = 0;
-      const downloadablePhotos = [
-          { src: 'photos/modal/UK.png', filename: 'UK.png', title: 'UK Collection' },
-          { src: 'photos/modal/Brazil.png', filename: 'Brazil.png', title: 'Brazil Collection' }
-      ];
+
+      function initializePhotosModal() {
+        if (photosModalInitialized) return;
+        photosModalInitialized = true;
+        fetch('photos/modal/modal_photos.json')
+            .then(response => response.ok ? response.json() : [])
+            .then(photos => {
+                downloadablePhotos = photos;
+            })
+            .catch(error => console.error('Error loading modal photos:', error));
+      }
 
       function renderSimpleGallery() {
-          if (!photoContainer) return;
+          if (!photoContainer || downloadablePhotos.length === 0) return;
           const slidesHTML = downloadablePhotos.map((photo, index) => `
               <div id="slide-${index}" class="photo-slide">
                   <h3 class="text-xl font-semibold text-zinc-100 mb-4">${photo.title}</h3>
