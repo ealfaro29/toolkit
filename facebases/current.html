@@ -670,9 +670,11 @@
                 return placeholder;
             }
 
+            // A list of API endpoints to try in order
             const urlsToTry = [
                 `https://www.theaudiodb.com/api/v1/json/2/searchtrack.php?s=${encodeURIComponent(artist)}&t=${encodeURIComponent(title)}`,
-                `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(title)}`
+                `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(title)}`,
+                 `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artist + " " + title)}`
             ];
 
             let imageUrl = placeholder;
@@ -682,18 +684,19 @@
                     const response = await fetch(url);
                     if (response.ok) {
                         const text = await response.text();
-                        if (text) { // API can return empty string if not found
+                        if (text) {
                             const data = JSON.parse(text);
-                            const track = data.track ? data.track[0] : null;
+                            // The API returns different structures for 'searchtrack' and 'search'
+                            const track = data.track ? data.track[0] : (data.tracks ? data.tracks[0] : null);
                             if (track && track.strTrackThumb) {
                                 imageUrl = track.strTrackThumb + '/small';
-                                break; // Found it, no need to try other URLs
+                                break; // Success, exit the loop
                             }
                         }
                     }
                 } catch (error) {
                     console.error(`Error fetching from ${url}:`, error);
-                    // Continue to the next URL
+                    // This error is expected if the fetch is blocked, continue to next try
                 }
             }
             
