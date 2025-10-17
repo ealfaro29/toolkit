@@ -655,26 +655,23 @@
           }
       };
       
-      const musicImageCache = new Map();
-
         const fetchMusicImage = async (artist, title) => {
-            const cacheKey = `${artist}-${title}`;
-            if (musicImageCache.has(cacheKey)) {
-                return musicImageCache.get(cacheKey);
+            const cacheKey = `music_cover_${artist}_${title}`;
+            const cachedUrl = localStorage.getItem(cacheKey);
+            if (cachedUrl) {
+                return cachedUrl;
             }
 
             const placeholder = 'photos/app/music.jpg';
 
             if (!artist || artist.toLowerCase() === 'varios' || !title) {
-                musicImageCache.set(cacheKey, placeholder);
                 return placeholder;
             }
-
-            // A list of API endpoints to try in order
+            
+            const proxy = 'https://corsproxy.io/?';
             const urlsToTry = [
-                `https://www.theaudiodb.com/api/v1/json/2/searchtrack.php?s=${encodeURIComponent(artist)}&t=${encodeURIComponent(title)}`,
-                `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(title)}`,
-                 `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artist + " " + title)}`
+                `${proxy}https://www.theaudiodb.com/api/v1/json/2/searchtrack.php?s=${encodeURIComponent(artist)}&t=${encodeURIComponent(title)}`,
+                `${proxy}https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(title)}`
             ];
 
             let imageUrl = placeholder;
@@ -686,21 +683,19 @@
                         const text = await response.text();
                         if (text) {
                             const data = JSON.parse(text);
-                            // The API returns different structures for 'searchtrack' and 'search'
                             const track = data.track ? data.track[0] : (data.tracks ? data.tracks[0] : null);
                             if (track && track.strTrackThumb) {
                                 imageUrl = track.strTrackThumb + '/small';
-                                break; // Success, exit the loop
+                                break; 
                             }
                         }
                     }
                 } catch (error) {
                     console.error(`Error fetching from ${url}:`, error);
-                    // This error is expected if the fetch is blocked, continue to next try
                 }
             }
             
-            musicImageCache.set(cacheKey, imageUrl);
+            localStorage.setItem(cacheKey, imageUrl);
             return imageUrl;
         };
 
