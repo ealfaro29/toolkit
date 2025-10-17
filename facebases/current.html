@@ -666,7 +666,7 @@
       function initializePhotosModal() {
         if (photosModalInitialized) return;
         photosModalInitialized = true;
-        fetch('photos/modal/modal_photos.json')
+        fetch('photos/modal/modal.json')
             .then(response => response.ok ? response.json() : [])
             .then(photos => {
                 downloadablePhotos = photos;
