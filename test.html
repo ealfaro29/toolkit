@@ -5,16 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Circular Maze Creator</title>
   <style>
-    /*
-     * CSS EXTREMADAMENTE SIMPLIFICADO:
-     * Se han eliminado todos los degradados (linear-gradient, radial-gradient)
-     * para satisfacer el linter estricto y evitar errores de sintaxis.
-     */
+    /* * SE ELIMINAN TODOS LOS ESTILOS INLINE Y SE REEMPLAZAN CON CLASES SIMPLES.
+     * Los estilos grid/flex se mantienen aquí para evitar que el linter los rompa en línea.
+     */
 
     html, body { height: 100%; }
-    body {
+    
+    body {
       margin: 0;
-      /* Fondo simple y sólido */
       background: #0b0f14; 
       color: #e6edf3;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
@@ -35,9 +33,11 @@
       letter-spacing: 0.4px;
       font-weight: 650;
     }
+    
+    /* Estilos de Controles y Grid Containers */
     .controls {
       margin: 0 16px 0 16px;
-      background: #111720; /* Color de panel sólido */
+      background: #111720; 
       border: 1px solid #1e2733;
       border-radius: 14px;
       padding: 12px;
@@ -45,6 +45,24 @@
       grid-template-columns: repeat(6, minmax(120px, 1fr));
       gap: 10px;
     }
+    .canvas-wrap {
+      margin: 4px 16px 16px;
+      background: #0b0f14; 
+      border: 1px solid #1b2533;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      min-height: 420px;
+    }
+    .row { 
+      display: flex; 
+      gap: 8px; 
+      flex-wrap: wrap; 
+    }
+    .grow { flex: 1; }
+    
+    /* Estilos de Fieldset y Labels */
     fieldset {
       border: 1px solid #223142;
       border-radius: 12px;
@@ -75,8 +93,9 @@
       width: 100%;
     }
     input[type="checkbox"] { transform: translateY(1px); }
+
+    /* Estilos de Botones */
     button {
-      /* Fondo de botón sólido simple */
       background: #172433; 
       color: #e6edf3; 
       border: 1px solid #2a3b52;
@@ -87,25 +106,16 @@
     }
     button:hover { border-color: #355176; }
     button.primary { 
-      background: #1a2b3d; /* Tono primario sólido */
+      background: #1a2b3d; 
       border-color: #3a5e87; 
     }
     button.accent { 
-      background: #0b2330; /* Tono acento sólido */
+      background: #0b2330; 
       border-color: #147da1; 
       color: #5dd6ff; 
     }
-    .canvas-wrap {
-      margin: 4px 16px 16px;
-      /* Fondo de canvas simple y sólido */
-      background: #0b0f14; 
-      border: 1px solid #1b2533;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      padding: 16px;
-      min-height: 420px;
-    }
+    
+    /* Estilos de Canvas y Footer */
     canvas { 
       width: 100%; 
       height: 100%; 
@@ -123,12 +133,6 @@
       gap: 8px;
       align-items: center;
     }
-    .row { 
-      display: flex; 
-      gap: 8px; 
-      flex-wrap: wrap; 
-    }
-    .grow { flex: 1; }
     .hint { 
       color: #9fb2c3; 
       font-size: 12px; 
@@ -147,10 +151,10 @@
     <h1>Circular Maze Creator</h1>
     <div class="row">
       <button id="btn-generate" class="primary">Generate</button>
-      <button id="btn-randseed" title="Randomize seed">New Seed</button>
-      <button id="btn-solve" title="Show a shortest path solution">Solve</button>
-      <button id="btn-clear" title="Clear solution">Clear</button>
-      <button id="btn-export" class="accent" title="Download PNG">Export PNG</button>
+      <button id="btn-randseed">New Seed</button>
+      <button id="btn-solve">Solve</button>
+      <button id="btn-clear">Clear</button>
+      <button id="btn-export" class="accent">Export PNG</button>
     </div>
   </header>
 
