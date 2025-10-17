@@ -289,16 +289,83 @@
           <div id="content-music" class="tab-content absolute inset-0 hidden scrollable-content">
               <div id="music-results-container" class="pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
           </div>
-          <div id="content-avatar" class="tab-content absolute inset-0 hidden">
-              <div class="h-full flex flex-col items-center justify-center text-center text-zinc-500 p-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-4" viewBox="0 0 16 16"><path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/></svg>
-                <h3 class="text-xl font-semibold text-zinc-300">Coming Soon</h3>
-                <p>The Avatar collection will be available here.</p>
-              </div>
+          <div id="content-avatar" class="tab-content absolute inset-0 hidden scrollable-content">
+            <div id="avatar-gallery-container" class="flex flex-col gap-8 pr-2">
+              <section class="country-row">
+                <div class="flex items-center gap-3 mb-4">
+                  <h2 class="text-2xl font-bold title-fancy gold-title">Hair</h2>
+                </div>
+                <div class="swiper relative">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">Nicki SL Black</div>
+                        <img src="photos/items/Hair-Nicki SL Black_14507337010.png" alt="Nicki SL Black" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                        <div class="flex items-center gap-1.5 p-1">
+                          <input readonly type="text" value="14507337010" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"></path><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"></path></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="swiper-slide">
+                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">Nicki SL Blonde</div>
+                        <img src="photos/items/Hair-Nicki SL Blonde_14507259815.png" alt="Nicki SL Blonde" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                        <div class="flex items-center gap-1.5 p-1">
+                          <input readonly type="text" value="14507259815" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"></path><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"></path></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="swiper-slide">
+                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">Nicki SL Brunette</div>
+                        <img src="photos/items/Hair-Nicki SL Brunette_14507761707.png" alt="Nicki SL Brunette" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                        <div class="flex items-center gap-1.5 p-1">
+                          <input readonly type="text" value="14507761707" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"></path><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"></path></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="swiper-button-prev"></div>
+                  <div class="swiper-button-next"></div>
+                </div>
+              </section>
+              <section class="country-row">
+                <div class="flex items-center gap-3 mb-4">
+                  <h2 class="text-2xl font-bold title-fancy gold-title">Chest</h2>
+                </div>
+                <div class="swiper relative">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">Boobs code</div>
+                        <img src="photos/items/Chest-Boobs code_11259731773.png" alt="Boobs code" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                        <div class="flex items-center gap-1.5 p-1">
+                          <input readonly type="text" value="11259731773" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"></path><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"></path></svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="swiper-button-prev"></div>
+                  <div class="swiper-button-next"></div>
+                </div>
+              </section>
+            </div>
           </div>
           <div id="content-other" class="tab-content absolute inset-0 hidden">
               <div class="h-full flex flex-col items-center justify-center text-center text-zinc-500 p-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-4" viewBox="0 0 16 16"><path d="M9.405 1.05c.412-1.4.786-2.532 1.14-3.464.354-.933.648-1.768.868-2.52C11.595 2.296 11.838 3 12 3c.162 0 .405-.704.587-1.448.22-.932.514-1.767.868-2.52.354.932.728 2.064 1.14 3.464.412 1.4.638 2.57.638 3.585 0 1.83-1.076 3.215-2.88 3.215-1.045 0-1.748-.6-2.21-1.168-.462-.567-.822-1.353-1.06-2.212-.238-.86-.36-1.755-.36-2.658 0-1.015.226-2.185.638-3.585zM8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="mb-4" viewBox="0 0 16 16"><path d="M9.405 1.05c.412-1.4.786-2.532 1.14-3.464.354-.933.648-1.768.868-2.52C11.595 2.296 11.838 3 12 3c.162 0 .405-.704.587-1.448.22-.932.514-1.767.868-2.52.354.932.728 2.064 1.14 3.464.412 1.4.638 2.57.638 3.585 0 1.83-1.076 3.215-2.88 3.215-1.045 0-1.748-.6-2.21-1.168-.462-.567-.822-1.353-1.06-2.212-.238-.86-.36-1.755-.36-2.658 0-1.015.226-2.185.638-3.585zM8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"></path></svg>
                 <h3 class="text-xl font-semibold text-zinc-300">Coming Soon</h3>
                 <p>Other resources will be available here.</p>
               </div>
@@ -324,6 +391,7 @@
       let galleryInitialized = false;
       let musicTabInitialized = false;
       let timeConverterInitialized = false;
+      let avatarTabInitialized = false;
       let allItems = []; 
       let allMusicCodes = [];
       
@@ -405,6 +473,13 @@
           contentAreas.forEach(area => area.classList.toggle('hidden', area.id !== `content-${target}`));
           updateSearchUI(target);
           searchBar.dispatchEvent(new Event('input')); 
+          if (target === 'avatar' && !avatarTabInitialized) {
+            document.querySelectorAll('#avatar-gallery-container .swiper').forEach(el => new Swiper(el, {
+              slidesPerView: 'auto', spaceBetween: 16, grabCursor: true,
+              navigation: { nextEl: el.querySelector('.swiper-button-next'), prevEl: el.querySelector('.swiper-button-prev'), },
+            }));
+            avatarTabInitialized = true;
+          }
         });
       });
 
