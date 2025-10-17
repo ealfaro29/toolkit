@@ -3,7 +3,7 @@
     "id": "1836798379",
     "artist": "Varios",
     "title": "Runway Upbeat",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "markers": [
       "No Pitch"
     ]
@@ -12,7 +12,7 @@
     "id": "1839744423",
     "artist": "Varios",
     "title": "Fashion Show",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "markers": [
       "No Pitch"
     ]
@@ -21,7 +21,7 @@
     "id": "1845341094",
     "artist": "Varios",
     "title": "Chill Jazz",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch"
     ]
@@ -30,7 +30,7 @@
     "id": "14145620056",
     "artist": "Varios",
     "title": "The Final Phonk:",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch"
     ]
@@ -39,7 +39,7 @@
     "id": "1837324424",
     "artist": "Varios",
     "title": "Stepping Up",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch"
     ]
@@ -48,7 +48,7 @@
     "id": "1835389714",
     "artist": "Varios",
     "title": "Replay",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch"
     ]
@@ -57,7 +57,7 @@
     "id": "1841296623",
     "artist": "Varios",
     "title": "On The Runway",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "markers": [
       "No Pitch"
     ]
@@ -66,7 +66,7 @@
     "id": "1838738815",
     "artist": "Varios",
     "title": "To The Top",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "Fast Song",
       "No Pitch"
@@ -76,7 +76,7 @@
     "id": "109780003032306",
     "artist": "Varios",
     "title": "The Pageant",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "markers": [
       "Fast Song",
       "No Pitch"
@@ -86,8 +86,8 @@
     "id": "98848011482473",
     "artist": "Kesha",
     "title": "Blah Blah Blah (Instrumental)",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Pop Hits",
+    "pitch": 1,
     "markers": [
       "Fast Song"
     ]
@@ -96,7 +96,7 @@
     "id": "124637792778996",
     "artist": "Bea and her business",
     "title": "Born To Be Alive (Sped Up)",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "pitch": 0.5,
     "markers": [
       "Slow Song"
@@ -106,7 +106,7 @@
     "id": "100355291771628",
     "artist": "Heidi Montag",
     "title": "I’ll do it (Instrumental)",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "pitch": 0.7,
     "markers": [
       "Fast Song"
@@ -116,7 +116,7 @@
     "id": "77513267073556",
     "artist": "Taylor Swift",
     "title": "Blank Space",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "pitch": 0.4,
     "markers": [
       "Fast Song"
@@ -126,7 +126,7 @@
     "id": "99614593049603",
     "artist": "Marlo Mortel",
     "title": "Bed Weather MUPH 25",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "pitch": 0.6,
     "markers": [
       "Slow Song"
@@ -136,8 +136,8 @@
     "id": "89305847919001",
     "artist": "Varios",
     "title": "Mabuhay 2025 Remix",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "World & Cultural",
+    "pitch": 1,
     "markers": [
       "Fast Song"
     ]
@@ -146,8 +146,8 @@
     "id": "137212150142512",
     "artist": "Varios",
     "title": "Margarita MUPH 25",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Runway & Pageant",
+    "pitch": 1,
     "markers": [
       "Fast Song"
     ]
@@ -156,8 +156,8 @@
     "id": "81292138008704",
     "artist": "Morissette",
     "title": "Power",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Pop Hits",
+    "pitch": 1,
     "markers": [
       "Slow Song"
     ]
@@ -166,7 +166,7 @@
     "id": "111808332502903",
     "artist": "Ariana Grande & Britney Spears",
     "title": "Step On Up x Gimme More",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -176,7 +176,7 @@
     "id": "131686879014251",
     "artist": "Jimmy James",
     "title": "Fashionista",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -186,7 +186,7 @@
     "id": "84000542252565",
     "artist": "Varios",
     "title": "Miss Universe 2016 Swimsuit (Sped Up)",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "pitch": 0.45,
     "markers": [
       "Slow Song"
@@ -196,7 +196,7 @@
     "id": "134200057750707",
     "artist": "Pentatonix",
     "title": "Miss Universe 2020 Swimsuit (Sped Up)",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -206,8 +206,8 @@
     "id": "87457967528518",
     "artist": "Varios",
     "title": "MUPH 2022 Evening Gown (Stay)",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Runway & Pageant",
+    "pitch": 1,
     "markers": [
       "Fast Song"
     ]
@@ -216,7 +216,7 @@
     "id": "98543173771309",
     "artist": "Varios",
     "title": "Miss Universe 2021 Swimsuit - Wave Your Flag",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -226,7 +226,7 @@
     "id": "89754456203585",
     "artist": "Varios",
     "title": "Miss Universe 2021 Swimsuit - Girls Gotta Do",
-    "category": "Custom Playlist",
+    "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -236,8 +236,8 @@
     "id": "82371518139043",
     "artist": "Varios",
     "title": "Main Theme Version - The Colors of Siam",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "World & Cultural",
+    "pitch": 1,
     "markers": [
       "Slow Song"
     ]
@@ -246,8 +246,8 @@
     "id": "74621780800677",
     "artist": "Michelle Dee",
     "title": "REYNA",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Runway & Pageant",
+    "pitch": 1,
     "markers": [
       "Fast Song"
     ]
@@ -256,8 +256,8 @@
     "id": "76776134066462",
     "artist": "James Reid",
     "title": "Love The Chase MUPH 2025",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Runway & Pageant",
+    "pitch": 1,
     "markers": [
       "Slow Song"
     ]
@@ -266,8 +266,8 @@
     "id": "127216545599200",
     "artist": "Varios",
     "title": "Miss Universe 2023 (Hola Universe) - Opening",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Runway & Pageant",
+    "pitch": 1,
     "markers": [
       "Fast Song"
     ]
@@ -276,7 +276,7 @@
     "id": "93086066381057",
     "artist": "Marina Summers",
     "title": "AMAFILIPINA",
-    "category": "Custom Playlist",
+    "category": "World & Cultural",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -286,7 +286,7 @@
     "id": "136474486170827",
     "artist": "Bruno Mars (ft. Cardi B)",
     "title": "Finesse",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "pitch": 0.4,
     "markers": [
       "Fast Song"
@@ -296,7 +296,7 @@
     "id": "76825576643483",
     "artist": "RuPaul",
     "title": "A.S.M.R Lover",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -306,7 +306,7 @@
     "id": "77612372586778",
     "artist": "Bellini",
     "title": "Samba do Brasil",
-    "category": "Custom Playlist",
+    "category": "World & Cultural",
     "pitch": 0.5,
     "markers": [
       "Fast Song"
@@ -316,7 +316,7 @@
     "id": "98092058574709",
     "artist": "Rupaul",
     "title": "Call Me Mother",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -327,7 +327,7 @@
     "id": "102706852645421",
     "artist": "Varios",
     "title": "Money Talks",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -337,7 +337,7 @@
     "id": "137155874195108",
     "artist": "Steve Lacy",
     "title": "Infrunami",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -347,7 +347,7 @@
     "id": "5410082097",
     "artist": "Varios",
     "title": "Chasing Clouds",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -357,7 +357,7 @@
     "id": "18841888868",
     "artist": "Varios",
     "title": "Love Bomb",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -367,7 +367,7 @@
     "id": "133494497080026",
     "artist": "Varios",
     "title": "What Can I Do",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -377,7 +377,7 @@
     "id": "93958751571254",
     "artist": "Varios",
     "title": "So Clean",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -387,7 +387,7 @@
     "id": "1844009208",
     "artist": "Varios",
     "title": "DJ Turn the Music Up",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -397,7 +397,7 @@
     "id": "1838888359",
     "artist": "Varios",
     "title": "Rio de Jenario",
-    "category": "Custom Playlist",
+    "category": "World & Cultural",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -407,7 +407,7 @@
     "id": "108203142438071",
     "artist": "Nicki Minaj",
     "title": "What You Know Bout Me",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -418,7 +418,7 @@
     "id": "91937876330462",
     "artist": "Varios",
     "title": "Say It Right Remix",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -428,7 +428,7 @@
     "id": "96087734905777",
     "artist": "Lady Gaga",
     "title": "Private Audition",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -439,7 +439,7 @@
     "id": "113570463600924",
     "artist": "Lady Gaga",
     "title": "Heiress",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -449,7 +449,7 @@
     "id": "120393832814886",
     "artist": "Azealia Banks",
     "title": "Big Big Beat",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -460,8 +460,8 @@
     "id": "1836635034",
     "artist": "Varios",
     "title": "Gothic Castle",
-    "category": "Custom Playlist",
-    "pitch": 1.0,
+    "category": "Thematic & Mood",
+    "pitch": 1,
     "markers": [
       "No Pitch"
     ]
@@ -470,7 +470,7 @@
     "id": "75085821591389",
     "artist": "Varios",
     "title": "Club Classics x Guess",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -480,7 +480,7 @@
     "id": "121552917879310",
     "artist": "Sabrina Carpenter",
     "title": "Espresso",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -490,7 +490,7 @@
     "id": "35930009",
     "artist": "Varios",
     "title": "Monster Mash",
-    "category": "Custom Playlist",
+    "category": "Thematic & Mood",
     "markers": [
       "No Pitch"
     ]
@@ -499,7 +499,7 @@
     "id": "1841274964",
     "artist": "Varios",
     "title": "Halloween Funk",
-    "category": "Custom Playlist",
+    "category": "Thematic & Mood",
     "markers": [
       "No Pitch"
     ]
@@ -508,7 +508,7 @@
     "id": "71956674693421",
     "artist": "Varios",
     "title": "Spooky Scary Skeletons",
-    "category": "Custom Playlist",
+    "category": "Thematic & Mood",
     "markers": [
       "No Pitch"
     ]
@@ -517,7 +517,7 @@
     "id": "1845497774",
     "artist": "Varios",
     "title": "Into the Forest",
-    "category": "Custom Playlist",
+    "category": "Thematic & Mood",
     "markers": [
       "No Pitch"
     ]
@@ -526,7 +526,7 @@
     "id": "118457386765851",
     "artist": "Varios",
     "title": "Glitch",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -536,7 +536,7 @@
     "id": "136409279011083",
     "artist": "Varios",
     "title": "Golden Hour LoFi",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -546,7 +546,7 @@
     "id": "131148332622519",
     "artist": "Varios",
     "title": "I Watch The Moon",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -556,7 +556,7 @@
     "id": "86907345866772",
     "artist": "Varios",
     "title": "Stell",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -566,7 +566,7 @@
     "id": "6902400044",
     "artist": "Varios",
     "title": "Not Around",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -576,7 +576,7 @@
     "id": "82148953715595",
     "artist": "Varios",
     "title": "I Love Remix",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -586,7 +586,7 @@
     "id": "79507677596805",
     "artist": "Varios",
     "title": "Better Off Alone Remix",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -596,7 +596,7 @@
     "id": "115925172742147",
     "artist": "Varios",
     "title": "Moment After The Fall",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -606,7 +606,7 @@
     "id": "16831108393",
     "artist": "Blessed Mane",
     "title": "Death Is No More",
-    "category": "Custom Playlist",
+    "category": "Thematic & Mood",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -616,7 +616,7 @@
     "id": "89610760702249",
     "artist": "Varios",
     "title": "Stero Love Remix",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -626,7 +626,7 @@
     "id": "120885023497936",
     "artist": "Varios",
     "title": "Woman Remix",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -636,7 +636,7 @@
     "id": "104207837699519",
     "artist": "Varios",
     "title": "Tabola Bale Remix",
-    "category": "Custom Playlist",
+    "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -646,7 +646,7 @@
     "id": "120102995443063",
     "artist": "Varios",
     "title": "Stray",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -656,7 +656,7 @@
     "id": "1844282512",
     "artist": "Varios",
     "title": "Swan Lake",
-    "category": "Custom Playlist",
+    "category": "Thematic & Mood",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -666,7 +666,7 @@
     "id": "76760458012018",
     "artist": "Varios",
     "title": "Violet",
-    "category": "Custom Playlist",
+    "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
       "Slow Song"
@@ -676,7 +676,7 @@
     "id": "139218946376655",
     "artist": "Varios",
     "title": "Aw Yea",
-    "category": "Custom Playlist",
+    "category": "Upbeat & Energetic",
     "markers": [
       "No Pitch",
       "Fast Song"
@@ -686,7 +686,7 @@
     "id": "132643763204246",
     "artist": "Childish Gambino",
     "title": "Do Ya Like",
-    "category": "Custom Playlist",
+    "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"

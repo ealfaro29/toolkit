@@ -324,6 +324,7 @@
       let avatarTabInitialized = false;
       
       let allFacebaseItems = [];
+      let facebaseCategories = null; // <- Para guardar las categorías cargadas
       let allAvatarItems = [];
       let allMusicCodes = [];
       
@@ -333,7 +334,7 @@
         if (!facebasesTabInitialized) initializeFacebasesTab();
         if (!musicTabInitialized) initializeMusicTab();
         if (!timeConverterInitialized) initializeTimeConverter();
-        if (!avatarTabInitialized) initializeAvatarTab(); // Initialize avatar tab data
+        if (!avatarTabInitialized) initializeAvatarTab();
       };
 
       const checkAuthentication = () => {
@@ -442,44 +443,59 @@
       };
 
       // --- Facebases Tab Logic ---
-      function renderFacebasesGallery(itemsToRender) {
+      function renderFacebasesGallery(itemsToRender, categoriesData) {
         const galleryContainer = document.getElementById('gallery-container');
-        const countryCodeMap = { UK: 'gb', Albania: 'al', India: 'in', Brazil: 'br', Italy: 'it'};
-        const byCountry = itemsToRender.reduce((acc, it) => { (acc[it.group] ||= []).push(it); return acc; }, {});
-        const countries = Object.keys(byCountry).sort((a,b)=>{ if(a==='Drag') return 1; if(b==='Drag') return -1; return a.localeCompare(b); });
+        
+        const byGroup = itemsToRender.reduce((acc, it) => {
+            (acc[it.group] ||= []).push(it);
+            return acc;
+        }, {});
+
+        const allCategories = [...(categoriesData.countries || []), ...(categoriesData.others || [])];
         
         let galleryHTML = '';
-        countries.forEach(country => {
-          galleryHTML += `
-            <section class="country-row">
-              <div class="flex items-center gap-3 mb-4">
-                <img src="${country === 'Drag' ? 'photos/app/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`}" alt="${country} flag" class="flag-aesthetic">
-                <h2 class="text-2xl font-bold title-fancy gold-title">${country.replace(/([a-z])([A-Z])/g,'$1 $2')}</h2>
-              </div>
-              <div class="swiper relative">
-                <div class="swiper-wrapper">
-                  ${byCountry[country].map(it => `
-                    <div class="swiper-slide">
-                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
-                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">${it.displayName}</div>
-                        <img src="${it.src}" alt="${it.displayName}" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
-                        <div class="flex items-center gap-1.5 p-1">
-                          <input readonly type="text" value="${it.codeId || ''}" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
-                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
-                          </button>
+        allCategories.forEach(category => {
+            const itemsForCategory = byGroup[category.name];
+            
+            if (!itemsForCategory || itemsForCategory.length === 0) {
+                return; 
+            }
+
+            const flagSrc = category.iso 
+                ? `https://flagcdn.com/h80/${category.iso.toLowerCase()}.png`
+                : category.flag;
+
+            galleryHTML += `
+              <section class="country-row">
+                <div class="flex items-center gap-3 mb-4">
+                  <img src="${flagSrc}" alt="${category.name} flag" class="flag-aesthetic">
+                  <h2 class="text-2xl font-bold title-fancy gold-title">${category.name}</h2>
+                </div>
+                <div class="swiper relative">
+                  <div class="swiper-wrapper">
+                    ${itemsForCategory.map(it => `
+                      <div class="swiper-slide">
+                        <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                          <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">${it.displayName}</div>
+                          <img src="${it.src}" alt="${it.displayName}" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                          <div class="flex items-center gap-1.5 p-1">
+                            <input readonly type="text" value="${it.codeId || ''}" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                            <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  `).join('')}
+                    `).join('')}
+                  </div>
+                  <div class="swiper-button-prev"></div>
+                  <div class="swiper-button-next"></div>
                 </div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-              </div>
-            </section>
-          `;
+              </section>
+            `;
         });
-        galleryContainer.innerHTML = galleryHTML;
+        
+        galleryContainer.innerHTML = galleryHTML || `<p class="text-zinc-500 text-center col-span-full">No results found.</p>`;
         
         document.querySelectorAll('#gallery-container .swiper').forEach(el => new Swiper(el, { 
           slidesPerView: 'auto', spaceBetween: 16, grabCursor: true,
@@ -490,10 +506,18 @@
       function initializeFacebasesTab() {
         if (facebasesTabInitialized) return;
         facebasesTabInitialized = true;
-        const imageBasenames = ['Italy-Purple_133032969154063', 'Italy-Clean_116626528835377', 'Italy-Pink_80018469234096','India-Natural_128586628387033', 'India-Green_89459981542643', 'India-Drag_105955462028585', 'India-Cyan_84991426964751', 'India-Clean_129924320013385', 'India-Bindi_116471445261411', 'Brazil-Smokey_87998683947973', 'Brazil-Green_133933500490066', 'Brazil-Cyan_93898667008722','Brazil-Putana_131247169320314','Brazil-Peacock_99890684900396','Brazil-Red-Lips_72311140661924','Drag-ByPro_96702423214463','Albania-Clean_71573260575660','Albania-Pink_124837307393411','Albania-Red-Lips_102656913832746','Brazil-Earth_130516089719062','Brazil-Carnaval_125408725754854','Brazil-Emerald_114953748620757','India-Bronze_83588150632830','Brazil-Golden_117867012248972','UK-B&W_85642942689445','UK-Blue_128520402838099','UK-Clean_126355540174598','UK-Emerald_94551483806396','UK-Gradient_73716735189749','UK-Pink_105794887444435','UK-Purple-Lips_70410906023429','UK-Red-Lips_101953457592295'];
         
-        allFacebaseItems = imageBasenames.map(basename => parseItemName(basename, 'photos/facebases'));
-        renderFacebasesGallery(allFacebaseItems);
+        Promise.all([
+          fetch('photos/facebases/facebases.json').then(res => res.json()),
+          fetch('photos/facebases/categories.json').then(res => res.json())
+        ]).then(([imageBasenames, categoriesData]) => {
+          facebaseCategories = categoriesData;
+          allFacebaseItems = imageBasenames.map(basename => parseItemName(basename, 'photos/facebases'));
+          renderFacebasesGallery(allFacebaseItems, facebaseCategories);
+        }).catch(error => {
+          console.error("Failed to load facebase data:", error);
+          document.getElementById('gallery-container').innerHTML = `<p class="text-red-400 text-center">Error loading data. Check if JSON files are correct.</p>`;
+        });
       }
       
       // --- Avatar Tab Logic ---
@@ -534,7 +558,6 @@
           });
           galleryContainer.innerHTML = galleryHTML;
 
-          // Initialize Swiper for the newly created carousels
           document.querySelectorAll('#avatar-gallery-container .swiper').forEach(el => new Swiper(el, {
               slidesPerView: 'auto',
               spaceBetween: 16,
@@ -560,7 +583,6 @@
           allAvatarItems = avatarBasenames.map(basename => parseItemName(basename, 'photos/items'));
           renderAvatarGallery(allAvatarItems);
       }
-
 
       // --- Music Tab Logic ---
       function initializeMusicTab() {
@@ -613,7 +635,9 @@
                   item.group.toLowerCase().includes(searchTerm) || 
                   item.displayName.toLowerCase().includes(searchTerm)
               );
-              renderFacebasesGallery(filteredItems);
+              if (facebaseCategories) {
+                  renderFacebasesGallery(filteredItems, facebaseCategories);
+              }
           } else if (activeTab === 'avatar') {
               const filteredItems = (searchTerm === '') ? allAvatarItems : allAvatarItems.filter(item =>
                   item.group.toLowerCase().includes(searchTerm) ||
