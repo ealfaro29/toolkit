@@ -1,0 +1,30 @@
+{
+  "countries": [
+    {
+      "name": "Albania",
+      "iso": "AL"
+    },
+    {
+      "name": "Brazil",
+      "iso": "BR"
+    },
+    {
+      "name": "India",
+      "iso": "IN"
+    },
+    {
+      "name": "Italy",
+      "iso": "IT"
+    },
+    {
+      "name": "UK",
+      "iso": "GB"
+    }
+  ],
+  "others": [
+    {
+      "name": "Drag",
+      "flag": "photos/app/Drag.png"
+    }
+  ]
+}

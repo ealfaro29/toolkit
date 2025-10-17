@@ -110,6 +110,7 @@
         max-width: 90vw;
         max-height: 90vh;
     }
+    /* NUEVOS ESTILOS PARA LA GALERÍA SIMPLE */
     #photo-container {
       position: relative;
       display: flex;
@@ -117,13 +118,14 @@
       justify-content: center;
       width: 100%;
       height: 100%;
-      max-width: 700px;
+      max-width: 700px; /* Ancho máximo para que se vea bien */
       margin: 0 auto;
     }
     #photo-container .photo-slide {
       position: absolute;
       width: 100%;
       max-width: 100%;
+      /* Usamos display: none / flex para el control simple de visibilidad */
       display: none; 
       flex-direction: column;
       align-items: center;
@@ -132,14 +134,14 @@
       padding-top: 20px;
     }
     #photo-container .photo-slide.active {
-      display: flex;
+      display: flex; /* Muestra solo la imagen activa */
     }
     #photo-container img {
       max-height: 65vh;
       object-fit: contain;
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      max-width: 95%;
+      max-width: 95%; /* Ajuste de tamaño para móviles */
     }
     .nav-btn {
       position: absolute;
@@ -320,12 +322,11 @@
       let musicTabInitialized = false;
       let timeConverterInitialized = false;
       let avatarTabInitialized = false;
-      let photosModalInitialized = false;
       
       let allFacebaseItems = [];
+      let facebaseCategories = null; // <- Para guardar las categorías cargadas
       let allAvatarItems = [];
       let allMusicCodes = [];
-      let downloadablePhotos = [];
       
       passwordInput.value = '';
 
@@ -334,7 +335,6 @@
         if (!musicTabInitialized) initializeMusicTab();
         if (!timeConverterInitialized) initializeTimeConverter();
         if (!avatarTabInitialized) initializeAvatarTab();
-        if (!photosModalInitialized) initializePhotosModal();
       };
 
       const checkAuthentication = () => {
@@ -425,6 +425,7 @@
         });
       });
       
+      // Generic function to parse item names
       const parseItemName = (basename, pathPrefix) => {
           const name = basename.replace(/\.png$/,'');
           const lastUnderscore = name.lastIndexOf('_');
@@ -442,44 +443,59 @@
       };
 
       // --- Facebases Tab Logic ---
-      function renderFacebasesGallery(itemsToRender) {
+      function renderFacebasesGallery(itemsToRender, categoriesData) {
         const galleryContainer = document.getElementById('gallery-container');
-        const countryCodeMap = { UK: 'gb', Albania: 'al', India: 'in', Brazil: 'br', Italy: 'it'};
-        const byCountry = itemsToRender.reduce((acc, it) => { (acc[it.group] ||= []).push(it); return acc; }, {});
-        const countries = Object.keys(byCountry).sort((a,b)=>{ if(a==='Drag') return 1; if(b==='Drag') return -1; return a.localeCompare(b); });
+        
+        const byGroup = itemsToRender.reduce((acc, it) => {
+            (acc[it.group] ||= []).push(it);
+            return acc;
+        }, {});
+
+        const allCategories = [...(categoriesData.countries || []), ...(categoriesData.others || [])];
         
         let galleryHTML = '';
-        countries.forEach(country => {
-          galleryHTML += `
-            <section class="country-row">
-              <div class="flex items-center gap-3 mb-4">
-                <img src="${country === 'Drag' ? 'photos/app/drag-flag.png' : `https://flagcdn.com/h80/${countryCodeMap[country]}.png`}" alt="${country} flag" class="flag-aesthetic">
-                <h2 class="text-2xl font-bold title-fancy gold-title">${country.replace(/([a-z])([A-Z])/g,'$1 $2')}</h2>
-              </div>
-              <div class="swiper relative">
-                <div class="swiper-wrapper">
-                  ${byCountry[country].map(it => `
-                    <div class="swiper-slide">
-                      <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
-                        <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">${it.displayName}</div>
-                        <img src="${it.src}" alt="${it.displayName}" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
-                        <div class="flex items-center gap-1.5 p-1">
-                          <input readonly type="text" value="${it.codeId || ''}" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
-                          <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
-                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
-                          </button>
+        allCategories.forEach(category => {
+            const itemsForCategory = byGroup[category.name];
+            
+            if (!itemsForCategory || itemsForCategory.length === 0) {
+                return; 
+            }
+
+            const flagSrc = category.iso 
+                ? `https://flagcdn.com/h80/${category.iso.toLowerCase()}.png`
+                : category.flag;
+
+            galleryHTML += `
+              <section class="country-row">
+                <div class="flex items-center gap-3 mb-4">
+                  <img src="${flagSrc}" alt="${category.name} flag" class="flag-aesthetic">
+                  <h2 class="text-2xl font-bold title-fancy gold-title">${category.name}</h2>
+                </div>
+                <div class="swiper relative">
+                  <div class="swiper-wrapper">
+                    ${itemsForCategory.map(it => `
+                      <div class="swiper-slide">
+                        <div class="facebase-card bg-[#151722] rounded-xl shadow-xl ring-1 ring-[var(--border)] overflow-hidden flex flex-col p-1.5 space-y-1.5">
+                          <div class="text-xs text-zinc-200 font-medium px-1 text-center h-8 flex items-center justify-center">${it.displayName}</div>
+                          <img src="${it.src}" alt="${it.displayName}" loading="lazy" class="w-full h-auto object-cover aspect-square rounded-md">
+                          <div class="flex items-center gap-1.5 p-1">
+                            <input readonly type="text" value="${it.codeId || ''}" placeholder="…" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md">
+                            <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition">
+                              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  `).join('')}
+                    `).join('')}
+                  </div>
+                  <div class="swiper-button-prev"></div>
+                  <div class="swiper-button-next"></div>
                 </div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
-              </div>
-            </section>
-          `;
+              </section>
+            `;
         });
-        galleryContainer.innerHTML = galleryHTML;
+        
+        galleryContainer.innerHTML = galleryHTML || `<p class="text-zinc-500 text-center col-span-full">No results found.</p>`;
         
         document.querySelectorAll('#gallery-container .swiper').forEach(el => new Swiper(el, { 
           slidesPerView: 'auto', spaceBetween: 16, grabCursor: true,
@@ -490,13 +506,18 @@
       function initializeFacebasesTab() {
         if (facebasesTabInitialized) return;
         facebasesTabInitialized = true;
-        fetch('photos/facebases/facebases.json')
-          .then(response => response.ok ? response.json() : [])
-          .then(imageBasenames => {
-            allFacebaseItems = imageBasenames.map(basename => parseItemName(basename, 'photos/facebases'));
-            renderFacebasesGallery(allFacebaseItems);
-          })
-          .catch(error => console.error('Error loading facebases:', error));
+        
+        Promise.all([
+          fetch('photos/facebases/facebases.json').then(res => res.json()),
+          fetch('photos/facebases/categories.json').then(res => res.json())
+        ]).then(([imageBasenames, categoriesData]) => {
+          facebaseCategories = categoriesData;
+          allFacebaseItems = imageBasenames.map(basename => parseItemName(basename, 'photos/facebases'));
+          renderFacebasesGallery(allFacebaseItems, facebaseCategories);
+        }).catch(error => {
+          console.error("Failed to load facebase data:", error);
+          document.getElementById('gallery-container').innerHTML = `<p class="text-red-400 text-center">Error loading data. Check if JSON files are correct.</p>`;
+        });
       }
       
       // --- Avatar Tab Logic ---
@@ -551,13 +572,16 @@
       function initializeAvatarTab() {
           if (avatarTabInitialized) return;
           avatarTabInitialized = true;
-          fetch('photos/items/items.json')
-            .then(response => response.ok ? response.json() : [])
-            .then(avatarBasenames => {
-                allAvatarItems = avatarBasenames.map(basename => parseItemName(basename, 'photos/items'));
-                renderAvatarGallery(allAvatarItems);
-            })
-            .catch(error => console.error('Error loading avatar items:', error));
+          
+          const avatarBasenames = [
+              'Hair-Nicki SL Black_14507337010',
+              'Hair-Nicki SL Blonde_14507259815',
+              'Hair-Nicki SL Brunette_14507761707',
+              'Chest-Boobs code_11259731773'
+          ];
+          
+          allAvatarItems = avatarBasenames.map(basename => parseItemName(basename, 'photos/items'));
+          renderAvatarGallery(allAvatarItems);
       }
 
       // --- Music Tab Logic ---
@@ -611,7 +635,9 @@
                   item.group.toLowerCase().includes(searchTerm) || 
                   item.displayName.toLowerCase().includes(searchTerm)
               );
-              renderFacebasesGallery(filteredItems);
+              if (facebaseCategories) {
+                  renderFacebasesGallery(filteredItems, facebaseCategories);
+              }
           } else if (activeTab === 'avatar') {
               const filteredItems = (searchTerm === '') ? allAvatarItems : allAvatarItems.filter(item =>
                   item.group.toLowerCase().includes(searchTerm) ||
@@ -662,20 +688,13 @@
       const prevPhotoBtn = document.getElementById('prevPhotoBtn');
       const nextPhotoBtn = document.getElementById('nextPhotoBtn');
       let currentPhotoIndex = 0;
-
-      function initializePhotosModal() {
-        if (photosModalInitialized) return;
-        photosModalInitialized = true;
-        fetch('photos/modal/modal.json')
-            .then(response => response.ok ? response.json() : [])
-            .then(photos => {
-                downloadablePhotos = photos;
-            })
-            .catch(error => console.error('Error loading modal photos:', error));
-      }
+      const downloadablePhotos = [
+          { src: 'photos/modal/UK.png', filename: 'UK.png', title: 'UK Collection' },
+          { src: 'photos/modal/Brazil.png', filename: 'Brazil.png', title: 'Brazil Collection' }
+      ];
 
       function renderSimpleGallery() {
-          if (!photoContainer || downloadablePhotos.length === 0) return;
+          if (!photoContainer) return;
           const slidesHTML = downloadablePhotos.map((photo, index) => `
               <div id="slide-${index}" class="photo-slide">
                   <h3 class="text-xl font-semibold text-zinc-100 mb-4">${photo.title}</h3>
