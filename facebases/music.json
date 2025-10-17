@@ -1,7 +1,7 @@
 [
   {
     "id": "1836798379",
-    "artist": "Varios",
+    "artist": "Infraction",
     "title": "Runway Upbeat",
     "category": "Runway & Pageant",
     "markers": [
@@ -10,7 +10,7 @@
   },
   {
     "id": "1839744423",
-    "artist": "Varios",
+    "artist": "Infraction",
     "title": "Fashion Show",
     "category": "Runway & Pageant",
     "markers": [
@@ -19,7 +19,7 @@
   },
   {
     "id": "1845341094",
-    "artist": "Varios",
+    "artist": "MokkaMusic",
     "title": "Chill Jazz",
     "category": "Chill & LoFi",
     "markers": [
@@ -28,8 +28,8 @@
   },
   {
     "id": "14145620056",
-    "artist": "Varios",
-    "title": "The Final Phonk:",
+    "artist": "Dxrk",
+    "title": "The Final Phonk",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch"
@@ -37,7 +37,7 @@
   },
   {
     "id": "1837324424",
-    "artist": "Varios",
+    "artist": "LesFM",
     "title": "Stepping Up",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -46,7 +46,7 @@
   },
   {
     "id": "1835389714",
-    "artist": "Varios",
+    "artist": "Iyaz",
     "title": "Replay",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -55,7 +55,7 @@
   },
   {
     "id": "1841296623",
-    "artist": "Varios",
+    "artist": "Alexi Action",
     "title": "On The Runway",
     "category": "Runway & Pageant",
     "markers": [
@@ -64,7 +64,7 @@
   },
   {
     "id": "1838738815",
-    "artist": "Varios",
+    "artist": "Paesante",
     "title": "To The Top",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -74,7 +74,7 @@
   },
   {
     "id": "109780003032306",
-    "artist": "Varios",
+    "artist": "ABS-CBN Music",
     "title": "The Pageant",
     "category": "Runway & Pageant",
     "markers": [
@@ -94,8 +94,8 @@
   },
   {
     "id": "124637792778996",
-    "artist": "Bea and her business",
-    "title": "Born To Be Alive (Sped Up)",
+    "artist": "Bea and her Business",
+    "title": "Born To Be Alive",
     "category": "Electronic & Remixes",
     "pitch": 0.5,
     "markers": [
@@ -105,7 +105,7 @@
   {
     "id": "100355291771628",
     "artist": "Heidi Montag",
-    "title": "I’ll do it (Instrumental)",
+    "title": "I'll do it (Instrumental)",
     "category": "Pop Hits",
     "pitch": 0.7,
     "markers": [
@@ -125,7 +125,7 @@
   {
     "id": "99614593049603",
     "artist": "Marlo Mortel",
-    "title": "Bed Weather MUPH 25",
+    "title": "Bed Weather",
     "category": "Runway & Pageant",
     "pitch": 0.6,
     "markers": [
@@ -134,8 +134,8 @@
   },
   {
     "id": "89305847919001",
-    "artist": "Varios",
-    "title": "Mabuhay 2025 Remix",
+    "artist": "Gigi De Lana",
+    "title": "Mabuhay",
     "category": "World & Cultural",
     "pitch": 1,
     "markers": [
@@ -144,8 +144,8 @@
   },
   {
     "id": "137212150142512",
-    "artist": "Varios",
-    "title": "Margarita MUPH 25",
+    "artist": "BGYO",
+    "title": "Margarita",
     "category": "Runway & Pageant",
     "pitch": 1,
     "markers": [
@@ -184,8 +184,8 @@
   },
   {
     "id": "84000542252565",
-    "artist": "Varios",
-    "title": "Miss Universe 2016 Swimsuit (Sped Up)",
+    "artist": "The Black Eyed Peas",
+    "title": "Don't Stop the Party",
     "category": "Runway & Pageant",
     "pitch": 0.45,
     "markers": [
@@ -195,7 +195,7 @@
   {
     "id": "134200057750707",
     "artist": "Pentatonix",
-    "title": "Miss Universe 2020 Swimsuit (Sped Up)",
+    "title": "Higher",
     "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
@@ -204,8 +204,8 @@
   },
   {
     "id": "87457967528518",
-    "artist": "Varios",
-    "title": "MUPH 2022 Evening Gown (Stay)",
+    "artist": "Justin Bieber",
+    "title": "Stay",
     "category": "Runway & Pageant",
     "pitch": 1,
     "markers": [
@@ -214,8 +214,8 @@
   },
   {
     "id": "98543173771309",
-    "artist": "Varios",
-    "title": "Miss Universe 2021 Swimsuit - Wave Your Flag",
+    "artist": "Pitbull",
+    "title": "Wave Your Flag",
     "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
@@ -224,8 +224,8 @@
   },
   {
     "id": "89754456203585",
-    "artist": "Varios",
-    "title": "Miss Universe 2021 Swimsuit - Girls Gotta Do",
+    "artist": "Natti Natasha, Daddy Yankee, Jonas Brothers",
+    "title": "Runaway",
     "category": "Runway & Pageant",
     "pitch": 0.5,
     "markers": [
@@ -234,8 +234,8 @@
   },
   {
     "id": "82371518139043",
-    "artist": "Varios",
-    "title": "Main Theme Version - The Colors of Siam",
+    "artist": "Bangkok Philharmonic Orchestra",
+    "title": "The Colors of Siam",
     "category": "World & Cultural",
     "pitch": 1,
     "markers": [
@@ -255,7 +255,7 @@
   {
     "id": "76776134066462",
     "artist": "James Reid",
-    "title": "Love The Chase MUPH 2025",
+    "title": "Love The Chase",
     "category": "Runway & Pageant",
     "pitch": 1,
     "markers": [
@@ -264,8 +264,8 @@
   },
   {
     "id": "127216545599200",
-    "artist": "Varios",
-    "title": "Miss Universe 2023 (Hola Universe) - Opening",
+    "artist": "J Balvin",
+    "title": "Hola Universe",
     "category": "Runway & Pageant",
     "pitch": 1,
     "markers": [
@@ -284,7 +284,7 @@
   },
   {
     "id": "136474486170827",
-    "artist": "Bruno Mars (ft. Cardi B)",
+    "artist": "Bruno Mars ft. Cardi B",
     "title": "Finesse",
     "category": "Pop Hits",
     "pitch": 0.4,
@@ -305,7 +305,7 @@
   {
     "id": "77612372586778",
     "artist": "Bellini",
-    "title": "Samba do Brasil",
+    "title": "Samba De Janeiro",
     "category": "World & Cultural",
     "pitch": 0.5,
     "markers": [
@@ -314,7 +314,7 @@
   },
   {
     "id": "98092058574709",
-    "artist": "Rupaul",
+    "artist": "RuPaul",
     "title": "Call Me Mother",
     "category": "Pop Hits",
     "markers": [
@@ -325,7 +325,7 @@
   },
   {
     "id": "102706852645421",
-    "artist": "Varios",
+    "artist": "Paesante",
     "title": "Money Talks",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -345,7 +345,7 @@
   },
   {
     "id": "5410082097",
-    "artist": "Varios",
+    "artist": "LiQWYD",
     "title": "Chasing Clouds",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -355,7 +355,7 @@
   },
   {
     "id": "18841888868",
-    "artist": "Varios",
+    "artist": "Ramol",
     "title": "Love Bomb",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -365,7 +365,7 @@
   },
   {
     "id": "133494497080026",
-    "artist": "Varios",
+    "artist": "NEFFEX",
     "title": "What Can I Do",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -375,7 +375,7 @@
   },
   {
     "id": "93958751571254",
-    "artist": "Varios",
+    "artist": "Infraction",
     "title": "So Clean",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -385,7 +385,7 @@
   },
   {
     "id": "1844009208",
-    "artist": "Varios",
+    "artist": "Alexi Action",
     "title": "DJ Turn the Music Up",
     "category": "Electronic & Remixes",
     "markers": [
@@ -395,8 +395,8 @@
   },
   {
     "id": "1838888359",
-    "artist": "Varios",
-    "title": "Rio de Jenario",
+    "artist": "Infraction",
+    "title": "Rio de Janeiro",
     "category": "World & Cultural",
     "markers": [
       "No Pitch",
@@ -406,7 +406,7 @@
   {
     "id": "108203142438071",
     "artist": "Nicki Minaj",
-    "title": "What You Know Bout Me",
+    "title": "I'm The Best",
     "category": "Pop Hits",
     "markers": [
       "No Pitch",
@@ -416,8 +416,8 @@
   },
   {
     "id": "91937876330462",
-    "artist": "Varios",
-    "title": "Say It Right Remix",
+    "artist": "Nelly Furtado",
+    "title": "Say It Right (Remix)",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
@@ -427,18 +427,17 @@
   {
     "id": "96087734905777",
     "artist": "Lady Gaga",
-    "title": "Private Audition",
+    "title": "Fashion!",
     "category": "Pop Hits",
     "markers": [
       "No Pitch",
       "Fast Song"
-    ],
-    "notes": "Contains curse words"
+    ]
   },
   {
     "id": "113570463600924",
     "artist": "Lady Gaga",
-    "title": "Heiress",
+    "title": "Donatella",
     "category": "Pop Hits",
     "markers": [
       "No Pitch",
@@ -458,7 +457,7 @@
   },
   {
     "id": "1836635034",
-    "artist": "Varios",
+    "artist": "Myuu",
     "title": "Gothic Castle",
     "category": "Thematic & Mood",
     "pitch": 1,
@@ -468,7 +467,7 @@
   },
   {
     "id": "75085821591389",
-    "artist": "Varios",
+    "artist": "DMedley",
     "title": "Club Classics x Guess",
     "category": "Electronic & Remixes",
     "markers": [
@@ -488,7 +487,7 @@
   },
   {
     "id": "35930009",
-    "artist": "Varios",
+    "artist": "Bobby Pickett",
     "title": "Monster Mash",
     "category": "Thematic & Mood",
     "markers": [
@@ -497,7 +496,7 @@
   },
   {
     "id": "1841274964",
-    "artist": "Varios",
+    "artist": "MokkaMusic",
     "title": "Halloween Funk",
     "category": "Thematic & Mood",
     "markers": [
@@ -506,7 +505,7 @@
   },
   {
     "id": "71956674693421",
-    "artist": "Varios",
+    "artist": "Andrew Gold",
     "title": "Spooky Scary Skeletons",
     "category": "Thematic & Mood",
     "markers": [
@@ -515,7 +514,7 @@
   },
   {
     "id": "1845497774",
-    "artist": "Varios",
+    "artist": "Myuu",
     "title": "Into the Forest",
     "category": "Thematic & Mood",
     "markers": [
@@ -524,7 +523,7 @@
   },
   {
     "id": "118457386765851",
-    "artist": "Varios",
+    "artist": "Infraction",
     "title": "Glitch",
     "category": "Electronic & Remixes",
     "markers": [
@@ -534,8 +533,8 @@
   },
   {
     "id": "136409279011083",
-    "artist": "Varios",
-    "title": "Golden Hour LoFi",
+    "artist": "Lofi Girl",
+    "title": "Golden Hour",
     "category": "Chill & LoFi",
     "markers": [
       "No Pitch",
@@ -544,7 +543,7 @@
   },
   {
     "id": "131148332622519",
-    "artist": "Varios",
+    "artist": "Lofi Girl",
     "title": "I Watch The Moon",
     "category": "Chill & LoFi",
     "markers": [
@@ -554,7 +553,7 @@
   },
   {
     "id": "86907345866772",
-    "artist": "Varios",
+    "artist": "Infraction",
     "title": "Stell",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -564,7 +563,7 @@
   },
   {
     "id": "6902400044",
-    "artist": "Varios",
+    "artist": "ghostrifter official",
     "title": "Not Around",
     "category": "Chill & LoFi",
     "markers": [
@@ -574,8 +573,8 @@
   },
   {
     "id": "82148953715595",
-    "artist": "Varios",
-    "title": "I Love Remix",
+    "artist": "DMedley",
+    "title": "I Love (Remix)",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
@@ -584,8 +583,8 @@
   },
   {
     "id": "79507677596805",
-    "artist": "Varios",
-    "title": "Better Off Alone Remix",
+    "artist": "Alice Deejay",
+    "title": "Better Off Alone (Remix)",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
@@ -594,7 +593,7 @@
   },
   {
     "id": "115925172742147",
-    "artist": "Varios",
+    "artist": "Lofi Girl",
     "title": "Moment After The Fall",
     "category": "Chill & LoFi",
     "markers": [
@@ -614,8 +613,8 @@
   },
   {
     "id": "89610760702249",
-    "artist": "Varios",
-    "title": "Stero Love Remix",
+    "artist": "Edward Maya & Vika Jigulina",
+    "title": "Stereo Love (Remix)",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
@@ -624,8 +623,8 @@
   },
   {
     "id": "120885023497936",
-    "artist": "Varios",
-    "title": "Woman Remix",
+    "artist": "Doja Cat",
+    "title": "Woman (Remix)",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
@@ -634,8 +633,8 @@
   },
   {
     "id": "104207837699519",
-    "artist": "Varios",
-    "title": "Tabola Bale Remix",
+    "artist": "DJ ALVIX",
+    "title": "Tabola Bale (Remix)",
     "category": "Electronic & Remixes",
     "markers": [
       "No Pitch",
@@ -644,7 +643,7 @@
   },
   {
     "id": "120102995443063",
-    "artist": "Varios",
+    "artist": "Infraction",
     "title": "Stray",
     "category": "Upbeat & Energetic",
     "markers": [
@@ -654,7 +653,7 @@
   },
   {
     "id": "1844282512",
-    "artist": "Varios",
+    "artist": "Pyotr Ilyich Tchaikovsky",
     "title": "Swan Lake",
     "category": "Thematic & Mood",
     "markers": [
@@ -664,7 +663,7 @@
   },
   {
     "id": "76760458012018",
-    "artist": "Varios",
+    "artist": "Lofi Girl",
     "title": "Violet",
     "category": "Chill & LoFi",
     "markers": [
@@ -674,7 +673,7 @@
   },
   {
     "id": "139218946376655",
-    "artist": "Varios",
+    "artist": "NEFFEX",
     "title": "Aw Yea",
     "category": "Upbeat & Energetic",
     "markers": [

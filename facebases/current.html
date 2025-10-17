@@ -29,7 +29,7 @@
 
     html, body {
       font-family: var(--font-family-sans);
-      background-color: #12111700;
+      background-color: #121117;
       color: var(--ink);
       margin: 0;
       padding: var(--space-4);
@@ -287,7 +287,7 @@
               <div id="gallery-container" class="flex flex-col gap-8 pr-2"></div>
           </div>
           <div id="content-music" class="tab-content absolute inset-0 hidden scrollable-content">
-              <div id="music-results-container" class="pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+              <div id="music-results-container" class="pr-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
           </div>
           <div id="content-avatar" class="tab-content absolute inset-0 hidden scrollable-content">
             <div id="avatar-gallery-container" class="flex flex-col gap-8 pr-2">
@@ -655,6 +655,52 @@
           }
       };
       
+      const musicImageCache = new Map();
+
+        const fetchMusicImage = async (artist, title) => {
+            const cacheKey = `${artist}-${title}`;
+            if (musicImageCache.has(cacheKey)) {
+                return musicImageCache.get(cacheKey);
+            }
+
+            const placeholder = 'photos/app/music.jpg';
+
+            if (!artist || artist.toLowerCase() === 'varios' || !title) {
+                musicImageCache.set(cacheKey, placeholder);
+                return placeholder;
+            }
+
+            const urlsToTry = [
+                `https://www.theaudiodb.com/api/v1/json/2/searchtrack.php?s=${encodeURIComponent(artist)}&t=${encodeURIComponent(title)}`,
+                `https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(title)}`
+            ];
+
+            let imageUrl = placeholder;
+
+            for (const url of urlsToTry) {
+                try {
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const text = await response.text();
+                        if (text) { // API can return empty string if not found
+                            const data = JSON.parse(text);
+                            const track = data.track ? data.track[0] : null;
+                            if (track && track.strTrackThumb) {
+                                imageUrl = track.strTrackThumb + '/small';
+                                break; // Found it, no need to try other URLs
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching from ${url}:`, error);
+                    // Continue to the next URL
+                }
+            }
+            
+            musicImageCache.set(cacheKey, imageUrl);
+            return imageUrl;
+        };
+
       const renderMusicCodes = (codes) => {
         const resultsContainer = document.getElementById('music-results-container');
         resultsContainer.innerHTML = '';
@@ -662,11 +708,27 @@
             resultsContainer.innerHTML = `<p class="text-zinc-500 text-center col-span-full">No results found.</p>`;
             return;
         }
-        codes.forEach(code => {
-            const cardHTML = ` <div class="music-card rounded-lg p-4 flex flex-col justify-between gap-3"> <div class="flex-grow"> <h3 class="font-semibold text-zinc-100 truncate" title="${code.title}">${code.title} ${ (code.pitch && code.pitch !== 0) ? `<span class="ml-2 text-xs font-semibold text-cyan-400" title="Pitch: ${code.pitch}">[PITCH]</span>` : ''}</h3> <p class="text-sm text-zinc-400 truncate" title="${code.artist}">${code.artist || 'Unknown Artist'}</p> <p class="text-xs text-[var(--gold2)] opacity-80 mt-2">${code.category || 'Uncategorized'}</p> ${ (code.markers && code.markers.length > 0) ? `<div class="flex flex-wrap gap-1.5 mt-2">${code.markers.map(marker => `<span class="text-xs font-medium bg-zinc-700 text-zinc-300 px-2 py-0.5 rounded-full">${marker}</span>`).join('')}</div>` : ''} </div> <div class="flex items-center gap-2 mt-2"> <input readonly type="text" value="${code.id}" class="flex-grow w-0 h-9 px-2 text-xs dark-input rounded-md font-mono"> <button class="copy-btn flex-shrink-0 w-9 h-9 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition" data-id="${code.id}" title="Copy ID"> <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg> </button> </div> </div>`;
-            resultsContainer.innerHTML += cardHTML;
+        codes.forEach(async (code) => {
+            const imageUrl = await fetchMusicImage(code.artist, code.title);
+            const card = document.createElement('div');
+            card.className = 'music-card rounded-lg p-3 flex flex-col justify-between gap-3';
+            card.innerHTML = `
+              <div class="flex-grow">
+                <img src="${imageUrl}" alt="Cover for ${code.title}" class="w-full h-auto object-cover aspect-square rounded-md mb-3">
+                <h3 class="font-semibold text-zinc-100 truncate text-sm" title="${code.title}">${code.title} ${ (code.pitch && code.pitch !== 0) ? `<span class="ml-1 text-xs font-semibold text-cyan-400" title="Pitch: ${code.pitch}">[P]</span>` : ''}</h3>
+                <p class="text-xs text-zinc-400 truncate" title="${code.artist}">${code.artist || 'Unknown Artist'}</p>
+              </div>
+              <div class="flex items-center gap-2 mt-2">
+                <input readonly type="text" value="${code.id}" class="flex-grow w-0 h-8 px-2 text-xs dark-input rounded-md font-mono">
+                <button class="copy-btn flex-shrink-0 w-8 h-8 flex items-center justify-center bg-[#1b1d24] text-zinc-200 rounded-md border border-[var(--border)] hover:bg-[#222533] transition" data-id="${code.id}" title="Copy ID">
+                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/></svg>
+                </button>
+              </div>
+            `;
+            resultsContainer.appendChild(card);
         });
       };
+
 
       searchBar.addEventListener('input', debounce(filterContent, 300));
       musicCategoryFilter.addEventListener('change', filterContent);
