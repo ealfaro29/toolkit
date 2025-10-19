@@ -1,10 +1,6 @@
 {
   "countries": [
     {
-      "name": "Albania",
-      "iso": "AL"
-    },
-    {
       "name": "Barbados",
       "iso": "BB"
     },
