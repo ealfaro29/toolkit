@@ -247,6 +247,19 @@
         height: 100%;
         object-fit: cover;
     }
+    
+    /* === 1. AÑADIR ESTILO PARA EL CONTADOR FLOTANTE === */
+    .floating-visitor-badge {
+      position: fixed;
+      bottom: var(--space-4, 16px);
+      right: var(--space-4, 16px);
+      z-index: 1000;
+      opacity: 0.7;
+      transition: opacity var(--duration-standard) ease;
+    }
+    .floating-visitor-badge:hover {
+      opacity: 1;
+    }
 
     /* Responsive Adjustments */
     @media (max-width: 800px) { 
@@ -328,7 +341,7 @@
           "content": [
             "<b>Theme Toggle:</b> Switch between light, dark, and system-preferred color schemes.",
             "<b>Responsive Design:</b> The layout automatically adjusts for smaller screen sizes.",
-            "<b>Info Panel:</b> This panel can be customized by updating the <code>WIKI_DATA</code> object."
+            "<b>Info Panel:</b> This panel can be customized by updating the E<codeB>WIKI_DATA</codeB> object."
           ]
         }
       ]
@@ -347,6 +360,7 @@
         this.cacheDOMElements();
         this.initTheme();
         this.bindEvents();
+        this.initVisitorCounter(); // === 2. LLAMAR A LA NUEVA FUNCIÓN ===
         this.render();
       },
 
@@ -361,7 +375,8 @@
       cacheDOMElements() {
         const ids = [
           'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen', 
-          'app-container', 'splash-close-btn'
+          'app-container', 'splash-close-btn',
+          'visitor-badge-container' // === 3. AÑADIR EL CONTENEDOR AL CACHÉ ===
         ];
         ids.forEach(id => {
           const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
@@ -384,6 +399,33 @@
       
       render() {
         // App-specific rendering logic goes here.
+      },
+      
+      // === 4. AÑADIR NUEVA FUNCIÓN PARA EL CONTADOR ===
+      initVisitorCounter() {
+        if (!this.el.visitorBadgeContainer) return;
+
+        // 1. Obtener el título de la página (ej. "Any2SVG")
+        const title = document.title;
+        // 2. Crear un 'path' limpio (ej. "any2svg")
+        const pagePath = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/--+/g, '-');
+        
+        // 3. Combinarlo con el ID de tu toolkit
+        const fullPath = `ealfaro29.toolkit.${pagePath}`;
+
+        // 4. Obtener el color --accent-color actual para que el contador combine
+        let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim().substring(1);
+        if (!accentColor || accentColor.length < 6) {
+          accentColor = '4f46e5'; // Fallback al morado por defecto
+        }
+        
+        // 5. Crear la URL de la imagen y el enlace
+        const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}&labelColor=%23555555&countColor=%23${accentColor}`;
+        const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}`;
+
+        // 6. Insertar el contador en el contenedor
+        this.el.visitorBadgeContainer.href = linkUrl;
+        this.el.visitorBadgeContainer.innerHTML = `<img src="${badgeUrl}" alt="Visitor counter" />`;
       },
 
       // --- Theme Toggle Logic ---
@@ -466,5 +508,13 @@
 
     document.addEventListener('DOMContentLoaded', () => BaseApp.init());
   </script>
+
+  <a id="visitor-badge-container" 
+     class="floating-visitor-badge" 
+     href="https://api.visitorbadge.io" 
+     target="_blank" 
+     title="Visitor counter">
+  </a>
+
 </body>
 </html>

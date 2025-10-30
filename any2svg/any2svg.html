@@ -57,8 +57,52 @@
     
     main.panel{display:flex;align-items:center;justify-content:center;padding:var(--space-5);min-height:0;position:relative}
     canvas#preview{max-width:100%;max-height:100%;border:1px dashed var(--border-color);border-radius:var(--radius-md);background:var(--surface)}
-    .placeholder{color:var(--muted);text-align:center}
     
+    .placeholder{
+      color: var(--muted);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+    }
+    
+    .loader-svg {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border-color);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .toast-notification {
+      position: absolute;
+      bottom: var(--space-5);
+      left: 50%;
+      transform: translate(-50%, 20px);
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-floating-3);
+      font-weight: var(--font-weight-medium);
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--duration-standard) ease;
+      z-index: 10;
+      pointer-events: none;
+    }
+    .toast-notification.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+      visibility: visible;
+    }
+
     .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
     .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
     .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
@@ -243,6 +287,19 @@
     }
     .error-note { color: var(--danger-color) !important; font-weight: var(--font-weight-medium); }
 
+    /* === 1. AÑADIR ESTILO PARA EL CONTADOR FLOTANTE === */
+    .floating-visitor-badge {
+      position: fixed;
+      bottom: var(--space-4, 16px);
+      right: var(--space-4, 16px);
+      z-index: 1000;
+      opacity: 0.7;
+      transition: opacity var(--duration-standard) ease;
+    }
+    .floating-visitor-badge:hover {
+      opacity: 1;
+    }
+
     @media (max-width:800px){ 
       body{padding:var(--space-4)} 
       .container{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;height:auto;gap:var(--space-4)} 
@@ -314,6 +371,7 @@
     <main class="panel" id="main-panel">
       <div class="placeholder" id="ph">The preview will appear here once you select a file.</div>
       <canvas id="preview" width="1" height="1" style="display:none"></canvas>
+      <div id="toast-notification" class="toast-notification"></div>
     </main>
   </div>
   
@@ -360,7 +418,8 @@
         isOpening: false, 
         isExpectingPreview: false,
         filenameBase: 'converted',
-        splashHidden: false
+        splashHidden: false,
+        toastTimeout: null
       },
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
@@ -371,6 +430,7 @@
         this.el.splashCloseBtn.disabled = true;
         this.initTheme();
         this.bind();
+        this.initVisitorCounter(); // === 2. LLAMAR A LA NUEVA FUNCIÓN ===
         
         this.loadEngine();
         
@@ -424,7 +484,9 @@
         const ids = [
           'theme-toggle', 'fileInput', 'convertBtn', 'fileMeta', 'main-panel', 'preview', 'ph',
           'wiki-open-btn', 'wiki-overlay', 'splash-screen', 'app-container', 'splash-close-btn',
-          'splash-progress-text', 'progress-bar-inner', 'engine-status', 'reload-engine-btn'
+          'splash-progress-text', 'progress-bar-inner', 'engine-status', 'reload-engine-btn',
+          'toast-notification',
+          'visitor-badge-container' // === 3. AÑADIR EL CONTENEDOR AL CACHÉ ===
         ];
         ids.forEach(id => this.el[id.replace(/-(\w)/g, (_,c) => c.toUpperCase())] = document.getElementById(id));
       },
@@ -506,11 +568,19 @@
         const isDark = (t === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : t === 'dark'; 
         document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; 
       },
+      
       async handleFilePick(e){
         const file = e.target.files && e.target.files[0];
         if(!file || !this.state.engineReady) return;
         
         this.resetState();
+        this.el.ph.innerHTML = `
+          <div class="loader-svg"></div>
+          <div>Converting to SVG...</div>
+        `;
+        this.el.ph.style.display = 'flex';
+        this.el.preview.style.display = 'none';
+        
         this.state.filenameBase = file.name.replace(/\.[^.]+$/,'') || 'converted';
         this.el.fileMeta.textContent = `${file.name}, ${this.prettyBytes(file.size)}`;
         
@@ -519,21 +589,27 @@
         this.state.isExpectingPreview = true;
         this.pp.postMessage(buffer, '*', [buffer]);
       },
+      
       resetState() {
         this.state.isOpening = false;
         this.state.isExpectingPreview = false;
         this.el.convertBtn.disabled = true;
-        this.el.ph.style.display = 'block';
+        this.el.convertBtn.textContent = 'Convert to SVG';
+        this.el.ph.innerHTML = 'The preview will appear here once you select a file.';
+        
+        this.el.ph.style.display = 'flex';
         this.el.preview.style.display = 'none';
         this.el.fileMeta.textContent = '';
       },
+      
       convert(){
         if(!this.state.engineReady) return;
         this.state.isExpectingPreview = false;
         this.el.convertBtn.disabled = true;
-        this.el.convertBtn.textContent = 'Converting...';
+        this.el.convertBtn.textContent = 'Downloading...';
         this.pp.postMessage('app.activeDocument.saveToOE("svg");', '*');
       },
+      
       renderPreview(ab){
         const blob = new Blob([ab], {type:'image/png'});
         const url = URL.createObjectURL(blob);
@@ -549,11 +625,17 @@
           ctx.drawImage(img, 0, 0, cw, ch);
           this.el.ph.style.display = 'none';
           cv.style.display = 'block';
+          
+          this.el.convertBtn.textContent = 'Download SVG';
           this.el.convertBtn.disabled = false;
+          
+          this.showToast('Conversion Complete!');
+          
           URL.revokeObjectURL(url);
         };
         img.src = url;
       },
+      
       autoDownload(ab, filename, mime){
         const blob = new Blob([ab], {type:mime});
         const url = URL.createObjectURL(blob);
@@ -561,15 +643,49 @@
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
         
-        this.el.convertBtn.textContent = 'Convert to SVG';
         this.resetState();
       },
+      
       prettyBytes(n){
         if(n < 1024) return n + ' B';
         const u=['KB','MB','GB','TB']; let i=-1;
         do { n/=1024; i++; } while (n>=1024 && i<u.length-1);
         return n.toFixed(1) + ' ' + u[i];
       },
+
+      // === 4. AÑADIR NUEVA FUNCIÓN PARA EL CONTADOR ===
+      initVisitorCounter() {
+        if (!this.el.visitorBadgeContainer) return;
+
+        const title = document.title; // "Any2SVG"
+        const pagePath = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/--+/g, '-'); // "any2svg"
+        const fullPath = `ealfaro29.toolkit.${pagePath}`; // "ealfaro29.toolkit.any2svg"
+
+        let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim().substring(1);
+        if (!accentColor || accentColor.length < 6) {
+          accentColor = 'A4C639'; // Fallback al color verde de esta app
+        }
+        
+        const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}&labelColor=%23555555&countColor=%23${accentColor}`;
+        const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}`;
+
+        this.el.visitorBadgeContainer.href = linkUrl;
+        this.el.visitorBadgeContainer.innerHTML = `<img src="${badgeUrl}" alt="Visitor counter" />`;
+      },
+
+      showToast(message) {
+        if (this.state.toastTimeout) {
+          clearTimeout(this.state.toastTimeout);
+        }
+        this.el.toastNotification.textContent = message;
+        this.el.toastNotification.classList.add('show');
+        
+        this.state.toastTimeout = setTimeout(() => {
+          this.el.toastNotification.classList.remove('show');
+          this.state.toastTimeout = null;
+        }, 2500);
+      },
+
       openWiki() {
         if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
             const wikiModal = document.createElement('div');
@@ -618,5 +734,13 @@
     
     document.addEventListener('DOMContentLoaded', ()=>App.init());
   </script>
+
+  <a id="visitor-badge-container" 
+     class="floating-visitor-badge" 
+     href="https://api.visitorbadge.io" 
+     target="_blank" 
+     title="Visitor counter">
+  </a>
+
 </body>
 </html>

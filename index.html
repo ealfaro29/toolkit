@@ -49,6 +49,20 @@
     .kickass-destroyed { opacity: 0; transform: scale(0.5); }
     .kickass-card-hittable { box-shadow: 0 0 15px var(--accent-color) !important; border-color: var(--accent-color) !important; }
 
+    /* ========== START: FLOATING BADGE STYLE ========== */
+    .floating-visitor-badge {
+      position: fixed;
+      bottom: var(--space-4, 16px);
+      right: var(--space-4, 16px);
+      z-index: 1000;
+      opacity: 0.7;
+      transition: opacity var(--duration-standard) ease;
+    }
+    .floating-visitor-badge:hover {
+      opacity: 1;
+    }
+    /* ========== END: FLOATING BADGE STYLE ========== */
+
   </style>
 </head>
 <body>
@@ -126,12 +140,6 @@
       </div>
     </main>
 
-    <footer class="panel" style="padding: 24px; display: flex; justify-content: center; align-items: center; gap: 10px; color: var(--muted); font-size: 14px;">
-      <span>Page Visitors:</span>
-      <a href="https://api.visitorbadge.io/api/visitors?path=ealfaro29.toolkit">
-        <img src="https://api.visitorbadge.io/api/visitors?path=ealfaro29.toolkit&labelColor=%23555555&countColor=%234f46e5" alt="Visitor counter badge" />
-      </a>
-    </footer>
     </div>
 
   <script>
@@ -559,5 +567,9 @@
 
     document.addEventListener('DOMContentLoaded', () => App.init());
   </script>
-</body>
+
+  <a href="https://api.visitorbadge.io/api/visitors?path=ealfaro29.toolkit" class="floating-visitor-badge">
+    <img src="https://api.visitorbadge.io/api/visitors?path=ealfaro29.toolkit&labelColor=%23555555&countColor=%234f46e5" alt="Visitor counter badge" />
+  </a>
+  </body>
 </html>
