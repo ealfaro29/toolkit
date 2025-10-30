@@ -1,749 +1,1022 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Circular Maze Creator</title>
-  <style>
-    /* * SE ELIMINAN TODOS LOS ESTILOS INLINE Y SE REEMPLAZAN CON CLASES SIMPLES.
-     * Los estilos grid/flex se mantienen aquí para evitar que el linter los rompa en línea.
-     */
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Creative Toolkit</title>
+  <style>
+    :root {
+      --accent-color: #4f46e5;
+      --accent-color-tint: #c7d2fe;
+      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
+      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
+      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
+      --font-weight-emphasis: 600; --font-weight-medium: 500;
+      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
+      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --duration-standard: 200ms;
+    }
+    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
+    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
+    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
 
-    html, body { height: 100%; }
-    
-    body {
-      margin: 0;
-      background: #0b0f14; 
-      color: #e6edf3;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 10px;
-    }
-    header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 12px;
-      padding: 14px 16px 0 16px;
-      align-items: end;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(18px, 2.6vw, 28px);
-      letter-spacing: 0.4px;
-      font-weight: 650;
-    }
-    
-    /* Estilos de Controles y Grid Containers */
-    .controls {
-      margin: 0 16px 0 16px;
-      background: #111720; 
-      border: 1px solid #1e2733;
-      border-radius: 14px;
-      padding: 12px;
-      display: grid;
-      grid-template-columns: repeat(6, minmax(120px, 1fr));
-      gap: 10px;
-    }
-    .canvas-wrap {
-      margin: 4px 16px 16px;
-      background: #0b0f14; 
-      border: 1px solid #1b2533;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      padding: 16px;
-      min-height: 420px;
-    }
-    .row { 
-      display: flex; 
-      gap: 8px; 
-      flex-wrap: wrap; 
-    }
-    .grow { flex: 1; }
-    
-    /* Estilos de Fieldset y Labels */
-    fieldset {
-      border: 1px solid #223142;
-      border-radius: 12px;
-      padding: 10px;
-      min-width: 0;
-    }
-    legend {
-      color: #9fb2c3; 
-      font-size: 12px;
-      padding: 0 6px;
-    }
-    label { 
-      display: grid; 
-      gap: 6px; 
-      font-size: 12px; 
-      color: #9fb2c3; 
-    }
-    input[type="number"], input[type="text"], select {
-      -webkit-appearance: none;
-      appearance: none;
-      background: #0f1621;
-      color: #e6edf3; 
-      border: 1px solid #233246;
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 14px;
-      outline: none;
-      width: 100%;
-    }
-    input[type="checkbox"] { transform: translateY(1px); }
+    .container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 25px; }
+    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
+    header.panel { height: 65px; display: flex; align-items: center; gap: var(--space-3); padding: 0 var(--space-4); }
+    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
+    header .sub { color: var(--muted); }
+    .theme-switcher { margin-left: auto; }
+    #theme-toggle { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
+    #theme-toggle:hover { background-color: var(--surface-alt); }
 
-    /* Estilos de Botones */
-    button {
-      background: #172433; 
-      color: #e6edf3; 
-      border: 1px solid #2a3b52;
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    button:hover { border-color: #355176; }
-    button.primary { 
-      background: #1a2b3d; 
-      border-color: #3a5e87; 
-    }
-    button.accent { 
-      background: #0b2330; 
-      border-color: #147da1; 
-      color: #5dd6ff; 
-    }
+    .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+    .app-card { text-decoration: none; color: var(--ink); background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); transition: transform var(--duration-standard) ease, box-shadow var(--duration-standard) ease; border-top: 4px solid var(--card-accent-color); cursor: grab; }
+    .app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-floating-3); }
+    .app-card.dragging { opacity: 0.5; cursor: grabbing; }
+    .app-card-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: var(--radius-md); background-color: var(--card-icon-bg-color-transparent); color: var(--color-accent-text, #FFF); font-size: 28px; }
+    .app-card-title { font-size: 18px; font-weight: var(--font-weight-emphasis); margin: 0; }
+    .app-card-description { margin: 0; color: var(--muted); line-height: 1.6; }
     
-    /* Estilos de Canvas y Footer */
-    canvas { 
-      width: 100%; 
-      height: 100%; 
-      max-width: 950px; 
-      max-height: 950px; 
-      aspect-ratio: 1; 
-      display: block; 
-    }
-    footer {
-      padding: 8px 16px 16px;
-      color: #9fb2c3; 
-      font-size: 12px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-    }
-    .hint { 
-      color: #9fb2c3; 
-      font-size: 12px; 
-    }
-    .badge { 
-      color: #a5ff5d; 
-      font-weight: 600; 
-    }
-    .mono { 
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; 
-    }
-  </style>
+    /* Easter Egg Styles */
+    .kickass-target { transition: opacity 0.2s, transform 0.2s; display: inline-block; }
+    .kickass-destroyed { opacity: 0; transform: scale(0.5); }
+    .kickass-card-hittable { box-shadow: 0 0 15px var(--accent-color) !important; border-color: var(--accent-color) !important; }
+
+    /* === 1. INICIA CSS PARA MODAL Y FOOTER === */
+    
+    /* Nuevo Footer Minimalista */
+    .site-footer-minimal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: var(--space-4);
+      /* No background, no border, no shadow */
+    }
+
+    /* Estilo de botón/enlace Minimalista */
+    .minimal-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md); /* Suave para hover */
+      color: var(--muted); /* Sutil */
+      text-decoration: none;
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+      font-weight: 500;
+      transition: all var(--duration-standard) ease;
+      cursor: pointer;
+    }
+    .minimal-btn:hover {
+      background-color: var(--surface-alt); /* Fondo sutil en hover */
+      color: var(--ink);
+    }
+    .minimal-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+    .minimal-btn img {
+      height: 20px; /* Altura para la imagen del contador */
+      vertical-align: middle;
+      opacity: 0.7;
+    }
+    .minimal-btn:hover img {
+      opacity: 1;
+    }
+
+    /* Overlay del Popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    /* Contenido del Modal de Feedback */
+    .feedback-modal-content {
+      background: var(--surface-alt);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 2001;
+      width: 500px;
+      max-width: 90vw;
+      max-height: 90vh;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .feedback-header h3 {
+      margin: 0;
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-emphasis);
+    }
+    #feedback-close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #feedback-close-btn:hover {
+      background-color: var(--surface);
+      color: var(--ink);
+    }
+
+    /* Formulario */
+    #feedback-form {
+      padding: var(--space-5);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .form-section {
+      display: none; /* Oculto por defecto */
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .form-group label {
+      font-weight: var(--font-weight-medium);
+    }
+    .form-control, .select-wrapper select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      resize: vertical;
+      min-height: 40px;
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+    }
+    textarea.form-control {
+      min-height: 80px;
+    }
+    .select-wrapper {
+      position: relative;
+    }
+    .select-wrapper select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      cursor: pointer;
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      height: 40px;
+      padding: 0 var(--space-4);
+      border: 1px solid transparent;
+      transition: all var(--duration-standard) ease;
+    }
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+    }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { 
+      outline: 2px solid var(--accent-color); 
+      outline-offset: 2px; 
+    }
+    .btn:disabled {
+      background-color: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    
+    /* Estilos para el 5-Star Rating */
+    .star-rating {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    .star-rating input[type="radio"] {
+      display: none;
+    }
+    .star-rating label {
+      font-size: 28px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .star-rating input[type="radio"]:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: #f59e0b; /* Naranja/Amarillo para estrella */
+    }
+    
+    /* Estilos para el estado del formulario */
+    #form-status {
+      padding: var(--space-3);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      font-weight: var(--font-weight-medium);
+      display: none;
+    }
+    #form-status.success {
+      background-color: var(--accent-color-tint);
+      color: var(--accent-color);
+    }
+    #form-status.error {
+      background-color: #fecaca;
+      color: #dc2626;
+    }
+    #form-status.sending {
+      background-color: var(--surface);
+      color: var(--muted);
+    }
+    /* === FIN CSS PARA MODAL Y FOOTER === */
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Circular Maze Creator</h1>
-    <div class="row">
-      <button id="btn-generate" class="primary">Generate</button>
-      <button id="btn-randseed">New Seed</button>
-      <button id="btn-solve">Solve</button>
-      <button id="btn-clear">Clear</button>
-      <button id="btn-export" class="accent">Export PNG</button>
-    </div>
-  </header>
+  <div class="container">
+    <header class="panel">
+      <h1>Creative Toolkit</h1>
+      <div class="sub">A universe of mini-apps.</div>
+      <div class="theme-switcher">
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
 
-  <section class="controls">
-    <fieldset>
-      <legend>Structure</legend>
-      <label> Rings
-        <input type="number" id="rings" min="3" max="400" step="1" value="32" />
-      </label>
-      <label> Base cells on ring 1
-        <input type="number" id="baseCells" min="3" max="128" step="1" value="8" />
-      </label>
-      <label> Wall thickness (px)
-        <input type="number" id="wall" min="1" max="12" step="1" value="2" />
-      </label>
-    </fieldset>
+    <main>
+      <div class="app-grid" id="app-grid">
+        <a href="moodboards/moodboards.html" class="app-card" style="--card-accent-color: #FFD300; --card-icon-bg-color-transparent: rgba(255, 211, 0, 0.15);" data-id="moodboards" draggable="true">
+          <div class="app-card-icon">🖼️</div>
+          <h2 class="app-card-title">Moodboard Studio</h2>
+          <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding, colors, and images.</p>
+        </a>
+        <a href="blobs/blobs.html" class="app-card" style="--card-accent-color: #800080; --card-icon-bg-color-transparent: rgba(128, 0, 128, 0.15);" data-id="blobs" draggable="true">
+            <div class="app-card-icon">💧</div>
+            <h2 class="app-card-title">Blob Studio</h2>
+            <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Tweak points, variance, and smoothness.</p>
+        </a>
+        <a href="jigsaws/jigsaws.html" class="app-card" style="--card-accent-color: #00B5AD; --card-icon-bg-color-transparent: rgba(0, 181, 173, 0.15);" data-id="jigsaws" draggable="true">
+          <div class="app-card-icon">🧩</div>
+          <h2 class="app-card-title">Jigsaw Generator</h2>
+          <p class="app-card-description">Design and export custom vector jigsaw puzzle grids with control over rows, columns, and tab size.</p>
+        </a>
+        <a href="iconfactory/iconfactory.html" class="app-card" style="--card-accent-color: #3B4352; --card-icon-bg-color-transparent: rgba(59, 67, 82, 0.15);" data-id="iconfactory" draggable="true">
+          <div class="app-card-icon">🛠️</div>
+          <h2 class="app-card-title">Icon Factory</h2>
+          <p class="app-card-description">Combine shapes to create custom icons. Build your collection and download them as a ZIP file.</p>
+        </a>
+        <a href="qrcodes/qrcodes.html" class="app-card" style="--card-accent-color: #2CA02C; --card-icon-bg-color-transparent: rgba(44, 160, 44, 0.15);" data-id="qrcodes" draggable="true">
+            <div class="app-card-icon">📱</div>
+            <h2 class="app-card-title">QR Code Generator</h2>
+            <p class="app-card-description">Create custom QR codes for URLs, WiFi, and more. All data is generated locally in your browser.</p>
+        </a>
+        <a href="palettes/palettes.html" class="app-card" style="--card-accent-color: #FF7F00; --card-icon-bg-color-transparent: rgba(255, 127, 0, 0.15);" data-id="colors" draggable="true">
+            <div class="app-card-icon">🌈</div>
+            <h2 class="app-card-title">Color Mixer</h2>
+            <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a single base color.</p>
+        </a>
+        <a href="notes/notes.html" class="app-card" style="--card-accent-color: #FF1493; --card-icon-bg-color-transparent: rgba(255, 20, 147, 0.15);" data-id="notes" draggable="true">
+            <div class="app-card-icon">📝</div>
+            <h2 class="app-card-title">Notepad & Kanban</h2>
+            <p class="app-card-description">Capture ideas, then drag them into your workflow. Your data is saved automatically in the browser.</p>
+        </a>
+        <a href="locator/locator.html" class="app-card" style="--card-accent-color: #4B0082; --card-icon-bg-color-transparent: rgba(75, 0, 130, 0.15);" data-id="locator" draggable="true">
+            <div class="app-card-icon">📍</div>
+            <h2 class="app-card-title">Locator</h2>
+            <p class="app-card-description">Geocode a list of locations and visualize the results on an interactive world map. Export as SVG.</p>
+        </a>
+        <a href="signatures/signatures.html" class="app-card" style="--card-accent-color: #002493; --card-icon-bg-color-transparent: rgba(80, 96, 126, 0.15);" data-id="signatures" draggable="true">
+            <div class="app-card-icon">✍️</div>
+            <h2 class="app-card-title">Signature to SVG</h2>
+            <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with adjustable settings.</p>
+        </a>
+        <a href="any2svg/any2svg.html" class="app-card" style="--card-accent-color: #A4C639; --card-icon-bg-color-transparent: rgba(164, 198, 57, 0.15);" data-id="any2svg" draggable="true">
+            <div class="app-card-icon">🪄</div>
+            <h2 class="app-card-title">Any2SVG</h2>
+            <p class="app-card-description">Convert AI, PSD, PDF, and more to SVG. All files are processed locally in your browser.</p>
+        </a>
+        <a href="bgremover/bgremover.html" class="app-card" style="--card-accent-color: #E63946; --card-icon-bg-color-transparent: rgba(230, 57, 70, 0.15);" data-id="bgremover" draggable="true">
+          <div class="app-card-icon">✂️</div>
+          <h2 class="app-card-title">Background Remover</h2>
+          <p class="app-card-description">Client-side AI cutout. Click, drop or paste an image to automatically remove the background.</p>
+        </a>
+        <a href="wordclouds/wordclouds.html" class="app-card" style="--card-accent-color: #20B2AA; --card-icon-bg-color-transparent: rgba(32, 178, 170, 0.15);" data-id="wordclouds" draggable="true">
+          <div class="app-card-icon">☁️</div>
+          <h2 class="app-card-title">Word Cloud Generator</h2>
+          <p class="app-card-description">Generate beautiful and customizable word clouds from any text source.</p>
+        </a>
+      </div>
+    </main>
 
-    <fieldset>
-      <legend>Geometry</legend>
-      <label> Size (px)
-        <input type="number" id="size" min="200" max="2400" step="10" value="900" />
-      </label>
-      <label> Center radius (%)
-        <input type="number" id="core" min="0" max="25" step="1" value="7" />
-      </label>
-      <label> Equalize cell aspect
-        <select id="equalize">
-          <option value="balanced" selected>Balanced</option>
-          <option value="fixed">Fixed per ring</option>
-        </select>
-      </label>
-    </fieldset>
+    <footer class="site-footer-minimal">
+      <button id="feedback-open-btn" class="minimal-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Feedback</span>
+      </button>
+      
+      <a id="visitor-badge-container" class="minimal-btn" href="https://api.visitorbadge.io" target="_blank" title="Visitor counter">
+        </a>
+    </footer>
+    </div>
 
-    <fieldset>
-      <legend>Randomness</legend>
-      <label> Seed
-        <input type="text" id="seed" value="auto" class="mono" />
-      </label>
-      <label> Bias
-        <select id="bias">
-          <option value="none" selected>None</option>
-          <option value="cw">Clockwise</option>
-          <option value="ccw">Counterclockwise</option>
-          <option value="in">Inward</option>
-          <option value="out">Outward</option>
-        </select>
-      </label>
-      <label>
-        <span>Weave dead-ends (rare)</span>
-        <input type="checkbox" id="braid" />
-      </label>
-    </fieldset>
+  <script>
+    const App = {
+      el: {},
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+      DRAG_STATE: { dragged: null, over: null },
 
-    <fieldset>
-      <legend>Goal</legend>
-      <label> Entrance ring
-        <input type="number" id="entrRing" min="0" step="1" value="0" />
-      </label>
-      <label> Exit ring
-        <input type="number" id="exitRing" min="1" step="1" value="31" />
-      </label>
-      <label> Exit arc index
-        <input type="number" id="exitArc" min="0" step="1" value="0" />
-      </label>
-    </fieldset>
+      konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
+      konamiIndex: 0,
+      
+      init() {
+        this.cacheDOMElements();
+        this.initTheme();
+        this.loadCardOrder();
+        this.bindEvents();
+        this.initVisitorCounter(); // <-- Llamar al contador de visitas
+      },
 
-    <fieldset>
-      <legend>Style</legend>
-      <label> Wall color
-        <input type="text" id="color" value="#e6edf3" />
-      </label>
-      <label> Background
-        <input type="text" id="bg" value="#0b0f14" />
-      </label>
-      <label>
-        <span>Show polar grid</span>
-        <input type="checkbox" id="showGrid" />
-      </label>
-    </fieldset>
+      cacheDOMElements() {
+        this.el.themeToggle = document.getElementById('theme-toggle');
+        this.el.appGrid = document.getElementById('app-grid');
+        this.el.appCards = Array.from(this.el.appGrid.children);
+        
+        // === CACHEAR TODOS LOS ELEMENTOS DEL MODAL Y BOTONES ===
+        const ids = [
+          'feedback-open-btn', 'feedback-overlay', 'feedback-close-btn',
+          'feedback-form', 'feedback-type', 'form-status', 'feedback-submit-btn',
+          'form-section-feedback', 'form-section-suggest', 'form-section-bug',
+          'visitor-badge-container'
+        ];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          const element = document.getElementById(id);
+          if (element) this.el[key] = element;
+        });
+      },
 
-    <fieldset>
-      <legend>Info</legend>
-      <div class="hint">Seed <span class="mono" id="seedEcho">auto</span></div>
-      <div class="hint">Cells <span class="mono" id="cellEcho">0</span></div>
-      <div class="hint">Edges <span class="mono" id="edgeEcho">0</span></div>
-    </fieldset>
-  </section>
+      bindEvents() {
+        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if (localStorage.getItem('creative-toolkit-theme') === 'system') {
+            this.applyTheme('system');
+          }
+        });
 
-  <section class="canvas-wrap">
-    <canvas id="maze" width="900" height="900"></canvas>
-  </section>
+        this.el.appGrid.addEventListener('dragstart', this.handleDragStart.bind(this));
+        this.el.appGrid.addEventListener('dragover', this.handleDragOver.bind(this));
+        this.el.appGrid.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        this.el.appGrid.addEventListener('drop', this.handleDrop.bind(this));
+        this.el.appGrid.addEventListener('dragend', this.handleDragEnd.bind(this));
 
-  <footer>
-    <div class="hint">Algorithm: polar grid, recursive backtracker, optional dead-end braiding. Aspect equalization doubles cells per ring when circumference warrants, keeping arc length near radial height. Entrance defaults to center, exit on outer ring. <span class="badge">Single-file</span>.</div>
-    <div class="row">
-      <button id="btn-copy-json" title="Copy maze JSON">Copy JSON</button>
-    </div>
-  </footer>
+        window.addEventListener('keydown', this.handleKonamiCode.bind(this));
+        
+        // === BIND EVENTOS DEL MODAL ===
+        if(this.el.feedbackOpenBtn) this.el.feedbackOpenBtn.addEventListener('click', () => this.openFeedback());
+        if(this.el.feedbackCloseBtn) this.el.feedbackCloseBtn.addEventListener('click', () => this.closeFeedback());
+        if(this.el.feedbackOverlay) this.el.feedbackOverlay.addEventListener('click', (e) => {
+          if (e.target === this.el.feedbackOverlay) this.closeFeedback();
+        });
+        if(this.el.feedbackType) this.el.feedbackType.addEventListener('change', () => this.updateFormDisplay());
+        if(this.el.feedbackForm) this.el.feedbackForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
+      },
 
-<script>
-// Utility: deterministic PRNG (xorshift32) from 32-bit seed derived from string
-function hash32(str) {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-function XorShift32(seed) {
-  let x = seed >>> 0 || 1;
-  return function() {
-    x ^= x << 13; x >>>= 0;
-    x ^= x >>> 17; x >>>= 0;
-    x ^= x << 5;  x >>>= 0;
-    return (x >>> 0) / 0x100000000;
-  };
-}
-function choice(rng, arr) { return arr[(rng()*arr.length)|0]; }
-function shuffle(rng, arr) { for (let i = arr.length - 1; i > 0; i--) { const j = (rng()*(i+1))|0; [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+      handleKonamiCode(e) {
+          if (window.KICKASS_GAME) return;
+          if (e.key.toLowerCase() === this.konamiCode[this.konamiIndex].toLowerCase()) {
+              this.konamiIndex++;
+              if (this.konamiIndex === this.konamiCode.length) {
+                  this.activateGame();
+                  this.konamiIndex = 0;
+              }
+          } else {
+              this.konamiIndex = 0;
+          }
+      },
+      
+      // === CÓDIGO KONAMI COMPLETO RESTAURADO ===
+      activateGame() {
+        if (window.KICKASS_GAME) return;
 
-// Polar grid cell
-class Cell {
-  constructor(r, c) {
-    this.r = r;      // ring index
-    this.c = c;      // cell index within ring
-    this.links = new Set(); // linked neighbor ids
-  }
-  id() { return `${this.r}:${this.c}`; }
-}
+        const KICKASS_GAME = {
+            init: function() {
+                this.canvas = document.createElement('canvas');
+                this.canvas.style.cssText = 'position:fixed; top:0; left:0; z-index:10000; pointer-events:none;';
+                document.body.appendChild(this.canvas);
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.score = 0;
+                this.lastPowerUpScore = 0;
+                this.scoreEl = document.createElement('div');
+                this.scoreEl.style.cssText = 'position:fixed; top:10px; left:10px; color:white; font:bold 24px sans-serif; text-shadow:0 0 5px black; z-index:10001;';
+                this.statusEl = document.createElement('div');
+                this.statusEl.style.cssText = 'position:fixed; top:40px; left:10px; color:lime; font:bold 16px sans-serif; text-shadow:0 0 5px black; z-index:10001;';
+                document.body.appendChild(this.scoreEl);
+                document.body.appendChild(this.statusEl);
 
-// Build polar grid with aspect-equalized arcs
-function buildPolarGrid(rings, baseCells, equalize) {
-  const ringCounts = new Array(rings+1).fill(0);
-  ringCounts[0] = 1; // center cell
-  ringCounts[1] = Math.max(3, baseCells|0);
-  const ringThickness = 1; // abstract units
-  for (let r = 2; r <= rings; r++) {
-    if (equalize === 'fixed') { ringCounts[r] = ringCounts[r-1]; continue; }
-    const prev = ringCounts[r-1];
-    const outerCircum = 2 * Math.PI * r;
-    // target arc length near ring height
-    const targetCells = Math.round(outerCircum / ringThickness);
-    // keep stable unless doubling reduces arc length significantly
-    ringCounts[r] = (targetCells > prev * 1.5) ? prev * 2 : prev;
-  }
+                this.resize();
+                
+                this.ship = { x: this.width / 2, y: this.height / 2, vx: 0, vy: 0, angle: -Math.PI / 2, rotation: 0, thrust: 0, size: 20 };
+                this.bullets = [];
+                this.explosions = [];
+                this.targets = [];
+                this.specialBullet = null; // Can be 'bomb' or 'superbomb'
 
-  // cells map
-  const cells = new Map();
-  for (let r = 0; r <= rings; r++) {
-    for (let c = 0; c < ringCounts[r]; c++) cells.set(`${r}:${c}`, new Cell(r, c));
-  }
+                this.keys = {};
+                this.boundKeyDown = this.handleKeyDown.bind(this);
+                this.boundKeyUp = this.handleKeyUp.bind(this);
+                this.boundResize = this.resize.bind(this);
+                window.addEventListener('keydown', this.boundKeyDown);
+                window.addEventListener('keyup', this.boundKeyUp);
+                window.addEventListener('resize', this.boundResize);
 
-  // neighbor function for polar topology
-  function neighbors(cell) {
-    const r = cell.r, c = cell.c;
-    const arr = [];
-    // same ring neighbors
-    if (r > 0) {
-      const count = ringCounts[r];
-      arr.push(`${r}:${(c-1+count)%count}`);
-      arr.push(`${r}:${(c+1)%count}`);
-    }
-    // inward neighbors
-    if (r > 0) {
-      const inwardCount = ringCounts[r-1];
-      const ratio = inwardCount / ringCounts[r];
-      // one or two inward neighbors depending on subdivision
-      const inwardIndex = Math.floor(c * ratio);
-      arr.push(`${r-1}:${inwardIndex}`);
-      // if this ring has more cells than inward ring, some cells straddle two inward
-      if (Math.floor((c+1) * ratio) !== inwardIndex) {
-        arr.push(`${r-1}:${(inwardIndex+1)%inwardCount}`);
-      }
-    }
-    // outward neighbors
-    if (r < rings) {
-      const outwardCount = ringCounts[r+1];
-      const ratio = outwardCount / ringCounts[r];
-      const start = Math.floor(c * ratio);
-      const end   = Math.floor((c+1) * ratio);
-      for (let k = start; k <= end; k++) arr.push(`${r+1}:${k % outwardCount}`);
-    }
-    return arr;
-  }
+                this.prepareTargets();
+                this.loop();
+            },
+            
+            resize: function() {
+                this.width = window.innerWidth;
+                this.height = window.innerHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+            },
 
-  return { ringCounts, cells, neighbors };
-}
+            prepareTargets: function() {
+                const elementsToTarget = document.querySelectorAll('.app-card h2, .app-card p, header.panel h1, header.panel .sub');
+                elementsToTarget.forEach(el => {
+                    const parentCard = el.closest('.app-card');
+                    const text = el.innerText;
+                    el.innerHTML = '';
+                    text.split(/(\s+)/).forEach(word => {
+                        if (word.trim().length > 0) {
+                            const span = document.createElement('span');
+                            span.className = 'kickass-target';
+                            span.textContent = word;
+                            el.appendChild(span);
+                            this.targets.push({ el: span, parentCard: parentCard, active: true });
+                        } else {
+                            el.appendChild(document.createTextNode(word));
+                        }
+                    });
+                });
+            },
 
-// Maze generation: recursive backtracker
-function generateMaze(cfg) {
-  const { rings, baseCells, equalize, rng, bias, braid } = cfg;
-  const grid = buildPolarGrid(rings, baseCells, equalize);
-  const { cells, neighbors, ringCounts } = grid;
+            handleKeyDown: function(e) {
+                this.keys[e.code] = true;
+                if (e.code === 'Space' || e.code === 'ArrowUp') e.preventDefault();
+                if (e.code === 'Space') this.fireBullet();
+                if (e.code === 'Escape') this.destroy();
+            },
+            
+            handleKeyUp: function(e) {
+                this.keys[e.code] = false;
+            },
 
-  // pick start at center by default
-  const start = cells.get('0:0');
-  const stack = [start];
-  const visited = new Set([start.id()]);
+            fireBullet: function() {
+                const bulletType = this.specialBullet || 'normal';
+                this.bullets.push({
+                    x: this.ship.x + Math.cos(this.ship.angle) * this.ship.size,
+                    y: this.ship.y + Math.sin(this.ship.angle) * this.ship.size,
+                    vx: Math.cos(this.ship.angle) * 10,
+                    vy: Math.sin(this.ship.angle) * 10,
+                    life: 80,
+                    type: bulletType
+                });
+                this.specialBullet = null; // Consume the special bullet
+            },
+            
+            createExplosion: function(x, y, radius, color) {
+                this.explosions.push({x, y, radius, color, life: 30});
+            },
 
-  function biasedOrder(list, cell) {
-    if (bias === 'none') return shuffle(rng, list.slice());
-    // reorder list by bias preferences
-    const scored = list.map(id => {
-      const [r2, c2] = id.split(':').map(Number);
-      let score = 0;
-      if (bias === 'in')  score -= r2;
-      if (bias === 'out') score += r2;
-      if (bias === 'cw')  score += c2 / ringCounts[r2];
-      if (bias === 'ccw') score -= c2 / ringCounts[r2];
-      return { id, s: score + rng() * 0.1 };
-    });
-    scored.sort((a,b) => b.s - a.s);
-    return scored.map(o => o.id);
-  }
+            checkCardStatus: function(card) {
+                if (!card) return;
+                const remainingTargets = this.targets.some(t => t.parentCard === card && t.active);
+                if (!remainingTargets) {
+                    card.classList.add('kickass-card-hittable');
+                    this.targets.push({ el: card, parentCard: null, active: true, isCard: true });
+                }
+            },
 
-  while (stack.length) {
-    const current = stack[stack.length-1];
-    const neigh = neighbors(current).filter(id => !visited.has(id));
-    if (neigh.length === 0) { stack.pop(); continue; }
-    const order = biasedOrder(neigh, current);
-    const nextId = order[0];
-    const next = cells.get(nextId);
-    // link cells both ways
-    current.links.add(nextId);
-    next.links.add(current.id());
-    visited.add(nextId);
-    stack.push(next);
-  }
+            update: function() {
+                // Ship movement
+                if (this.keys['ArrowLeft']) this.ship.angle -= 0.1;
+                if (this.keys['ArrowRight']) this.ship.angle += 0.1;
 
-  // optional braiding: remove some dead-ends by adding an extra link
-  if (braid) {
-    const deadEnds = Array.from(cells.values()).filter(c => c.links.size === 1 && c.r > 0);
-    for (const c of deadEnds) {
-      if (rng() < 0.18) {
-        // link to a non-linked neighbor if available
-        const opts = buildPolarGridNeighborsOnly(c, neighbors).filter(id => !c.links.has(id));
-        if (opts.length) {
-          const pick = choice(rng, opts);
-          c.links.add(pick);
-          const other = cells.get(pick);
-          other.links.add(c.id());
-        }
-      }
-    }
-  }
+                if (this.keys['ArrowUp']) {
+                    this.ship.vx += Math.cos(this.ship.angle) * 0.2;
+                    this.ship.vy += Math.sin(this.ship.angle) * 0.2;
+                }
+                this.ship.vx *= 0.98;
+                this.ship.vy *= 0.98;
+                this.ship.x += this.ship.vx;
+                this.ship.y += this.ship.vy;
 
-  function buildPolarGridNeighborsOnly(cell, neighborsFn) { return neighborsFn(cell); }
+                // Screen wrap
+                if (this.ship.x < 0) this.ship.x = this.width;
+                if (this.ship.x > this.width) this.ship.x = 0;
+                if (this.ship.y < 0) this.ship.y = this.height;
+                if (this.ship.y > this.height) this.ship.y = 0;
 
-  return { grid, start: '0:0' };
-}
+                // Bullets and Collision
+                for (let i = this.bullets.length - 1; i >= 0; i--) {
+                    const b = this.bullets[i];
+                    b.x += b.vx;
+                    b.y += b.vy;
+                    b.life--;
 
-// Convert links to drawable wall segments on canvas
-function drawMaze(ctx, maze, drawCfg) {
-  const { grid } = maze;
-  const { cells, ringCounts } = grid;
-  const { size, wall, color, bg, showGrid, corePct } = drawCfg;
+                    if (b.life <= 0 || b.x < 0 || b.x > this.width || b.y < 0 || b.y > this.height) {
+                        this.bullets.splice(i, 1);
+                        continue;
+                    }
 
-  ctx.save();
-  ctx.clearRect(0,0,size,size);
-  ctx.fillStyle = bg;
-  ctx.fillRect(0,0,size,size);
-  ctx.translate(size/2, size/2);
-  ctx.lineWidth = wall;
-  ctx.strokeStyle = color;
-  ctx.lineCap = 'round';
+                    for (let j = this.targets.length - 1; j >= 0; j--) {
+                        const target = this.targets[j];
+                        if (!target.active) continue;
+                        
+                        const rect = target.el.getBoundingClientRect();
+                        if (b.x > rect.left && b.x < rect.right && b.y > rect.top && b.y < rect.bottom) {
+                            
+                            if (b.type === 'normal') {
+                                target.el.classList.add('kickass-destroyed');
+                                target.active = false;
+                                this.score++;
+                                this.checkCardStatus(target.parentCard);
+                            } else if (b.type === 'bomb' || b.type === 'superbomb') {
+                                const radius = b.type === 'bomb' ? 75 : 150;
+                                const color = b.type === 'bomb' ? 'orange' : 'red';
+                                this.createExplosion(b.x, b.y, radius, color);
+                                this.targets.forEach(t => {
+                                    if (t.active) {
+                                        const tRect = t.el.getBoundingClientRect();
+                                        const tCenterX = tRect.left + tRect.width / 2;
+                                        const tCenterY = tRect.top + tRect.height / 2;
+                                        const dist = Math.sqrt(Math.pow(tCenterX - b.x, 2) + Math.pow(tCenterY - b.y, 2));
+                                        if (dist < radius) {
+                                            t.el.classList.add('kickass-destroyed');
+                                            t.active = false;
+                                            this.score++;
+                                            this.checkCardStatus(t.parentCard);
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            this.bullets.splice(i, 1);
+                            break; 
+                        }
+                    }
+                }
+                
+                // Explosions
+                for (let i = this.explosions.length - 1; i >= 0; i--) {
+                    const exp = this.explosions[i];
+                    exp.life--;
+                    if (exp.life <= 0) {
+                        this.explosions.splice(i, 1);
+                    }
+                }
 
-  const rings = ringCounts.length - 1;
-  const maxRadius = size * 0.48;
-  const r0 = maxRadius * (corePct / 100);
-  const dr = (maxRadius - r0) / rings;
+                // Score and Power-ups
+                if (Math.floor(this.score / 100) > Math.floor(this.lastPowerUpScore / 100)) {
+                    this.specialBullet = 'superbomb';
+                } else if (Math.floor(this.score / 10) > Math.floor(this.lastPowerUpScore / 10)) {
+                    this.specialBullet = 'bomb';
+                }
+                this.lastPowerUpScore = this.score;
 
-  // helpers
-  function arcPath(radius, a0, a1) { ctx.beginPath(); ctx.arc(0,0,radius,a0,a1); ctx.stroke(); }
-  function spokePath(radius0, radius1, ang) { ctx.beginPath(); ctx.moveTo(radius0*Math.cos(ang), radius0*Math.sin(ang)); ctx.lineTo(radius1*Math.cos(ang), radius1*Math.sin(ang)); ctx.stroke(); }
+                this.scoreEl.innerHTML = this.score + " DESTROYED";
+                if(this.specialBullet === 'superbomb') {
+                    this.statusEl.innerHTML = 'MEGA BOMB LOADED!';
+                    this.statusEl.style.color = 'red';
+                } else if (this.specialBullet === 'bomb') {
+                    this.statusEl.innerHTML = 'BOMB LOADED';
+                    this.statusEl.style.color = 'orange';
+                } else {
+                    this.statusEl.innerHTML = '';
+                }
+            },
 
-  // precompute start angle per cell
-  const startAngles = [];
-  for (let r = 0; r <= rings; r++) {
-    startAngles[r] = [];
-    const count = ringCounts[r];
-    for (let c = 0; c < count; c++) startAngles[r][c] = (2*Math.PI) * (c / count);
-  }
+            draw: function() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                
+                // Ship
+                this.ctx.save();
+                this.ctx.translate(this.ship.x, this.ship.y);
+                this.ctx.rotate(this.ship.angle + Math.PI / 2);
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, -this.ship.size / 2);
+                this.ctx.lineTo(this.ship.size / 2, this.ship.size / 2);
+                this.ctx.lineTo(-this.ship.size / 2, this.ship.size / 2);
+                this.ctx.closePath();
+                this.ctx.fillStyle = 'white';
+                this.ctx.strokeStyle = '#4f46e5';
+                this.ctx.lineWidth = 2;
+                this.ctx.fill();
+                this.ctx.stroke();
+                this.ctx.restore();
+                
+                // Bullets
+                for (let i = 0; i < this.bullets.length; i++) {
+                    const b = this.bullets[i];
+                    if(b.type === 'normal') this.ctx.fillStyle = 'lime';
+                    if(b.type === 'bomb') this.ctx.fillStyle = 'orange';
+                    if(b.type === 'superbomb') this.ctx.fillStyle = 'red';
+                    this.ctx.beginPath();
+                    this.ctx.arc(b.x, b.y, b.type === 'normal' ? 3 : 6, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+                
+                // Explosions
+                for (const exp of this.explosions) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(exp.x, exp.y, exp.radius * (1 - exp.life / 30), 0, Math.PI * 2);
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${exp.life / 30})`;
+                    this.ctx.fill();
+                    this.ctx.strokeStyle = `${exp.color}`;
+                    this.ctx.lineWidth = 3;
+                    this.ctx.stroke();
+                }
+            },
 
-  // 1. Draw walls related to the center cell (ring 0) and ring 1
-  const ring1Count = ringCounts[1];
-  const rOuter = r0 + dr;
+            loop: function() {
+                this.update();
+                this.draw();
+                this.raf = requestAnimationFrame(this.loop.bind(this));
+            },
+            
+            destroy: function() {
+                window.removeEventListener('keydown', this.boundKeyDown);
+                window.removeEventListener('keyup', this.boundKeyUp);
+                window.removeEventListener('resize', this.boundResize);
+                cancelAnimationFrame(this.raf);
+                if (this.canvas.parentNode) document.body.removeChild(this.canvas);
+                if (this.scoreEl.parentNode) document.body.removeChild(this.scoreEl);
+                if (this.statusEl.parentNode) document.body.removeChild(this.statusEl);
+                
+                document.querySelectorAll('.kickass-target').forEach(span => {
+                    if (span.parentNode) {
+                        const parent = span.parentNode;
+                        parent.replaceChild(document.createTextNode(span.textContent), span);
+                        parent.normalize();
+                    }
+                });
+                document.querySelectorAll('.kickass-card-hittable').forEach(card => card.classList.remove('kickass-card-hittable'));
+                
+                window.KICKASS_GAME = null;
+            }
+        };
+        window.KICKASS_GAME = KICKASS_GAME;
+        KICKASS_GAME.init();
+      },
+      // === FIN CÓDIGO KONAMI ===
 
-  // The wall separating ring 0 and ring 1 is at rOuter (when r=1)
-  const centerCell = cells.get('0:0');
-  for (let c1 = 0; c1 < ring1Count; c1++) {
-    // Wall/Opening between center (0:0) and cell (1:c1)
-    if (!centerCell.links.has(`1:${c1}`)) {
-      const aS = startAngles[1][c1];
-      const aE = startAngles[1][(c1+1)%ring1Count];
-      arcPath(rOuter, aS, aE);
-    }
-  }
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+      },
 
-  // 2. Draw walls for rings 1 to maxRings
-  for (const cell of cells.values()) {
-    const r = cell.r;
+      setTheme(theme, save = true) {
+        if (save) {
+          localStorage.setItem('creative-toolkit-theme', theme);
+        }
+        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.applyTheme(theme);
+      },
 
-    // Ring 0 is handled above. We start the main loop from Ring 1 (r=1).
-    if (r === 0) continue; 
+      cycleTheme() {
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        const currentIndex = this.THEMES.indexOf(currentTheme);
+        const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length];
+        this.setTheme(nextTheme);
+      },
 
-    const c = cell.c;
-    const count = ringCounts[r];
-    const a0 = startAngles[r][c];
-    const a1 = startAngles[r][(c+1)%count];
-    
-    // The radial walls (spokes) span from r's inner radius to r's outer radius
-    const r_inner_wall = r0 + r * dr;
-    const r_outer_wall = r0 + (r+1) * dr;
-    
-    // Inner wall (connection to r-1) - Only for rings r >= 2
-    if (r > 1) { 
-      const inwardIds = [];
-      const inwardCount = ringCounts[r-1];
-      const ratioIn = inwardCount / ringCounts[r];
-      const inwardIndex = Math.floor(c * ratioIn);
-      inwardIds.push(`${r-1}:${inwardIndex}`);
-      if (Math.floor((c+1) * ratioIn) !== inwardIndex) inwardIds.push(`${r-1}:${(inwardIndex+1)%inwardCount}`);
+      applyTheme(theme) {
+        const isDark = (theme === 'system')
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      },
 
-      const hasInnerLink = inwardIds.some(id => cell.links.has(id));
-      if (!hasInnerLink) arcPath(r_inner_wall, a0, a1);
-    }
+      handleDragStart(e) {
+        const targetCard = e.target.closest('.app-card');
+        if (targetCard) {
+          this.DRAG_STATE.dragged = targetCard;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', targetCard.dataset.id);
+          setTimeout(() => targetCard.classList.add('dragging'), 0);
+        }
+      },
 
+      handleDragOver(e) {
+        e.preventDefault();
+        const targetCard = e.target.closest('.app-card');
+        if (targetCard && targetCard !== this.DRAG_STATE.dragged) {
+          this.DRAG_STATE.over = targetCard;
+          
+          const bounding = targetCard.getBoundingClientRect();
+          const offset = bounding.y + bounding.height / 2;
+          
+          if (e.clientY - offset > 0) {
+            targetCard.parentNode.insertBefore(this.DRAG_STATE.dragged, targetCard.nextSibling);
+          } else {
+            targetCard.parentNode.insertBefore(this.DRAG_STATE.dragged, targetCard);
+          }
+        }
+      },
 
-    // Outer wall (connection to r+1)
-    if (r < rings) {
-      const outerCount = ringCounts[r+1];
-      const ratioOut = outerCount / ringCounts[r];
-      const start = Math.floor(c * ratioOut);
-      const end = Math.floor((c+1) * ratioOut);
-      let hasOuterLink = false;
-      for (let k = start; k <= end; k++) if (cell.links.has(`${r+1}:${k%outerCount}`)) { hasOuterLink = true; break; }
-      if (!hasOuterLink) arcPath(r_outer_wall, a0, a1);
-    } else {
-      // outer boundary of the maze (last ring)
-      arcPath(r_outer_wall, a0, a1);
-    }
+      handleDragLeave(e) { /* Can be empty for this logic */ },
 
-    // Left radial wall (spoke)
-    const leftId = `${r}:${(c-1+count)%count}`;
-    if (!cell.links.has(leftId)) spokePath(r_inner_wall, r_outer_wall, a0);
+      handleDrop(e) {
+        e.preventDefault();
+      },
 
-    // Right radial wall (spoke)
-    const rightId = `${r}:${(c+1)%count}`;
-    if (!cell.links.has(rightId)) spokePath(r_inner_wall, r_outer_wall, a1);
+      handleDragEnd(e) {
+        if (this.DRAG_STATE.dragged) {
+          this.DRAG_STATE.dragged.classList.remove('dragging');
+        }
+        this.DRAG_STATE.dragged = null;
+        this.saveCardOrder();
+      },
 
-    // optional grid overlay
-    if (showGrid) {
-      ctx.save();
-      ctx.globalAlpha = 0.08;
-      ctx.strokeStyle = '#71b7ff';
-      // Draw a faint grid line for the inner boundary of this cell
-      if (r > 0) arcPath(r_inner_wall, 0, 2*Math.PI);
-      ctx.restore();
-    }
-  }
+      saveCardOrder() {
+        const order = Array.from(this.el.appGrid.children).map(card => card.dataset.id);
+        localStorage.setItem('appCardOrder', JSON.stringify(order));
+      },
 
-  ctx.restore();
-}
+      loadCardOrder() {
+        const savedOrder = localStorage.getItem('appCardOrder');
+        if (savedOrder) {
+          const order = JSON.parse(savedOrder);
+          const currentCards = Array.from(this.el.appGrid.children);
+          const cardMap = new Map(currentCards.map(card => [card.dataset.id, card]));
 
-// Shortest path solver using BFS on cell graph
-function solveMaze(maze, startId, targetId) {
-  const { cells } = maze.grid;
-  const queue = [startId];
-  const prev = new Map([[startId, null]]);
-  while (queue.length) {
-    const id = queue.shift();
-    if (id === targetId) break;
-    const cell = cells.get(id);
-    for (const nid of cell.links) if (!prev.has(nid)) { prev.set(nid, id); queue.push(nid); }
-  }
-  if (!prev.has(targetId)) return [];
-  const path = [];
-  for (let at = targetId; at != null; at = prev.get(at)) path.push(at);
-  return path.reverse();
-}
+          const fragment = document.createDocumentFragment();
+          order.forEach(id => {
+            if (cardMap.has(id)) {
+              fragment.appendChild(cardMap.get(id));
+              cardMap.delete(id);
+            }
+          });
+          cardMap.forEach(card => fragment.appendChild(card));
 
-function drawSolution(ctx, maze, drawCfg, path) {
-  if (!path || path.length === 0) return;
-  const { ringCounts } = maze.grid;
-  const { size, bg, corePct } = drawCfg;
-  const rings = ringCounts.length - 1;
-  const maxRadius = size * 0.48;
-  const r0 = maxRadius * (corePct / 100);
-  const dr = (maxRadius - r0) / rings;
+          this.el.appGrid.innerHTML = '';
+          this.el.appGrid.appendChild(fragment);
+        }
+      },
+      
+      // === INICIO DE NUEVAS FUNCIONES ===
+      
+      // -- Contador de Visitas --
+      initVisitorCounter() {
+        if (!this.el.visitorBadgeContainer) return;
 
-  ctx.save();
-  ctx.translate(size/2, size/2);
-  ctx.lineWidth = Math.max(2, drawCfg.wall * 1.6);
-  ctx.strokeStyle = '#5dd6ff';
-  ctx.lineCap = 'round';
-  ctx.globalCompositeOperation = 'lighter';
+        const title = document.title;
+        const pagePath = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/--+/g, '-');
+        const fullPath = `ealfaro29.toolkit.${pagePath}`;
 
-  function centerOfCell(id) {
-    const [r, c] = id.split(':').map(Number);
-    const count = ringCounts[r];
-    const theta = 2*Math.PI * (c + 0.5) / count;
-    const radius = r0 + (r + 0.5) * dr;
-    return [radius*Math.cos(theta), radius*Math.sin(theta)];
-  }
+        let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim().substring(1);
+        if (!accentColor || accentColor.length < 6) {
+          accentColor = '4f46e5'; // Fallback
+        }
+        
+        const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}&label=Visitors&labelColor=%23555555&countColor=%23${accentColor}`;
+        const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}`;
 
-  ctx.beginPath();
-  const [x0, y0] = centerOfCell(path[0]);
-  ctx.moveTo(x0, y0);
-  for (let i = 1; i < path.length; i++) {
-    const [x, y] = centerOfCell(path[i]);
-    ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-  ctx.restore();
-}
+        this.el.visitorBadgeContainer.href = linkUrl;
+        this.el.visitorBadgeContainer.innerHTML = `<img src="${badgeUrl}" alt="Visitor counter" />`;
+      },
 
-// Wire UI
-(function main(){
-  const el = id => document.getElementById(id);
-  const rings = el('rings');
-  const baseCells = el('baseCells');
-  const wall = el('wall');
-  const size = el('size');
-  const core = el('core');
-  const equalize = el('equalize');
-  const seed = el('seed');
-  const bias = el('bias');
-  const braid = el('braid');
-  const color = el('color');
-  const bg = el('bg');
-  const showGrid = el('showGrid');
-  const entrRing = el('entrRing');
-  const exitRing = el('exitRing');
-  const exitArc = el('exitArc');
+      // -- Lógica del Modal de Feedback --
+      openFeedback() {
+        if(this.el.feedbackOverlay) this.el.feedbackOverlay.classList.add('show');
+      },
+      
+      closeFeedback() {
+        if(this.el.feedbackOverlay) this.el.feedbackOverlay.classList.remove('show');
+        if(this.el.feedbackForm) this.el.feedbackForm.reset();
+        this.updateFormDisplay();
+        this.setFormStatus(null);
+      },
+      
+      updateFormDisplay() {
+        const type = this.el.feedbackType.value;
+        
+        if(this.el.formSectionFeedback) this.el.formSectionFeedback.style.display = 'none';
+        if(this.el.formSectionSuggest) this.el.formSectionSuggest.style.display = 'none';
+        if(this.el.formSectionBug) this.el.formSectionBug.style.display = 'none';
+        
+        this.el.feedbackForm.querySelectorAll('.form-section [required]').forEach(el => el.required = false);
+        
+        switch(type) {
+          case 'feedback':
+            if(this.el.formSectionFeedback) this.el.formSectionFeedback.style.display = 'flex';
+            break;
+          case 'suggest':
+            if(this.el.formSectionSuggest) this.el.formSectionSuggest.style.display = 'flex';
+            break;
+          case 'bug':
+            if(this.el.formSectionBug) this.el.formSectionBug.style.display = 'flex';
+            if(this.el.formSectionBug.querySelector('[name="bug_behavior"]')) {
+              this.el.formSectionBug.querySelector('[name="bug_behavior"]').required = true;
+            }
+            break;
+        }
+      },
+      
+      setFormStatus(status, message) {
+        if (!this.el.formStatus) return;
+        
+        this.el.formStatus.style.display = status ? 'block' : 'none';
+        this.el.formStatus.className = ``;
+        
+        if (status) {
+          this.el.formStatus.classList.add(status); // 'sending', 'success', 'error'
+          this.el.formStatus.textContent = message;
+        }
+      },
+      
+      async handleFormSubmit(event) {
+        event.preventDefault();
+        const form = this.el.feedbackForm;
+        const submitButton = this.el.feedbackSubmitBtn;
+        const data = new FormData(form);
 
-  const seedEcho = el('seedEcho');
-  const cellEcho = el('cellEcho');
-  const edgeEcho = el('edgeEcho');
+        this.setFormStatus('sending', 'Sending...');
+        submitButton.disabled = true;
 
-  const cvs = el('maze');
-  const ctx = cvs.getContext('2d');
-  let lastMaze = null;
-  let lastDrawCfg = null;
-  let lastPath = null;
+        try {
+          const response = await fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
 
-  function makeRNG() {
-    let s = seed.value.trim();
-    if (s === '' || s.toLowerCase() === 'auto') s = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    seedEcho.textContent = s;
-    return XorShift32(hash32(s));
-  }
-  function buildCfg() {
-    const ringsVal = Math.max(3, Number(rings.value)|0);
-    const baseVal  = Math.max(3, Number(baseCells.value)|0);
-    const sz = Math.max(200, Math.min(2400, Number(size.value)|0));
-    const wl = Math.max(1, Math.min(20, Number(wall.value)|0));
-    const corePct = Math.max(0, Math.min(25, Number(core.value)|0));
+          if (response.ok) {
+            this.setFormStatus('success', 'Thank you! Your message has been sent.');
+            form.reset();
+            this.updateFormDisplay();
+            setTimeout(() => {
+              this.closeFeedback();
+            }, 2500);
+          } else {
+            const responseData = await response.json();
+            if (responseData.errors) {
+              const errorMsg = responseData.errors.map(err => err.message).join(', ');
+              this.setFormStatus('error', `Error: ${errorMsg}`);
+            } else {
+              this.setFormStatus('error', 'Error submitting the form.');
+            }
+          }
+        } catch (error) {
+          this.setFormStatus('error', 'Network error. Please try again.');
+        } finally {
+          submitButton.disabled = false;
+        }
+      }
+      // === FIN DE NUEVAS FUNCIONES ===
+    };
 
-    const rng = makeRNG();
-    const cfg = {
-      rings: ringsVal,
-      baseCells: baseVal,
-      equalize: equalize.value,
-      rng,
-      bias: bias.value,
-      braid: braid.checked
-    };
-    cvs.width = sz; cvs.height = sz;
-    lastDrawCfg = {
-      size: sz,
-      wall: wl,
-      color: color.value,
-      bg: bg.value,
-      showGrid: showGrid.checked,
-      corePct
-    };
-    return cfg;
-  }
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
 
-  function countCellsEdges(grid) {
-    const cells = grid.cells.size;
-    let edges = 0;
-    for (const cell of grid.cells.values()) edges += cell.links.size;
-    return { cells, edges: edges/2 };
-  }
+  <div id="feedback-overlay" class="popup-overlay">
+    <div class="feedback-modal-content panel">
+      <div class="feedback-header">
+        <h3>Submit Feedback</h3>
+        <button id="feedback-close-btn" title="Close">&times;</button>
+      </div>
+      
+      <form id="feedback-form" action="https://formspree.io/f/xanldeve" method="POST">
+        
+        <div id="form-status"></div>
 
-  function regenerate() {
-    lastPath = null;
-    const cfg = buildCfg();
-    lastMaze = generateMaze(cfg);
-    const stats = countCellsEdges(lastMaze.grid);
-    cellEcho.textContent = stats.cells.toString();
-    edgeEcho.textContent = stats.edges.toString();
-    
-    // Update max values for inputs based on new maze structure
-    const maxRings = cfg.rings;
-    exitRing.max = String(maxRings);
-    entrRing.max = String(maxRings);
+        <div class="form-group">
+          <label for="feedback-type">Message Type</label>
+          <div class="select-wrapper">
+            <select id="feedback-type" name="submission_type" class="form-control" required>
+              <option value="" disabled selected>Choose an option...</option>
+              <option value="feedback">General Feedback</option>
+              <option value="suggest">Suggest an App</option>
+              <option value="bug">Report a Bug</option>
+            </select>
+          </div>
+        </div>
 
-    // Clamp current values if they exceed the new max
-    if (Number(exitRing.value) > maxRings) exitRing.value = String(maxRings);
-    if (Number(entrRing.value) > maxRings) entrRing.value = String(maxRings);
-    
-    // Update max value for exitArc
-    const exitR = Math.min(maxRings, Number(exitRing.value));
-    const ringCount = lastMaze.grid.ringCounts[exitR];
-    if (ringCount) {
-      exitArc.max = String(ringCount - 1);
-      if (Number(exitArc.value) >= ringCount) exitArc.value = '0';
-    }
+        <div id="form-section-feedback" class="form-section">
+          <div class="form-group">
+            <label>Rating</label>
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
+              <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+              <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+              <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+              <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="feedback-comment">Comments</label>
+            <textarea id="feedback-comment" name="comment" class="form-control" rows="4" placeholder="What do you like or what could we improve?"></textarea>
+          </div>
+        </div>
 
-    drawMaze(ctx, lastMaze, lastDrawCfg);
-  }
+        <div id="form-section-suggest" class="form-section">
+          <div class="form-group">
+            <label for="suggest-task">Task to Solve</label>
+            <input type="text" id="suggest-task" name="suggest_task" class="form-control" placeholder="e.g., 'Convert audio to text'">
+          </div>
+          <div class="form-group">
+            <label for="suggest-comment">Additional Comments</label>
+            <textarea id="suggest-comment" name="suggest_comment" class="form-control" rows="4" placeholder="Describe your idea a bit more..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="suggest-name">App Name (Optional)</label>
+            <input type="text" id="suggest-name" name="suggest_name" class="form-control" placeholder="e.g., 'Audio Transcriber'">
+          </div>
+        </div>
 
-  function solve() {
-    if (!lastMaze) return;
-    // choose entrance and exit cells
-    const ringCounts = lastMaze.grid.ringCounts;
-    const maxRings = ringCounts.length - 1;
+        <div id="form-section-bug" class="form-section">
+          <div class="form-group">
+            <label for="bug-app">Which app has the bug?</label>
+            <div class="select-wrapper">
+              <select id="bug-app" name="bug_app" class="form-control">
+                <option value="General">General (Main Website)</option>
+                <option value="Moodboard Studio">Moodboard Studio</option>
+                <option value="Blob Studio">Blob Studio</option>
+                <option value="Jigsaw Generator">Jigsaw Generator</option>
+                <option value="Icon Factory">Icon Factory</option>
+                <option value="QR Code Generator">QR Code Generator</option>
+                <option value="Color Mixer">Color Mixer</option>
+                <option value="Notepad & Kanban">Notepad & Kanban</option>
+                <option value="Locator">Locator</option>
+                <option value="Signature to SVG">Signature to SVG</option>
+                <option value="Any2SVG">Any2SVG</option>
+                <option value="Background Remover">Background Remover</option>
+                <option value="Word Cloud Generator">Word Cloud Generator</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="bug-behavior">Bug Behavior</label>
+            <textarea id="bug-behavior" name="bug_behavior" class="form-control" rows="5" placeholder="What were you doing? What did you expect to happen? What actually happened?" required></textarea>
+          </div>
+        </div>
+        
+        <div class_group" style="border-top: 1px solid var(--border-color); padding-top: var(--space-4);">
+          <label for="user-email">Your Name (Optional)</label>
+          <input type="email" id="user-email" name="email" class="form-control" placeholder="So we can get back to you...">
+        </div>
 
-    // Validate and set entrance ring
-    const erVal = Number(entrRing.value)|0;
-    const er = Math.max(0, Math.min(maxRings, erVal));
-    entrRing.value = String(er);
-
-    // Validate and set exit ring
-    const xrVal = Number(exitRing.value)|0;
-    const xr = Math.max(1, Math.min(maxRings, xrVal)); 
-    exitRing.value = String(xr);
-
-    // Validate and set exit arc index
-    const ringCountAtExit = ringCounts[xr];
-    exitArc.max = String(ringCountAtExit - 1);
-    const xcVal = Number(exitArc.value)|0;
-    const xc = ((xcVal % ringCountAtExit) + ringCountAtExit) % ringCountAtExit;
-    exitArc.value = String(xc);
-
-    // Entrance defaults to cell 0 of its ring.
-    const startId = `${er}:0`;
-    const endId = `${xr}:${xc}`;
-    lastPath = solveMaze(lastMaze, startId, endId);
-    drawMaze(ctx, lastMaze, lastDrawCfg);
-    drawSolution(ctx, lastMaze, lastDrawCfg, lastPath);
-  }
-
-  function clearSolution() {
-    if (!lastMaze) return;
-    lastPath = null;
-    drawMaze(ctx, lastMaze, lastDrawCfg);
-  }
-
-  function exportPNG() {
-    if (!lastMaze) regenerate();
-    const link = document.createElement('a');
-    link.download = `circular-maze-${Date.now()}.png`;
-    link.href = cvs.toDataURL('image/png');
-    link.click();
-  }
-
-  function copyJSON() {
-    if (!lastMaze) return;
-    const payload = {
-      ringCounts: lastMaze.grid.ringCounts,
-      links: Array.from(lastMaze.grid.cells.values()).map(c => ({ id: c.id(), links: Array.from(c.links) }))
-    };
-    const text = JSON.stringify(payload);
-    navigator.clipboard.writeText(text).then(() => {
-      // no toast; keep UI minimal
-    });
-  }
-
-  // Bindings
-  document.getElementById('btn-generate').addEventListener('click', regenerate);
-  document.getElementById('btn-randseed').addEventListener('click', () => { seed.value = 'auto'; regenerate(); });
-  document.getElementById('btn-solve').addEventListener('click', solve);
-  document.getElementById('btn-clear').addEventListener('click', clearSolution);
-  document.getElementById('btn-export').addEventListener('click', exportPNG);
-  document.getElementById('btn-copy-json').addEventListener('click', copyJSON);
-  exitRing.addEventListener('change', () => {
-    if (!lastMaze) return;
-    const ringCount = lastMaze.grid.ringCounts[Number(exitRing.value)];
-    if (ringCount) exitArc.max = String(ringCount - 1);
-    if (Number(exitArc.value) >= ringCount) exitArc.value = '0';
-  });
-
-  // Auto-generate on load
-  regenerate();
-})();
-</script>
-</body>
+        <button type="submit" class="btn btn-primary" id="feedback-submit-btn">Send Feedback</button>
+      </form>
+    </div>
+  </div>
+  </body>
 </html>

@@ -49,20 +49,232 @@
     .kickass-destroyed { opacity: 0; transform: scale(0.5); }
     .kickass-card-hittable { box-shadow: 0 0 15px var(--accent-color) !important; border-color: var(--accent-color) !important; }
 
-    /* ========== START: FLOATING BADGE STYLE ========== */
-    .floating-visitor-badge {
-      position: fixed;
-      bottom: var(--space-4, 16px);
-      right: var(--space-4, 16px);
-      z-index: 1000;
-      opacity: 0.7;
-      transition: opacity var(--duration-standard) ease;
+    /* === 1. INICIA CSS PARA MODAL Y FOOTER === */
+    
+    /* Nuevo Footer Minimalista */
+    .site-footer-minimal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: var(--space-4);
+      /* No background, no border, no shadow */
     }
-    .floating-visitor-badge:hover {
+
+    /* Estilo de botón/enlace Minimalista */
+    .minimal-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-md); /* Suave para hover */
+      color: var(--muted); /* Sutil */
+      text-decoration: none;
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+      font-weight: 500;
+      transition: all var(--duration-standard) ease;
+      cursor: pointer;
+    }
+    .minimal-btn:hover {
+      background-color: var(--surface-alt); /* Fondo sutil en hover */
+      color: var(--ink);
+    }
+    .minimal-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+    .minimal-btn img {
+      height: 20px; /* Altura para la imagen del contador */
+      vertical-align: middle;
+      opacity: 0.7;
+    }
+    .minimal-btn:hover img {
       opacity: 1;
     }
-    /* ========== END: FLOATING BADGE STYLE ========== */
 
+    /* Overlay del Popup */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    /* Contenido del Modal de Feedback */
+    .feedback-modal-content {
+      background: var(--surface-alt);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 2001;
+      width: 500px;
+      max-width: 90vw;
+      max-height: 90vh;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .feedback-header h3 {
+      margin: 0;
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-emphasis);
+    }
+    #feedback-close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      padding: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #feedback-close-btn:hover {
+      background-color: var(--surface);
+      color: var(--ink);
+    }
+
+    /* Formulario */
+    #feedback-form {
+      padding: var(--space-5);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .form-section {
+      display: none; /* Oculto por defecto */
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .form-group label {
+      font-weight: var(--font-weight-medium);
+    }
+    .form-control, .select-wrapper select, textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      resize: vertical;
+      min-height: 40px;
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+    }
+    textarea.form-control {
+      min-height: 80px;
+    }
+    .select-wrapper {
+      position: relative;
+    }
+    .select-wrapper select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      cursor: pointer;
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      height: 40px;
+      padding: 0 var(--space-4);
+      border: 1px solid transparent;
+      transition: all var(--duration-standard) ease;
+    }
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+    }
+    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { 
+      outline: 2px solid var(--accent-color); 
+      outline-offset: 2px; 
+    }
+    .btn:disabled {
+      background-color: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+    
+    /* Estilos para el 5-Star Rating */
+    .star-rating {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    .star-rating input[type="radio"] {
+      display: none;
+    }
+    .star-rating label {
+      font-size: 28px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .star-rating input[type="radio"]:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: #f59e0b; /* Naranja/Amarillo para estrella */
+    }
+    
+    /* Estilos para el estado del formulario */
+    #form-status {
+      padding: var(--space-3);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      font-weight: var(--font-weight-medium);
+      display: none;
+    }
+    #form-status.success {
+      background-color: var(--accent-color-tint);
+      color: var(--accent-color);
+    }
+    #form-status.error {
+      background-color: #fecaca;
+      color: #dc2626;
+    }
+    #form-status.sending {
+      background-color: var(--surface);
+      color: var(--muted);
+    }
+    /* === FIN CSS PARA MODAL Y FOOTER === */
   </style>
 </head>
 <body>
@@ -140,6 +352,15 @@
       </div>
     </main>
 
+    <footer class="site-footer-minimal">
+      <button id="feedback-open-btn" class="minimal-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Feedback</span>
+      </button>
+      
+      <a id="visitor-badge-container" class="minimal-btn" href="https://api.visitorbadge.io" target="_blank" title="Visitor counter">
+        </a>
+    </footer>
     </div>
 
   <script>
@@ -157,12 +378,26 @@
         this.initTheme();
         this.loadCardOrder();
         this.bindEvents();
+        this.initVisitorCounter(); // <-- Llamar al contador de visitas
       },
 
       cacheDOMElements() {
         this.el.themeToggle = document.getElementById('theme-toggle');
         this.el.appGrid = document.getElementById('app-grid');
         this.el.appCards = Array.from(this.el.appGrid.children);
+        
+        // === CACHEAR TODOS LOS ELEMENTOS DEL MODAL Y BOTONES ===
+        const ids = [
+          'feedback-open-btn', 'feedback-overlay', 'feedback-close-btn',
+          'feedback-form', 'feedback-type', 'form-status', 'feedback-submit-btn',
+          'form-section-feedback', 'form-section-suggest', 'form-section-bug',
+          'visitor-badge-container'
+        ];
+        ids.forEach(id => {
+          const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+          const element = document.getElementById(id);
+          if (element) this.el[key] = element;
+        });
       },
 
       bindEvents() {
@@ -180,6 +415,15 @@
         this.el.appGrid.addEventListener('dragend', this.handleDragEnd.bind(this));
 
         window.addEventListener('keydown', this.handleKonamiCode.bind(this));
+        
+        // === BIND EVENTOS DEL MODAL ===
+        if(this.el.feedbackOpenBtn) this.el.feedbackOpenBtn.addEventListener('click', () => this.openFeedback());
+        if(this.el.feedbackCloseBtn) this.el.feedbackCloseBtn.addEventListener('click', () => this.closeFeedback());
+        if(this.el.feedbackOverlay) this.el.feedbackOverlay.addEventListener('click', (e) => {
+          if (e.target === this.el.feedbackOverlay) this.closeFeedback();
+        });
+        if(this.el.feedbackType) this.el.feedbackType.addEventListener('change', () => this.updateFormDisplay());
+        if(this.el.feedbackForm) this.el.feedbackForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
       },
 
       handleKonamiCode(e) {
@@ -195,6 +439,7 @@
           }
       },
       
+      // === CÓDIGO KONAMI COMPLETO RESTAURADO ===
       activateGame() {
         if (window.KICKASS_GAME) return;
 
@@ -469,6 +714,7 @@
         window.KICKASS_GAME = KICKASS_GAME;
         KICKASS_GAME.init();
       },
+      // === FIN CÓDIGO KONAMI ===
 
       initTheme() {
         const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
@@ -562,14 +808,215 @@
           this.el.appGrid.innerHTML = '';
           this.el.appGrid.appendChild(fragment);
         }
+      },
+      
+      // === INICIO DE NUEVAS FUNCIONES ===
+      
+      // -- Contador de Visitas --
+      initVisitorCounter() {
+        if (!this.el.visitorBadgeContainer) return;
+
+        const title = document.title;
+        const pagePath = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/--+/g, '-');
+        const fullPath = `ealfaro29.toolkit.${pagePath}`;
+
+        let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim().substring(1);
+        if (!accentColor || accentColor.length < 6) {
+          accentColor = '4f46e5'; // Fallback
+        }
+        
+        const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}&label=Visitors&labelColor=%23555555&countColor=%23${accentColor}`;
+        const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}`;
+
+        this.el.visitorBadgeContainer.href = linkUrl;
+        this.el.visitorBadgeContainer.innerHTML = `<img src="${badgeUrl}" alt="Visitor counter" />`;
+      },
+
+      // -- Lógica del Modal de Feedback --
+      openFeedback() {
+        if(this.el.feedbackOverlay) this.el.feedbackOverlay.classList.add('show');
+      },
+      
+      closeFeedback() {
+        if(this.el.feedbackOverlay) this.el.feedbackOverlay.classList.remove('show');
+        if(this.el.feedbackForm) this.el.feedbackForm.reset();
+        this.updateFormDisplay();
+        this.setFormStatus(null);
+      },
+      
+      updateFormDisplay() {
+        const type = this.el.feedbackType.value;
+        
+        if(this.el.formSectionFeedback) this.el.formSectionFeedback.style.display = 'none';
+        if(this.el.formSectionSuggest) this.el.formSectionSuggest.style.display = 'none';
+        if(this.el.formSectionBug) this.el.formSectionBug.style.display = 'none';
+        
+        this.el.feedbackForm.querySelectorAll('.form-section [required]').forEach(el => el.required = false);
+        
+        switch(type) {
+          case 'feedback':
+            if(this.el.formSectionFeedback) this.el.formSectionFeedback.style.display = 'flex';
+            break;
+          case 'suggest':
+            if(this.el.formSectionSuggest) this.el.formSectionSuggest.style.display = 'flex';
+            break;
+          case 'bug':
+            if(this.el.formSectionBug) this.el.formSectionBug.style.display = 'flex';
+            if(this.el.formSectionBug.querySelector('[name="bug_behavior"]')) {
+              this.el.formSectionBug.querySelector('[name="bug_behavior"]').required = true;
+            }
+            break;
+        }
+      },
+      
+      setFormStatus(status, message) {
+        if (!this.el.formStatus) return;
+        
+        this.el.formStatus.style.display = status ? 'block' : 'none';
+        this.el.formStatus.className = ``;
+        
+        if (status) {
+          this.el.formStatus.classList.add(status); // 'sending', 'success', 'error'
+          this.el.formStatus.textContent = message;
+        }
+      },
+      
+      async handleFormSubmit(event) {
+        event.preventDefault();
+        const form = this.el.feedbackForm;
+        const submitButton = this.el.feedbackSubmitBtn;
+        const data = new FormData(form);
+
+        this.setFormStatus('sending', 'Sending...');
+        submitButton.disabled = true;
+
+        try {
+          const response = await fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            this.setFormStatus('success', 'Thank you! Your message has been sent.');
+            form.reset();
+            this.updateFormDisplay();
+            setTimeout(() => {
+              this.closeFeedback();
+            }, 2500);
+          } else {
+            const responseData = await response.json();
+            if (responseData.errors) {
+              const errorMsg = responseData.errors.map(err => err.message).join(', ');
+              this.setFormStatus('error', `Error: ${errorMsg}`);
+            } else {
+              this.setFormStatus('error', 'Error submitting the form.');
+            }
+          }
+        } catch (error) {
+          this.setFormStatus('error', 'Network error. Please try again.');
+        } finally {
+          submitButton.disabled = false;
+        }
       }
+      // === FIN DE NUEVAS FUNCIONES ===
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
   </script>
 
-  <a href="https://api.visitorbadge.io/api/visitors?path=ealfaro29.toolkit" class="floating-visitor-badge">
-    <img src="https://api.visitorbadge.io/api/visitors?path=ealfaro29.toolkit&labelColor=%23555555&countColor=%234f46e5" alt="Visitor counter badge" />
-  </a>
+  <div id="feedback-overlay" class="popup-overlay">
+    <div class="feedback-modal-content panel">
+      <div class="feedback-header">
+        <h3>Submit Feedback</h3>
+        <button id="feedback-close-btn" title="Close">&times;</button>
+      </div>
+      
+      <form id="feedback-form" action="https://formspree.io/f/xanldeve" method="POST">
+        
+        <div id="form-status"></div>
+
+        <div class="form-group">
+          <label for="feedback-type">Message Type</label>
+          <div class="select-wrapper">
+            <select id="feedback-type" name="submission_type" class="form-control" required>
+              <option value="" disabled selected>Choose an option...</option>
+              <option value="feedback">General Feedback</option>
+              <option value="suggest">Suggest an App</option>
+              <option value="bug">Report a Bug</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="form-section-feedback" class="form-section">
+          <div class="form-group">
+            <label>Rating</label>
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
+              <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+              <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+              <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+              <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="feedback-comment">Comments</label>
+            <textarea id="feedback-comment" name="comment" class="form-control" rows="4" placeholder="What do you like or what could we improve?"></textarea>
+          </div>
+        </div>
+
+        <div id="form-section-suggest" class="form-section">
+          <div class="form-group">
+            <label for="suggest-task">Task to Solve</label>
+            <input type="text" id="suggest-task" name="suggest_task" class="form-control" placeholder="e.g., 'Convert audio to text'">
+          </div>
+          <div class="form-group">
+            <label for="suggest-comment">Additional Comments</label>
+            <textarea id="suggest-comment" name="suggest_comment" class="form-control" rows="4" placeholder="Describe your idea a bit more..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="suggest-name">App Name (Optional)</label>
+            <input type="text" id="suggest-name" name="suggest_name" class="form-control" placeholder="e.g., 'Audio Transcriber'">
+          </div>
+        </div>
+
+        <div id="form-section-bug" class="form-section">
+          <div class="form-group">
+            <label for="bug-app">Which app has the bug?</label>
+            <div class="select-wrapper">
+              <select id="bug-app" name="bug_app" class="form-control">
+                <option value="General">General (Main Website)</option>
+                <option value="Moodboard Studio">Moodboard Studio</option>
+                <option value="Blob Studio">Blob Studio</option>
+                <option value="Jigsaw Generator">Jigsaw Generator</option>
+                <option value="Icon Factory">Icon Factory</option>
+                <option value="QR Code Generator">QR Code Generator</option>
+                <option value="Color Mixer">Color Mixer</option>
+                <option value="Notepad & Kanban">Notepad & Kanban</option>
+                <option value="Locator">Locator</option>
+                <option value="Signature to SVG">Signature to SVG</option>
+                <option value="Any2SVG">Any2SVG</option>
+                <option value="Background Remover">Background Remover</option>
+                <option value="Word Cloud Generator">Word Cloud Generator</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="bug-behavior">Bug Behavior</label>
+            <textarea id="bug-behavior" name="bug_behavior" class="form-control" rows="5" placeholder="What were you doing? What did you expect to happen? What actually happened?" required></textarea>
+          </div>
+        </div>
+        
+        <div class_group" style="border-top: 1px solid var(--border-color); padding-top: var(--space-4);">
+          <label for="user-email">Your Name (Optional)</label>
+          <input type="email" id="user-email" name="email" class="form-control" placeholder="So we can get back to you...">
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="feedback-submit-btn">Send Feedback</button>
+      </form>
+    </div>
+  </div>
   </body>
 </html>
