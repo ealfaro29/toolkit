@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brick Builder</title>
+    <script>
+        (function () {
+            try {
+                let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.dataset.theme = theme;
+            } catch (e) { }
+        })();
+    </script>
+
+    <style>
+        :root {
+            --accent-color: #EF4444;
+            /* Red for Bricks */
+            --accent-color-tint: #fee2e2;
+            --color-text-primary-light: #1C1C1E;
+            --color-text-secondary-light: #3A3A3C;
+            --color-surface-light: #F5F5F7;
+            --color-background-light: #FFFFFF;
+            --color-divider-light: #EAEAEA;
+            --color-text-primary-dark: #EAEAEB;
+            --color-text-secondary-dark: #9A9A9E;
+            --color-surface-dark: #121212;
+            --color-background-dark: #1E1E1E;
+            --color-divider-dark: #3A3A3C;
+            --color-accent-text: #FFFFFF;
+            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            --font-size-h1: 20px;
+            --font-size-body: 14px;
+            --font-size-caption: 12px;
+            --font-weight-emphasis: 600;
+            --font-weight-medium: 500;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-xl: 16px;
+            --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --duration-standard: 200ms;
+        }
+
+        html[data-theme="light"] {
+            --ink: var(--color-text-primary-light);
+            --muted: var(--color-text-secondary-light);
+            --surface: var(--color-surface-light);
+            --surface-alt: var(--color-background-light);
+            --border-color: var(--color-divider-light);
+            --panel-shadow: var(--shadow-raised-2);
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            --ink: var(--color-text-primary-dark);
+            --muted: var(--color-text-secondary-dark);
+            --surface: var(--color-surface-dark);
+            --surface-alt: var(--color-background-dark);
+            --border-color: var(--color-divider-dark);
+            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color-scheme: dark;
+        }
+
+        html {
+            box-sizing: border-box;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background-color: var(--surface);
+            font: var(--font-size-body)/1.5 var(--font-family-sans);
+            padding: 25px;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .container {
+            max-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .container.loading {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        /* Header */
+        header.panel {
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--space-4);
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        header h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+            margin: 0;
+        }
+
+        header .sub {
+            color: var(--muted);
+            font-size: var(--font-size-caption);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .back-to-home {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            text-decoration: none;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+        }
+
+        .icon-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: var(--font-weight-emphasis);
+            font-size: 14px;
+            border-radius: var(--radius-md);
+            height: 36px;
+            padding: 0 var(--space-4);
+            border: 1px solid transparent;
+            transition: all var(--duration-standard) ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--color-accent-text);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            color: var(--ink);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .btn-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .separator {
+            width: 1px;
+            height: 24px;
+            background-color: var(--border-color);
+            margin: 0 var(--space-2);
+        }
+
+        /* Main Layout */
+        .main-area {
+            flex: 1;
+            display: flex;
+            gap: 25px;
+            min-height: 0;
+            position: relative;
+        }
+
+        /* Canvas */
+        .canvas-container {
+            flex: 1;
+            background-color: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            grid-template-rows: 40px 1fr;
+        }
+
+        #canvas-svg {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            display: block;
+            touch-action: none;
+        }
+
+        /* Rulers */
+        .ruler-corner {
+            background-color: var(--surface);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .ruler-h {
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ruler-v {
+            background-color: var(--surface);
+            border-right: 1px solid var(--border-color);
+            z-index: 10;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-viewport {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            background-color: var(--surface-alt);
+        }
+
+        /* Dock */
+        .dock {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2);
+            display: flex;
+            gap: var(--space-2);
+            box-shadow: var(--shadow-floating-3);
+            z-index: 30;
+        }
+
+        .dock-separator {
+            width: 1px;
+            background-color: var(--border-color);
+            margin: 4px 0;
+            align-self: stretch;
+        }
+
+        .dock-item {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .dock-item:hover {
+            background-color: var(--surface-alt);
+            transform: translateY(-2px);
+        }
+
+        .dock-item.active {
+            background-color: rgba(79, 70, 229, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .dock-item svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .dock-tooltip {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--ink);
+            color: var(--surface);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, top 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .dock-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid var(--ink);
+        }
+
+        .dock-tooltip small {
+            opacity: 0.7;
+            margin-left: 6px;
+            font-size: 9px;
+        }
+
+        .dock-item:hover .dock-tooltip {
+            opacity: 1;
+            top: -45px;
+        }
+
+        /* Properties Panel */
+        .properties-panel {
+            width: 280px;
+            background-color: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .properties-panel.hidden {
+            transform: translateX(320px);
+            display: none;
+        }
+
+        .panel-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .panel-header {
+            font-weight: var(--font-weight-emphasis);
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-2);
+        }
+
+        .control-label {
+            font-size: 13px;
+            color: var(--ink);
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+
+        .color-swatch.active {
+            border-color: var(--ink);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .number-input {
+            width: 60px;
+            padding: 4px 8px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--ink);
+            font-family: var(--font-family-sans);
+            font-size: 13px;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background-color: var(--surface);
+            padding: 8px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-raised-2);
+            z-index: 30;
+        }
+
+        .zoom-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .zoom-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .zoom-level {
+            font-size: 10px;
+            text-align: center;
+            color: var(--muted);
+            padding: 4px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Splash Screen */
+        .splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .splash-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            width: 800px;
+            height: 450px;
+            max-width: 90vw;
+            max-height: 80vh;
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-floating-3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .splash-info {
+            flex: 0 0 300px;
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .splash-image {
+            flex: 1;
+            background: linear-gradient(135deg, #ef4444 0%, #3b82f6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0.8;
+        }
+
+        #splash-close-btn {
+            position: absolute;
+            top: var(--space-3);
+            right: var(--space-3);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* Wiki Modal */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .wiki-modal-content {
+            background: var(--surface-alt);
+            border-radius: var(--radius-xl);
+            width: 800px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-floating-3);
+        }
+
+        .wiki-header {
+            height: 80px;
+            background: linear-gradient(to right, #ef4444, #3b82f6);
+            padding: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .wiki-body {
+            padding: var(--space-5);
+            overflow-y: auto;
+            display: flex;
+            gap: var(--space-5);
+        }
+
+        .wiki-column {
+            flex: 1;
+        }
+
+        /* Utility */
+        .panel {
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--panel-shadow);
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-floating-3);
+            padding: 4px 0;
+            z-index: 1000;
+            display: none;
+            min-width: 160px;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            font-size: 13px;
+            color: var(--ink);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .context-menu-item:hover {
+            background-color: var(--surface);
+        }
+
+        .context-menu-item.danger {
+            color: #ef4444;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 4px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Context Menu -->
+    <div id="context-menu" class="context-menu">
+        <div class="context-menu-item" id="ctx-duplicate">Duplicate <span>D</span></div>
+        <div class="context-menu-item" id="ctx-rotate">Rotate <span>R</span></div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-group">Group <span>Ctrl+G</span></div>
+        <div class="context-menu-item" id="ctx-ungroup">Ungroup <span>Ctrl+Shift+G</span></div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item" id="ctx-front">Bring to Front</div>
+        <div class="context-menu-item" id="ctx-back">Send to Back</div>
+        <div class="context-menu-separator"></div>
+        <div class="context-menu-item danger" id="ctx-delete">Delete <span>Del</span></div>
+    </div>
+
+    <!-- Splash Screen -->
+    <div class="splash-overlay" id="splash-screen">
+        <div class="splash-content">
+            <button id="splash-close-btn" title="Close">&times;</button>
+            <div class="splash-info">
+                <span style="font-size: 48px; margin-bottom: 16px;">🧱</span>
+                <h2 style="margin: 0 0 16px 0; color: var(--accent-color);">Brick Builder</h2>
+                <p style="color: var(--muted); line-height: 1.6;">A modern, 2D brick building experience. Design your
+                    creations with customizable bricks, slopes, and arches.</p>
+                <p style="margin-top: auto; font-size: 12px; color: var(--muted);">2025. Toolkit by e</p>
+            </div>
+            <div class="splash-image"
+                style="background-image: url('modal.png'); background-size: cover; background-position: center;">
+            </div>
+        </div>
+    </div>
+
+    <div class="container loading" id="app-container">
+        <!-- Header -->
+        <header class="panel">
+            <div class="header-left">
+                <a href="../index.html" class="back-to-home" title="Return to Home">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </a>
+                <div>
+                    <h1>Brick Builder</h1>
+                    <div class="sub">Create 2D Masterpieces</div>
+                </div>
+            </div>
+
+            <div class="header-controls">
+                <span id="save-indicator" style="font-size: 12px; color: var(--muted); margin-right: 8px;">Not
+                    saved</span>
+                <button id="restore-btn" class="btn btn-secondary"
+                    style="font-size: 11px; padding: 4px 8px; display: none;" title="Restore auto-saved work">↻
+                    Restore</button>
+                <button id="flip-btn" class="btn btn-secondary" title="Flip (R)" disabled>Flip</button>
+                <button id="delete-btn" class="btn btn-danger" title="Delete (Del)" disabled>Delete</button>
+                <div class="separator"></div>
+                <button id="clear-btn" class="btn btn-secondary">Clear</button>
+                <button id="export-png-btn" class="btn btn-secondary">Export PNG</button>
+                <button id="export-btn" class="btn btn-primary">Export SVG ⬇️</button>
+                <div class="separator"></div>
+                <button id="wiki-open-btn" class="icon-btn" title="Info">ⓘ</button>
+                <button id="theme-toggle" class="icon-btn" title="Change theme"></button>
+            </div>
+        </header>
+
+        <!-- Main Area -->
+        <div class="main-area">
+            <!-- Canvas -->
+            <div class="canvas-container" id="canvas-container">
+                <div class="ruler-corner">px</div>
+                <div class="ruler-h"><canvas id="ruler-h"></canvas></div>
+                <div class="ruler-v"><canvas id="ruler-v"></canvas></div>
+                <div class="canvas-viewport" id="canvas-viewport">
+                    <svg id="canvas-svg">
+                        <defs>
+                            <pattern id="grid" width="30" height="36" patternUnits="userSpaceOnUse">
+                                <path d="M 30 0 L 0 0 0 36" fill="none" stroke="rgba(128,128,128,0.1)"
+                                    stroke-width="1" />
+                            </pattern>
+                        </defs>
+                        <g id="canvas-transform" transform="translate(0,0) scale(1)">
+                            <rect x="-50000" y="-50000" width="100000" height="100000" fill="url(#grid)" />
+                            <line x1="-50000" y1="500" x2="50000" y2="500" stroke="rgba(128,128,128,0.3)"
+                                stroke-width="2" />
+                            <g id="bricks-layer"></g>
+                            <rect id="selection-box" fill="rgba(79, 70, 229, 0.2)" stroke="#4f46e5" stroke-width="1"
+                                stroke-dasharray="4 2" style="display: none;" />
+                        </g>
+                    </svg>
+
+                    <!-- Dock -->
+                    <div class="dock" id="dock">
+                        <!-- Dock items will be injected here -->
+                    </div>
+
+                    <!-- Zoom Controls -->
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" id="zoom-in">+</button>
+                        <div class="zoom-level" id="zoom-level">100%</div>
+                        <button class="zoom-btn" id="zoom-out">-</button>
+                        <button class="zoom-btn" id="zoom-reset" title="Reset View">R</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Properties Panel -->
+            <aside class="properties-panel" id="properties-panel">
+                <div class="panel-section">
+                    <div class="panel-header">Selection</div>
+                    <div id="selection-info" style="font-size: 13px; color: var(--muted);">No bricks selected</div>
+                </div>
+
+                <div id="properties-content" style="display: none; flex-direction: column; gap: var(--space-4);">
+                    <div class="panel-section">
+                        <div class="panel-header">Color</div>
+                        <div class="color-grid" id="color-grid">
+                            <!-- Colors injected here -->
+                        </div>
+                        <div class="control-row" style="margin-top: 12px;">
+                            <span class="control-label">Custom</span>
+                            <input type="color" id="custom-color"
+                                style="width: 40px; height: 32px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <div class="panel-header">Dimensions</div>
+                        <div class="control-row">
+                            <span class="control-label">Width</span>
+                            <div class="input-group">
+                                <input type="number" id="prop-width" class="number-input" step="1" min="1">
+                                <span style="font-size: 10px; color: var(--muted);">u</span>
+                            </div>
+                        </div>
+                        <div class="control-row">
+                            <span class="control-label">Height</span>
+                            <div class="input-group">
+                                <input type="number" id="prop-height" class="number-input" step="1" min="1">
+                                <span style="font-size: 10px; color: var(--muted);">u</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <div class="panel-header">Layering</div>
+                        <div class="control-row">
+                            <button id="bring-front-btn" class="btn btn-secondary"
+                                style="flex: 1; font-size: 12px;">Bring to Front</button>
+                            <button id="send-back-btn" class="btn btn-secondary" style="flex: 1; font-size: 12px;">Send
+                                to Back</button>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <div class="panel-header">Alignment</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                            <button class="btn btn-secondary" id="align-left" title="Align Left"
+                                style="padding: 0;">⇤</button>
+                            <button class="btn btn-secondary" id="align-center-x" title="Align Center X"
+                                style="padding: 0;">⇹</button>
+                            <button class="btn btn-secondary" id="align-right" title="Align Right"
+                                style="padding: 0;">⇥</button>
+                            <button class="btn btn-secondary" id="align-top" title="Align Top"
+                                style="padding: 0;">⤒</button>
+                            <button class="btn btn-secondary" id="align-center-y" title="Align Center Y"
+                                style="padding: 0;">⇕</button>
+                            <button class="btn btn-secondary" id="align-bottom" title="Align Bottom"
+                                style="padding: 0;">⤓</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Wiki Modal -->
+    <div class="popup-overlay" id="wiki-overlay">
+        <div class="wiki-modal-content">
+            <div class="wiki-header">
+                <h3 style="margin: 0;">Info</h3>
+                <button id="wiki-close-btn" class="icon-btn"
+                    style="background: rgba(255,255,255,0.2); border: none; color: white;">&times;</button>
+            </div>
+            <div class="wiki-body">
+                <div class="wiki-column">
+                    <h4 style="color: var(--accent-color);">How to Use</h4>
+                    <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                        <li><b>Add Bricks:</b> Click on any brick in the bottom Dock to add it.</li>
+                        <li><b>Move:</b> Drag bricks to position them. They snap to the grid.</li>
+                        <li><b>Customize:</b> Select a brick to change size and color in the panel.</li>
+                        <li><b>Custom Colors:</b> Use the Custom color picker for any RGB color.</li>
+                        <li><b>Shortcuts:</b>
+                            <ul style="font-size: 12px; color: var(--muted);">
+                                <li><b>R:</b> Rotate</li>
+                                <li><b>Del:</b> Delete</li>
+                                <li><b>D:</b> Duplicate</li>
+                                <li><b>H:</b> Hand / Pan (Toggle)</li>
+                                <li><b>V:</b> Select Tool</li>
+                                <li><b>Space:</b> Hold to Pan</li>
+                                <li><b>Ctrl+Z/Y:</b> Undo/Redo</li>
+                                <li><b>Ctrl+G:</b> Group / Ungroup</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="wiki-column">
+                    <h4 style="color: var(--accent-color);">Features <span
+                            style="font-size: 11px; opacity: 0.7;">v2.3.0</span></h4>
+                    <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                        <li><b>Smart Bricks:</b> Resizable bricks, slopes, and arches.</li>
+                        <li><b>Auto-Save:</b> Work saved every 30s automatically.</li>
+                        <li><b>Export:</b> Save as SVG or PNG format.</li>
+                        <li><b>Custom Colors:</b> Any color via color picker.</li>
+                        <li><b>Selection Info:</b> Live brick count and type display.</li>
+                        <li><b>Grouping:</b> Group multiple bricks together.</li>
+                        <li><b>Alignment:</b> Align and distribute tools.</li>
+                        <li><b>Themes:</b> Light and Dark mode support.</li>
+                    </ul>
+                    <div
+                        style="margin-top: 16px; padding: 12px; background: rgba(239,68,68,0.1); border-radius: 8px; font-size: 12px;">
+                        <b>💾 Auto-Save Active</b><br>
+                        Your work is automatically saved every 30 seconds to your browser.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Keyboard Shortcuts Modal -->
+            <div class="popup-overlay" id="shortcuts-overlay">
+                <div class="wiki-modal-content">
+                    <div class="wiki-header">
+                        <h3 style="margin: 0;">⌨️ Keyboard Shortcuts</h3>
+                        <button id="shortcuts-close-btn" class="icon-btn"
+                            style="background: rgba(255,255,255,0.2); border: none; color: white;">&times;</button>
+                    </div>
+                    <div class="wiki-body" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+                        <div>
+                            <h4 style="color: var(--accent-color); margin-bottom: 12px;">Tools</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Select Tool</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">V</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Hand Tool (Pan)</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">H</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Hold to Pan</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Space</kbd>
+                                </div>
+                            </div>
+
+                            <h4 style="color: var(--accent-color); margin: 20px 0 12px;">Edit</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Duplicate</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">D</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Rotate</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">R</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Delete</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Del</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Undo</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Ctrl+Z</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Redo</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Ctrl+Y</kbd>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="color: var(--accent-color); margin-bottom: 12px;">Selection</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Group</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Ctrl+G</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Ungroup</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Ctrl+Shift+G</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Select All</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Ctrl+A</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Deselect</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">Esc</kbd>
+                                </div>
+                            </div>
+
+                            <h4 style="color: var(--accent-color); margin: 20px 0 12px;">View</h4>
+                            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Show Shortcuts</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">?</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Zoom In/Out</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">+/-</kbd>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Reset Zoom</span>
+                                    <kbd
+                                        style="background: var(--surface-alt); padding: 2px 8px; border-radius: 4px; font-family: monospace;">0</kbd>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+
+</html>
