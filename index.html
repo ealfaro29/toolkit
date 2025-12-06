@@ -241,6 +241,30 @@
       display: none;
     }
 
+    /* Keyboard navigation highlight */
+    .app-card.keyboard-selected {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+      box-shadow: 0 0 0 6px rgba(79, 70, 229, 0.4), 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Return animation */
+    @keyframes pageReturn {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    body.page-return .app-grid {
+      animation: pageReturn 0.5s ease forwards;
+    }
+
     /* Glass overlay content area */
     .card-glass-content {
       position: relative;
@@ -751,11 +775,33 @@
     /* Nuevo Footer Minimalista */
     .site-footer-minimal {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       gap: 12px;
       padding: var(--space-4);
-      /* No background, no border, no shadow */
+    }
+
+    .footer-left,
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-version,
+    .footer-app-count,
+    .footer-hint {
+      color: var(--muted);
+      font-size: var(--font-size-caption);
+    }
+
+    .footer-divider {
+      color: var(--border-color);
+      font-size: 10px;
+    }
+
+    .footer-hint {
+      opacity: 0.7;
     }
 
     /* Estilo de botón/enlace Minimalista */
@@ -1142,17 +1188,25 @@
     </main>
 
     <footer class="site-footer-minimal">
-      <button id="feedback-open-btn" class="minimal-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span>Feedback</span>
-      </button>
-
-      <a id="visitor-badge-container" class="minimal-btn" href="https://api.visitorbadge.io" target="_blank"
-        title="Visitor counter">
-      </a>
+      <div class="footer-left">
+        <span class="footer-version">v1.0.0</span>
+        <span class="footer-divider">•</span>
+        <span class="footer-app-count">13 apps</span>
+        <span class="footer-divider">•</span>
+        <span class="footer-hint">⌨️ Use arrow keys to navigate</span>
+      </div>
+      <div class="footer-right">
+        <button id="feedback-open-btn" class="minimal-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Feedback</span>
+        </button>
+        <a id="visitor-badge-container" class="minimal-btn" href="https://api.visitorbadge.io" target="_blank"
+          title="Visitor counter">
+        </a>
+      </div>
     </footer>
   </div>
 
@@ -1165,13 +1219,16 @@
 
       konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
       konamiIndex: 0,
+      selectedCardIndex: -1,
 
       init() {
         this.cacheDOMElements();
         this.initTheme();
         this.loadCardOrder();
+        this.sortByUsage();
         this.bindEvents();
-        this.initVisitorCounter(); // <-- Llamar al contador de visitas
+        this.initVisitorCounter();
+        this.checkReturnAnimation();
       },
 
       cacheDOMElements() {
@@ -1243,12 +1300,20 @@
         document.querySelectorAll('.app-card, .featured-card').forEach(card => {
           card.addEventListener('click', (e) => this.handleCardClick(e, card));
         });
+
+        // Keyboard navigation
+        window.addEventListener('keydown', (e) => this.handleKeyboardNav(e));
       },
 
       handleCardClick(e, card) {
         e.preventDefault();
         const href = card.getAttribute('href');
         if (!href) return;
+
+        // Track usage and set returning flag
+        const appId = card.dataset.id;
+        if (appId) this.trackUsage(appId);
+        sessionStorage.setItem('vgtools-returning', 'true');
 
         // Get card color and icon from data attribute
         const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
@@ -1304,6 +1369,86 @@
           const desc = featuredCard.querySelector('.app-card-description')?.textContent.toLowerCase() || '';
           const matches = title.includes(query) || desc.includes(query);
           featuredCard.style.display = matches ? '' : 'none';
+        }
+      },
+
+      // === USAGE TRACKING ===
+      sortByUsage() {
+        const usage = JSON.parse(localStorage.getItem('vgtools-usage') || '{}');
+        const cards = Array.from(this.el.appGrid.children);
+
+        // Sort cards by usage count (descending), keeping NEW apps first
+        cards.sort((a, b) => {
+          const aIsNew = a.classList.contains('app-card-new');
+          const bIsNew = b.classList.contains('app-card-new');
+          if (aIsNew && !bIsNew) return -1;
+          if (!aIsNew && bIsNew) return 1;
+
+          const aUsage = usage[a.dataset.id] || 0;
+          const bUsage = usage[b.dataset.id] || 0;
+          return bUsage - aUsage;
+        });
+
+        // Reappend in new order
+        cards.forEach(card => this.el.appGrid.appendChild(card));
+        this.el.appCards = cards;
+      },
+
+      trackUsage(appId) {
+        const usage = JSON.parse(localStorage.getItem('vgtools-usage') || '{}');
+        usage[appId] = (usage[appId] || 0) + 1;
+        localStorage.setItem('vgtools-usage', JSON.stringify(usage));
+      },
+
+      // === KEYBOARD NAVIGATION ===
+      handleKeyboardNav(e) {
+        // Skip if typing in search
+        if (document.activeElement === this.el.searchInput) return;
+
+        const visibleCards = this.el.appCards.filter(c => !c.classList.contains('hidden'));
+        if (visibleCards.length === 0) return;
+
+        const cols = Math.floor(this.el.appGrid.offsetWidth / visibleCards[0].offsetWidth) || 3;
+
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          this.selectedCardIndex = Math.min(this.selectedCardIndex + 1, visibleCards.length - 1);
+          this.highlightCard(visibleCards);
+        } else if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          this.selectedCardIndex = Math.max(this.selectedCardIndex - 1, 0);
+          this.highlightCard(visibleCards);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          this.selectedCardIndex = Math.min(this.selectedCardIndex + cols, visibleCards.length - 1);
+          this.highlightCard(visibleCards);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          this.selectedCardIndex = Math.max(this.selectedCardIndex - cols, 0);
+          this.highlightCard(visibleCards);
+        } else if (e.key === 'Enter' && this.selectedCardIndex >= 0) {
+          e.preventDefault();
+          visibleCards[this.selectedCardIndex]?.click();
+        } else if (e.key === 'Escape') {
+          this.selectedCardIndex = -1;
+          this.el.appCards.forEach(c => c.classList.remove('keyboard-selected'));
+        }
+      },
+
+      highlightCard(visibleCards) {
+        this.el.appCards.forEach(c => c.classList.remove('keyboard-selected'));
+        if (this.selectedCardIndex >= 0 && visibleCards[this.selectedCardIndex]) {
+          visibleCards[this.selectedCardIndex].classList.add('keyboard-selected');
+          visibleCards[this.selectedCardIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      },
+
+      // === RETURN ANIMATION ===
+      checkReturnAnimation() {
+        if (sessionStorage.getItem('vgtools-returning')) {
+          sessionStorage.removeItem('vgtools-returning');
+          document.body.classList.add('page-return');
+          setTimeout(() => document.body.classList.remove('page-return'), 600);
         }
       },
 
