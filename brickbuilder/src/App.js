@@ -1264,9 +1264,9 @@ export const App = {
             if (type.shape === 'slope') {
                 body = document.createElementNS(svgNS, "path");
                 if (brick.rotation === 180) {
-                    body.setAttribute("d", `M1 ${bHeight - 1} L${bWidth - 1} ${bHeight - 1} L${bWidth - 1} 1 L1 ${bHeight - 10} Z`);
+                    body.setAttribute("d", `M1 ${bHeight - 1} L${bWidth - 1} ${bHeight - 1} L${bWidth - 1} 1 Z`);
                 } else {
-                    body.setAttribute("d", `M1 ${bHeight - 1} L${bWidth - 1} ${bHeight - 1} L${bWidth - 1} ${bHeight - 10} L1 1 Z`);
+                    body.setAttribute("d", `M1 ${bHeight - 1} L${bWidth - 1} ${bHeight - 1} L${bWidth - 1} 1 Z`);
                 }
             } else if (type.shape === 'arch') {
                 body = document.createElementNS(svgNS, "path");
