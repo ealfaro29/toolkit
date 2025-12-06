@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Creative Toolkit</title>
+  <title>VGTools Pro</title>
   <style>
     :root {
       --accent-color: #4f46e5;
@@ -109,8 +109,50 @@
       color: var(--muted);
     }
 
-    .theme-switcher {
+    /* Search Bar */
+    .search-container {
+      position: relative;
       margin-left: auto;
+      margin-right: var(--space-3);
+    }
+
+    .search-input {
+      width: 220px;
+      height: 36px;
+      padding: 0 var(--space-4) 0 36px;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      background-color: var(--surface);
+      color: var(--ink);
+      font-size: var(--font-size-body);
+      font-family: var(--font-family-sans);
+      transition: all var(--duration-standard) ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+      width: 280px;
+    }
+
+    .search-input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .theme-switcher {
+      display: flex;
     }
 
     #theme-toggle {
@@ -132,31 +174,62 @@
       background-color: var(--surface-alt);
     }
 
+    /* Stagger Animation */
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .app-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
     }
 
     .app-card {
       text-decoration: none;
-      color: var(--ink);
-      background: var(--surface-alt);
-      border: 1px solid var(--border-color);
+      color: #fff;
       border-radius: var(--radius-xl);
       box-shadow: var(--panel-shadow);
-      padding: var(--space-5);
+      cursor: pointer;
+      opacity: 0;
+      animation: cardEntrance 0.5s ease forwards;
+      animation-delay: var(--stagger-delay, 0ms);
+      aspect-ratio: 1 / 1.1;
+      /* More square-ish cards */
+      position: relative;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      gap: var(--space-3);
-      transition: transform var(--duration-standard) ease, box-shadow var(--duration-standard) ease;
-      border-top: 4px solid var(--card-accent-color);
-      cursor: grab;
+      justify-content: flex-end;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background-color: var(--card-accent-color, var(--accent-color));
+    }
+
+    .app-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--card-bg-image) center/cover no-repeat;
+      z-index: 0;
+      transition: transform 0.4s ease, opacity 0.3s ease;
+      opacity: 0.75;
+    }
+
+    .app-card:hover::before {
+      transform: scale(1.02);
     }
 
     .app-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-floating-3);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
 
     .app-card.dragging {
@@ -164,28 +237,351 @@
       cursor: grabbing;
     }
 
+    .app-card.hidden {
+      display: none;
+    }
+
+    /* Glass overlay content area */
+    .card-glass-content {
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+      border-radius: 16px 16px 0 0;
+      /* Rounded top corners */
+      background: linear-gradient(to top,
+          rgba(0, 0, 0, 0.85) 0%,
+          rgba(0, 0, 0, 0.6) 60%,
+          rgba(0, 0, 0, 0.3) 100%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Dark mode: subtle border for card visibility */
+    html[data-theme="dark"] .app-card {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-theme="dark"] .app-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Light mode: slightly lighter glass overlay for better contrast */
+    html[data-theme="light"] .card-glass-content {
+      background: linear-gradient(to top,
+          rgba(0, 0, 0, 0.75) 0%,
+          rgba(0, 0, 0, 0.5) 60%,
+          rgba(0, 0, 0, 0.2) 100%);
+    }
+
     .app-card-icon {
-      width: 48px;
-      height: 48px;
+      display: none;
+      /* Hidden in new design */
+    }
+
+    .app-card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .app-card-description {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.5;
+      font-size: 13px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .app-card-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .app-card-tag {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    .app-card-tag.accent {
+      background: var(--card-accent-color);
+      border-color: var(--card-accent-color);
+      color: #fff;
+    }
+
+    /* NEW Card Special Styling */
+    @keyframes newCardGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2);
+      }
+
+      50% {
+        box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), 0 0 60px rgba(239, 68, 68, 0.3);
+      }
+    }
+
+    @keyframes newCardShimmer {
+      0% {
+        left: -100%;
+      }
+
+      100% {
+        left: 150%;
+      }
+    }
+
+    .app-card-new {
+      animation: cardEntrance 0.5s ease forwards, newCardGlow 3s ease-in-out infinite;
+      animation-delay: var(--stagger-delay, 0ms), 0.5s;
+      border: 2px solid rgba(239, 68, 68, 0.5);
+    }
+
+    .app-card-new::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -100%;
+      width: 60%;
+      height: 200%;
+      background: linear-gradient(100deg,
+          transparent 20%,
+          rgba(255, 255, 255, 0.2) 50%,
+          transparent 80%);
+      transform: skewX(-20deg);
+      animation: newCardShimmer 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* NEW Badge */
+    .new-badge-overlay {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: linear-gradient(135deg, #EF4444 0%, #F97316 100%);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    /* Enhanced Tooltips */
+    .app-card {
+      position: relative;
+    }
+
+    .app-card-tooltip {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+      pointer-events: none;
+      z-index: 100;
+      min-width: 200px;
+      max-width: 280px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .app-card-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: var(--surface-alt);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .app-card:hover .app-card-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .tooltip-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tooltip-row+.tooltip-row {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .tooltip-icon {
+      font-size: 14px;
+      width: 18px;
+      text-align: center;
+    }
+
+    .tooltip-label {
+      flex: 1;
+    }
+
+    .tooltip-value {
+      font-weight: var(--font-weight-medium);
+      color: var(--ink);
+    }
+
+    .tooltip-kbd {
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 10px;
+      color: var(--ink);
+    }
+
+    /* Page Transition */
+    .page-transition-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-transition-circle {
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: var(--transition-color, var(--accent-color));
+      transform: translate(-50%, -50%);
+      position: absolute;
+      opacity: 0;
+    }
+
+    .page-transition-circle.animate {
+      animation: circleExpand 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes circleExpand {
+      0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+      }
+
+      100% {
+        width: 300vmax;
+        height: 300vmax;
+        opacity: 1;
+      }
+    }
+
+    .page-transition-icon {
+      position: fixed;
+      z-index: 10000;
+      font-size: 80px;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.5);
+      pointer-events: none;
+      top: 50%;
+      left: 50%;
+    }
+
+    .page-transition-icon.animate {
+      animation: iconPop 0.6s ease-out 0.15s forwards;
+    }
+
+    @keyframes iconPop {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.3);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .app-card-icon {
+      width: 56px;
+      height: 56px;
       display: grid;
       place-items: center;
       border-radius: var(--radius-md);
       background-color: var(--card-icon-bg-color-transparent);
       color: var(--color-accent-text, #FFF);
-      font-size: 28px;
+      font-size: 32px;
+      transition: transform 0.2s ease;
+    }
+
+    .app-card:hover .app-card-icon {
+      transform: scale(1.1);
     }
 
     .app-card-title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: var(--font-weight-emphasis);
       margin: 0;
     }
 
-    .app-card-description {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+    /* Description is now visible in glass cards - old tooltip-based rule removed */
 
     /* Featured Card Styles */
     @keyframes borderGlow {
@@ -621,65 +1017,70 @@
 <body>
   <div class="container">
     <header class="panel">
-      <h1>Creative Toolkit</h1>
+      <h1>VGTools Pro</h1>
       <div class="sub">A universe of mini-apps.</div>
+      <div class="search-container">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" id="search-input" class="search-input" placeholder="Search apps..." autocomplete="off">
+      </div>
       <div class="theme-switcher">
         <button id="theme-toggle" title="Change theme"></button>
       </div>
     </header>
 
     <main>
-      <!-- Featured Card -->
-      <a href="brickbuilder/brickbuilder.html" class="featured-card"
-        style="--card-accent-color: #EF4444; --card-icon-bg-color-transparent: rgba(239, 68, 68, 0.15);">
-        <div class="app-card-icon">🧱</div>
-        <div class="featured-card-content">
-          <h2 class="app-card-title">Brick Builder</h2>
-          <p class="app-card-description">Design and build 2D brick structures. Export your creations as SVG or PNG.</p>
-        </div>
-        <span class="new-badge">New</span>
-      </a>
-
       <div class="app-grid" id="app-grid">
+        <!-- Brick Builder - NEW -->
+        <a href="brickbuilder/brickbuilder.html" class="app-card app-card-new"
+          style="--card-accent-color: #EF4444; --card-icon-bg-color-transparent: rgba(239, 68, 68, 0.15);"
+          data-id="brickbuilder" data-new="true" draggable="true">
+          <div class="app-card-icon">🧱</div>
+          <h2 class="app-card-title">Brick Builder</h2>
+          <p class="app-card-description">Design and build 2D brick structures with a simple drag-and-drop interface.
+            Export your creations as high-quality SVG or PNG files.</p>
+        </a>
         <a href="moodboards/moodboards.html" class="app-card"
           style="--card-accent-color: #FFD300; --card-icon-bg-color-transparent: rgba(255, 211, 0, 0.15);"
           data-id="moodboards" draggable="true">
           <div class="app-card-icon">🖼️</div>
           <h2 class="app-card-title">Moodboard Studio</h2>
           <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding,
-            colors, and images.</p>
+            colors, typography, and images.</p>
         </a>
         <a href="blobs/blobs.html" class="app-card"
           style="--card-accent-color: #800080; --card-icon-bg-color-transparent: rgba(128, 0, 128, 0.15);"
           data-id="blobs" draggable="true">
           <div class="app-card-icon">💧</div>
           <h2 class="app-card-title">Blob Studio</h2>
-          <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Tweak points, variance,
-            and smoothness.</p>
+          <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Fine-tune points,
+            variance, and smoothness to your liking.</p>
         </a>
         <a href="jigsaws/jigsaws.html" class="app-card"
           style="--card-accent-color: #00B5AD; --card-icon-bg-color-transparent: rgba(0, 181, 173, 0.15);"
           data-id="jigsaws" draggable="true">
           <div class="app-card-icon">🧩</div>
           <h2 class="app-card-title">Jigsaw Generator</h2>
-          <p class="app-card-description">Design and export custom vector jigsaw puzzle grids with control over rows,
-            columns, and tab size.</p>
+          <p class="app-card-description">Design and export custom vector jigsaw puzzle grids. Full control over rows,
+            columns, and tab styling.</p>
         </a>
         <a href="iconfactory/iconfactory.html" class="app-card"
           style="--card-accent-color: #3B4352; --card-icon-bg-color-transparent: rgba(59, 67, 82, 0.15);"
           data-id="iconfactory" draggable="true">
           <div class="app-card-icon">🛠️</div>
           <h2 class="app-card-title">Icon Factory</h2>
-          <p class="app-card-description">Combine shapes to create custom icons. Build your collection and download them
-            as a ZIP file.</p>
+          <p class="app-card-description">Combine shapes to create custom icons with ease. Build your collection and
+            download them all as a ZIP file.</p>
         </a>
         <a href="qrcodes/qrcodes.html" class="app-card"
-          style="--card-accent-color: #2CA02C; --card-icon-bg-color-transparent: rgba(44, 160, 44, 0.15);"
+          style="--card-accent-color: #2BA24C; --card-icon-bg-color-transparent: rgba(43, 162, 76, 0.15);"
           data-id="qrcodes" draggable="true">
           <div class="app-card-icon">📱</div>
           <h2 class="app-card-title">QR Code Generator</h2>
-          <p class="app-card-description">Create custom QR codes for URLs, WiFi, and more. All data is generated locally
-            in your browser.</p>
+          <p class="app-card-description">Create custom QR codes for URLs, WiFi, vCards, and more. All data is generated
+            locally in your browser.</p>
         </a>
         <a href="palettes/palettes.html" class="app-card"
           style="--card-accent-color: #FF7F00; --card-icon-bg-color-transparent: rgba(255, 127, 0, 0.15);"
@@ -687,14 +1088,14 @@
           <div class="app-card-icon">🌈</div>
           <h2 class="app-card-title">Color Mixer</h2>
           <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a
-            single base color.</p>
+            single base color with ease.</p>
         </a>
         <a href="notes/notes.html" class="app-card"
           style="--card-accent-color: #FF1493; --card-icon-bg-color-transparent: rgba(255, 20, 147, 0.15);"
           data-id="notes" draggable="true">
           <div class="app-card-icon">📝</div>
           <h2 class="app-card-title">Notepad & Kanban</h2>
-          <p class="app-card-description">Capture ideas, then drag them into your workflow. Your data is saved
+          <p class="app-card-description">Capture ideas quickly, then drag them into your Kanban workflow. Data is saved
             automatically in the browser.</p>
         </a>
         <a href="locator/locator.html" class="app-card"
@@ -702,8 +1103,8 @@
           data-id="locator" draggable="true">
           <div class="app-card-icon">📍</div>
           <h2 class="app-card-title">Locator</h2>
-          <p class="app-card-description">Geocode a list of locations and visualize the results on an interactive world
-            map. Export as SVG.</p>
+          <p class="app-card-description">Geocode a list of locations and visualize them on an interactive world map.
+            Export results as SVG or PNG.</p>
         </a>
         <a href="signatures/signatures.html" class="app-card"
           style="--card-accent-color: #002493; --card-icon-bg-color-transparent: rgba(80, 96, 126, 0.15);"
@@ -711,30 +1112,31 @@
           <div class="app-card-icon">✍️</div>
           <h2 class="app-card-title">Signature to SVG</h2>
           <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with
-            adjustable settings.</p>
+            adjustable threshold settings.</p>
         </a>
         <a href="any2svg/any2svg.html" class="app-card"
           style="--card-accent-color: #A4C639; --card-icon-bg-color-transparent: rgba(164, 198, 57, 0.15);"
           data-id="any2svg" draggable="true">
           <div class="app-card-icon">🪄</div>
           <h2 class="app-card-title">Any2SVG</h2>
-          <p class="app-card-description">Convert AI, PSD, PDF, and more to SVG. All files are processed locally in your
-            browser.</p>
+          <p class="app-card-description">Convert AI, PSD, PDF, and many more formats to SVG. All files are processed
+            locally in your browser.</p>
         </a>
         <a href="bgremover/bgremover.html" class="app-card"
           style="--card-accent-color: #E63946; --card-icon-bg-color-transparent: rgba(230, 57, 70, 0.15);"
           data-id="bgremover" draggable="true">
           <div class="app-card-icon">✂️</div>
           <h2 class="app-card-title">Background Remover</h2>
-          <p class="app-card-description">Client-side AI cutout. Click, drop or paste an image to automatically remove
-            the background.</p>
+          <p class="app-card-description">Client-side AI-powered cutout tool. Click, drop or paste an image to
+            automatically remove the background.</p>
         </a>
         <a href="wordclouds/wordclouds.html" class="app-card"
-          style="--card-accent-color: #20B2AA; --card-icon-bg-color-transparent: rgba(32, 178, 170, 0.15);"
+          style="--card-accent-color: #3f3d6c; --card-icon-bg-color-transparent: rgba(63, 61, 108, 0.15);"
           data-id="wordclouds" draggable="true">
           <div class="app-card-icon">☁️</div>
           <h2 class="app-card-title">Word Cloud Generator</h2>
-          <p class="app-card-description">Generate beautiful and customizable word clouds from any text source.</p>
+          <p class="app-card-description">Generate beautiful and customizable word clouds from any text source. Export
+            in SVG or PNG formats.</p>
         </a>
       </div>
     </main>
@@ -776,6 +1178,15 @@
         this.el.themeToggle = document.getElementById('theme-toggle');
         this.el.appGrid = document.getElementById('app-grid');
         this.el.appCards = Array.from(this.el.appGrid.children);
+        this.el.searchInput = document.getElementById('search-input');
+
+        // Apply stagger animation delays
+        this.el.appCards.forEach((card, index) => {
+          card.style.setProperty('--stagger-delay', `${index * 80}ms`);
+        });
+
+        // Initialize enhanced tooltips
+        this.initTooltips();
 
         // === CACHEAR TODOS LOS ELEMENTOS DEL MODAL Y BOTONES ===
         const ids = [
@@ -807,6 +1218,18 @@
 
         window.addEventListener('keydown', this.handleKonamiCode.bind(this));
 
+        // Search functionality
+        if (this.el.searchInput) {
+          this.el.searchInput.addEventListener('input', () => this.handleSearch());
+          // Keyboard shortcut: Cmd/Ctrl + K to focus search
+          window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+              e.preventDefault();
+              this.el.searchInput.focus();
+            }
+          });
+        }
+
         // === BIND EVENTOS DEL MODAL ===
         if (this.el.feedbackOpenBtn) this.el.feedbackOpenBtn.addEventListener('click', () => this.openFeedback());
         if (this.el.feedbackCloseBtn) this.el.feedbackCloseBtn.addEventListener('click', () => this.closeFeedback());
@@ -815,6 +1238,183 @@
         });
         if (this.el.feedbackType) this.el.feedbackType.addEventListener('change', () => this.updateFormDisplay());
         if (this.el.feedbackForm) this.el.feedbackForm.addEventListener('submit', (e) => this.handleFormSubmit(e));
+
+        // Page transition on card click
+        document.querySelectorAll('.app-card, .featured-card').forEach(card => {
+          card.addEventListener('click', (e) => this.handleCardClick(e, card));
+        });
+      },
+
+      handleCardClick(e, card) {
+        e.preventDefault();
+        const href = card.getAttribute('href');
+        if (!href) return;
+
+        // Get card color and icon from data attribute
+        const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
+        const icon = card.dataset.icon || '🚀';
+
+        // Get click position
+        const rect = card.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+
+        // Create transition overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'page-transition-overlay';
+
+        const circle = document.createElement('div');
+        circle.className = 'page-transition-circle';
+        circle.style.cssText = `left: ${x}px; top: ${y}px; --transition-color: ${accentColor};`;
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'page-transition-icon';
+        iconSpan.textContent = icon;
+
+        overlay.appendChild(circle);
+        document.body.appendChild(overlay);
+        document.body.appendChild(iconSpan);
+
+        // Trigger animations
+        requestAnimationFrame(() => {
+          circle.classList.add('animate');
+          iconSpan.classList.add('animate');
+        });
+
+        // Navigate after animation
+        setTimeout(() => {
+          window.location.href = href;
+        }, 800);
+      },
+
+      handleSearch() {
+        const query = this.el.searchInput.value.toLowerCase().trim();
+        const featuredCard = document.querySelector('.featured-card');
+
+        this.el.appCards.forEach(card => {
+          const title = card.querySelector('.app-card-title')?.textContent.toLowerCase() || '';
+          const desc = card.querySelector('.app-card-description')?.textContent.toLowerCase() || '';
+          const matches = title.includes(query) || desc.includes(query);
+          card.classList.toggle('hidden', !matches);
+        });
+
+        // Also filter featured card
+        if (featuredCard) {
+          const title = featuredCard.querySelector('.app-card-title')?.textContent.toLowerCase() || '';
+          const desc = featuredCard.querySelector('.app-card-description')?.textContent.toLowerCase() || '';
+          const matches = title.includes(query) || desc.includes(query);
+          featuredCard.style.display = matches ? '' : 'none';
+        }
+      },
+
+      initTooltips() {
+        // Transform cards to glass design with background images
+        const appImagePaths = {
+          brickbuilder: 'brickbuilder/modal.png',
+          moodboards: 'moodboards/modal.png',
+          blobs: 'blobs/modal.png',
+          jigsaws: 'jigsaws/modal.png',
+          iconfactory: 'iconfactory/modal.png',
+          qrcodes: 'qrcodes/modal.png',
+          colors: 'palettes/modal.png',
+          notes: 'notes/modal.png',
+          locator: 'locator/modal.png',
+          signatures: 'signatures/modal.png',
+          any2svg: 'any2svg/modal.png',
+          bgremover: 'bgremover/modal.png',
+          wordclouds: 'wordclouds/modal.png',
+        };
+
+        const appTech = {
+          brickbuilder: ['2D', 'SVG'],
+          moodboards: ['Canvas', 'PNG'],
+          blobs: ['SVG', 'Bezier'],
+          jigsaws: ['SVG', 'Vector'],
+          iconfactory: ['SVG', 'ZIP'],
+          qrcodes: ['QR', 'Offline'],
+          colors: ['HSL', 'CSS'],
+          notes: ['LocalStorage', 'MD'],
+          locator: ['Leaflet', 'Maps'],
+          signatures: ['Canvas', 'Trace'],
+          any2svg: ['In-Browser', 'PDF'],
+          bgremover: ['AI', 'U2Net'],
+          wordclouds: ['D3', 'Cloud'],
+        };
+
+        this.el.appCards.forEach(card => {
+          const id = card.dataset.id;
+          const imgPath = appImagePaths[id];
+          const tech = appTech[id] || [];
+          const isNew = card.dataset.new === 'true';
+
+          if (imgPath) {
+            card.style.setProperty('--card-bg-image', `url('${imgPath}')`);
+          }
+
+          // Save the original icon emoji for page transitions
+          const iconEl = card.querySelector('.app-card-icon');
+          const iconEmoji = iconEl ? iconEl.textContent : '';
+          if (iconEl) {
+            card.dataset.icon = iconEmoji;
+          }
+
+          // Get existing elements TEXT before clearing
+          const titleEl = card.querySelector('.app-card-title');
+          const descEl = card.querySelector('.app-card-description');
+          const titleText = titleEl ? titleEl.textContent : '';
+          const descText = descEl ? descEl.textContent : '';
+
+          // Create glass content wrapper
+          const glassContent = document.createElement('div');
+          glassContent.className = 'card-glass-content';
+
+          // Create title element with emoji
+          if (titleText) {
+            const newTitle = document.createElement('h2');
+            newTitle.className = 'app-card-title';
+            newTitle.textContent = iconEmoji ? `${iconEmoji} ${titleText}` : titleText;
+            glassContent.appendChild(newTitle);
+          }
+
+          // Create description element
+          if (descText) {
+            const newDesc = document.createElement('p');
+            newDesc.className = 'app-card-description';
+            newDesc.textContent = descText;
+            glassContent.appendChild(newDesc);
+          }
+
+          // Add tech tags
+          if (tech.length > 0) {
+            const tagsDiv = document.createElement('div');
+            tagsDiv.className = 'app-card-tags';
+            tech.forEach((t, i) => {
+              const tag = document.createElement('span');
+              tag.className = 'app-card-tag' + (i === 0 ? ' accent' : '');
+              tag.textContent = t;
+              tagsDiv.appendChild(tag);
+            });
+            glassContent.appendChild(tagsDiv);
+          }
+
+          // Clear card and add glass content
+          card.innerHTML = '';
+          card.appendChild(glassContent);
+
+          // Add NEW badge for new apps (only before January 1, 2026)
+          const newExpireDate = new Date('2026-01-01T00:00:00');
+          const isStillNew = isNew && (new Date() < newExpireDate);
+
+          if (isStillNew) {
+            const badge = document.createElement('span');
+            badge.className = 'new-badge-overlay';
+            badge.textContent = '✨ NEW';
+            card.appendChild(badge);
+          } else if (isNew) {
+            // After expiry date, remove the special styling
+            card.classList.remove('app-card-new');
+          }
+        });
       },
 
       handleKonamiCode(e) {
