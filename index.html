@@ -320,6 +320,7 @@
       font-size: 13px;
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -580,6 +581,46 @@
       100% {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    /* Return animation (circle shrinks, icon fades out) */
+    .page-transition-circle.return-animate {
+      width: 300vmax;
+      height: 300vmax;
+      opacity: 1;
+      animation: circleShrink 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes circleShrink {
+      0% {
+        width: 300vmax;
+        height: 300vmax;
+        opacity: 1;
+      }
+
+      100% {
+        width: 0;
+        height: 0;
+        opacity: 0;
+      }
+    }
+
+    .page-transition-icon.return-icon-animate {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      animation: iconFadeOut 0.5s ease-out 0.1s forwards;
+    }
+
+    @keyframes iconFadeOut {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
       }
     }
 
@@ -1319,6 +1360,11 @@
         const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
         const icon = card.dataset.icon || '🚀';
 
+        // Save for return animation
+        sessionStorage.setItem('vgtools-last-app', appId);
+        sessionStorage.setItem('vgtools-last-color', accentColor.trim());
+        sessionStorage.setItem('vgtools-last-icon', icon);
+
         // Get click position
         const rect = card.getBoundingClientRect();
         const x = rect.left + rect.width / 2;
@@ -1445,10 +1491,38 @@
 
       // === RETURN ANIMATION ===
       checkReturnAnimation() {
-        if (sessionStorage.getItem('vgtools-returning')) {
+        const returning = sessionStorage.getItem('vgtools-returning');
+        const lastAppId = sessionStorage.getItem('vgtools-last-app');
+        const lastAppColor = sessionStorage.getItem('vgtools-last-color');
+        const lastAppIcon = sessionStorage.getItem('vgtools-last-icon');
+
+        if (returning) {
           sessionStorage.removeItem('vgtools-returning');
-          document.body.classList.add('page-return');
-          setTimeout(() => document.body.classList.remove('page-return'), 600);
+          sessionStorage.removeItem('vgtools-last-app');
+          sessionStorage.removeItem('vgtools-last-color');
+          sessionStorage.removeItem('vgtools-last-icon');
+
+          // Create return transition overlay
+          const overlay = document.createElement('div');
+          overlay.className = 'page-transition-overlay';
+
+          const circle = document.createElement('div');
+          circle.className = 'page-transition-circle return-animate';
+          circle.style.cssText = `left: 50%; top: 50%; --transition-color: ${lastAppColor || '#4f46e5'};`;
+
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'page-transition-icon return-icon-animate';
+          iconSpan.textContent = lastAppIcon || '🏠';
+
+          overlay.appendChild(circle);
+          document.body.appendChild(overlay);
+          document.body.appendChild(iconSpan);
+
+          // Remove after animation
+          setTimeout(() => {
+            overlay.remove();
+            iconSpan.remove();
+          }, 800);
         }
       },
 
