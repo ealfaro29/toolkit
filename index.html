@@ -428,6 +428,10 @@
         left: -100%;
       }
 
+      10% {
+        left: 150%;
+      }
+
       100% {
         left: 150%;
       }
@@ -450,7 +454,7 @@
           rgba(255, 255, 255, 0.2) 50%,
           transparent 80%);
       transform: skewX(-20deg);
-      animation: newCardShimmer 4s ease-in-out infinite;
+      animation: newCardShimmer 20s ease-in-out infinite;
       pointer-events: none;
       z-index: 5;
     }
@@ -459,7 +463,7 @@
     .new-badge-overlay {
       position: absolute;
       top: 12px;
-      right: 12px;
+      left: 12px;
       background: linear-gradient(135deg, #EF4444 0%, #F97316 100%);
       color: white;
       padding: 6px 12px;
@@ -1157,7 +1161,84 @@
     }
 
     /* === FIN CSS PARA MODAL Y FOOTER === */
+
+    /* Landing Animation Styles */
+    #landing-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--surface);
+      z-index: 20000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+
+    #landing-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .landing-content {
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .landing-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 24px;
+      letter-spacing: -0.5px;
+    }
+
+    .landing-loader {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border-color);
+      border-radius: 50%;
+      border-top-color: var(--accent-color);
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
+  <script>
+    (function () {
+      try {
+        const localTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (localTheme === 'dark' || ((!localTheme || localTheme === 'system') && systemDark)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) { }
+    })();
+  </script>
 </head>
 
 <body>
@@ -1180,7 +1261,7 @@
     <main>
       <div class="app-grid" id="app-grid">
         <!-- Brick Builder - NEW -->
-        <a href="brickbuilder/brickbuilder.html" class="app-card app-card-new"
+        <a href="brickbuilder/" class="app-card app-card-new"
           style="--card-accent-color: #EF4444; --card-icon-bg-color-transparent: rgba(239, 68, 68, 0.15);"
           data-id="brickbuilder" data-new="true" draggable="true">
           <div class="app-card-icon">🧱</div>
@@ -1188,7 +1269,7 @@
           <p class="app-card-description">Design and build 2D brick structures with a simple drag-and-drop interface.
             Export your creations as high-quality SVG or PNG files.</p>
         </a>
-        <a href="moodboards/moodboards.html" class="app-card"
+        <a href="moodboards/" class="app-card"
           style="--card-accent-color: #FFD300; --card-icon-bg-color-transparent: rgba(255, 211, 0, 0.15);"
           data-id="moodboards" draggable="true">
           <div class="app-card-icon">🖼️</div>
@@ -1196,7 +1277,7 @@
           <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding,
             colors, typography, and images.</p>
         </a>
-        <a href="blobs/blobs.html" class="app-card"
+        <a href="blobs/" class="app-card"
           style="--card-accent-color: #800080; --card-icon-bg-color-transparent: rgba(128, 0, 128, 0.15);"
           data-id="blobs" draggable="true">
           <div class="app-card-icon">💧</div>
@@ -1204,7 +1285,7 @@
           <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Fine-tune points,
             variance, and smoothness to your liking.</p>
         </a>
-        <a href="jigsaws/jigsaws.html" class="app-card"
+        <a href="jigsaws/" class="app-card"
           style="--card-accent-color: #00B5AD; --card-icon-bg-color-transparent: rgba(0, 181, 173, 0.15);"
           data-id="jigsaws" draggable="true">
           <div class="app-card-icon">🧩</div>
@@ -1212,7 +1293,7 @@
           <p class="app-card-description">Design and export custom vector jigsaw puzzle grids. Full control over rows,
             columns, and tab styling.</p>
         </a>
-        <a href="iconfactory/iconfactory.html" class="app-card"
+        <a href="iconfactory/" class="app-card"
           style="--card-accent-color: #3B4352; --card-icon-bg-color-transparent: rgba(59, 67, 82, 0.15);"
           data-id="iconfactory" draggable="true">
           <div class="app-card-icon">🛠️</div>
@@ -1220,7 +1301,7 @@
           <p class="app-card-description">Combine shapes to create custom icons with ease. Build your collection and
             download them all as a ZIP file.</p>
         </a>
-        <a href="qrcodes/qrcodes.html" class="app-card"
+        <a href="qrcodes/" class="app-card"
           style="--card-accent-color: #2BA24C; --card-icon-bg-color-transparent: rgba(43, 162, 76, 0.15);"
           data-id="qrcodes" draggable="true">
           <div class="app-card-icon">📱</div>
@@ -1228,7 +1309,7 @@
           <p class="app-card-description">Create custom QR codes for URLs, WiFi, vCards, and more. All data is generated
             locally in your browser.</p>
         </a>
-        <a href="palettes/palettes.html" class="app-card"
+        <a href="palettes/" class="app-card"
           style="--card-accent-color: #FF7F00; --card-icon-bg-color-transparent: rgba(255, 127, 0, 0.15);"
           data-id="colors" draggable="true">
           <div class="app-card-icon">🌈</div>
@@ -1236,7 +1317,7 @@
           <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a
             single base color with ease.</p>
         </a>
-        <a href="notes/notes.html" class="app-card"
+        <a href="notes/" class="app-card"
           style="--card-accent-color: #FF1493; --card-icon-bg-color-transparent: rgba(255, 20, 147, 0.15);"
           data-id="notes" draggable="true">
           <div class="app-card-icon">📝</div>
@@ -1244,7 +1325,7 @@
           <p class="app-card-description">Capture ideas quickly, then drag them into your Kanban workflow. Data is saved
             automatically in the browser.</p>
         </a>
-        <a href="locator/locator.html" class="app-card"
+        <a href="locator/" class="app-card"
           style="--card-accent-color: #4B0082; --card-icon-bg-color-transparent: rgba(75, 0, 130, 0.15);"
           data-id="locator" draggable="true">
           <div class="app-card-icon">📍</div>
@@ -1252,7 +1333,7 @@
           <p class="app-card-description">Geocode a list of locations and visualize them on an interactive world map.
             Export results as SVG or PNG.</p>
         </a>
-        <a href="signatures/signatures.html" class="app-card"
+        <a href="signatures/" class="app-card"
           style="--card-accent-color: #002493; --card-icon-bg-color-transparent: rgba(80, 96, 126, 0.15);"
           data-id="signatures" draggable="true">
           <div class="app-card-icon">✍️</div>
@@ -1260,7 +1341,7 @@
           <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with
             adjustable threshold settings.</p>
         </a>
-        <a href="any2svg/any2svg.html" class="app-card"
+        <a href="any2svg/" class="app-card"
           style="--card-accent-color: #A4C639; --card-icon-bg-color-transparent: rgba(164, 198, 57, 0.15);"
           data-id="any2svg" draggable="true">
           <div class="app-card-icon">🪄</div>
@@ -1268,7 +1349,7 @@
           <p class="app-card-description">Convert AI, PSD, PDF, and many more formats to SVG. All files are processed
             locally in your browser.</p>
         </a>
-        <a href="bgremover/bgremover.html" class="app-card"
+        <a href="bgremover/" class="app-card"
           style="--card-accent-color: #E63946; --card-icon-bg-color-transparent: rgba(230, 57, 70, 0.15);"
           data-id="bgremover" draggable="true">
           <div class="app-card-icon">✂️</div>
@@ -1276,7 +1357,7 @@
           <p class="app-card-description">Client-side AI-powered cutout tool. Click, drop or paste an image to
             automatically remove the background.</p>
         </a>
-        <a href="wordclouds/wordclouds.html" class="app-card"
+        <a href="wordclouds/" class="app-card"
           style="--card-accent-color: #3f3d6c; --card-icon-bg-color-transparent: rgba(63, 61, 108, 0.15);"
           data-id="wordclouds" draggable="true">
           <div class="app-card-icon">☁️</div>
@@ -1284,13 +1365,28 @@
           <p class="app-card-description">Generate beautiful and customizable word clouds from any text source. Export
             in SVG or PNG formats.</p>
         </a>
-        <a href="sankey/sankey.html" class="app-card app-card-new"
+        <a href="sankey/" class="app-card app-card-new"
           style="--card-accent-color: #0891B2; --card-icon-bg-color-transparent: rgba(8, 145, 178, 0.15);"
           data-id="sankey" data-new="true" draggable="true">
           <div class="app-card-icon">📊</div>
           <h2 class="app-card-title">Sankey Diagram</h2>
           <p class="app-card-description">Create flow diagrams with proportional widths. Perfect for budgets, processes,
             and resource flows. Export as SVG.</p>
+        </a>
+        <a href="mockups/" class="app-card app-card-new"
+          style="--card-accent-color: #8b5cf6; --card-icon-bg-color-transparent: rgba(139, 92, 246, 0.15); --card-bg-image: url('modal.png');"
+          data-id="mockups" data-icon="📱" data-new="true" draggable="true">
+          <div class="new-badge-overlay">NEW</div>
+          <div class="card-glass-content">
+            <h2 class="app-card-title">Device Mockups</h2>
+            <p class="app-card-description">Create stunning device mockups for phones, tablets, laptops, watches, and
+              monitors. Realistic materials and direct canvas manipulation.</p>
+            <div class="app-card-tags">
+              <span class="app-card-tag">Canvas</span>
+              <span class="app-card-tag">PNG</span>
+              <span class="app-card-tag">Mockups</span>
+            </div>
+          </div>
         </a>
       </div>
     </main>
@@ -1299,7 +1395,7 @@
       <div class="footer-left">
         <span class="footer-version">v1.0.0</span>
         <span class="footer-divider">•</span>
-        <span class="footer-app-count">14 apps</span>
+        <span class="footer-app-count">15 apps</span>
         <span class="footer-divider">•</span>
         <span class="footer-hint">⌨️ Use arrow keys to navigate</span>
       </div>
@@ -2355,6 +2451,43 @@
       </form>
     </div>
   </div>
+  <div id="landing-overlay" class="hidden">
+    <div class="landing-content">
+      <div class="landing-title">VG Tools Pro</div>
+      <div class="landing-loader"></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const overlay = document.getElementById('landing-overlay');
+      const LAST_VISIT_KEY = 'vgtools-last-visit';
+      const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+      const now = Date.now();
+      const lastVisit = localStorage.getItem(LAST_VISIT_KEY);
+
+      // Check if we should show the animation
+      if (true || !lastVisit || (now - parseInt(lastVisit) > ONE_DAY_MS)) {
+        // Show animation
+        overlay.classList.remove('hidden');
+
+        // Wait 2 seconds then fade out
+        setTimeout(() => {
+          overlay.classList.add('hidden');
+          localStorage.setItem(LAST_VISIT_KEY, now.toString());
+
+          // Remove from DOM after fade out to save resources
+          setTimeout(() => {
+            overlay.style.display = 'none';
+          }, 500);
+        }, 2000);
+      } else {
+        // Ensure it's hidden immediately
+        overlay.style.display = 'none';
+      }
+    })();
+  </script>
 </body>
 
 </html>
