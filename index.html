@@ -1225,6 +1225,61 @@
         transform: translateY(0);
       }
     }
+
+    /* Maintenance Overlay */
+    .maintenance-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .maintenance-content {
+      background: var(--surface-alt);
+      padding: 40px;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      color: var(--ink);
+      animation: cardEntrance 0.5s ease forwards;
+    }
+
+    html[data-theme="dark"] .maintenance-content {
+      background: rgba(30, 30, 30, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .maintenance-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: var(--accent-color);
+    }
+
+    .maintenance-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--ink);
+    }
+
+    .maintenance-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
   </style>
   <script>
     (function () {
@@ -2493,6 +2548,14 @@
       }
     })();
   </script>
+  <div class="maintenance-overlay">
+    <div class="maintenance-content">
+      <div class="maintenance-icon">🚧</div>
+      <h2 class="maintenance-title">Under Maintenance: Come Back Soon</h2>
+      <p class="maintenance-text">We are currently updating the system and adding more tools to enhance your experience.
+      </p>
+    </div>
+  </div>
 </body>
 
 </html>
