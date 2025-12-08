@@ -1,0 +1,1531 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sankey Diagram — Flow Visualization Tool</title>
+
+    <style>
+        :root {
+            --accent-color: #0891B2;
+            /* Cyan/Teal */
+            --accent-color-tint: #a5f3fc;
+            --color-text-primary-light: #1C1C1E;
+            --color-text-secondary-light: #3A3A3C;
+            --color-surface-light: #F5F5F7;
+            --color-background-light: #FFFFFF;
+            --color-divider-light: #EAEAEA;
+            --color-text-primary-dark: #EAEAEB;
+            --color-text-secondary-dark: #9A9A9E;
+            --color-surface-dark: #121212;
+            --color-background-dark: #1E1E1E;
+            --color-divider-dark: #3A3A3C;
+            --color-accent-text: #FFFFFF;
+            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            --font-size-h1: 20px;
+            --font-size-body: 14px;
+            --font-size-caption: 12px;
+            --font-weight-emphasis: 600;
+            --font-weight-medium: 500;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-xl: 16px;
+            --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --duration-standard: 200ms;
+        }
+
+        html[data-theme="light"] {
+            --ink: var(--color-text-primary-light);
+            --muted: var(--color-text-secondary-light);
+            --surface: var(--color-surface-light);
+            --surface-alt: var(--color-background-light);
+            --border-color: var(--color-divider-light);
+            --panel-shadow: var(--shadow-raised-2);
+            --sankey-link-opacity: 0.4;
+            --sankey-link-blend: multiply;
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            --ink: var(--color-text-primary-dark);
+            --muted: var(--color-text-secondary-dark);
+            --surface: var(--color-surface-dark);
+            --surface-alt: var(--color-background-dark);
+            --border-color: var(--color-divider-dark);
+            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --sankey-link-opacity: 0.6;
+            --sankey-link-blend: normal;
+            color-scheme: dark;
+        }
+
+        /* Sankey Styles */
+        .sankey-node rect {
+            fill-opacity: 0.9;
+            stroke-width: 0;
+            cursor: default;
+        }
+
+        .sankey-node text {
+            font-size: 12px;
+            font-weight: 500;
+            fill: var(--ink);
+            pointer-events: none;
+        }
+
+        .sankey-link-group {
+            mix-blend-mode: var(--sankey-link-blend);
+        }
+
+        .sankey-link {
+            fill: none;
+            stroke-opacity: var(--sankey-link-opacity);
+            transition: stroke-opacity 0.2s ease;
+        }
+
+        .sankey-link:hover {
+            stroke-opacity: 0.8;
+        }
+
+        html {
+            box-sizing: border-box;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background-color: var(--surface);
+            font: var(--font-size-body)/1.5 var(--font-family-sans);
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 25px;
+            height: calc(100vh - 50px);
+            transition: filter 0.5s ease-in-out;
+        }
+
+        .container.loading {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        .panel {
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--panel-shadow);
+        }
+
+        header.panel {
+            grid-column: 1 / -1;
+            height: 65px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        header h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+            margin: 0;
+        }
+
+        header .sub {
+            color: var(--muted);
+        }
+
+        .theme-switcher {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #theme-toggle,
+        #wiki-open-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+        }
+
+        #theme-toggle:hover,
+        #wiki-open-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            text-decoration: none;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        aside.panel.controls {
+            position: sticky;
+            top: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            padding: var(--space-5);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .control-group+.control-group {
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-4);
+        }
+
+        .control-group-title {
+            font-weight: var(--font-weight-emphasis);
+            font-size: var(--font-size-caption);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+            margin-bottom: var(--space-2);
+        }
+
+        .note {
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-4);
+            margin-top: auto;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            cursor: pointer;
+            font-weight: var(--font-weight-emphasis);
+            font-size: 14px;
+            border-radius: var(--radius-md);
+            height: 40px;
+            padding: 0 var(--space-4);
+            border: 1px solid transparent;
+            transition: all var(--duration-standard) ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--color-accent-text);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color-tint);
+            color: var(--accent-color);
+            border-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            filter: brightness(0.95);
+        }
+
+        .btn-small {
+            height: 32px;
+            font-size: 12px;
+        }
+
+        .btn:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        /* Data Entry */
+        .data-textarea {
+            width: 100%;
+            min-height: 200px;
+            resize: vertical;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface);
+            color: var(--ink);
+        }
+
+        .data-textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Preset buttons */
+        .preset-row {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            flex: 1;
+            min-width: 80px;
+            height: 28px;
+            font-size: 11px;
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--ink);
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+        }
+
+        .preset-btn:hover {
+            background: var(--accent-color-tint);
+            border-color: var(--accent-color);
+        }
+
+        /* Slider Rows */
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .slider-row label {
+            flex: 0 0 100px;
+            font-weight: var(--font-weight-medium);
+            font-size: 13px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            margin: 0;
+            background: transparent;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            height: 16px;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: var(--surface);
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            background: var(--surface-alt);
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            margin-top: -6px;
+        }
+
+        .num-input {
+            background: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0 var(--space-2);
+            height: 28px;
+            width: 55px;
+            text-align: right;
+            font-size: 12px;
+        }
+
+        /* Main Canvas */
+        main.panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-4);
+            min-height: 0;
+            overflow: hidden;
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+        }
+
+        #sankey-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #sankey-svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Sankey Styles */
+        .sankey-node rect {
+            fill-opacity: 0.9;
+            stroke-width: 0;
+            cursor: default;
+        }
+
+        .sankey-node text {
+            font-size: 12px;
+            font-weight: 500;
+            fill: var(--ink);
+            pointer-events: none;
+        }
+
+        .sankey-link {
+            fill: none;
+            stroke-opacity: 0.4;
+            transition: stroke-opacity 0.2s ease;
+        }
+
+        .sankey-link:hover {
+            stroke-opacity: 0.7;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--ink);
+            color: var(--surface-alt);
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-emphasis);
+            font-size: 14px;
+            box-shadow: var(--shadow-floating-3);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 300ms ease;
+        }
+
+        .toast.show {
+            bottom: 30px;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Splash Screen */
+        .splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            cursor: pointer;
+        }
+
+        .splash-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            width: 800px;
+            height: 450px;
+            max-width: 90vw;
+            max-height: 80vh;
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-floating-3);
+            overflow: hidden;
+            cursor: default;
+            position: relative;
+        }
+
+        #splash-close-btn {
+            position: absolute;
+            top: var(--space-3);
+            right: var(--space-3);
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border-color);
+            font-size: 24px;
+            line-height: 1;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            z-index: 10;
+        }
+
+        #splash-close-btn:hover {
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            transform: scale(1.1);
+        }
+
+        .splash-info {
+            flex: 0 0 300px;
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .splash-icon {
+            font-size: 32px;
+            margin-bottom: var(--space-4);
+        }
+
+        .splash-title {
+            font-size: 24px;
+            font-weight: var(--font-weight-emphasis);
+            color: var(--accent-color);
+            margin-bottom: var(--space-5);
+        }
+
+        .splash-tech {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .splash-credits {
+            margin-top: auto;
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+        }
+
+        .splash-image {
+            flex: 1;
+            background-color: var(--surface);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .splash-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Error state */
+        .error-message {
+            color: #dc2626;
+            font-size: 12px;
+            padding: var(--space-2);
+            background: #fef2f2;
+            border-radius: var(--radius-sm);
+            margin-top: var(--space-2);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            body {
+                padding: var(--space-4);
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                height: auto;
+                gap: var(--space-4);
+            }
+
+            aside.controls {
+                position: static;
+                max-height: none;
+            }
+
+            main.panel {
+                min-height: 60vh;
+            }
+
+            .splash-content {
+                flex-direction: column;
+                width: 90vw;
+                height: auto;
+                max-height: 90vh;
+            }
+
+        }
+
+        /* Wiki/Info Modal */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wiki-modal-content {
+            background: var(--surface-alt);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-floating-3);
+            z-index: 2001;
+            width: 800px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .wiki-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4);
+            flex-shrink: 0;
+            position: relative;
+            height: 80px;
+            color: white;
+            background-image: url('modal.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .wiki-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+            z-index: 1;
+        }
+
+        .wiki-header h3,
+        #wiki-close-btn {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .wiki-header h3 {
+            margin: 0;
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+        }
+
+        #wiki-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--color-accent-text);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: grid;
+            place-items: center;
+        }
+
+        #wiki-close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #wiki-content {
+            padding: var(--space-5);
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            gap: var(--space-5);
+        }
+
+        .wiki-column {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        #wiki-content h4 {
+            margin-top: 0;
+            margin-bottom: var(--space-2);
+            font-weight: var(--font-weight-emphasis);
+            color: var(--accent-color);
+        }
+
+        #wiki-content p {
+            margin: 0;
+            line-height: 1.6;
+            color: var(--ink);
+        }
+
+        @media (max-width: 900px) {
+            #wiki-content {
+                flex-direction: column;
+            }
+        }
+
+        /* New Structured Input Styles */
+        .level-card {
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-3);
+            font-size: 12px;
+            font-weight: var(--font-weight-emphasis);
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 12px 1fr 60px 24px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .input-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .flow-arrow {
+            color: var(--muted);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .flow-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            background: var(--surface-alt);
+            color: var(--ink);
+            font-size: 13px;
+        }
+
+        .flow-input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        select.flow-input {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px top 50%;
+            background-size: 10px auto;
+            padding-right: 20px;
+        }
+
+        .remove-row-btn {
+            width: 24px;
+            height: 24px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .remove-row-btn:hover {
+            background: #Fee2e2;
+            color: #ef4444;
+        }
+
+        .add-row-btn {
+            width: 100%;
+            margin-top: 8px;
+            height: 28px;
+            border: 1px dashed var(--border-color);
+            background: transparent;
+            color: var(--muted);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .add-row-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: var(--surface-alt);
+        }
+
+        #add-level-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px dashed var(--border-color);
+            background: var(--surface);
+            color: var(--muted);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #add-level-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: var(--accent-color-tint);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="splash-overlay" id="splash-screen">
+        <div class="splash-content">
+            <button id="splash-close-btn" title="Close">&times;</button>
+            <div class="splash-info">
+                <span class="splash-icon">📊</span>
+                <h2 class="splash-title">Sankey Diagram</h2>
+                <p class="splash-tech">The Sankey Diagram is a powerful visualization tool used to depict flows in a
+                    system. The width of the arrows is proportional to the flow quantity, making it perfect for
+                    visualizing material, energy, cost, or time transfers.</p>
+                <p class="splash-tech"><strong>How to use:</strong></p>
+                <ul class="splash-tech" style="padding-left: 20px; margin-top: 5px;">
+                    <li><strong>Define Flows:</strong> Use the row inputs to define standard Source → Target flows.</li>
+                    <li><strong>Levels:</strong> Add new levels to create multi-step flows. The "Source" of a new level
+                        is automatically populated from the "Target" of the previous level.</li>
+                    <li><strong>Export:</strong> Download your chart as a vector SVG, ready for professional
+                        presentations.</li>
+                </ul>
+                <p class="splash-credits" style="margin-top: 15px;"><strong>Pro Tip:</strong> Hover over any link to
+                    highlight the connection.</p>
+                <p class="splash-credits">2025. VGTools Pro</p>
+            </div>
+            <div class="splash-image" id="splash-preview">
+                <!-- Preview will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="container loading" id="app-container">
+        <header class="panel">
+            <a href="../index.html" class="back-to-home" title="Return to Home">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </a>
+            <h1>Sankey Diagram</h1>
+            <div class="sub">Flow visualization with proportional widths</div>
+            <div class="theme-switcher">
+                <button id="wiki-open-btn" title="Info">ⓘ</button>
+                <button id="theme-toggle" title="Change theme"></button>
+            </div>
+        </header>
+
+        <aside class="panel controls" id="controls">
+            <div class="control-group">
+                <!-- Data Input -->
+                <div id="levels-container">
+                    <!-- Levels will be injected here -->
+                </div>
+                <button id="add-level-btn">+ Add Next Level</button>
+                <div id="error-container"></div>
+            </div>
+
+            <div class="control-group">
+                <button class="btn btn-primary" id="download-btn">Download SVG</button>
+            </div>
+
+            <div class="note">Tip: Use → (arrow) to separate source and target. Values define the flow width.</div>
+        </aside>
+
+        <main class="panel" id="canvas-container">
+            <div id="sankey-container">
+                <svg id="sankey-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <div id="wiki-overlay" class="popup-overlay"></div>
+
+    <!-- D3.js and d3-sankey -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+
+    <script>
+        // Color palette for nodes
+        const COLORS = [
+            '#0891B2', '#059669', '#D97706', '#DC2626', '#7C3AED',
+            '#DB2777', '#2563EB', '#65A30D', '#EA580C', '#4F46E5'
+        ];
+
+        // Initial State for Level 1
+        const DEFAULT_LEVELS = [
+            {
+                id: 1,
+                rows: [
+                    { source: 'Income', target: 'Rent', value: 1000 },
+                    { source: 'Income', target: 'Food', value: 500 },
+                    { source: 'Bonus', target: 'Savings', value: 300 }
+                ]
+            },
+            {
+                id: 2,
+                rows: [
+                    { source: 'Rent', target: 'Landlord', value: 1000 },
+                    { source: 'Food', target: 'Groceries', value: 300 },
+                    { source: 'Food', target: 'Restaurants', value: 200 }
+                ]
+            }
+        ];
+
+        const WIKI_DATA = {
+            "title": "Sankey Diagram",
+            "sections": [
+                {
+                    "title": "How to Use",
+                    "content": [
+                        "The Sankey Diagram is a powerful visualization tool used to depict flows in a system. The width of the arrows is proportional to the flow quantity.",
+                        "<b>1. Define Flows:</b> Use the row inputs to define standard Source → Target flows. Each row represents a connection with a specific value.",
+                        "<b>2. Add Levels:</b> Create multi-step flows by adding new levels. The 'Source' dropdowns in a new level are automatically populated from the 'Target' nodes of the previous level, ensuring a connected flow.",
+                        "<b>3. Export:</b> Once your diagram is ready, click 'Download SVG' to get a high-quality vector file suitable for presentations or further editing."
+                    ]
+                },
+                {
+                    "title": "Tips",
+                    "content": [
+                        "<b>Hover Interactions:</b> Hover over any link or node to highlight the connection and see the exact flow value.",
+                        "<b>Proportionality:</b> The visual width of nodes and links is directly proportional to the values you enter. Ensure your inputs are consistent (e.g., all in dollars or all in kWh)."
+                    ]
+                }
+            ]
+        };
+
+        const SankeyApp = {
+            state: {
+                nodeWidth: 16,
+                nodePadding: 16,
+                levels: JSON.parse(JSON.stringify(DEFAULT_LEVELS)), // Deep copy
+                splashHidden: false,
+                isWikiLoaded: false
+            },
+            el: {},
+            THEMES: ['light', 'dark', 'system'],
+            THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+            colorMap: new Map(),
+
+            init() {
+                this.cacheDOMElements();
+                this.initTheme();
+                this.bindEvents();
+                this.renderInputForm();
+                this.renderDiagram();
+                this.renderSplashPreview();
+                this.initResizeObserver();
+            },
+
+            hideSplashScreen() {
+                if (!this.state.splashHidden) {
+                    this.state.splashHidden = true;
+                    this.el.splashScreen.classList.add('hidden');
+                    this.el.appContainer.classList.remove('loading');
+                }
+            },
+
+            cacheDOMElements() {
+                const ids = [
+                    'levels-container', 'add-level-btn',
+                    'download-btn', 'sankey-svg', 'sankey-container', 'toast',
+                    'theme-toggle', 'wiki-open-btn', 'splash-screen', 'app-container', 'splash-close-btn',
+                    'error-container', 'splash-preview', 'wiki-overlay'
+                ];
+                ids.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        const camelCaseKey = id.replace(/[-_](\w)/g, (_, char) => char.toUpperCase());
+                        this.el[camelCaseKey] = element;
+                    }
+                });
+            },
+
+            bindEvents() {
+                if (this.el.downloadBtn) this.el.downloadBtn.addEventListener('click', () => this.downloadSvg());
+                if (this.el.themeToggle) this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+                if (this.el.addLevelBtn) this.el.addLevelBtn.addEventListener('click', () => this.addLevel());
+                if (this.el.wikiOpenBtn) this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+                if (this.el.wikiOverlay) this.el.wikiOverlay.addEventListener('click', (e) => {
+                    if (e.target === this.el.wikiOverlay) this.closeWiki();
+                });
+
+                if (this.el.splashScreen) {
+                    this.el.splashScreen.addEventListener('click', (e) => {
+                        if (e.target === this.el.splashScreen) this.hideSplashScreen();
+                    });
+                }
+                if (this.el.splashCloseBtn) {
+                    this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+                }
+            },
+
+            initResizeObserver() {
+                if (this.el.sankeyContainer) {
+                    const observer = new ResizeObserver(() => {
+                        if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
+                        this.resizeTimeout = setTimeout(() => {
+                            this.renderDiagram();
+                        }, 100);
+                    });
+                    observer.observe(this.el.sankeyContainer);
+                }
+            },
+
+            // --- Structured Data Logic ---
+
+            addLevel() {
+                const prevLevel = this.state.levels[this.state.levels.length - 1];
+                let defaultSource = '';
+
+                // Try to find a valid source from previous targets
+                if (prevLevel && prevLevel.rows.length > 0) {
+                    defaultSource = prevLevel.rows[0].target;
+                }
+
+                this.state.levels.push({
+                    id: Date.now(),
+                    rows: [{ source: defaultSource, target: '', value: 10 }]
+                });
+                this.renderInputForm();
+                this.renderDiagram();
+            },
+
+            removeLevel(index) {
+                if (this.state.levels.length <= 1) return; // Keep at least one level
+                this.state.levels.splice(index, 1);
+                this.renderInputForm();
+                this.renderDiagram();
+            },
+
+            addRow(levelIndex) {
+                const level = this.state.levels[levelIndex];
+                // Default source logic for Levels > 0
+                let defaultSource = '';
+                if (levelIndex > 0) {
+                    const prevLevel = this.state.levels[levelIndex - 1];
+                    if (prevLevel.rows.length > 0) defaultSource = prevLevel.rows[0].target;
+                }
+
+                level.rows.push({ source: defaultSource, target: '', value: 10 });
+                this.renderInputForm();
+                this.renderDiagram();
+            },
+
+            removeRow(levelIndex, rowIndex) {
+                const level = this.state.levels[levelIndex];
+                if (level.rows.length <= 1) return; // Keep at least one row per level? Or allow empty?
+                level.rows.splice(rowIndex, 1);
+                this.renderInputForm();
+                this.renderDiagram();
+            },
+
+            updateRow(levelIndex, rowIndex, field, value) {
+                const row = this.state.levels[levelIndex].rows[rowIndex];
+                if (field === 'value') value = parseFloat(value) || 0;
+                row[field] = value;
+
+                // If we updated a target in Level N, we might need to refresh Level N+1 sources dropdowns
+                // But since we re-render the diagram on every change, maybe we should re-render inputs only when strictly needed?
+                // For simplicity, let's re-render inputs if we changed a Target (affects next level dropdowns)
+
+                if (field === 'target' && levelIndex < this.state.levels.length - 1) {
+                    this.renderInputForm();
+                }
+
+                this.renderDiagram();
+            },
+
+            getAvailableSources(levelIndex) {
+                if (levelIndex === 0) return null; // Level 0 is free text
+                const prevLevel = this.state.levels[levelIndex - 1];
+                const targets = new Set();
+                prevLevel.rows.forEach(r => {
+                    if (r.target && r.target.trim()) targets.add(r.target.trim());
+                });
+                return Array.from(targets);
+            },
+
+            renderInputForm() {
+                const container = this.el.levelsContainer;
+                container.innerHTML = '';
+
+                this.state.levels.forEach((level, levelIndex) => {
+                    const card = document.createElement('div');
+                    card.className = 'level-card';
+
+                    const header = document.createElement('div');
+                    header.className = 'level-header';
+                    header.innerHTML = `<span>Level ${levelIndex + 1}</span>`;
+
+                    if (levelIndex > 0) {
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'remove-row-btn';
+                        delBtn.innerHTML = '×';
+                        delBtn.title = 'Remove Level';
+                        delBtn.style.fontSize = '18px';
+                        delBtn.onclick = () => this.removeLevel(levelIndex);
+                        header.appendChild(delBtn);
+                    }
+                    card.appendChild(header);
+
+                    const sources = this.getAvailableSources(levelIndex);
+
+                    level.rows.forEach((row, rowIndex) => {
+                        const rowEl = document.createElement('div');
+                        rowEl.className = 'input-row';
+
+                        // Source Input
+                        let sourceInput;
+                        if (levelIndex === 0) {
+                            sourceInput = document.createElement('input');
+                            sourceInput.className = 'flow-input';
+                            sourceInput.placeholder = 'Source';
+                            sourceInput.value = row.source;
+                            sourceInput.oninput = (e) => this.updateRow(levelIndex, rowIndex, 'source', e.target.value);
+                        } else {
+                            sourceInput = document.createElement('select');
+                            sourceInput.className = 'flow-input';
+                            if (sources.length === 0) {
+                                const opt = document.createElement('option');
+                                opt.text = '(No targets)';
+                                sourceInput.appendChild(opt);
+                                sourceInput.disabled = true;
+                            } else {
+                                sources.forEach(s => {
+                                    const opt = document.createElement('option');
+                                    opt.value = s;
+                                    opt.text = s;
+                                    if (s === row.source) opt.selected = true;
+                                    sourceInput.appendChild(opt);
+                                });
+                                // Handle case where current row source isn't in valid options anymore
+                                if (row.source && !sources.includes(row.source)) {
+                                    // Optional: Auto-select first? Or Add hidden option?
+                                    // Let's add it temporarily or reset. Reset is safer.
+                                    if (sources.length > 0 && !row.source) {
+                                        // If initialized empty, set to first
+                                        this.updateRow(levelIndex, rowIndex, 'source', sources[0]);
+                                    }
+                                }
+                                sourceInput.onchange = (e) => this.updateRow(levelIndex, rowIndex, 'source', e.target.value);
+                            }
+                        }
+
+                        // Arrow
+                        const arrow = document.createElement('div');
+                        arrow.className = 'flow-arrow';
+                        arrow.textContent = '→';
+
+                        // Target Input
+                        const targetInput = document.createElement('input');
+                        targetInput.className = 'flow-input';
+                        targetInput.placeholder = 'Target';
+                        targetInput.value = row.target;
+                        targetInput.oninput = (e) => this.updateRow(levelIndex, rowIndex, 'target', e.target.value);
+
+                        // Value Input
+                        const valInput = document.createElement('input');
+                        valInput.className = 'flow-input';
+                        valInput.type = 'number';
+                        valInput.placeholder = 'Val';
+                        valInput.value = row.value;
+                        valInput.oninput = (e) => this.updateRow(levelIndex, rowIndex, 'value', e.target.value);
+
+                        // Remove Row Btn
+                        const rmBtn = document.createElement('button');
+                        rmBtn.className = 'remove-row-btn';
+                        rmBtn.innerHTML = '×';
+                        rmBtn.onclick = () => this.removeRow(levelIndex, rowIndex);
+
+                        rowEl.append(sourceInput, arrow, targetInput, valInput, rmBtn);
+                        card.appendChild(rowEl);
+                    });
+
+                    // Add Row Button
+                    const addRowBtn = document.createElement('button');
+                    addRowBtn.className = 'add-row-btn';
+                    addRowBtn.innerHTML = '+ Add Flow';
+                    addRowBtn.onclick = () => this.addRow(levelIndex);
+                    card.appendChild(addRowBtn);
+
+                    container.appendChild(card);
+                });
+            },
+
+            // --- Visualization Logic ---
+
+            parseData() {
+                // Flatten levels logic to link array
+                const links = [];
+                const errors = [];
+                const nodeNames = new Set();
+
+                this.state.levels.forEach((level, lvlIdx) => {
+                    level.rows.forEach((row, rIdx) => {
+                        if (!row.source || !row.target || !row.value) {
+                            // Skip incomplete rows but don't error loudly unless it's messy
+                            return;
+                        }
+                        const s = row.source.trim();
+                        const t = row.target.trim();
+
+                        if (s && t) {
+                            links.push({ source: s, target: t, value: row.value });
+                            nodeNames.add(s);
+                            nodeNames.add(t);
+                        }
+                    });
+                });
+
+                const nodes = Array.from(nodeNames).map(name => ({ name }));
+                return { nodes, links, errors };
+            },
+
+            getNodeColor(name) {
+                if (!this.colorMap.has(name)) {
+                    this.colorMap.set(name, COLORS[this.colorMap.size % COLORS.length]);
+                }
+                return this.colorMap.get(name);
+            },
+
+            renderDiagram(targetSvg = null, width = null, height = null, idPrefix = 'main') {
+                const svgEl = targetSvg || this.el.sankeySvg;
+                if (!svgEl) return;
+
+                const container = this.el.sankeyContainer;
+                // Use client dimensions directly for the logic 
+                // but we will set svg to 100% to fill container as well.
+                const w = width || (container ? container.clientWidth : 800);
+                const h = height || (container ? container.clientHeight : 600);
+                const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+                const graphWidth = w - margin.left - margin.right;
+                const graphHeight = h - margin.top - margin.bottom;
+
+                const { nodes: rawNodes, links: rawLinks, errors } = this.parseData();
+
+                // Show errors (only for main chart)
+                if (this.el.errorContainer && idPrefix === 'main') {
+                    this.el.errorContainer.innerHTML = '';
+                }
+
+                // Clean SVG
+                svgEl.innerHTML = '';
+                svgEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                svgEl.setAttribute('width', '100%');
+                svgEl.setAttribute('height', '100%');
+                svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+                if (rawLinks.length === 0) {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', '50%');
+                    text.setAttribute('y', '50%');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('fill', 'var(--muted)');
+                    text.textContent = 'Add data to generate diagram';
+                    svgEl.appendChild(text);
+                    return;
+                }
+
+                // D3 Selection
+                const svg = d3.select(svgEl);
+
+                // Define Gradients
+                const defs = svg.append("defs");
+
+                // Sankey Layout
+                const sankey = d3.sankey()
+                    .nodeId(d => d.name)
+                    .nodeWidth(this.state.nodeWidth)
+                    .nodePadding(this.state.nodePadding)
+                    .extent([[margin.left, margin.top], [margin.left + graphWidth, margin.top + graphHeight]]);
+
+                // Create a Deep Copy for D3 (it mutates inputs)
+                let graph = null;
+                try {
+                    graph = sankey({
+                        nodes: rawNodes.map(d => Object.assign({}, d)),
+                        links: rawLinks.map(d => Object.assign({}, d))
+                    });
+                } catch (err) {
+                    console.error(err);
+                    if (this.el.errorContainer && idPrefix === 'main') {
+                        this.el.errorContainer.innerHTML = `<div class="error-message">Layout Error: ${err.message} (Check for loops)</div>`;
+                    }
+                    return;
+                }
+
+                // Links
+                const link = svg.append("g")
+                    .attr("fill", "none")
+                    .selectAll("g")
+                    .data(graph.links)
+                    .join("g")
+                    .attr("class", "sankey-link-group");
+
+                // Gradient per link with UNIQUE ID
+                const gradient = link.append("linearGradient")
+                    .attr("id", (d, i) => {
+                        d.uid = `${idPrefix}-link-grad-${i}`;
+                        return d.uid;
+                    })
+                    .attr("gradientUnits", "userSpaceOnUse")
+                    .attr("x1", d => d.source.x1)
+                    .attr("x2", d => d.target.x0);
+
+                gradient.append("stop")
+                    .attr("offset", "0%")
+                    .attr("stop-color", d => this.getNodeColor(d.source.name));
+
+                gradient.append("stop")
+                    .attr("offset", "100%")
+                    .attr("stop-color", d => this.getNodeColor(d.target.name));
+
+                link.append("path")
+                    .attr("class", "sankey-link")
+                    .attr("d", d3.sankeyLinkHorizontal())
+                    .attr("stroke", d => `url(#${d.uid})`)
+                    .attr("stroke-width", d => Math.max(1, d.width));
+
+                link.append("title")
+                    .text(d => `${d.source.name} → ${d.target.name}\n${d.value}`);
+
+                // Nodes
+                const node = svg.append("g")
+                    .selectAll("rect")
+                    .data(graph.nodes)
+                    .join("rect")
+                    .attr("x", d => d.x0)
+                    .attr("y", d => d.y0)
+                    .attr("height", d => d.y1 - d.y0)
+                    .attr("width", d => d.x1 - d.x0)
+                    .attr("fill", d => this.getNodeColor(d.name))
+                    .attr("opacity", 0.9)
+                    .attr("rx", 2);
+
+                node.append("title")
+                    .text(d => `${d.name}\n${d.value}`);
+
+                // Labels
+                svg.append("g")
+                    .attr("font-family", "var(--font-family-sans)")
+                    .attr("font-size", 12)
+                    .attr("font-weight", 500)
+                    .attr("fill", "var(--ink)")
+                    .selectAll("text")
+                    .data(graph.nodes)
+                    .join("text")
+                    .attr("x", d => d.x0 < w / 2 ? d.x1 + 6 : d.x0 - 6)
+                    .attr("y", d => (d.y1 + d.y0) / 2)
+                    .attr("dy", "0.35em")
+                    .attr("text-anchor", d => d.x0 < w / 2 ? "start" : "end")
+                    .text(d => d.name)
+                    .attr("pointer-events", "none");
+            },
+
+            renderSplashPreview() {
+                const preview = this.el.splashPreview;
+                if (!preview) return;
+
+                preview.innerHTML = '<img src="modal.png" alt="Sankey Diagram Preview">';
+            },
+
+            showToast(message) {
+                if (this.el.toast) {
+                    this.el.toast.textContent = message;
+                    this.el.toast.classList.add('show');
+                    setTimeout(() => this.el.toast.classList.remove('show'), 2000);
+                }
+            },
+
+            downloadSvg() {
+                const svg = this.el.sankeySvg;
+                if (!svg) return;
+
+                const clone = svg.cloneNode(true);
+                clone.setAttribute('width', '800');
+                clone.setAttribute('height', '600');
+                clone.removeAttribute('style');
+
+                const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+                style.textContent = `
+          text { font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 500; fill: #1C1C1E; }
+        `;
+                clone.insertBefore(style, clone.firstChild);
+
+                const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bg.setAttribute('width', '100%');
+                bg.setAttribute('height', '100%');
+                bg.setAttribute('fill', '#ffffff');
+                clone.insertBefore(bg, clone.firstChild);
+
+                const svgData = new XMLSerializer().serializeToString(clone);
+                const blob = new Blob([`<?xml version="1.0" standalone="no"?>\n${svgData}`], { type: 'image/svg+xml' });
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'sankey-diagram.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+
+                this.showToast('SVG downloaded!');
+            },
+
+            openWiki() {
+                if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+                    const wikiModal = document.createElement('div');
+                    wikiModal.className = 'wiki-modal-content';
+                    wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content"></div>`;
+                    this.el.wikiOverlay.appendChild(wikiModal);
+                    wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+                }
+                if (!this.state.isWikiLoaded) {
+                    const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+                    this.el.wikiOverlay.querySelector('#wiki-title').textContent = WIKI_DATA.title;
+                    const col1 = document.createElement('div'); col1.className = 'wiki-column';
+                    const col2 = document.createElement('div'); col2.className = 'wiki-column';
+                    WIKI_DATA.sections.forEach((s, index) => {
+                        const sectionContainer = document.createElement('div');
+                        sectionContainer.innerHTML = `<h4>${s.title}</h4>${s.content.map(c => `<p>${c}</p>`).join('')}`;
+                        if (index < Math.ceil(WIKI_DATA.sections.length / 2)) col1.appendChild(sectionContainer);
+                        else col2.appendChild(sectionContainer);
+                    });
+                    contentEl.append(col1, col2);
+                    this.state.isWikiLoaded = true;
+                }
+                this.el.wikiOverlay.classList.add('show');
+            },
+
+            closeWiki() {
+                this.el.wikiOverlay.classList.remove('show');
+            },
+
+            initTheme() {
+                const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                this.setTheme(savedTheme, false);
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+                });
+            },
+            setTheme(theme, save = true) {
+                if (save) localStorage.setItem('creative-toolkit-theme', theme);
+                if (this.el.themeToggle) this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+                this.applyTheme(theme);
+            },
+            cycleTheme() {
+                const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                const currentIndex = this.THEMES.indexOf(currentTheme);
+                const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length];
+                this.setTheme(nextTheme);
+            },
+            applyTheme(theme) {
+                const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+                document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => SankeyApp.init());
+    </script>
+</body>
+
+</html>
