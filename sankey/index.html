@@ -6,67 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sankey Diagram — Flow Visualization Tool</title>
 
+    <link rel="stylesheet" href="../shared/styles.css" />
     <style>
-        :root {
-            --accent-color: #E72F2F;
-            /* Red */
-            --accent-color-tint: rgba(231, 47, 47, 0.1);
-            --accent-yellow: #F7CF27;
-            --color-cream: #FAF6F0;
-            --color-text-primary-light: #1C1C1E;
-            --color-text-secondary-light: #3A3A3C;
-            --color-surface-light: #FAF6F0;
-            --color-background-light: #FFFFFF;
-            --color-divider-light: #E8E1D8;
-            --color-text-primary-dark: #EAEAEB;
-            --color-text-secondary-dark: #9A9A9E;
-            --color-surface-dark: #1a1815;
-            --color-background-dark: #0d0c0a;
-            --color-divider-dark: #3A3A3C;
-            --color-accent-text: #FFFFFF;
-            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-            --font-size-h1: 20px;
-            --font-size-body: 14px;
-            --font-size-caption: 12px;
-            --font-weight-emphasis: 600;
-            --font-weight-medium: 500;
-            --space-2: 8px;
-            --space-3: 12px;
-            --space-4: 16px;
-            --space-5: 24px;
-            --radius-sm: 6px;
-            --radius-md: 8px;
-            --radius-xl: 16px;
-            --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
-            --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
-            --duration-standard: 200ms;
-        }
+        /* === SANKEY-SPECIFIC STYLES === */
 
+        /* Additional theme variables for sankey */
         html[data-theme="light"] {
-            --ink: var(--color-text-primary-light);
-            --muted: var(--color-text-secondary-light);
-            --surface: var(--color-surface-light);
-            --surface-alt: var(--color-background-light);
-            --border-color: var(--color-divider-light);
-            --panel-shadow: var(--shadow-raised-2);
             --sankey-link-opacity: 0.4;
             --sankey-link-blend: multiply;
-            color-scheme: light;
         }
 
         html[data-theme="dark"] {
-            --ink: var(--color-text-primary-dark);
-            --muted: var(--color-text-secondary-dark);
-            --surface: var(--color-surface-dark);
-            --surface-alt: var(--color-background-dark);
-            --border-color: var(--color-divider-dark);
-            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             --sankey-link-opacity: 0.6;
             --sankey-link-blend: normal;
-            color-scheme: dark;
         }
 
-        /* Sankey Styles */
+        /* Sankey SVG node styles */
         .sankey-node rect {
             fill-opacity: 0.9;
             stroke-width: 0;
@@ -80,10 +35,12 @@
             pointer-events: none;
         }
 
+        /* Sankey link group with blend mode */
         .sankey-link-group {
             mix-blend-mode: var(--sankey-link-blend);
         }
 
+        /* Sankey link styles */
         .sankey-link {
             fill: none;
             stroke-opacity: var(--sankey-link-opacity);
@@ -94,140 +51,17 @@
             stroke-opacity: 0.8;
         }
 
-        html {
-            box-sizing: border-box;
-        }
-
-        *,
-        *:before,
-        *:after {
-            box-sizing: inherit;
-        }
-
-        body {
-            margin: 0;
-            color: var(--ink);
-            background-color: var(--surface);
-            font: var(--font-size-body)/1.5 var(--font-family-sans);
-            padding: 25px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            grid-template-rows: auto 1fr;
-            gap: 25px;
-            height: calc(100vh - 50px);
-            transition: filter 0.5s ease-in-out;
-        }
-
-        .container.loading {
-            filter: blur(5px);
-            pointer-events: none;
-        }
-
-        .panel {
-            background: var(--surface-alt);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--panel-shadow);
-        }
-
+        /* Header grid positioning */
         header.panel {
             grid-column: 1 / -1;
-            height: 65px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            gap: var(--space-3);
-            padding: var(--space-4);
         }
 
-        header h1 {
-            font-size: var(--font-size-h1);
-            font-weight: var(--font-weight-emphasis);
-            margin: 0;
+        /* Wider container for sankey */
+        .container {
+            max-width: 1400px;
         }
 
-        header .sub {
-            color: var(--muted);
-        }
-
-        .theme-switcher {
-            margin-left: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #theme-toggle,
-        #wiki-open-btn {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border-radius: 50%;
-            background-color: var(--surface);
-            color: var(--ink);
-            border: 1px solid var(--border-color);
-            font-size: 18px;
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            transition: all var(--duration-standard) ease;
-        }
-
-        #theme-toggle:hover,
-        #wiki-open-btn:hover {
-            background-color: var(--surface-alt);
-        }
-
-        .back-to-home {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: var(--surface);
-            color: var(--ink);
-            border: 1px solid var(--border-color);
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            transition: all var(--duration-standard) ease;
-            text-decoration: none;
-        }
-
-        .back-to-home:hover {
-            background-color: var(--surface-alt);
-        }
-
-        .back-to-home svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        aside.panel.controls {
-            position: sticky;
-            top: 0;
-            max-height: 100%;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-4);
-            padding: var(--space-5);
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
-        }
-
-        .control-group+.control-group {
-            border-top: 1px solid var(--border-color);
-            padding-top: var(--space-4);
-        }
-
+        /* Control group title */
         .control-group-title {
             font-weight: var(--font-weight-emphasis);
             font-size: var(--font-size-caption);
@@ -237,63 +71,18 @@
             margin-bottom: var(--space-2);
         }
 
+        /* Note at bottom of sidebar */
         .note {
-            font-size: var(--font-size-caption);
-            color: var(--muted);
-            border-top: 1px solid var(--border-color);
-            padding-top: var(--space-4);
             margin-top: auto;
         }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            cursor: pointer;
-            font-weight: var(--font-weight-emphasis);
-            font-size: 14px;
-            border-radius: var(--radius-md);
-            height: 40px;
-            padding: 0 var(--space-4);
-            border: 1px solid transparent;
-            transition: all var(--duration-standard) ease;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-color);
-            color: var(--color-accent-text);
-        }
-
-        .btn-primary:hover {
-            filter: brightness(1.1);
-        }
-
-        .btn-secondary {
-            background-color: var(--accent-color-tint);
-            color: var(--accent-color);
-            border-color: transparent;
-        }
-
-        .btn-secondary:hover {
-            filter: brightness(0.95);
-        }
-
+        /* Small button variant */
         .btn-small {
             height: 32px;
             font-size: 12px;
         }
 
-        .btn:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        textarea:focus-visible,
-        button:focus-visible {
-            outline: 2px solid var(--accent-color);
-            outline-offset: 2px;
-        }
-
-        /* Data Entry */
+        /* Data entry textarea */
         .data-textarea {
             width: 100%;
             min-height: 200px;
@@ -312,7 +101,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Preset buttons */
+        /* Preset buttons row */
         .preset-row {
             display: flex;
             gap: var(--space-2);
@@ -337,7 +126,7 @@
             border-color: var(--accent-color);
         }
 
-        /* Slider Rows */
+        /* Slider rows */
         .slider-row {
             display: flex;
             align-items: center;
@@ -350,6 +139,7 @@
             font-size: 13px;
         }
 
+        /* Range input styling */
         input[type="range"] {
             -webkit-appearance: none;
             appearance: none;
@@ -380,6 +170,7 @@
             margin-top: -6px;
         }
 
+        /* Number input for sliders */
         .num-input {
             background: var(--surface);
             color: var(--ink);
@@ -392,7 +183,7 @@
             font-size: 12px;
         }
 
-        /* Main Canvas */
+        /* Main canvas with grid background */
         main.panel {
             display: flex;
             align-items: center;
@@ -404,6 +195,7 @@
             background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
         }
 
+        /* Sankey diagram container */
         #sankey-container {
             width: 100%;
             height: 100%;
@@ -417,31 +209,7 @@
             max-height: 100%;
         }
 
-        /* Sankey Styles */
-        .sankey-node rect {
-            fill-opacity: 0.9;
-            stroke-width: 0;
-            cursor: default;
-        }
-
-        .sankey-node text {
-            font-size: 12px;
-            font-weight: 500;
-            fill: var(--ink);
-            pointer-events: none;
-        }
-
-        .sankey-link {
-            fill: none;
-            stroke-opacity: 0.4;
-            transition: stroke-opacity 0.2s ease;
-        }
-
-        .sankey-link:hover {
-            stroke-opacity: 0.7;
-        }
-
-        /* Toast */
+        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -466,133 +234,7 @@
             visibility: visible;
         }
 
-        /* Splash Screen */
-        .splash-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.1);
-            -webkit-backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 1;
-            transition: opacity 0.5s ease-out;
-            cursor: pointer;
-        }
-
-        .splash-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .splash-content {
-            display: flex;
-            width: 800px;
-            height: 450px;
-            max-width: 90vw;
-            max-height: 80vh;
-            background: var(--surface-alt);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-floating-3);
-            overflow: hidden;
-            cursor: default;
-            position: relative;
-        }
-
-        #splash-close-btn {
-            position: absolute;
-            top: var(--space-3);
-            right: var(--space-3);
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            border-radius: 50%;
-            background-color: var(--surface);
-            color: var(--muted);
-            border: 1px solid var(--border-color);
-            font-size: 24px;
-            line-height: 1;
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            transition: all var(--duration-standard) ease;
-            z-index: 10;
-        }
-
-        #splash-close-btn:hover {
-            background-color: var(--surface-alt);
-            color: var(--ink);
-            transform: scale(1.1);
-        }
-
-        .splash-info {
-            flex: 0 0 300px;
-            padding: var(--space-5);
-            display: flex;
-            flex-direction: column;
-            background-color: var(--surface-alt);
-            color: var(--ink);
-            border-left: 4px solid var(--accent-color);
-        }
-
-        .splash-icon {
-            font-size: 32px;
-            margin-bottom: var(--space-4);
-        }
-
-        .splash-title {
-            font-size: 24px;
-            font-weight: var(--font-weight-emphasis);
-            color: var(--accent-color);
-            margin-bottom: var(--space-5);
-        }
-
-        .splash-tech {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.6;
-        }
-
-        .splash-dont-show {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-      font-size: var(--font-size-caption);
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .splash-dont-show input {
-      cursor: pointer;
-    }
-
-    .splash-credits {
-            margin-top: auto;
-            font-size: var(--font-size-caption);
-            color: var(--muted);
-        }
-
-        .splash-image {
-            flex: 1;
-            background-color: var(--surface);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .splash-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Error state */
+        /* Error message */
         .error-message {
             color: #dc2626;
             font-size: 12px;
@@ -602,200 +244,48 @@
             margin-top: var(--space-2);
         }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            body {
-                padding: var(--space-4);
-            }
-
-            .container {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr;
-                height: auto;
-                gap: var(--space-4);
-            }
-
-            aside.controls {
-                position: static;
-                max-height: none;
-            }
-
-            main.panel {
-                min-height: 60vh;
-            }
-
-            .splash-content {
-                flex-direction: column;
-                width: 90vw;
-                height: auto;
-                max-height: 90vh;
-            }
-
-        }
-
-        /* Wiki/Info Modal */
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 2000;
-            display: none;
-        }
-
-        .popup-overlay.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .wiki-modal-content {
-            background: var(--surface-alt);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-floating-3);
-            z-index: 2001;
-            width: 800px;
-            max-width: 90vw;
-            max-height: 80vh;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
+        /* Wiki header background */
         .wiki-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--space-4);
-            flex-shrink: 0;
-            position: relative;
-            height: 80px;
-            color: white;
             background-image: url('modal.png');
-            background-size: cover;
-            background-position: center;
         }
 
-        .wiki-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
-            z-index: 1;
-        }
-
-        .wiki-header h3,
-        #wiki-close-btn {
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
-
-        .wiki-header h3 {
-            margin: 0;
-            font-size: var(--font-size-h1);
-            font-weight: var(--font-weight-emphasis);
-        }
-
-        #wiki-close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            line-height: 1;
-            padding: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            color: var(--color-accent-text);
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            display: grid;
-            place-items: center;
-        }
-
-        #wiki-close-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        #wiki-content {
-            padding: var(--space-5);
-            overflow-y: auto;
-            flex-grow: 1;
-            display: flex;
-            gap: var(--space-5);
-        }
-
-        .wiki-column {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-3);
-        }
-
-        #wiki-content h4 {
-            margin-top: 0;
-            margin-bottom: var(--space-2);
-            font-weight: var(--font-weight-emphasis);
-            color: var(--accent-color);
-        }
-
-        #wiki-content p {
-            margin: 0;
-            line-height: 1.6;
-            color: var(--ink);
-        }
-
-        @media (max-width: 900px) {
-            #wiki-content {
-                flex-direction: column;
-            }
-        }
-
-        /* New Structured Input Styles */
+        /* Level card container */
         .level-card {
             background: var(--surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             padding: var(--space-3);
-            margin-bottom: var(--space-4);
+            margin-bottom: var(--space-3);
         }
 
         .level-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--space-3);
-            font-size: 12px;
             font-weight: var(--font-weight-emphasis);
-            color: var(--muted);
-            text-transform: uppercase;
+            font-size: 13px;
+            color: var(--ink);
+            margin-bottom: var(--space-3);
+            padding-bottom: var(--space-2);
+            border-bottom: 1px solid var(--border-color);
         }
 
+        /* Input row for source -> target -> value */
         .input-row {
             display: grid;
-            grid-template-columns: 1fr 12px 1fr 60px 24px;
-            gap: 8px;
+            grid-template-columns: 1fr auto 1fr 70px auto;
+            gap: var(--space-2);
             align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .input-row:last-child {
-            margin-bottom: 0;
+            margin-bottom: var(--space-2);
         }
 
         .flow-arrow {
             color: var(--muted);
-            font-size: 12px;
+            font-size: 14px;
             text-align: center;
         }
 
+        /* Form inputs for structured data */
         .flow-input {
             width: 100%;
             height: 32px;
@@ -815,7 +305,8 @@
         select.flow-input {
             appearance: none;
             cursor: pointer;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-image:
+                url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239CA3AF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
             background-position: right 8px top 50%;
             background-size: 10px auto;
@@ -1003,7 +494,7 @@
             init() {
                 this.cacheDOMElements();
                 this.initTheme();
-        this.checkSplashPreference();
+                this.checkSplashPreference();
                 this.bindEvents();
                 this.renderInputForm();
                 this.renderDiagram();
@@ -1016,17 +507,17 @@
                     this.state.splashHidden = true;
                     this.el.splashScreen.classList.add('hidden');
                     this.el.appContainer.classList.remove('loading');
-          if (dontShowAgain) {
-            localStorage.setItem('sankey-splash-hidden', 'true');
-          }
+                    if (dontShowAgain) {
+                        localStorage.setItem('sankey-splash-hidden', 'true');
+                    }
+                }
+            },
 
-      checkSplashPreference() {
-        if (localStorage.getItem('sankey-splash-hidden') === 'true') {
-          this.state.splashHidden = true;
-          this.el.splashScreen.classList.add('hidden');
-          this.el.appContainer.classList.remove('loading');
-        }
-      },
+            checkSplashPreference() {
+                if (localStorage.getItem('sankey-splash-hidden') === 'true') {
+                    this.state.splashHidden = true;
+                    this.el.splashScreen.classList.add('hidden');
+                    this.el.appContainer.classList.remove('loading');
                 }
             },
 

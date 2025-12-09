@@ -6,280 +6,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Notes & Kanban Board</title>
 
+  <link rel="stylesheet" href="../shared/styles.css" />
   <style>
-    /* Global CSS Variables from baseapp */
+    /* === NOTES-SPECIFIC STYLES === */
+
+    /* Additional theme variables for notes */
     :root {
-      --accent-color: #E72F2F;
-      /* Red */
-      --accent-color-tint: rgba(231, 47, 47, 0.1);
-      --accent-yellow: #F7CF27;
-      --color-cream: #FAF6F0;
       --danger-color: #cc036e;
       --danger-color-tint: #fee2f0;
       --priority-high: #ef4444;
       --priority-medium: #f97316;
       --priority-low: #22c55e;
-      --color-text-primary-light: #1C1C1E;
-      --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #FAF6F0;
-      --color-background-light: #FFFFFF;
-      --color-divider-light: #E8E1D8;
-      --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E;
-      --color-surface-dark: #1a1815;
-      --color-background-dark: #0d0c0a;
-      --color-divider-dark: #3A3A3C;
-      --color-accent-text: #FFFFFF;
-      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      --font-size-h1: 20px;
-      --font-size-h2: 16px;
-      --font-size-body: 14px;
-      --font-size-caption: 12px;
-      --font-weight-bold: 700;
-      --font-weight-emphasis: 600;
-      --font-weight-medium: 500;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-5: 24px;
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-xl: 16px;
-      --shadow-raised: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
-      --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
-      --duration-standard: 200ms;
     }
 
-    html[data-theme="light"] {
-      --ink: var(--color-text-primary-light);
-      --muted: var(--color-text-secondary-light);
-      --surface: var(--color-surface-light);
-      --surface-alt: var(--color-background-light);
-      --border-color: var(--color-divider-light);
-      --panel-shadow: var(--shadow-raised-2);
-      color-scheme: light;
-    }
-
-    html[data-theme="dark"] {
-      --ink: var(--color-text-primary-dark);
-      --muted: var(--color-text-secondary-dark);
-      --surface: var(--color-surface-dark);
-      --surface-alt: var(--color-background-dark);
-      --border-color: var(--color-divider-dark);
-      --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      color-scheme: dark;
-    }
-
-    /* Base Styles */
-    html {
-      box-sizing: border-box;
-    }
-
-    *,
-    *:before,
-    *:after {
-      box-sizing: inherit;
-    }
-
-    body {
-      margin: 0;
-      color: var(--ink);
-      background-color: var(--surface);
-      font: var(--font-size-body)/1.5 var(--font-family-sans);
-      padding: 25px;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      grid-template-rows: auto 1fr;
-      gap: 25px;
-      height: calc(100vh - 50px);
-      transition: filter 0.5s ease-in-out;
-    }
-
-    .container.loading {
-      filter: blur(5px);
-      pointer-events: none;
-    }
-
-    .panel {
-      background: var(--surface-alt);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--panel-shadow);
-    }
-
+    /* Header grid positioning */
     header.panel {
       grid-column: 1 / -1;
-      height: 65px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: var(--space-4);
     }
 
-    header h1 {
-      font-size: var(--font-size-h1);
-      font-weight: var(--font-weight-emphasis);
-      margin: 0;
-    }
-
-    header .sub {
-      color: var(--muted);
-    }
-
-    .theme-switcher {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    #theme-toggle,
-    #wiki-open-btn {
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      border-radius: 50%;
-      background-color: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--border-color);
-      font-size: 18px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all var(--duration-standard) ease;
-    }
-
-    #theme-toggle:hover,
-    #wiki-open-btn:hover {
-      background-color: var(--surface-alt);
-    }
-
-    .back-to-home {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background-color: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--border-color);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all var(--duration-standard) ease;
-      text-decoration: none;
-    }
-
-    .back-to-home:hover {
-      background-color: var(--surface-alt);
-    }
-
-    .back-to-home svg {
-      width: 18px;
-      height: 18px;
-    }
-
+    /* Aside controls with sticky positioning */
     aside.panel.controls {
       position: sticky;
       top: 25px;
       max-height: calc(100vh - 50px);
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-5);
-      padding: var(--space-5);
     }
 
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-4);
-    }
-
-    .control-group+.control-group {
-      border-top: 1px solid var(--border-color);
-      padding-top: var(--space-5);
-    }
-
+    /* Actions group at bottom of sidebar */
     .actions-group {
       margin-top: auto;
     }
 
-    .note {
-      font-size: var(--font-size-caption);
-      color: var(--muted);
-      border-top: 1px solid var(--border-color);
-      padding-top: var(--space-4);
-    }
-
-    .form-group {
+    /* Main panel specific styles */
+    main.panel {
+      padding: 0;
+      min-height: 0;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
+    }
+
+    /* Main header inside panel */
+    .main-header {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    /* Main scrollable content area */
+    .main-content {
+      overflow-y: auto;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    /* Button group */
+    .btn-group {
+      display: flex;
       gap: var(--space-2);
     }
 
-    .form-group label {
-      font-weight: var(--font-weight-medium);
+    /* Small button variant */
+    .btn-sm {
+      height: 32px;
+      padding: 0 var(--space-2);
+      font-size: var(--font-size-caption);
     }
 
-    .form-control,
-    textarea {
-      width: 100%;
-      box-sizing: border-box;
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 8px 12px;
-      resize: vertical;
-      min-height: 40px;
-      font-family: inherit;
-      font-size: inherit;
-    }
-
-    textarea.form-control {
-      min-height: 80px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      cursor: pointer;
-      font-weight: var(--font-weight-emphasis);
-      font-size: 14px;
-      border-radius: var(--radius-md);
-      height: 40px;
-      padding: 0 var(--space-4);
-      border: 1px solid transparent;
-      transition: all var(--duration-standard) ease;
-    }
-
-    .btn-primary {
-      background-color: var(--accent-color);
-      color: var(--color-accent-text);
-    }
-
-    .btn-primary:hover {
-      filter: brightness(1.1);
-    }
-
-    .btn-secondary {
-      background-color: var(--accent-color-tint);
-      color: var(--accent-color);
-      border-color: transparent;
-    }
-
-    .btn-secondary:hover {
-      filter: brightness(0.95);
-    }
-
+    /* Danger button */
     .btn-danger {
       background-color: var(--danger-color-tint);
       color: var(--danger-color);
@@ -291,55 +86,14 @@
       color: var(--color-accent-text);
     }
 
-    .btn:focus-visible,
-    input:focus-visible,
-    select:focus-visible,
-    button:focus-visible,
-    textarea:focus-visible {
-      outline: 2px solid var(--accent-color);
-      outline-offset: 2px;
-    }
-
-    /* --- App Specific Styles --- */
-    main.panel {
-      padding: 0;
-      min-height: 0;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .main-header {
-      padding: var(--space-4);
-      border-bottom: 1px solid var(--border-color);
-      flex-shrink: 0;
-    }
-
-    .main-content {
-      overflow-y: auto;
-      padding: var(--space-5);
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-5);
-    }
-
-    .btn-group {
-      display: flex;
-      gap: var(--space-2);
-    }
-
-    .btn-sm {
-      height: 32px;
-      padding: 0 var(--space-2);
-      font-size: var(--font-size-caption);
-    }
-
+    /* Kanban board grid */
     .kanban-board {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: var(--space-4);
     }
 
+    /* Kanban column */
     .kanban-column {
       background-color: var(--surface);
       border: 1px solid var(--border-color);
@@ -356,6 +110,7 @@
       box-shadow: 0 0 0 2px var(--accent-color);
     }
 
+    /* Kanban column header */
     .kanban-column-header {
       font-weight: var(--font-weight-bold);
       font-size: var(--font-size-h2);
@@ -365,6 +120,7 @@
       margin: 0;
     }
 
+    /* Kanban column content area */
     .kanban-column-content {
       flex-grow: 1;
       display: flex;
@@ -373,6 +129,7 @@
       min-height: 50px;
     }
 
+    /* Card (note/task) */
     .card {
       background-color: var(--surface-alt);
       border: 1px solid var(--border-color);
@@ -397,6 +154,7 @@
       box-shadow: var(--shadow-floating-3);
     }
 
+    /* Task card with priority border */
     .card.is-task {
       border-left: 4px solid var(--border-color);
     }
@@ -413,11 +171,13 @@
       border-left-color: var(--priority-low);
     }
 
+    /* Completed task styling */
     .card.status-done .editable-content {
       text-decoration: line-through;
       color: var(--muted);
     }
 
+    /* Card metadata (date, etc) */
     .card-meta {
       display: flex;
       justify-content: space-between;
@@ -426,28 +186,33 @@
       color: var(--muted);
     }
 
+    /* Notes section */
     .notes-section {
       display: flex;
       flex-direction: column;
       gap: var(--space-3);
     }
 
+    /* Notes grid layout */
     .notes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: var(--space-4);
     }
 
+    /* Editable content */
     .editable-content {
       cursor: text;
       margin-bottom: var(--space-2);
     }
 
+    /* Edit controls (hidden by default) */
     .edit-controls {
       display: none;
       margin-top: var(--space-2);
     }
 
+    /* When card is being edited */
     .is-editing .editable-content,
     .is-editing .card-meta {
       display: none;
@@ -459,12 +224,14 @@
       gap: var(--space-3);
     }
 
+    /* Item controls (edit/delete buttons) */
     .item-controls {
       position: absolute;
       top: var(--space-2);
       right: var(--space-2);
     }
 
+    /* Delete button */
     .delete-btn {
       background: none;
       border: none;
@@ -483,6 +250,7 @@
       background-color: var(--danger-color-tint);
     }
 
+    /* Empty state */
     .empty-state {
       text-align: center;
       color: var(--muted);
@@ -493,314 +261,20 @@
       margin-top: var(--space-2);
     }
 
+    /* Hidden utility class */
     .is-hidden {
       display: none;
     }
 
-    .select-wrapper {
-      position: relative;
-    }
-
-    .select-wrapper select {
-      -webkit-appearance: none;
-      appearance: none;
-      padding-right: 32px;
-      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-      background-position: right 0.5rem center;
-      background-repeat: no-repeat;
-      background-size: 1.5em 1.5em;
-    }
-
-    /* Popups & Modals */
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 2000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .popup-overlay.show {
-      display: flex;
-    }
-
-    .wiki-modal-content {
-      background: var(--surface-alt);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-floating-3);
-      z-index: 2001;
-      width: 800px;
-      max-width: 90vw;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
+    /* Wiki header background */
     .wiki-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-4);
-      flex-shrink: 0;
-      position: relative;
-      height: 80px;
-      color: white;
       background-image: url('modal.png');
-      background-size: cover;
-      background-position: center bottom;
     }
 
-    .wiki-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
-      z-index: 1;
-    }
-
-    .wiki-header h3,
-    #wiki-close-btn {
-      position: relative;
-      z-index: 2;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-    }
-
-    #wiki-close-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      line-height: 1;
-      padding: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      color: var(--color-accent-text);
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    #wiki-close-btn:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    #wiki-content {
-      padding: var(--space-5);
-      overflow: hidden;
-      flex-grow: 1;
-      display: flex;
-      gap: var(--space-5);
-    }
-
-    .wiki-column {
-      flex: 1;
-      min-width: 0;
-    }
-
-    #wiki-content h4 {
-      margin-top: 0;
-      margin-bottom: var(--space-3);
-      font-weight: var(--font-weight-emphasis);
-      color: var(--accent-color);
-    }
-
-    .dialog-content {
-      width: 90%;
-      max-width: 400px;
-      padding: var(--space-5);
-      text-align: center;
-    }
-
-    #dialog-message {
-      margin: 0 0 var(--space-5);
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    #dialog-actions {
-      justify-content: center;
-    }
-
-    #dialog-actions .btn {
-      width: auto;
-      min-width: 100px;
-    }
-
-    .splash-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.1);
-      -webkit-backdrop-filter: blur(4px);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 1;
-      transition: opacity 0.5s ease-out;
-      cursor: pointer;
-    }
-
-    .splash-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .splash-content {
-      display: flex;
-      width: 800px;
-      height: 450px;
-      max-width: 90vw;
-      max-height: 80vh;
-      background: var(--surface-alt);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-floating-3);
-      overflow: hidden;
-      cursor: default;
-      position: relative;
-    }
-
-    #splash-close-btn {
-      position: absolute;
-      top: var(--space-3);
-      right: var(--space-3);
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      border-radius: 50%;
-      background-color: var(--surface);
-      color: var(--muted);
-      border: 1px solid var(--border-color);
-      font-size: 24px;
-      line-height: 1;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all var(--duration-standard) ease;
-      z-index: 10;
-    }
-
-    #splash-close-btn:hover {
-      background-color: var(--surface-alt);
-      color: var(--ink);
-      transform: scale(1.1);
-    }
-
-    .splash-info {
-      flex: 0 0 300px;
-      padding: var(--space-5);
-      display: flex;
-      flex-direction: column;
-      background-color: var(--surface-alt);
-      color: var(--ink);
-      border-left: 4px solid var(--accent-color);
-    }
-
-    .splash-icon {
-      font-size: 32px;
-      margin-bottom: var(--space-4);
-    }
-
-    .splash-title {
-      font-size: 24px;
-      font-weight: var(--font-weight-emphasis);
-      color: var(--accent-color);
-      margin-bottom: var(--space-5);
-    }
-
-    .splash-tech {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .splash-dont-show {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-      font-size: var(--font-size-caption);
-      color: var(--muted);
-      cursor: pointer;
-    }
-
-    .splash-dont-show input {
-      cursor: pointer;
-    }
-
-    .splash-credits {
-      margin-top: auto;
-      font-size: var(--font-size-caption);
-      color: var(--muted);
-    }
-
-    .splash-image {
-      flex: 1;
-      background-color: var(--surface);
-    }
-
-    .splash-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
+    /* Responsive adjustments */
     @media (max-width: 800px) {
-      body {
-        padding: var(--space-4);
-      }
-
-      .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto 1fr;
-        height: auto;
-        gap: var(--space-4);
-      }
-
-      aside.controls {
-        position: static;
-        max-height: none;
-      }
-
-      main.panel {
-        min-height: 60vh;
-      }
-
       .kanban-board {
         grid-template-columns: 1fr;
-      }
-
-      .splash-content {
-        flex-direction: column;
-        width: 90vw;
-        height: auto;
-        max-height: 90vh;
-      }
-
-      .splash-info {
-        flex-basis: auto;
-        border-left: none;
-        border-top: 4px solid var(--accent-color);
-      }
-
-      .splash-image {
-        width: 100%;
-        height: 200px;
-      }
-
-      #wiki-content {
-        flex-direction: column;
       }
     }
   </style>
@@ -960,13 +434,13 @@
             localStorage.setItem('notes-splash-hidden', 'true');
           }
 
-      checkSplashPreference() {
-        if (localStorage.getItem('notes-splash-hidden') === 'true') {
-          this.state.splashHidden = true;
-          this.el.splashScreen.classList.add('hidden');
-          this.el.appContainer.classList.remove('loading');
-        }
-      },
+          checkSplashPreference() {
+            if (localStorage.getItem('notes-splash-hidden') === 'true') {
+              this.state.splashHidden = true;
+              this.el.splashScreen.classList.add('hidden');
+              this.el.appContainer.classList.remove('loading');
+            }
+          },
         }
       },
 
