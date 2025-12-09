@@ -1,67 +1,281 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Blob Studio — SVG Organic Shape Generator</title>
-  
+
   <style>
     :root {
-      --accent-color: #800080; /* Púrpura */
-      --accent-color-tint: #e0b3e0;
-      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --accent-color: #E72F2F;
+      --accent-color-tint: rgba(231, 47, 47, 0.1);
+      --accent-yellow: #F7CF27;
+      --color-cream: #FAF6F0;
+      --color-text-primary-light: #1C1C1E;
+      --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #FAF6F0;
+      --color-background-light: #FFFFFF;
+      --color-divider-light: #E8E1D8;
+      --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E;
+      --color-surface-dark: #1a1815;
+      --color-background-dark: #0d0c0a;
+      --color-divider-dark: #3A3A3C;
       --color-accent-text: #FFFFFF;
       --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-      --font-weight-emphasis: 600; --font-weight-medium: 500;
-      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
-      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
-      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --font-size-h1: 20px;
+      --font-size-body: 14px;
+      --font-size-caption: 12px;
+      --font-weight-emphasis: 600;
+      --font-weight-medium: 500;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
       --duration-standard: 200ms;
     }
-    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
-    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
-    
-    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
-    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    
-    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
-    .container.loading { filter: blur(5px); pointer-events: none; }
-    
-    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    
-    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
-    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-    header .sub { color: var(--muted); }
-    
-    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
-    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-    
-    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
-    .back-to-home:hover { background-color: var(--surface-alt); }
-    .back-to-home svg { width: 18px; height: 18px; }
 
-    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
-    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
-    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
-    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); margin-top: auto; }
-    
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
-    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
-    .btn-secondary:hover { filter: brightness(0.95); }
-    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+    html[data-theme="light"] {
+      --ink: var(--color-text-primary-light);
+      --muted: var(--color-text-secondary-light);
+      --surface: var(--color-surface-light);
+      --surface-alt: var(--color-background-light);
+      --border-color: var(--color-divider-light);
+      --panel-shadow: var(--shadow-raised-2);
+      color-scheme: light;
+    }
 
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; align-items: center; justify-content: center; }
-    .popup-overlay.show { display: flex; }
-    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    html[data-theme="dark"] {
+      --ink: var(--color-text-primary-dark);
+      --muted: var(--color-text-secondary-dark);
+      --surface: var(--color-surface-dark);
+      --surface-alt: var(--color-background-dark);
+      --border-color: var(--color-divider-dark);
+      --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color-scheme: dark;
+    }
+
+    html {
+      box-sizing: border-box;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--surface);
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+      padding: 25px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 25px;
+      height: calc(100vh - 50px);
+      transition: filter 0.5s ease-in-out;
+    }
+
+    .container.loading {
+      filter: blur(5px);
+      pointer-events: none;
+    }
+
+    .panel {
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--panel-shadow);
+    }
+
+    header.panel {
+      grid-column: 1 / -1;
+      height: 65px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+    }
+
+    header h1 {
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-emphasis);
+      margin: 0;
+    }
+
+    header .sub {
+      color: var(--muted);
+    }
+
+    .theme-switcher {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #theme-toggle,
+    #wiki-open-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+    }
+
+    #theme-toggle:hover,
+    #wiki-open-btn:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .back-to-home {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      text-decoration: none;
+    }
+
+    .back-to-home:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .back-to-home svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    aside.panel.controls {
+      position: sticky;
+      top: 0;
+      max-height: 100%;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      padding: var(--space-5);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .control-group+.control-group {
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-5);
+    }
+
+    .note {
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-4);
+      margin-top: auto;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      cursor: pointer;
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      height: 40px;
+      padding: 0 var(--space-4);
+      border: 1px solid transparent;
+      transition: all var(--duration-standard) ease;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background-color: var(--accent-color-tint);
+      color: var(--accent-color);
+      border-color: transparent;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    .wiki-modal-content {
+      background: var(--surface-alt);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 2001;
+      width: 800px;
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     .wiki-header {
       display: flex;
       justify-content: space-between;
@@ -75,18 +289,25 @@
       background-size: cover;
       background-position: center bottom;
     }
+
     .wiki-header::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
       z-index: 1;
     }
-    .wiki-header h3, #wiki-close-btn {
+
+    .wiki-header h3,
+    #wiki-close-btn {
       position: relative;
       z-index: 2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
+
     #wiki-close-btn {
       background: none;
       border: none;
@@ -100,46 +321,150 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
+
     #wiki-close-btn:hover {
-      background-color: rgba(255,255,255,0.1);
+      background-color: rgba(255, 255, 255, 0.1);
     }
+
     #wiki-content {
-        padding: var(--space-5);
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-        gap: var(--space-5);
+      padding: var(--space-5);
+      overflow: hidden;
+      flex-grow: 1;
+      display: flex;
+      gap: var(--space-5);
     }
+
     .wiki-column {
-        flex: 1;
-        min-width: 0;
+      flex: 1;
+      min-width: 0;
     }
+
     #wiki-content h4 {
-        margin-top: 0;
-        margin-bottom: var(--space-3);
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
     }
-    
+
     /* --- APP SPECIFIC STYLES --- */
-    main.panel { display: grid; padding: 0; min-height: 0; overflow: hidden; background-size: 40px 40px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
-    
-    .num-input { background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0 var(--space-3); height: 36px; width: 70px; text-align: right; }
-    .num-input::-webkit-outer-spin-button, .num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    
-    .slider-row { display: flex; align-items: center; gap: var(--space-3); }
-    .slider-row label { flex: 0 0 90px; font-weight: var(--font-weight-medium); }
-    input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 0; background: transparent; padding: 0; border: none; cursor: pointer; height: 16px; }
-    input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: var(--surface); border-radius: 2px; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 16px; width: 16px; background: var(--surface-alt); border-radius: 50%; border: 2px solid var(--accent-color); margin-top: -6px; }
-    
-    .stage { width: 100%; height: 100%; }
-    svg { display: block; width: 100%; height: 100%; }
-    #blob { fill: var(--accent-color); transition: fill var(--duration-standard) ease; }
-    
-    .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--ink); color: var(--surface-alt); padding: var(--space-3) var(--space-5); border-radius: var(--radius-md); font-weight: var(--font-weight-emphasis); font-size: 14px; box-shadow: var(--shadow-floating-3); z-index: 1000; opacity: 0; visibility: hidden; transition: all 300ms ease; }
-    .toast.show { bottom: 30px; opacity: 1; visibility: visible; }
+    main.panel {
+      display: grid;
+      padding: 0;
+      min-height: 0;
+      overflow: hidden;
+      background-size: 40px 40px;
+      background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+    }
+
+    .num-input {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0 var(--space-3);
+      height: 36px;
+      width: 70px;
+      text-align: right;
+    }
+
+    .num-input::-webkit-outer-spin-button,
+    .num-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .slider-row label {
+      flex: 0 0 90px;
+      font-weight: var(--font-weight-medium);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      margin: 0;
+      background: transparent;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+      height: 16px;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 4px;
+      background: var(--surface);
+      border-radius: 2px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 16px;
+      width: 16px;
+      background: var(--surface-alt);
+      border-radius: 50%;
+      border: 2px solid var(--accent-color);
+      margin-top: -6px;
+    }
+
+    .stage {
+      width: 100%;
+      height: 100%;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #blob {
+      fill: var(--accent-color);
+      transition: fill var(--duration-standard) ease;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--ink);
+      color: var(--surface-alt);
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-md);
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      box-shadow: var(--shadow-floating-3);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 300ms ease;
+    }
+
+    .toast.show {
+      bottom: 30px;
+      opacity: 1;
+      visibility: visible;
+    }
 
     /* Splash Screen Modal */
     .splash-overlay {
@@ -148,7 +473,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0,0,0,0.1);
+      background-color: rgba(0, 0, 0, 0.1);
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       z-index: 9999;
@@ -159,10 +484,12 @@
       transition: opacity 0.5s ease-out;
       cursor: pointer;
     }
+
     .splash-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
+
     .splash-content {
       display: flex;
       width: 800px;
@@ -176,82 +503,125 @@
       cursor: default;
       position: relative;
     }
+
     #splash-close-btn {
-        position: absolute;
-        top: var(--space-3);
-        right: var(--space-3);
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 50%;
-        background-color: var(--surface);
-        color: var(--muted);
-        border: 1px solid var(--border-color);
-        font-size: 24px;
-        line-height: 1;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: all var(--duration-standard) ease;
-        z-index: 10;
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border-color);
+      font-size: 24px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      z-index: 10;
     }
+
     #splash-close-btn:hover {
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        transform: scale(1.1);
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      transform: scale(1.1);
     }
+
     .splash-info {
-        flex: 0 0 300px;
-        padding: var(--space-5);
-        display: flex;
-        flex-direction: column;
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        border-left: 4px solid var(--accent-color);
+      flex: 0 0 300px;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      border-left: 4px solid var(--accent-color);
     }
+
     .splash-icon {
-        font-size: 32px;
-        margin-bottom: var(--space-4);
+      font-size: 32px;
+      margin-bottom: var(--space-4);
     }
+
     .splash-title {
-        font-size: 24px;
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
-        margin-bottom: var(--space-5);
+      font-size: 24px;
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
+      margin-bottom: var(--space-5);
     }
+
     .splash-tech {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.6;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
     }
+
     .splash-credits {
-        margin-top: auto;
-        font-size: var(--font-size-caption);
-        color: var(--muted);
+      margin-top: auto;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
     }
+
     .splash-image {
-        flex: 1;
-        background-color: var(--surface);
+      flex: 1;
+      background-color: var(--surface);
     }
+
     .splash-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Responsive Adjustments */
-    @media (max-width: 800px) { 
-        body { padding: var(--space-4); } 
-        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
-        aside.controls { position: static; max-height: none; } 
-        main.panel { min-height: 50vh; } 
-        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
-        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
-        .splash-image { width: 100%; height: 200px; }
-        #wiki-content { flex-direction: column; }
+    @media (max-width: 800px) {
+      body {
+        padding: var(--space-4);
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        height: auto;
+        gap: var(--space-4);
+      }
+
+      aside.controls {
+        position: static;
+        max-height: none;
+      }
+
+      main.panel {
+        min-height: 50vh;
+      }
+
+      .splash-content {
+        flex-direction: column;
+        width: 90vw;
+        height: auto;
+        max-height: 90vh;
+      }
+
+      .splash-info {
+        flex-basis: auto;
+        border-left: none;
+        border-top: 4px solid var(--accent-color);
+      }
+
+      .splash-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      #wiki-content {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
@@ -259,7 +629,8 @@
       <div class="splash-info">
         <span class="splash-icon">💧</span>
         <h2 class="splash-title">Blob Studio</h2>
-        <p class="splash-tech">Generates unique, organic shapes using procedural SVG path creation directly in your browser.</p>
+        <p class="splash-tech">Generates unique, organic shapes using procedural SVG path creation directly in your
+          browser.</p>
         <p class="splash-credits">2025. Toolkit by e</p>
       </div>
       <div class="splash-image">
@@ -271,7 +642,8 @@
   <div class="container loading" id="app-container">
     <header class="panel">
       <a href="../index.html" class="back-to-home" title="Return to Home">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
         </svg>
       </a>
@@ -311,12 +683,12 @@
     <main class="panel" id="canvas-container">
       <div class="stage">
         <svg id="svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Blob preview">
-          <path id="blob" d=""/>
+          <path id="blob" d="" />
         </svg>
       </div>
     </main>
   </div>
-  
+
   <div id="toast" class="toast"></div>
   <div class="visually-hidden" aria-live="polite" id="aria-notifications"></div>
 
@@ -324,10 +696,10 @@
 
   <script type="module">
     // --- UTILITY FUNCTIONS ---
-    function mulberry32(a) { return function() { let t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    function mulberry32(a) { return function () { let t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
     function randInt(min, max) { return Math.floor(min + Math.random() * (max - min + 1)); }
     function randFloat(min, max) { return min + Math.random() * (max - min); }
-    
+
     function closedCRtoBezier(points, tension) {
       const n = points.length; if (n < 2) return '';
       let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
@@ -344,41 +716,41 @@
       const rand = mulberry32(seed); const pts = [];
       for (let i = 0; i < points; i++) {
         const a = i * (Math.PI * 2 / points);
-        const r = radius * (1 + (rand() * 2 - 1) * variance); 
+        const r = radius * (1 + (rand() * 2 - 1) * variance);
         pts.push({ x: center.x + Math.cos(a) * r, y: center.y + Math.sin(a) * r });
       }
       return pts;
     }
 
-    const adjectives = [ 'blobby','gooey','squishy','wobbly','fluffy', 'round', 'organic', 'smooth', 'lumpy', 'bumpy' ];
-    const nouns = [ 'blob','glob','glorp','gloop', 'shape', 'form', 'mass', 'spot', 'splat' ];
+    const adjectives = ['blobby', 'gooey', 'squishy', 'wobbly', 'fluffy', 'round', 'organic', 'smooth', 'lumpy', 'bumpy'];
+    const nouns = ['blob', 'glob', 'glorp', 'gloop', 'shape', 'form', 'mass', 'spot', 'splat'];
 
     const WIKI_DATA = {
-        "title": "Blob Studio Info",
-        "sections": [
-            {
-                "title": "How to Use",
-                "content": [
-                    "<b>1. Generate Blobs:</b> Click the 'Generate' button to create a new random blob shape.",
-                    "<b>2. Adjust Parameters:</b> Use the sliders or input fields for 'Points', 'Smoothness', and 'Variance' to fine-tune your blob's appearance:",
-                    "  - <b>Points:</b> Controls the number of anchor points that define the blob's shape (3-9). More points generally lead to more complex shapes.",
-                    "  - <b>Smoothness:</b> Determines how smoothly the curves connect between points. Higher values create rounder, more organic shapes.",
-                    "  - <b>Variance:</b> Controls the randomness of each point's distance from the center. Higher variance results in more irregular, 'spiky' blobs.",
-                    "<b>3. Download:</b> Click the 'Download' button to save your current blob as an SVG file."
-                ]
-            },
-            {
-                "title": "What is an SVG Blob?",
-                "content": [
-                    "An SVG (Scalable Vector Graphics) blob is a graphic element that represents an organic, often irregular, shape. Unlike raster images (like JPEGs or PNGs) that are made of pixels, SVGs are defined by mathematical paths. This means they can be scaled to any size without losing quality or becoming pixelated.",
-                    "Blobs are popular in modern web design and UI/UX for adding a playful, fluid, and distinctive aesthetic. They can be used as background elements, decorative accents, or even masks for images."
-                ]
-            }
-        ]
+      "title": "Blob Studio Info",
+      "sections": [
+        {
+          "title": "How to Use",
+          "content": [
+            "<b>1. Generate Blobs:</b> Click the 'Generate' button to create a new random blob shape.",
+            "<b>2. Adjust Parameters:</b> Use the sliders or input fields for 'Points', 'Smoothness', and 'Variance' to fine-tune your blob's appearance:",
+            "  - <b>Points:</b> Controls the number of anchor points that define the blob's shape (3-9). More points generally lead to more complex shapes.",
+            "  - <b>Smoothness:</b> Determines how smoothly the curves connect between points. Higher values create rounder, more organic shapes.",
+            "  - <b>Variance:</b> Controls the randomness of each point's distance from the center. Higher variance results in more irregular, 'spiky' blobs.",
+            "<b>3. Download:</b> Click the 'Download' button to save your current blob as an SVG file."
+          ]
+        },
+        {
+          "title": "What is an SVG Blob?",
+          "content": [
+            "An SVG (Scalable Vector Graphics) blob is a graphic element that represents an organic, often irregular, shape. Unlike raster images (like JPEGs or PNGs) that are made of pixels, SVGs are defined by mathematical paths. This means they can be scaled to any size without losing quality or becoming pixelated.",
+            "Blobs are popular in modern web design and UI/UX for adding a playful, fluid, and distinctive aesthetic. They can be used as background elements, decorative accents, or even masks for images."
+          ]
+        }
+      ]
     };
 
     const BlobApp = {
-      state: { seed: 380098792, points: 5, variance: 0.39, smooth: 1.05, splashHidden: false }, 
+      state: { seed: 380098792, points: 5, variance: 0.39, smooth: 1.05, splashHidden: false },
       el: {}, THEMES: ['light', 'dark', 'system'], THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
       FIXED_FILL: '#8c19d8', canvasSize: { width: 0, height: 0 }, isWikiLoaded: false,
 
@@ -393,11 +765,11 @@
       },
 
       hideSplashScreen() {
-          if (!this.state.splashHidden) {
-              this.state.splashHidden = true;
-              this.el.splashScreen.classList.add('hidden');
-              this.el.appContainer.classList.remove('loading');
-          }
+        if (!this.state.splashHidden) {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
       },
 
       cacheDOMElements() {
@@ -413,8 +785,8 @@
             this.el[camelCaseKey] = element;
           }
         });
-        if (this.el.controls) { 
-            this.el.downloadSvgBtns = this.el.controls.querySelectorAll('.download-svg');
+        if (this.el.controls) {
+          this.el.downloadSvgBtns = this.el.controls.querySelectorAll('.download-svg');
         }
       },
 
@@ -431,35 +803,35 @@
       },
 
       bindEvents() {
-        if (this.el.controls) { 
-            this.el.controls.addEventListener('input', e => {
-              if (!e.target || !e.target.id || e.target.type === 'button') return; 
-              
-              const { id, value } = e.target;
-              const stateKey = id.replace('_num', ''); 
-              
-              if(this.state.hasOwnProperty(stateKey)) {
-                this.state[stateKey] = +value;
+        if (this.el.controls) {
+          this.el.controls.addEventListener('input', e => {
+            if (!e.target || !e.target.id || e.target.type === 'button') return;
 
-                const elRange = document.getElementById(stateKey);
-                const elNum = document.getElementById(`${stateKey}_num`);
-                if (elRange) elRange.value = value;
-                if (elNum) elNum.value = value;
+            const { id, value } = e.target;
+            const stateKey = id.replace('_num', '');
 
-                this.render();
-                this.updateURL();
-              }
-            });
+            if (this.state.hasOwnProperty(stateKey)) {
+              this.state[stateKey] = +value;
+
+              const elRange = document.getElementById(stateKey);
+              const elNum = document.getElementById(`${stateKey}_num`);
+              if (elRange) elRange.value = value;
+              if (elNum) elNum.value = value;
+
+              this.render();
+              this.updateURL();
+            }
+          });
         }
-        
+
         if (this.el.randomize) this.el.randomize.addEventListener('click', () => this.randomizeShape());
         if (this.el.themeToggle) this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
         document.querySelectorAll('.download-svg').forEach(btn => btn.addEventListener('click', () => this.downloadSvg()));
         if (this.el.wikiOpenBtn) this.el.wikiOpenBtn.addEventListener('click', (e) => { e.preventDefault(); this.openWiki(); });
         if (this.el.splashScreen) this.el.splashScreen.addEventListener('click', (e) => {
-            if (e.target === this.el.splashScreen) {
-                this.hideSplashScreen();
-            }
+          if (e.target === this.el.splashScreen) {
+            this.hideSplashScreen();
+          }
         });
         if (this.el.splashCloseBtn) this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
       },
@@ -498,13 +870,13 @@
         Array.from(this.el.blob.children).forEach(child => child.tagName === 'animate' && child.remove());
         const animateEl = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
         animateEl.setAttribute('attributeName', 'd');
-        animateEl.setAttribute('from', oldPath);             
-        animateEl.setAttribute('to', newPath);                
-        animateEl.setAttribute('dur', '0.5s');                
-        animateEl.setAttribute('fill', 'freeze');             
-        animateEl.setAttribute('calcMode', 'spline');         
-        animateEl.setAttribute('keyTimes', '0; 1');           
-        animateEl.setAttribute('keySplines', '0.16 1 0.3 1'); 
+        animateEl.setAttribute('from', oldPath);
+        animateEl.setAttribute('to', newPath);
+        animateEl.setAttribute('dur', '0.5s');
+        animateEl.setAttribute('fill', 'freeze');
+        animateEl.setAttribute('calcMode', 'spline');
+        animateEl.setAttribute('keyTimes', '0; 1');
+        animateEl.setAttribute('keySplines', '0.16 1 0.3 1');
         animateEl.addEventListener('endEvent', () => { this.el.blob.setAttribute('d', newPath); animateEl.remove(); });
         this.el.blob.appendChild(animateEl);
         animateEl.beginElement();
@@ -529,8 +901,8 @@
         for (const key in this.state) {
           if (this.state.hasOwnProperty(key)) {
             const value = this.state[key];
-            const elRange = document.getElementById(key); 
-            const elNum = document.getElementById(`${key}_num`); 
+            const elRange = document.getElementById(key);
+            const elNum = document.getElementById(`${key}_num`);
             if (elRange) elRange.value = value;
             if (elNum) elNum.value = value;
           }
@@ -549,9 +921,9 @@
 
       showToast(message) {
         if (this.el.toast) {
-            this.el.toast.textContent = message; this.el.toast.classList.add('show');
-            this.updateAriaLive(message);
-            setTimeout(() => this.el.toast.classList.remove('show'), 2000);
+          this.el.toast.textContent = message; this.el.toast.classList.add('show');
+          this.updateAriaLive(message);
+          setTimeout(() => this.el.toast.classList.remove('show'), 2000);
         }
       },
       updateAriaLive(message) { if (this.el.ariaNotifications) this.el.ariaNotifications.textContent = message; },
@@ -590,60 +962,61 @@
       },
 
       openWiki() {
-          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.setAttribute('role', 'dialog');
-              wikiModal.innerHTML = `
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+          const wikiModal = document.createElement('div');
+          wikiModal.className = 'wiki-modal-content';
+          wikiModal.setAttribute('role', 'dialog');
+          wikiModal.innerHTML = `
                   <div class="wiki-header">
                     <h3 id="wiki-title">Info</h3>
                     <button id="wiki-close-btn" title="Close">×</button>
                   </div>
                   <div id="wiki-content"></div>
               `;
-              this.el.wikiOverlay.appendChild(wikiModal);
-              document.getElementById('wiki-close-btn').addEventListener('click', () => this.closeWiki());
-          }
+          this.el.wikiOverlay.appendChild(wikiModal);
+          document.getElementById('wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
 
-          if (!this.isWikiLoaded) {
-              const titleEl = document.getElementById('wiki-title');
-              const contentEl = document.getElementById('wiki-content');
-              titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div');
-              col1.className = 'wiki-column';
-              const col2 = document.createElement('div');
-              col2.className = 'wiki-column';
+        if (!this.isWikiLoaded) {
+          const titleEl = document.getElementById('wiki-title');
+          const contentEl = document.getElementById('wiki-content');
+          titleEl.textContent = WIKI_DATA.title;
 
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); 
-                  h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { 
-                      const p = document.createElement('p'); 
-                      p.innerHTML = c; 
-                      sectionContainer.appendChild(p); 
-                  });
-                  if (index < 1) { // How to Use
-                      col1.appendChild(sectionContainer);
-                  } else { // What is an SVG Blob?
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              contentEl.innerHTML = '';
-              contentEl.appendChild(col1);
-              contentEl.appendChild(col2);
+          const col1 = document.createElement('div');
+          col1.className = 'wiki-column';
+          const col2 = document.createElement('div');
+          col2.className = 'wiki-column';
 
-              this.isWikiLoaded = true;
-          }
-          this.el.wikiOverlay.classList.add('show');
+          WIKI_DATA.sections.forEach((s, index) => {
+            const sectionContainer = document.createElement('div');
+            const h4 = document.createElement('h4');
+            h4.textContent = s.title;
+            sectionContainer.appendChild(h4);
+            s.content.forEach(c => {
+              const p = document.createElement('p');
+              p.innerHTML = c;
+              sectionContainer.appendChild(p);
+            });
+            if (index < 1) { // How to Use
+              col1.appendChild(sectionContainer);
+            } else { // What is an SVG Blob?
+              col2.appendChild(sectionContainer);
+            }
+          });
+
+          contentEl.innerHTML = '';
+          contentEl.appendChild(col1);
+          contentEl.appendChild(col2);
+
+          this.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
       },
       closeWiki() { if (this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show'); },
     };
-    
+
     document.addEventListener('DOMContentLoaded', () => BlobApp.init());
   </script>
 </body>
+
 </html>

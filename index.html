@@ -7,17 +7,19 @@
   <title>VGTools Pro</title>
   <style>
     :root {
-      --accent-color: #4f46e5;
-      --accent-color-tint: #c7d2fe;
+      --accent-color: #E72F2F;
+      --accent-color-tint: rgba(231, 47, 47, 0.1);
+      --accent-yellow: #F7CF27;
+      --color-cream: #FAF6F0;
       --color-text-primary-light: #1C1C1E;
       --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7;
-      --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA;
+      --color-surface-light: #FFFFFF;
+      --color-background-light: #FAF6F0;
+      --color-divider-light: #E8E1D8;
       --color-text-primary-dark: #EAEAEB;
       --color-text-secondary-dark: #9A9A9E;
-      --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E;
+      --color-surface-dark: #1a1815;
+      --color-background-dark: #0d0c0a;
       --color-divider-dark: #3A3A3C;
       --color-accent-text: #FFFFFF;
       --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
@@ -97,6 +99,16 @@
       align-items: center;
       gap: var(--space-3);
       padding: 0 var(--space-4);
+      background-color: var(--accent-yellow);
+    }
+
+    html[data-theme="dark"] header.panel {
+      background-color: #8B7518;
+    }
+
+    html[data-theme="dark"] header.panel h1,
+    html[data-theme="dark"] header.panel .sub {
+      color: #FFFFFF;
     }
 
     header h1 {
@@ -210,7 +222,7 @@
       flex-direction: column;
       justify-content: flex-end;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      background-color: var(--card-accent-color, var(--accent-color));
+      background-color: var(--accent-yellow);
     }
 
     .app-card::before {
@@ -219,8 +231,9 @@
       inset: 0;
       background: var(--card-bg-image) center/cover no-repeat;
       z-index: 0;
-      transition: transform 0.4s ease, opacity 0.3s ease;
-      opacity: 0.75;
+      transition: transform 0.4s ease;
+      opacity: 0.2;
+      mix-blend-mode: multiply;
     }
 
     .app-card:hover::before {
@@ -306,8 +319,8 @@
     }
 
     .app-card-title {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 400;
       margin: 0;
       color: #fff;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -345,8 +358,8 @@
     }
 
     .app-card-tag.accent {
-      background: var(--card-accent-color);
-      border-color: var(--card-accent-color);
+      background: var(--accent-color);
+      border-color: var(--accent-color);
       color: #fff;
     }
 
@@ -415,11 +428,11 @@
 
       0%,
       100% {
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.2);
+        box-shadow: 0 0 20px rgba(231, 47, 47, 0.4), 0 0 40px rgba(231, 47, 47, 0.2);
       }
 
       50% {
-        box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), 0 0 60px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 0 30px rgba(231, 47, 47, 0.6), 0 0 60px rgba(231, 47, 47, 0.3);
       }
     }
 
@@ -439,7 +452,7 @@
 
     .app-card-new {
       animation: cardEntrance 0.5s ease forwards, newCardGlow 3s ease-in-out infinite;
-      border: 2px solid rgba(239, 68, 68, 0.5);
+      border: 2px solid rgba(231, 47, 47, 0.5);
     }
 
     .app-card-new::after {
@@ -464,7 +477,7 @@
       position: absolute;
       top: 12px;
       left: 12px;
-      background: linear-gradient(135deg, #EF4444 0%, #F97316 100%);
+      background: linear-gradient(135deg, #E72F2F 0%, #F7CF27 100%);
       color: white;
       padding: 6px 12px;
       border-radius: 20px;
@@ -473,7 +486,7 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       z-index: 10;
-      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      box-shadow: 0 4px 12px rgba(231, 47, 47, 0.4);
       animation: badgePulse 2s ease-in-out infinite;
     }
 
@@ -618,12 +631,16 @@
     .page-transition-icon {
       position: fixed;
       z-index: 10000;
-      font-size: 80px;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
       opacity: 0;
       transform: translate(-50%, -50%) scale(0.5);
       pointer-events: none;
       top: 50%;
       left: 50%;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      white-space: nowrap;
     }
 
     .page-transition-icon.animate {
@@ -703,11 +720,7 @@
       transform: scale(1.1);
     }
 
-    .app-card-title {
-      font-size: 14px;
-      font-weight: var(--font-weight-emphasis);
-      margin: 0;
-    }
+    /* Title styles defined earlier */
 
     /* Description is now visible in glass cards - old tooltip-based rule removed */
 
@@ -716,11 +729,11 @@
 
       0%,
       100% {
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 40px rgba(239, 68, 68, 0.1), var(--panel-shadow);
+        box-shadow: 0 0 20px rgba(231, 47, 47, 0.3), 0 0 40px rgba(231, 47, 47, 0.1), var(--panel-shadow);
       }
 
       50% {
-        box-shadow: 0 0 30px rgba(239, 68, 68, 0.5), 0 0 60px rgba(239, 68, 68, 0.2), var(--panel-shadow);
+        box-shadow: 0 0 30px rgba(231, 47, 47, 0.5), 0 0 60px rgba(231, 47, 47, 0.2), var(--panel-shadow);
       }
     }
 
@@ -739,12 +752,12 @@
       0%,
       100% {
         transform: scale(1);
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 2px 8px rgba(231, 47, 47, 0.3);
       }
 
       50% {
         transform: scale(1.05);
-        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+        box-shadow: 0 4px 20px rgba(231, 47, 47, 0.5);
       }
     }
 
@@ -780,7 +793,7 @@
       margin-bottom: 25px;
       overflow: hidden;
       background-image: linear-gradient(var(--surface-alt), var(--surface-alt)),
-        linear-gradient(135deg, #EF4444 0%, #F97316 25%, #EF4444 50%, #DC2626 75%, #EF4444 100%);
+        linear-gradient(135deg, #E72F2F 0%, #F7CF27 25%, #E72F2F 50%, #E72F2F 75%, #E72F2F 100%);
       background-origin: border-box;
       background-clip: padding-box, border-box;
       animation: borderGlow 3s ease-in-out infinite;
@@ -805,7 +818,7 @@
 
     .featured-card:hover {
       transform: translateY(-8px) scale(1.01);
-      box-shadow: 0 0 40px rgba(239, 68, 68, 0.4), 0 20px 40px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 0 40px rgba(231, 47, 47, 0.4), 0 20px 40px rgba(0, 0, 0, 0.15);
       animation: none;
     }
 
@@ -828,7 +841,7 @@
 
     .featured-card .app-card-title {
       font-size: 24px;
-      background: linear-gradient(135deg, #EF4444, #F97316);
+      background: linear-gradient(135deg, #E72F2F, #F7CF27);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -842,7 +855,7 @@
       position: absolute;
       top: var(--space-4);
       right: var(--space-4);
-      background: linear-gradient(135deg, #EF4444 0%, #F97316 50%, #EF4444 100%);
+      background: linear-gradient(135deg, #E72F2F 0%, #F7CF27 50%, #E72F2F 100%);
       background-size: 200% 200%;
       color: white;
       padding: 6px 14px;
@@ -855,7 +868,7 @@
     }
 
     .new-badge::before {
-      content: '✨ ';
+      content: '';
     }
 
     /* Easter Egg Styles */
@@ -1175,7 +1188,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+      transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
     }
 
     #landing-overlay.hidden {
@@ -1187,7 +1200,7 @@
     .landing-content {
       text-align: center;
       opacity: 0;
-      animation: fadeIn 0.8s ease-out forwards;
+      animation: fadeIn 0.3s ease-out forwards;
     }
 
     .landing-title {
@@ -1199,13 +1212,7 @@
     }
 
     .landing-loader {
-      width: 48px;
-      height: 48px;
-      border: 3px solid var(--border-color);
-      border-radius: 50%;
-      border-top-color: var(--accent-color);
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
+      display: none;
     }
 
     @keyframes spin {
@@ -1224,61 +1231,6 @@
         opacity: 1;
         transform: translateY(0);
       }
-    }
-
-    /* Maintenance Overlay */
-    .maintenance-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-
-    .maintenance-content {
-      background: var(--surface-alt);
-      padding: 40px;
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--border-color);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-      max-width: 500px;
-      width: 90%;
-      text-align: center;
-      color: var(--ink);
-      animation: cardEntrance 0.5s ease forwards;
-    }
-
-    html[data-theme="dark"] .maintenance-content {
-      background: rgba(30, 30, 30, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .maintenance-icon {
-      font-size: 48px;
-      margin-bottom: 20px;
-      color: var(--accent-color);
-    }
-
-    .maintenance-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin: 0 0 12px;
-      color: var(--ink);
-    }
-
-    .maintenance-text {
-      font-size: 16px;
-      line-height: 1.6;
-      color: var(--muted);
-      margin: 0;
     }
   </style>
   <script>
@@ -1317,113 +1269,113 @@
       <div class="app-grid" id="app-grid">
         <!-- Brick Builder - NEW -->
         <a href="brickbuilder/" class="app-card app-card-new"
-          style="--card-accent-color: #EF4444; --card-icon-bg-color-transparent: rgba(239, 68, 68, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="brickbuilder" data-new="true" draggable="true">
-          <div class="app-card-icon">🧱</div>
+
           <h2 class="app-card-title">Brick Builder</h2>
           <p class="app-card-description">Design and build 2D brick structures with a simple drag-and-drop interface.
             Export your creations as high-quality SVG or PNG files.</p>
         </a>
         <a href="moodboards/" class="app-card"
-          style="--card-accent-color: #FFD300; --card-icon-bg-color-transparent: rgba(255, 211, 0, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="moodboards" draggable="true">
-          <div class="app-card-icon">🖼️</div>
+
           <h2 class="app-card-title">Moodboard Studio</h2>
           <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding,
             colors, typography, and images.</p>
         </a>
         <a href="blobs/" class="app-card"
-          style="--card-accent-color: #800080; --card-icon-bg-color-transparent: rgba(128, 0, 128, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="blobs" draggable="true">
-          <div class="app-card-icon">💧</div>
+
           <h2 class="app-card-title">Blob Studio</h2>
           <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Fine-tune points,
             variance, and smoothness to your liking.</p>
         </a>
         <a href="jigsaws/" class="app-card"
-          style="--card-accent-color: #00B5AD; --card-icon-bg-color-transparent: rgba(0, 181, 173, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="jigsaws" draggable="true">
-          <div class="app-card-icon">🧩</div>
+
           <h2 class="app-card-title">Jigsaw Generator</h2>
           <p class="app-card-description">Design and export custom vector jigsaw puzzle grids. Full control over rows,
             columns, and tab styling.</p>
         </a>
         <a href="iconfactory/" class="app-card"
-          style="--card-accent-color: #3B4352; --card-icon-bg-color-transparent: rgba(59, 67, 82, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="iconfactory" draggable="true">
-          <div class="app-card-icon">🛠️</div>
+
           <h2 class="app-card-title">Icon Factory</h2>
           <p class="app-card-description">Combine shapes to create custom icons with ease. Build your collection and
             download them all as a ZIP file.</p>
         </a>
         <a href="qrcodes/" class="app-card"
-          style="--card-accent-color: #2BA24C; --card-icon-bg-color-transparent: rgba(43, 162, 76, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="qrcodes" draggable="true">
-          <div class="app-card-icon">📱</div>
+
           <h2 class="app-card-title">QR Code Generator</h2>
           <p class="app-card-description">Create custom QR codes for URLs, WiFi, vCards, and more. All data is generated
             locally in your browser.</p>
         </a>
         <a href="palettes/" class="app-card"
-          style="--card-accent-color: #FF7F00; --card-icon-bg-color-transparent: rgba(255, 127, 0, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="colors" draggable="true">
-          <div class="app-card-icon">🌈</div>
+
           <h2 class="app-card-title">Color Mixer</h2>
           <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a
             single base color with ease.</p>
         </a>
         <a href="notes/" class="app-card"
-          style="--card-accent-color: #FF1493; --card-icon-bg-color-transparent: rgba(255, 20, 147, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="notes" draggable="true">
-          <div class="app-card-icon">📝</div>
+
           <h2 class="app-card-title">Notepad & Kanban</h2>
           <p class="app-card-description">Capture ideas quickly, then drag them into your Kanban workflow. Data is saved
             automatically in the browser.</p>
         </a>
         <a href="locator/" class="app-card"
-          style="--card-accent-color: #4B0082; --card-icon-bg-color-transparent: rgba(75, 0, 130, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="locator" draggable="true">
-          <div class="app-card-icon">📍</div>
+
           <h2 class="app-card-title">Locator</h2>
           <p class="app-card-description">Geocode a list of locations and visualize them on an interactive world map.
             Export results as SVG or PNG.</p>
         </a>
         <a href="signatures/" class="app-card"
-          style="--card-accent-color: #002493; --card-icon-bg-color-transparent: rgba(80, 96, 126, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="signatures" draggable="true">
-          <div class="app-card-icon">✍️</div>
+
           <h2 class="app-card-title">Signature to SVG</h2>
           <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with
             adjustable threshold settings.</p>
         </a>
         <a href="any2svg/" class="app-card"
-          style="--card-accent-color: #A4C639; --card-icon-bg-color-transparent: rgba(164, 198, 57, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="any2svg" draggable="true">
-          <div class="app-card-icon">🪄</div>
+
           <h2 class="app-card-title">Any2SVG</h2>
           <p class="app-card-description">Convert AI, PSD, PDF, and many more formats to SVG. All files are processed
             locally in your browser.</p>
         </a>
         <a href="bgremover/" class="app-card"
-          style="--card-accent-color: #E63946; --card-icon-bg-color-transparent: rgba(230, 57, 70, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="bgremover" draggable="true">
-          <div class="app-card-icon">✂️</div>
+
           <h2 class="app-card-title">Background Remover</h2>
           <p class="app-card-description">Client-side AI-powered cutout tool. Click, drop or paste an image to
             automatically remove the background.</p>
         </a>
         <a href="wordclouds/" class="app-card"
-          style="--card-accent-color: #3f3d6c; --card-icon-bg-color-transparent: rgba(63, 61, 108, 0.15);"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="wordclouds" draggable="true">
-          <div class="app-card-icon">☁️</div>
+
           <h2 class="app-card-title">Word Cloud Generator</h2>
           <p class="app-card-description">Generate beautiful and customizable word clouds from any text source. Export
             in SVG or PNG formats.</p>
         </a>
         <a href="sankey/" class="app-card app-card-new"
-          style="--card-accent-color: #0891B2; --card-icon-bg-color-transparent: rgba(8, 145, 178, 0.15);"
+          style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="sankey" data-new="true" draggable="true">
-          <div class="app-card-icon">📊</div>
+
           <h2 class="app-card-title">Sankey Diagram</h2>
           <p class="app-card-description">Create professional flow diagrams with proportional arrow widths. Visualize
             budgets, energy flows, and processes with ease. Export your high-quality diagrams as SVG vectors.</p>
@@ -1434,8 +1386,8 @@
           </div>
         </a>
         <a href="mockups/" class="app-card app-card-new"
-          style="--card-accent-color: #8b5cf6; --card-icon-bg-color-transparent: rgba(139, 92, 246, 0.15); --card-bg-image: url('modal.png');"
-          data-id="mockups" data-icon="📱" data-new="true" draggable="true">
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15); --card-bg-image: url('mockups/modal.png');"
+          data-id="mockups" data-new="true" draggable="true">
           <div class="new-badge-overlay">NEW</div>
           <div class="card-glass-content">
             <h2 class="app-card-title">Device Mockups</h2>
@@ -1591,14 +1543,14 @@
         if (appId) this.trackUsage(appId);
         sessionStorage.setItem('vgtools-returning', 'true');
 
-        // Get card color and icon from data attribute
+        // Get card color and title
         const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
-        const icon = card.dataset.icon || '🚀';
+        const appTitle = card.querySelector('.app-card-title')?.textContent || 'Loading...';
 
         // Save for return animation
         sessionStorage.setItem('vgtools-last-app', appId);
         sessionStorage.setItem('vgtools-last-color', accentColor.trim());
-        sessionStorage.setItem('vgtools-last-icon', icon);
+        sessionStorage.setItem('vgtools-last-icon', appTitle);
 
         // Get click position
         const rect = card.getBoundingClientRect();
@@ -1615,7 +1567,7 @@
 
         const iconSpan = document.createElement('span');
         iconSpan.className = 'page-transition-icon';
-        iconSpan.textContent = icon;
+        iconSpan.textContent = appTitle;
 
         overlay.appendChild(circle);
         document.body.appendChild(overlay);
@@ -1778,6 +1730,7 @@
           bgremover: 'bgremover/modal.png',
           wordclouds: 'wordclouds/modal.png',
           sankey: 'sankey/modal.png',
+          mockups: 'mockups/modal.png',
         };
 
         const appTech = {
@@ -1795,6 +1748,7 @@
           bgremover: ['AI', 'U2Net'],
           wordclouds: ['D3', 'Cloud'],
           sankey: ['SVG', 'Flow'],
+          mockups: ['Canvas', 'Mockups', '3D'],
         };
 
         this.el.appCards.forEach(card => {
@@ -1881,7 +1835,7 @@
           if (isStillNew) {
             const badge = document.createElement('span');
             badge.className = 'new-badge-overlay';
-            badge.textContent = '✨ NEW';
+            badge.textContent = 'NEW';
             card.appendChild(badge);
           } else if (isNew) {
             // After expiry date, remove the special styling
@@ -2548,14 +2502,7 @@
       }
     })();
   </script>
-  <div class="maintenance-overlay">
-    <div class="maintenance-content">
-      <div class="maintenance-icon">🚧</div>
-      <h2 class="maintenance-title">Under Maintenance: Come Back Soon</h2>
-      <p class="maintenance-text">We are currently updating the system and adding more tools to enhance your experience.
-      </p>
-    </div>
-  </div>
+
 </body>
 
 </html>

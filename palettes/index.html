@@ -1,12 +1,13 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Color Mixer</title>
   <script>
     // This script is placed in the <head> to prevent a theme flash on load.
-    (function() {
+    (function () {
       try {
         let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
         if (theme === 'system') {
@@ -18,168 +19,610 @@
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  
+
   <style>
     :root {
-      --accent-color: #FF7F00; /* Naranja */
-      --accent-color-tint: #ffDDB3;
-      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
-      --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --accent-color: #E72F2F;
+      /* Red */
+      --accent-color-tint: rgba(231, 47, 47, 0.1);
+      --accent-yellow: #F7CF27;
+      --color-cream: #FAF6F0;
+      --color-text-primary-light: #1C1C1E;
+      --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #FAF6F0;
+      --color-background-light: #FFFFFF;
+      --color-divider-light: #E8E1D8;
+      --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E;
+      --color-surface-dark: #1a1815;
+      --color-background-dark: #0d0c0a;
+      --color-divider-dark: #3A3A3C;
+      --color-accent-text: #FFFFFF;
+      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
       --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-      --font-weight-emphasis: 600; --font-weight-medium: 500;
-      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
-      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
-      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --font-size-h1: 20px;
+      --font-size-body: 14px;
+      --font-size-caption: 12px;
+      --font-weight-emphasis: 600;
+      --font-weight-medium: 500;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
       --duration-standard: 200ms;
     }
-    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
-    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
-    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
-    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
-    .container.loading { filter: blur(5px); pointer-events: none; }
-    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
-    aside.panel.controls { position: sticky; top: 0; max-height: 100%; }
-    main.panel { padding: 0; min-height: 0; display: flex; }
-    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
-    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-    header .sub { color: var(--muted); }
-    .theme-switcher { margin-left: auto; display:flex; align-items:center; gap: 8px;}
-    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
-    .back-to-home:hover { background-color: var(--surface-alt); }
-    .back-to-home svg { width: 18px; height: 18px; }
-    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
-    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-    .controls { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); height: 100%; box-sizing: border-box; }
-    .control-group { display: flex; flex-direction: column; gap: var(--space-3); }
-    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-3); }
-    .note { font-size: var(--font-size-caption); color: var(--muted); }
-    .controls-footer { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-3); border-top: 1px solid var(--border-color); padding-top: var(--space-3); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; width: 100%; }
-    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
-    .btn-primary:hover { filter: brightness(0.95); }
-    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); }
-    .btn-secondary:hover { filter: brightness(0.95); }
-    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
-    .inline-form-group { display: flex; align-items: center; justify-content: space-between; }
-    .inline-form-group label { font-weight: var(--font-weight-medium); }
-    .select-wrapper { position: relative; }
-    .select-wrapper select { width: 180px; -webkit-appearance: none; appearance: none; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; cursor: pointer; }
-    .select-wrapper::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--muted); }
-    .color-picker-group { position: relative; }
-    #color-wheel-container { width: 100%; max-width: 200px; margin: 0 auto; }
-    #lock-btn { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 14px; display: grid; place-items: center; transition: all var(--duration-standard) ease; flex-shrink: 0; cursor:pointer;}
-    #lock-btn.locked { color: var(--accent-color); border-color: var(--accent-color); }
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--ink); color: var(--surface-alt); padding: var(--space-3) var(--space-5); border-radius: var(--radius-md); font-weight: var(--font-weight-emphasis); font-size: 14px; box-shadow: var(--shadow-floating-3); z-index: 1000; opacity: 0; visibility: hidden; transition: all 300ms ease; }
-    .toast.show { bottom: 30px; opacity: 1; visibility: visible; }
-    .hex-input-wrapper { width: 110px; flex-shrink: 0; }
-    #hex-input { width: 100%; height: 36px; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; font-family: var(--font-family-mono); font-size: 14px; text-align: center; text-transform: uppercase; box-sizing: border-box;}
-    .color-details-bar { display: grid; grid-template-columns: 1fr auto auto; gap: var(--space-2); align-items: center; margin-top: var(--space-3); }
-    #color-display-header { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
-    #color-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--border-color); flex-shrink: 0; }
-    #color-name { font-size: var(--font-size-caption); color: var(--muted); font-weight: var(--font-weight-medium); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .canvas-half { padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); overflow-y: auto; }
-    #palette-container { border-right: 1px solid var(--border-color); flex: 0 0 60%; }
-    #gradients-container { flex: 1; }
-    #palette-display { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: var(--space-4); flex-grow: 1; }
-    .palette-swatch { border-radius: var(--radius-md); box-shadow: var(--shadow-raised-2); display: flex; flex-direction: column; justify-content: flex-end; padding: var(--space-3); transition: all var(--duration-standard) ease; position: relative; overflow: hidden;}
-    .palette-swatch .color-info { position: relative; z-index: 1; }
-    .palette-swatch .color-name { font-weight: var(--font-weight-emphasis); font-size: 14px; }
-    .palette-swatch .color-hex { font-family: var(--font-family-mono); font-size: 12px; opacity: 0.8; }
-    #gradient-explorer { display: grid; grid-auto-rows: 1fr; gap: var(--space-3); height: 100%; }
-    .gradient-card { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-raised-2); cursor: pointer; transition: all 150ms ease; position: relative; }
-    .gradient-card:hover { transform: scale(1.02); box-shadow: var(--shadow-floating-3); z-index: 5;}
-    
-    .download-container { 
-      position: absolute; top: -9999px; left: -9999px; 
-      background: var(--color-background-light); 
-      color: var(--color-text-primary-light); 
-      padding: 50px; 
-      width: 1400px; 
-      font-family: var(--font-family-sans); 
-      box-sizing: border-box; 
+
+    html[data-theme="light"] {
+      --ink: var(--color-text-primary-light);
+      --muted: var(--color-text-secondary-light);
+      --surface: var(--color-surface-light);
+      --surface-alt: var(--color-background-light);
+      --border-color: var(--color-divider-light);
+      --panel-shadow: var(--shadow-raised-2);
+      color-scheme: light;
     }
-    .download-container h2 { 
-      font-size: 36px; 
-      font-weight: var(--font-weight-emphasis); 
-      margin: 0 0 30px 0; 
-      border-bottom: 1px solid var(--color-divider-light); 
-      padding-bottom: 20px; 
+
+    html[data-theme="dark"] {
+      --ink: var(--color-text-primary-dark);
+      --muted: var(--color-text-secondary-dark);
+      --surface: var(--color-surface-dark);
+      --surface-alt: var(--color-background-dark);
+      --border-color: var(--color-divider-dark);
+      --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color-scheme: dark;
     }
-    .download-main-content {
-        display: flex;
-        gap: 50px;
+
+    html {
+      box-sizing: border-box;
     }
-    .download-section {
-        flex: 1;
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
     }
-    .download-section h3 { 
-      font-size: 24px; 
-      font-weight: var(--font-weight-medium); 
-      margin: 0 0 20px 0; 
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--surface);
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+      padding: 25px;
     }
-    .download-palette { 
-      display: grid; 
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 25px;
+      height: calc(100vh - 50px);
+      transition: filter 0.5s ease-in-out;
+    }
+
+    .container.loading {
+      filter: blur(5px);
+      pointer-events: none;
+    }
+
+    header.panel {
+      grid-column: 1 / -1;
+      height: 65px;
+      flex-shrink: 0
+    }
+
+    aside.panel.controls {
+      position: sticky;
+      top: 0;
+      max-height: 100%;
+    }
+
+    main.panel {
+      padding: 0;
+      min-height: 0;
+      display: flex;
+    }
+
+    .panel {
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--panel-shadow);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+    }
+
+    header h1 {
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-emphasis);
+      margin: 0;
+    }
+
+    header .sub {
+      color: var(--muted);
+    }
+
+    .theme-switcher {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-to-home {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      text-decoration: none;
+    }
+
+    .back-to-home:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .back-to-home svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    #theme-toggle,
+    #wiki-open-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+    }
+
+    #theme-toggle:hover,
+    #wiki-open-btn:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding: var(--space-5);
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .control-group+.control-group {
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-3);
+    }
+
+    .note {
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+    }
+
+    .controls-footer {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-3);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      height: 40px;
+      padding: 0 var(--space-4);
+      border: 1px solid transparent;
+      transition: all var(--duration-standard) ease;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn-secondary {
+      background-color: var(--accent-color-tint);
+      color: var(--accent-color);
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    .inline-form-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .inline-form-group label {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper select {
+      width: 180px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--muted);
+    }
+
+    .color-picker-group {
+      position: relative;
+    }
+
+    #color-wheel-container {
+      width: 100%;
+      max-width: 200px;
+      margin: 0 auto;
+    }
+
+    #lock-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      display: grid;
+      place-items: center;
+      transition: all var(--duration-standard) ease;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    #lock-btn.locked {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--ink);
+      color: var(--surface-alt);
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-md);
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      box-shadow: var(--shadow-floating-3);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 300ms ease;
+    }
+
+    .toast.show {
+      bottom: 30px;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .hex-input-wrapper {
+      width: 110px;
+      flex-shrink: 0;
+    }
+
+    #hex-input {
+      width: 100%;
+      height: 36px;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-family: var(--font-family-mono);
+      font-size: 14px;
+      text-align: center;
+      text-transform: uppercase;
+      box-sizing: border-box;
+    }
+
+    .color-details-bar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: var(--space-2);
+      align-items: center;
+      margin-top: var(--space-3);
+    }
+
+    #color-display-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+
+    #color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    #color-name {
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .canvas-half {
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      overflow-y: auto;
+    }
+
+    #palette-container {
+      border-right: 1px solid var(--border-color);
+      flex: 0 0 60%;
+    }
+
+    #gradients-container {
+      flex: 1;
+    }
+
+    #palette-display {
+      display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(2, 1fr);
-      gap: 25px; 
+      gap: var(--space-4);
+      flex-grow: 1;
     }
-    .download-swatch { 
-      border-radius: var(--radius-md); 
-      overflow: hidden; 
-      box-shadow: var(--shadow-raised-2); 
+
+    .palette-swatch {
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-raised-2);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-3);
+      transition: all var(--duration-standard) ease;
+      position: relative;
+      overflow: hidden;
     }
-    .download-swatch-color { 
-      height: 140px; 
+
+    .palette-swatch .color-info {
+      position: relative;
+      z-index: 1;
     }
-    .download-swatch-info { 
-      padding: 15px; 
-      background: var(--color-surface-light); 
+
+    .palette-swatch .color-name {
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
     }
-    .download-swatch-name { 
-      font-weight: var(--font-weight-emphasis); 
-      font-size: 16px; 
+
+    .palette-swatch .color-hex {
+      font-family: var(--font-family-mono);
+      font-size: 12px;
+      opacity: 0.8;
     }
-    .download-swatch-hex { 
-      font-family: var(--font-family-mono); 
-      font-size: 14px; 
-      opacity: 0.8; 
+
+    #gradient-explorer {
+      display: grid;
+      grid-auto-rows: 1fr;
+      gap: var(--space-3);
+      height: 100%;
     }
-    .download-gradients { 
-      display: grid; 
-      grid-template-columns: repeat(2, 1fr);
-      gap: 25px; 
+
+    .gradient-card {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-raised-2);
+      cursor: pointer;
+      transition: all 150ms ease;
+      position: relative;
     }
-    .download-gradient-item { 
-      display: flex; 
-      flex-direction: column; 
-      gap: 12px; 
+
+    .gradient-card:hover {
+      transform: scale(1.02);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 5;
     }
-    .download-gradient-card { 
-      height: 140px; 
-      border-radius: var(--radius-md); 
-      box-shadow: var(--shadow-raised-2); 
+
+    .download-container {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      background: var(--color-background-light);
+      color: var(--color-text-primary-light);
+      padding: 50px;
+      width: 1400px;
+      font-family: var(--font-family-sans);
+      box-sizing: border-box;
     }
-    .download-gradient-hex { 
-      text-align: center; 
-      font-family: var(--font-family-mono); 
-      font-size: 14px; 
-      background: var(--color-surface-light); 
-      padding: 10px; 
-      border-radius: var(--radius-sm); 
+
+    .download-container h2 {
+      font-size: 36px;
+      font-weight: var(--font-weight-emphasis);
+      margin: 0 0 30px 0;
+      border-bottom: 1px solid var(--color-divider-light);
+      padding-bottom: 20px;
+    }
+
+    .download-main-content {
+      display: flex;
+      gap: 50px;
+    }
+
+    .download-section {
+      flex: 1;
+    }
+
+    .download-section h3 {
+      font-size: 24px;
+      font-weight: var(--font-weight-medium);
+      margin: 0 0 20px 0;
+    }
+
+    .download-palette {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 25px;
+    }
+
+    .download-swatch {
+      border-radius: var(--radius-md);
+      overflow: hidden;
       box-shadow: var(--shadow-raised-2);
     }
 
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
-    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
-    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    .download-swatch-color {
+      height: 140px;
+    }
+
+    .download-swatch-info {
+      padding: 15px;
+      background: var(--color-surface-light);
+    }
+
+    .download-swatch-name {
+      font-weight: var(--font-weight-emphasis);
+      font-size: 16px;
+    }
+
+    .download-swatch-hex {
+      font-family: var(--font-family-mono);
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .download-gradients {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+    }
+
+    .download-gradient-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .download-gradient-card {
+      height: 140px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-raised-2);
+    }
+
+    .download-gradient-hex {
+      text-align: center;
+      font-family: var(--font-family-mono);
+      font-size: 14px;
+      background: var(--color-surface-light);
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-raised-2);
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      display: none;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wiki-modal-content {
+      background: var(--surface-alt);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 2001;
+      width: 800px;
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     .wiki-header {
       display: flex;
       justify-content: space-between;
@@ -193,18 +636,25 @@
       background-size: cover;
       background-position: center bottom;
     }
+
     .wiki-header::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
       z-index: 1;
     }
-    .wiki-header h3, #wiki-close-btn {
+
+    .wiki-header h3,
+    #wiki-close-btn {
       position: relative;
       z-index: 2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
+
     #wiki-close-btn {
       background: none;
       border: none;
@@ -218,25 +668,29 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
+
     #wiki-close-btn:hover {
-      background-color: rgba(255,255,255,0.1);
+      background-color: rgba(255, 255, 255, 0.1);
     }
+
     #wiki-content {
-        padding: var(--space-5);
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-        gap: var(--space-5);
+      padding: var(--space-5);
+      overflow: hidden;
+      flex-grow: 1;
+      display: flex;
+      gap: var(--space-5);
     }
+
     .wiki-column {
-        flex: 1;
-        min-width: 0;
+      flex: 1;
+      min-width: 0;
     }
+
     #wiki-content h4 {
-        margin-top: 0;
-        margin-bottom: var(--space-3);
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
     }
 
     /* Splash Screen Modal */
@@ -246,7 +700,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0,0,0,0.1);
+      background-color: rgba(0, 0, 0, 0.1);
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       z-index: 9999;
@@ -257,10 +711,12 @@
       transition: opacity 0.5s ease-out;
       cursor: pointer;
     }
+
     .splash-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
+
     .splash-content {
       display: flex;
       width: 800px;
@@ -274,82 +730,129 @@
       cursor: default;
       position: relative;
     }
-     #splash-close-btn {
-        position: absolute;
-        top: var(--space-3);
-        right: var(--space-3);
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 50%;
-        background-color: var(--surface);
-        color: var(--muted);
-        border: 1px solid var(--border-color);
-        font-size: 24px;
-        line-height: 1;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: all var(--duration-standard) ease;
-        z-index: 10;
-    }
-    #splash-close-btn:hover {
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        transform: scale(1.1);
-    }
-    .splash-info {
-        flex: 0 0 300px;
-        padding: var(--space-5);
-        display: flex;
-        flex-direction: column;
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        border-left: 4px solid var(--accent-color);
-    }
-    .splash-icon {
-        font-size: 32px;
-        margin-bottom: var(--space-4);
-    }
-    .splash-title {
-        font-size: 24px;
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
-        margin-bottom: var(--space-5);
-    }
-    .splash-tech {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.6;
-    }
-    .splash-credits {
-        margin-top: auto;
-        font-size: var(--font-size-caption);
-        color: var(--muted);
-    }
-    .splash-image {
-        flex: 1;
-        background-color: var(--surface);
-    }
-    .splash-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+
+    #splash-close-btn {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border-color);
+      font-size: 24px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      z-index: 10;
     }
 
-    @media (max-width: 1024px) { 
-      body { padding: var(--space-4); } 
-      .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
-      main.panel { flex-direction: column; } 
-      #palette-container { border-right: none; border-bottom: 1px solid var(--border-color); flex-basis: auto; } 
-      #palette-display { grid-template-columns: 1fr 1fr 1fr; } 
-      .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
-      .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
-      .splash-image { width: 100%; height: 200px; }
-      #wiki-content { flex-direction: column; }
+    #splash-close-btn:hover {
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      transform: scale(1.1);
+    }
+
+    .splash-info {
+      flex: 0 0 300px;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .splash-icon {
+      font-size: 32px;
+      margin-bottom: var(--space-4);
+    }
+
+    .splash-title {
+      font-size: 24px;
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
+      margin-bottom: var(--space-5);
+    }
+
+    .splash-tech {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .splash-credits {
+      margin-top: auto;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+    }
+
+    .splash-image {
+      flex: 1;
+      background-color: var(--surface);
+    }
+
+    .splash-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        padding: var(--space-4);
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        height: auto;
+        gap: var(--space-4);
+      }
+
+      main.panel {
+        flex-direction: column;
+      }
+
+      #palette-container {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        flex-basis: auto;
+      }
+
+      #palette-display {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .splash-content {
+        flex-direction: column;
+        width: 90vw;
+        height: auto;
+        max-height: 90vh;
+      }
+
+      .splash-info {
+        flex-basis: auto;
+        border-left: none;
+        border-top: 4px solid var(--accent-color);
+      }
+
+      .splash-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      #wiki-content {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
@@ -357,7 +860,8 @@
       <div class="splash-info">
         <span class="splash-icon">🌈</span>
         <h2 class="splash-title">Color Mixer</h2>
-        <p class="splash-tech">Powered by the iro.js color picker and an extensive color name library to generate harmonic palettes.</p>
+        <p class="splash-tech">Powered by the iro.js color picker and an extensive color name library to generate
+          harmonic palettes.</p>
         <p class="splash-credits">2025. Toolkit by e</p>
       </div>
       <div class="splash-image">
@@ -367,106 +871,109 @@
   </div>
 
   <div class="container loading" id="app-container">
-      <header class="panel">
-        <a href="../index.html" class="back-to-home" title="Return to Home">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-        </a>
-        <h1>Color Mixer</h1>
-        <div class="sub">Generate palettes and discover beautiful gradients.</div>
-        <div class="theme-switcher">
-          <button id="wiki-open-btn" title="Info">ⓘ</button>
-          <button id="theme-toggle" title="Change theme"></button>
+    <header class="panel">
+      <a href="../index.html" class="back-to-home" title="Return to Home">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </a>
+      <h1>Color Mixer</h1>
+      <div class="sub">Generate palettes and discover beautiful gradients.</div>
+      <div class="theme-switcher">
+        <button id="wiki-open-btn" title="Info">ⓘ</button>
+        <button id="theme-toggle" title="Change theme"></button>
+      </div>
+    </header>
+    <aside class="panel">
+      <div class="controls">
+        <div class="control-group">
+          <button id="randomize-btn" class="btn btn-primary">Generate</button>
         </div>
-      </header>
-      <aside class="panel">
-        <div class="controls">
-            <div class="control-group">
-                <button id="randomize-btn" class="btn btn-primary">Generate</button>
+        <div class="control-group color-picker-group">
+          <div id="color-wheel-container"></div>
+          <div class="color-details-bar">
+            <div id="color-display-header">
+              <span id="color-dot"></span>
+              <span id="color-name"></span>
             </div>
-            <div class="control-group color-picker-group">
-                <div id="color-wheel-container"></div>
-                <div class="color-details-bar">
-                    <div id="color-display-header">
-                        <span id="color-dot"></span>
-                        <span id="color-name"></span>
-                    </div>
-                    <div class="hex-input-wrapper">
-                        <input type="text" id="hex-input" />
-                    </div>
-                    <button id="lock-btn" title="Lock base color">🔓</button>
-                </div>
+            <div class="hex-input-wrapper">
+              <input type="text" id="hex-input" />
             </div>
-            <div class="control-group">
-                <div class="inline-form-group">
-                    <label for="harmony-rule">Type</label>
-                    <div class="select-wrapper">
-                        <select id="harmony-rule">
-                            <option value="analogous">Analogous</option>
-                            <option value="monochromatic">Monochromatic</option>
-                            <option value="triadic">Triadic</option>
-                            <option value="complementary">Complementary</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="controls-footer">
-                <button id="download-btn" class="btn btn-secondary">Download</button>
-                <div class="note">Click a gradient to cycle its style. Shift-click to copy CSS.</div>
-            </div>
+            <button id="lock-btn" title="Lock base color">🔓</button>
+          </div>
         </div>
-      </aside>
-      <main class="panel" id="main-canvas">
-          <div class="canvas-half" id="palette-container">
-              <div id="palette-display"></div>
+        <div class="control-group">
+          <div class="inline-form-group">
+            <label for="harmony-rule">Type</label>
+            <div class="select-wrapper">
+              <select id="harmony-rule">
+                <option value="analogous">Analogous</option>
+                <option value="monochromatic">Monochromatic</option>
+                <option value="triadic">Triadic</option>
+                <option value="complementary">Complementary</option>
+              </select>
+            </div>
           </div>
-          <div class="canvas-half" id="gradients-container">
-              <div id="gradient-explorer"></div>
-          </div>
-      </main>
+        </div>
+        <div class="controls-footer">
+          <button id="download-btn" class="btn btn-secondary">Download</button>
+          <div class="note">Click a gradient to cycle its style. Shift-click to copy CSS.</div>
+        </div>
+      </div>
+    </aside>
+    <main class="panel" id="main-canvas">
+      <div class="canvas-half" id="palette-container">
+        <div id="palette-display"></div>
+      </div>
+      <div class="canvas-half" id="gradients-container">
+        <div id="gradient-explorer"></div>
+      </div>
+    </main>
   </div>
   <div id="toast" class="toast"></div>
   <div id="wiki-overlay" class="popup-overlay"></div>
-  
+
   <script type="module">
     const ntc = {
-        names: [], rgb: [],
-        init: function() { for (let i = 0; i < ntc.names.length; i++) { const color = ntc.names[i][0]; ntc.rgb[i] = { r: parseInt(color.substring(0, 2), 16), g: parseInt(color.substring(2, 4), 16), b: parseInt(color.substring(4, 6), 16) }; } },
-        name: function(color) {
-            color = color.toUpperCase(); if (color.length < 3 || color.length > 7) return ["#000000", "Invalid Color", false]; if (color.length % 3 === 0) color = "#" + color; if (color.length === 4) color = "#" + color.substring(1, 2).repeat(2) + color.substring(2, 3).repeat(2) + color.substring(3, 4).repeat(2);
-            const [r, g, b] = [parseInt(color.substring(1, 3), 16), parseInt(color.substring(3, 5), 16), parseInt(color.substring(5, 7), 16)]; let cl = -1, df = -1;
-            for (let i = 0; i < ntc.names.length; i++) { const ref = ntc.rgb[i]; const ndf1 = Math.pow(r - ref.r, 2) + Math.pow(g - ref.g, 2) + Math.pow(b - ref.b, 2); if (df < 0 || ndf1 < df) { df = ndf1; cl = i; } }
-            return cl < 0 ? ["#000000", "Invalid Color", false] : ["#" + ntc.names[cl][0], ntc.names[cl][1], false];
-        }
+      names: [], rgb: [],
+      init: function () { for (let i = 0; i < ntc.names.length; i++) { const color = ntc.names[i][0]; ntc.rgb[i] = { r: parseInt(color.substring(0, 2), 16), g: parseInt(color.substring(2, 4), 16), b: parseInt(color.substring(4, 6), 16) }; } },
+      name: function (color) {
+        color = color.toUpperCase(); if (color.length < 3 || color.length > 7) return ["#000000", "Invalid Color", false]; if (color.length % 3 === 0) color = "#" + color; if (color.length === 4) color = "#" + color.substring(1, 2).repeat(2) + color.substring(2, 3).repeat(2) + color.substring(3, 4).repeat(2);
+        const [r, g, b] = [parseInt(color.substring(1, 3), 16), parseInt(color.substring(3, 5), 16), parseInt(color.substring(5, 7), 16)]; let cl = -1, df = -1;
+        for (let i = 0; i < ntc.names.length; i++) { const ref = ntc.rgb[i]; const ndf1 = Math.pow(r - ref.r, 2) + Math.pow(g - ref.g, 2) + Math.pow(b - ref.b, 2); if (df < 0 || ndf1 < df) { df = ndf1; cl = i; } }
+        return cl < 0 ? ["#000000", "Invalid Color", false] : ["#" + ntc.names[cl][0], ntc.names[cl][1], false];
+      }
     };
-    
+
     const WIKI_DATA = {
-        "title": "Color Mixer Info",
-        "sections":[
-            {
-                "title":"How to Use",
-                "content":[
-                    "<b>1. Generate:</b> Click 'Generate' for a random color palette, or use the color wheel to select a specific base color.",
-                    "<b>2. Lock Color:</b> Click the lock icon 🔒 to keep your base color while generating new harmonic palettes around it.",
-                    "<b>3. Change Harmony:</b> Select different rules like 'Analogous' or 'Triadic' to explore various color relationships.",
-                    "<b>4. Download:</b> Export your final palette and gradients as a high-quality PNG image."
-                ]
-            },
-            {
-                "title":"Features",
-                "content":[
-                   "<b>Harmonic Palettes:</b> Automatically generates beautiful, mathematically sound color schemes.",
-                   "<b>Gradient Discovery:</b> Explores interesting gradient combinations based on your selected palette.",
-                   "<b>Interactive UI:</b> Click a gradient to cycle its style (linear, radial) or Shift-click to copy its CSS code.",
-                   "<b>Local & Private:</b> All color generation happens directly in your browser. No data is ever sent to a server."
-                ]
-            }
-        ]
+      "title": "Color Mixer Info",
+      "sections": [
+        {
+          "title": "How to Use",
+          "content": [
+            "<b>1. Generate:</b> Click 'Generate' for a random color palette, or use the color wheel to select a specific base color.",
+            "<b>2. Lock Color:</b> Click the lock icon 🔒 to keep your base color while generating new harmonic palettes around it.",
+            "<b>3. Change Harmony:</b> Select different rules like 'Analogous' or 'Triadic' to explore various color relationships.",
+            "<b>4. Download:</b> Export your final palette and gradients as a high-quality PNG image."
+          ]
+        },
+        {
+          "title": "Features",
+          "content": [
+            "<b>Harmonic Palettes:</b> Automatically generates beautiful, mathematically sound color schemes.",
+            "<b>Gradient Discovery:</b> Explores interesting gradient combinations based on your selected palette.",
+            "<b>Interactive UI:</b> Click a gradient to cycle its style (linear, radial) or Shift-click to copy its CSS code.",
+            "<b>Local & Private:</b> All color generation happens directly in your browser. No data is ever sent to a server."
+          ]
+        }
+      ]
     };
 
     const StudioApp = {
       state: { palette: [], baseColor: '#6366f1', gradientGrid: [], isBaseColorLocked: false, splashHidden: false, isWikiLoaded: false },
       el: {}, colorPicker: null,
-      gradientCycle: [ { type: 'linear', angle: 90 }, { type: 'linear', angle: 135 }, { type: 'linear', angle: 180 }, { type: 'radial' } ],
+      gradientCycle: [{ type: 'linear', angle: 90 }, { type: 'linear', angle: 135 }, { type: 'linear', angle: 180 }, { type: 'radial' }],
       THEMES: ['light', 'dark', 'system'], THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
 
       async init() {
@@ -477,40 +984,40 @@
         this.bindEvents();
         this.generatePalette();
       },
-      
+
       async loadColorNames() {
         try {
-            const response = await fetch('colors.json');
-            if (!response.ok) throw new Error('Network response was not ok');
-            ntc.names = await response.json(); ntc.init();
+          const response = await fetch('colors.json');
+          if (!response.ok) throw new Error('Network response was not ok');
+          ntc.names = await response.json(); ntc.init();
         } catch (error) {
-            console.error("Could not load color names:", error);
-            this.el['paletteContainer'].innerHTML = '<h2>Error</h2><p>Could not load color name data. Please ensure colors.json is in the same directory.</p>';
+          console.error("Could not load color names:", error);
+          this.el['paletteContainer'].innerHTML = '<h2>Error</h2><p>Could not load color name data. Please ensure colors.json is in the same directory.</p>';
         }
       },
 
       hideSplashScreen() {
-          if (!this.state.splashHidden) {
-              this.state.splashHidden = true;
-              this.el.splashScreen.classList.add('hidden');
-              this.el.appContainer.classList.remove('loading');
-          }
+        if (!this.state.splashHidden) {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
       },
 
       cacheDOMElements() {
-        const ids = [ 'color-wheel-container', 'harmony-rule', 'randomize-btn', 'main-canvas', 'palette-display', 'gradient-explorer', 'toast', 'theme-toggle', 'palette-container', 'lock-btn', 'color-dot', 'color-name', 'download-btn', 'hex-input', 'splash-screen', 'app-container', 'splash-close-btn', 'wiki-open-btn', 'wiki-overlay' ];
-        ids.forEach(id => this.el[id.replace(/-(\w)/g, (_,c)=>c.toUpperCase())] = document.getElementById(id));
+        const ids = ['color-wheel-container', 'harmony-rule', 'randomize-btn', 'main-canvas', 'palette-display', 'gradient-explorer', 'toast', 'theme-toggle', 'palette-container', 'lock-btn', 'color-dot', 'color-name', 'download-btn', 'hex-input', 'splash-screen', 'app-container', 'splash-close-btn', 'wiki-open-btn', 'wiki-overlay'];
+        ids.forEach(id => this.el[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id));
       },
-      
+
       initColorWheel() {
         this.colorPicker = new iro.ColorPicker(this.el['colorWheelContainer'], {
-            width: 200, color: this.state.baseColor, borderWidth: 1, borderColor: "#fff",
-            layout: [ { component: iro.ui.Wheel }, { component: iro.ui.Slider, options: { sliderType: 'hue' }},{ component: iro.ui.Slider, options: { sliderType: 'saturation' }},{ component: iro.ui.Slider, options: { sliderType: 'value' }}]
+          width: 200, color: this.state.baseColor, borderWidth: 1, borderColor: "#fff",
+          layout: [{ component: iro.ui.Wheel }, { component: iro.ui.Slider, options: { sliderType: 'hue' } }, { component: iro.ui.Slider, options: { sliderType: 'saturation' } }, { component: iro.ui.Slider, options: { sliderType: 'value' } }]
         });
         this.colorPicker.on('color:change', (color) => {
-            this.state.baseColor = color.hexString;
-            this.el['hexInput'].value = color.hexString;
-            this.generatePalette();
+          this.state.baseColor = color.hexString;
+          this.el['hexInput'].value = color.hexString;
+          this.generatePalette();
         });
       },
 
@@ -524,40 +1031,40 @@
         this.el.hexInput.addEventListener('change', e => this.updateColorFromHex(e.target.value));
         this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
         this.el.splashScreen.addEventListener('click', (e) => {
-            if (e.target === this.el.splashScreen) this.hideSplashScreen();
+          if (e.target === this.el.splashScreen) this.hideSplashScreen();
         });
         this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
       },
-      
+
       updateColorFromHex(hex) {
         const hexRegex = /^#([0-9A-F]{3}){1,2}$/i;
         if (hexRegex.test(hex)) {
-            this.colorPicker.color.set(hex);
+          this.colorPicker.color.set(hex);
         } else {
-            this.el['hexInput'].value = this.state.baseColor;
-            this.showToast('Invalid HEX code');
+          this.el['hexInput'].value = this.state.baseColor;
+          this.showToast('Invalid HEX code');
         }
       },
-      
+
       render() {
         this.renderColorHeader();
         this.renderLockState();
         this.renderPaletteDisplay();
         this.renderGradientExplorer();
       },
-      
+
       randomizeAndGenerate() {
         const rules = Array.from(this.el['harmonyRule'].options).map(opt => opt.value);
         this.el['harmonyRule'].value = rules[Math.floor(Math.random() * rules.length)];
 
         if (!this.state.isBaseColorLocked) {
-            const randomColor = this.hslToHex(Math.random() * 360, 0.7, 0.6);
-            this.colorPicker.color.set(randomColor);
+          const randomColor = this.hslToHex(Math.random() * 360, 0.7, 0.6);
+          this.colorPicker.color.set(randomColor);
         } else {
-            this.generatePalette();
+          this.generatePalette();
         }
       },
-      
+
       toggleLock() {
         this.state.isBaseColorLocked = !this.state.isBaseColorLocked;
         this.renderLockState();
@@ -579,18 +1086,18 @@
         const count = 4; // Generate 4 colors based on the rule
         const newPalette = [];
         const baseHsl = this.hexToHsl(this.state.baseColor);
-        
+
         for (let i = 0; i < count; i++) {
-            let h = baseHsl.h, s = baseHsl.s, l = baseHsl.l;
-            switch(rule) {
-                case 'analogous': h = (baseHsl.h + (i * 30)) % 360; break;
-                case 'monochromatic': l = 0.15 + (i / (count - 1)) * 0.75; break;
-                case 'triadic': h = (baseHsl.h + (i * 120)) % 360; l -= Math.floor(i/3) * 0.1; break;
-                case 'complementary': h = (i % 2 === 0) ? baseHsl.h : (baseHsl.h + 180) % 360; l -= Math.floor(i/2) * 0.15; break;
-            }
-            newPalette.push(this.hslToHex(h,s,l));
+          let h = baseHsl.h, s = baseHsl.s, l = baseHsl.l;
+          switch (rule) {
+            case 'analogous': h = (baseHsl.h + (i * 30)) % 360; break;
+            case 'monochromatic': l = 0.15 + (i / (count - 1)) * 0.75; break;
+            case 'triadic': h = (baseHsl.h + (i * 120)) % 360; l -= Math.floor(i / 3) * 0.1; break;
+            case 'complementary': h = (i % 2 === 0) ? baseHsl.h : (baseHsl.h + 180) % 360; l -= Math.floor(i / 2) * 0.15; break;
+          }
+          newPalette.push(this.hslToHex(h, s, l));
         }
-        
+
         // Generate the 5th "creative" color (complementary based)
         const creativeHue = (baseHsl.h + 180) % 360;
         const creativeSaturation = Math.max(0.3, baseHsl.s * 0.85);
@@ -621,18 +1128,18 @@
 
       renderGradientExplorer() {
         this.el['gradientExplorer'].innerHTML = this.state.gradientGrid.map((gradState, index) => {
-            const css = this.generateGradientCSS(gradState.combo, gradState);
-            return `<div class="gradient-card" style="background-image: ${css}" data-type="cycle-gradient" data-index="${index}" title="Click to cycle style. Shift-click to copy."></div>`;
+          const css = this.generateGradientCSS(gradState.combo, gradState);
+          return `<div class="gradient-card" style="background-image: ${css}" data-type="cycle-gradient" data-index="${index}" title="Click to cycle style. Shift-click to copy."></div>`;
         }).join('');
       },
-      
+
       selectGoodGradientCombinations(palette) {
         if (!palette || palette.length < 2) return [];
         const p = palette; const len = p.length; const mid = Math.floor(len / 2);
-        const pairs = [[p[0], p[len-1]], [p[0], p[1]], [p[mid], p[mid+1]], [p[1], p[len-1]], [p[0], p[mid]]].filter(c => c[1] !== undefined);
-        const triplets = len < 3 ? [] : [[p[0], p[mid], p[len-1]], [p[0], p[1], p[2]], [p[len-3], p[len-2], p[len-1]], [p[0], p[2], p[4]]].filter(c => c[2] !== undefined && c[0] && c[1] && c[2]);
-        const quads = len < 4 ? [] : [[p[0], p[1], p[len-2], p[len-1]], [p[0], p[1], p[2], p[3]]].filter(c => c[3] !== undefined);
-        return [...pairs, ...triplets, ...quads].filter((v,i,a)=>a.findIndex(t=>(JSON.stringify(t) === JSON.stringify(v)))===i).sort(() => 0.5 - Math.random()).slice(0, 6);
+        const pairs = [[p[0], p[len - 1]], [p[0], p[1]], [p[mid], p[mid + 1]], [p[1], p[len - 1]], [p[0], p[mid]]].filter(c => c[1] !== undefined);
+        const triplets = len < 3 ? [] : [[p[0], p[mid], p[len - 1]], [p[0], p[1], p[2]], [p[len - 3], p[len - 2], p[len - 1]], [p[0], p[2], p[4]]].filter(c => c[2] !== undefined && c[0] && c[1] && c[2]);
+        const quads = len < 4 ? [] : [[p[0], p[1], p[len - 2], p[len - 1]], [p[0], p[1], p[2], p[3]]].filter(c => c[3] !== undefined);
+        return [...pairs, ...triplets, ...quads].filter((v, i, a) => a.findIndex(t => (JSON.stringify(t) === JSON.stringify(v))) === i).sort(() => 0.5 - Math.random()).slice(0, 6);
       },
 
       handleCanvasClick(e) {
@@ -641,17 +1148,17 @@
         const index = Number(gradientCard.dataset.index);
         const gradState = this.state.gradientGrid[index];
         if (e.shiftKey) {
-            const css = this.generateGradientCSS(gradState.combo, gradState);
-            navigator.clipboard.writeText(`background-image: ${css};`);
-            this.showToast('Gradient CSS copied!');
+          const css = this.generateGradientCSS(gradState.combo, gradState);
+          navigator.clipboard.writeText(`background-image: ${css};`);
+          this.showToast('Gradient CSS copied!');
         } else {
-            const currentIndex = this.gradientCycle.findIndex(s => s.type === gradState.type && s.angle === gradState.angle);
-            const nextIndex = (currentIndex + 1) % this.gradientCycle.length;
-            this.state.gradientGrid[index] = { ...gradState, ...this.gradientCycle[nextIndex] };
-            this.renderGradientExplorer();
+          const currentIndex = this.gradientCycle.findIndex(s => s.type === gradState.type && s.angle === gradState.angle);
+          const nextIndex = (currentIndex + 1) % this.gradientCycle.length;
+          this.state.gradientGrid[index] = { ...gradState, ...this.gradientCycle[nextIndex] };
+          this.renderGradientExplorer();
         }
       },
-      
+
       downloadImage() {
         const baseColorName = ntc.name(this.state.baseColor)[1];
         const lastColorName = ntc.name(this.state.palette[this.state.palette.length - 1])[1];
@@ -661,8 +1168,8 @@
         downloadContainer.classList.add('download-container');
 
         const paletteHtml = this.state.palette.map(color => {
-            const name = ntc.name(color)[1];
-            return `
+          const name = ntc.name(color)[1];
+          return `
                 <div class="download-swatch">
                     <div class="download-swatch-color" style="background-color: ${color};"></div>
                     <div class="download-swatch-info" style="background-color: #F5F5F7; color: #1C1C1E;">
@@ -673,9 +1180,9 @@
         }).join('');
 
         const gradientsHtml = this.state.gradientGrid.map(gradState => {
-            const css = this.generateGradientCSS(gradState.combo, gradState);
-            const hexCodes = gradState.combo.join(' → ');
-            return `
+          const css = this.generateGradientCSS(gradState.combo, gradState);
+          const hexCodes = gradState.combo.join(' → ');
+          return `
                 <div class="download-gradient-item">
                     <div class="download-gradient-card" style="background-image: ${css};"></div>
                     <div class="download-gradient-hex">${hexCodes}</div>
@@ -697,33 +1204,33 @@
         document.body.appendChild(downloadContainer);
 
         html2canvas(downloadContainer, {
-            scale: 2, useCORS: true, backgroundColor: '#ffffff'
+          scale: 2, useCORS: true, backgroundColor: '#ffffff'
         }).then(canvas => {
-            const image = canvas.toDataURL('image/png', 1.0);
-            const link = document.createElement('a');
-            link.download = `${title}.png`;
-            link.href = image;
-            link.click();
-            document.body.removeChild(downloadContainer);
+          const image = canvas.toDataURL('image/png', 1.0);
+          const link = document.createElement('a');
+          link.download = `${title}.png`;
+          link.href = image;
+          link.click();
+          document.body.removeChild(downloadContainer);
         }).catch(err => {
-            console.error('Oops, something went wrong!', err);
-            document.body.removeChild(downloadContainer);
+          console.error('Oops, something went wrong!', err);
+          document.body.removeChild(downloadContainer);
         });
       },
 
-      getContrastYIQ(hexcolor){
-        const {r,g,b} = this.hexToRgb(hexcolor);
-        const yiq = ((r*299)+(g*587)+(b*114))/1000;
+      getContrastYIQ(hexcolor) {
+        const { r, g, b } = this.hexToRgb(hexcolor);
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
         return (yiq >= 128) ? 'var(--color-text-primary-light)' : 'var(--color-text-primary-dark)';
       },
 
       generateGradientCSS(colors, options) {
         if (!colors || colors.length === 0) return 'none';
         const colorStops = colors.map((c, i) => `${c} ${Math.round((i / (colors.length - 1)) * 100)}%`).join(', ');
-        if(options.type === 'radial') return `radial-gradient(circle, ${colorStops})`;
+        if (options.type === 'radial') return `radial-gradient(circle, ${colorStops})`;
         return `linear-gradient(${options.angle}deg, ${colorStops})`;
       },
-      
+
       showToast(message) {
         this.el.toast.textContent = message; this.el.toast.classList.add('show');
         setTimeout(() => this.el.toast.classList.remove('show'), 2000);
@@ -731,77 +1238,77 @@
 
       hexToRgb(hex) {
         const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return r ? { r: parseInt(r[1], 16), g: parseInt(r[2], 16), b: parseInt(r[3], 16) } : {r:0,g:0,b:0};
+        return r ? { r: parseInt(r[1], 16), g: parseInt(r[2], 16), b: parseInt(r[3], 16) } : { r: 0, g: 0, b: 0 };
       },
-      
+
       hexToHsl(hex) {
-        const {r,g,b} = this.hexToRgb(hex); const r_norm=r/255, g_norm=g/255, b_norm=b/255; const max=Math.max(r_norm,g_norm,b_norm), min=Math.min(r_norm,g_norm,b_norm); let h,s,l=(max+min)/2; if(max===min) h=s=0; else { const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min); switch(max){case r_norm:h=(g_norm-b_norm)/d+(g_norm<b_norm?6:0);break;case g_norm:h=(b_norm-r_norm)/d+2;break;case b_norm:h=(r_norm-g_norm)/d+4;break;} h/=6; } return {h:h*360,s:s,l:l};
+        const { r, g, b } = this.hexToRgb(hex); const r_norm = r / 255, g_norm = g / 255, b_norm = b / 255; const max = Math.max(r_norm, g_norm, b_norm), min = Math.min(r_norm, g_norm, b_norm); let h, s, l = (max + min) / 2; if (max === min) h = s = 0; else { const d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min); switch (max) { case r_norm: h = (g_norm - b_norm) / d + (g_norm < b_norm ? 6 : 0); break; case g_norm: h = (b_norm - r_norm) / d + 2; break; case b_norm: h = (r_norm - g_norm) / d + 4; break; } h /= 6; } return { h: h * 360, s: s, l: l };
       },
 
       hslToHex(h, s, l) {
-        l=l<0?0:l>1?1:l; s=s<0?0:s>1?1:s; let c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2, r=0,g=0,b=0; if(h<60){r=c;g=x}else if(h<120){r=x;g=c}else if(h<180){g=c;b=x}else if(h<240){g=x;b=c}else if(h<300){r=x;b=c}else{r=c;b=x} const toHex=(n)=>Math.round((n+m)*255).toString(16).padStart(2,'0'); return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        l = l < 0 ? 0 : l > 1 ? 1 : l; s = s < 0 ? 0 : s > 1 ? 1 : s; let c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2, r = 0, g = 0, b = 0; if (h < 60) { r = c; g = x } else if (h < 120) { r = x; g = c } else if (h < 180) { g = c; b = x } else if (h < 240) { g = x; b = c } else if (h < 300) { r = x; b = c } else { r = c; b = x } const toHex = (n) => Math.round((n + m) * 255).toString(16).padStart(2, '0'); return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
       },
 
       initTheme() {
-        const savedTheme=localStorage.getItem('creative-toolkit-theme')||'system'; this.setTheme(savedTheme,false); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(localStorage.getItem('creative-toolkit-theme')==='system')this.applyTheme('system');});
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(savedTheme, false); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system'); });
       },
-      setTheme(theme, save=true) {
-        if(save)localStorage.setItem('creative-toolkit-theme',theme); this.el['themeToggle'].textContent=this.THEME_ICONS[theme];this.applyTheme(theme);
+      setTheme(theme, save = true) {
+        if (save) localStorage.setItem('creative-toolkit-theme', theme); this.el['themeToggle'].textContent = this.THEME_ICONS[theme]; this.applyTheme(theme);
       },
       cycleTheme() {
-        const currentTheme=localStorage.getItem('creative-toolkit-theme')||'system'; this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme)+1)%this.THEMES.length]);
+        const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
       },
       applyTheme(theme) {
-        document.documentElement.dataset.theme=(theme==='system')?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):theme;
+        document.documentElement.dataset.theme = (theme === 'system') ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
       },
-      
+
       openWiki() {
-          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.innerHTML = `
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+          const wikiModal = document.createElement('div');
+          wikiModal.className = 'wiki-modal-content';
+          wikiModal.innerHTML = `
                   <div class="wiki-header">
                     <h3 id="wiki-title">Info</h3>
                     <button id="wiki-close-btn" title="Close">×</button>
                   </div>
                   <div id="wiki-content"></div>`;
-              this.el.wikiOverlay.appendChild(wikiModal);
-              this.el.wikiOverlay.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
-          }
+          this.el.wikiOverlay.appendChild(wikiModal);
+          this.el.wikiOverlay.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
 
-          if (!this.state.isWikiLoaded) {
-              const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-              const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-              titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div'); col1.className = 'wiki-column';
-              const col2 = document.createElement('div'); col2.className = 'wiki-column';
+        if (!this.state.isWikiLoaded) {
+          const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+          const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+          titleEl.textContent = WIKI_DATA.title;
 
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                  if (index < WIKI_DATA.sections.length / 2) {
-                      col1.appendChild(sectionContainer);
-                  } else {
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              contentEl.innerHTML = '';
-              contentEl.appendChild(col1);
-              contentEl.appendChild(col2);
+          const col1 = document.createElement('div'); col1.className = 'wiki-column';
+          const col2 = document.createElement('div'); col2.className = 'wiki-column';
 
-              this.state.isWikiLoaded = true;
-          }
-          this.el.wikiOverlay.classList.add('show');
+          WIKI_DATA.sections.forEach((s, index) => {
+            const sectionContainer = document.createElement('div');
+            const h4 = document.createElement('h4'); h4.textContent = s.title;
+            sectionContainer.appendChild(h4);
+            s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+            if (index < WIKI_DATA.sections.length / 2) {
+              col1.appendChild(sectionContainer);
+            } else {
+              col2.appendChild(sectionContainer);
+            }
+          });
+
+          contentEl.innerHTML = '';
+          contentEl.appendChild(col1);
+          contentEl.appendChild(col2);
+
+          this.state.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
       },
-      closeWiki(){ this.el.wikiOverlay.classList.remove('show'); },
+      closeWiki() { this.el.wikiOverlay.classList.remove('show'); },
     };
 
     document.addEventListener('DOMContentLoaded', () => StudioApp.init());
   </script>
 </body>
-</html>
 
+</html>

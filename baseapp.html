@@ -1,96 +1,381 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-s8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>App Title Placeholder</title> 
-  
+  <title>App Title Placeholder</title>
+
   <style>
     /* Global CSS Variables */
     :root {
-      --accent-color: #4f46e5; /* Default Toolkit Purple */
-      --accent-color-tint: #c7d2fe;
-      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
+      --accent-color: #E72F2F;
+      /* Red */
+      --accent-color-tint: rgba(231, 47, 47, 0.1);
+      --accent-yellow: #F7CF27;
+      --color-cream: #FAF6F0;
+      --color-text-primary-light: #1C1C1E;
+      --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #FAF6F0;
+      --color-background-light: #FFFFFF;
+      --color-divider-light: #E8E1D8;
+      --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E;
+      --color-surface-dark: #1a1815;
+      --color-background-dark: #0d0c0a;
+      --color-divider-dark: #3A3A3C;
       --color-accent-text: #FFFFFF;
       --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-      --font-weight-emphasis: 600; --font-weight-medium: 500;
-      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
-      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
-      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --font-size-h1: 20px;
+      --font-size-body: 14px;
+      --font-size-caption: 12px;
+      --font-weight-emphasis: 600;
+      --font-weight-medium: 500;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
       --duration-standard: 200ms;
     }
+
     /* Theme Application */
-    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
-    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
-    
+    html[data-theme="light"] {
+      --ink: var(--color-text-primary-light);
+      --muted: var(--color-text-secondary-light);
+      --surface: var(--color-surface-light);
+      --surface-alt: var(--color-background-light);
+      --border-color: var(--color-divider-light);
+      --panel-shadow: var(--shadow-raised-2);
+      color-scheme: light;
+    }
+
+    html[data-theme="dark"] {
+      --ink: var(--color-text-primary-dark);
+      --muted: var(--color-text-secondary-dark);
+      --surface: var(--color-surface-dark);
+      --surface-alt: var(--color-background-dark);
+      --border-color: var(--color-divider-dark);
+      --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color-scheme: dark;
+    }
+
     /* Base Styles */
-    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
-    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    
+    html {
+      box-sizing: border-box;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--surface);
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+      padding: 25px;
+    }
+
     /* Layout Container */
-    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
-    .container.loading { filter: blur(5px); pointer-events: none; }
-    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 25px;
+      height: calc(100vh - 50px);
+      transition: filter 0.5s ease-in-out;
+    }
+
+    .container.loading {
+      filter: blur(5px);
+      pointer-events: none;
+    }
+
     /* Panel Styles */
-    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    
+    .panel {
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--panel-shadow);
+    }
+
     /* Header Specifics */
-    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
-    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-    header .sub { color: var(--muted); }
-    
+    header.panel {
+      grid-column: 1 / -1;
+      height: 65px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+    }
+
+    header h1 {
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-emphasis);
+      margin: 0;
+    }
+
+    header .sub {
+      color: var(--muted);
+    }
+
     /* Theme Switcher & Wiki Button */
-    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
-    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-    
+    .theme-switcher {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #theme-toggle,
+    #wiki-open-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+    }
+
+    #theme-toggle:hover,
+    #wiki-open-btn:hover {
+      background-color: var(--surface-alt);
+    }
+
     /* Back to Home Button */
-    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
-    .back-to-home:hover { background-color: var(--surface-alt); }
-    .back-to-home svg { width: 18px; height: 18px; }
+    .back-to-home {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      text-decoration: none;
+    }
+
+    .back-to-home:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .back-to-home svg {
+      width: 18px;
+      height: 18px;
+    }
 
     /* Aside Controls Layout */
-    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
-    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
-    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
-    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
-    
-    /* Form Elements & Buttons */
-    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
-    .form-group label { font-weight: var(--font-weight-medium); }
-    .form-control, .select-wrapper select, input[type="color"], input[type="number"], textarea { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; resize: vertical; min-height: 40px; }
-    textarea.form-control { min-height: 80px; }
-    input[type="number"] { text-align: right; width: 80px; }
-    input[type="color"] { height: 40px; padding: 4px; border-radius: var(--radius-sm); }
-    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    input[type="color"]::-webkit-color-swatch { border-radius: var(--radius-sm); border: none; }
-    input[type="color"]::-moz-color-swatch-wrapper { padding: 0; }
-    input[type="color"]::-moz-color-swatch { border-radius: var(--radius-sm); border: none; }
+    aside.panel.controls {
+      position: sticky;
+      top: 0;
+      max-height: 100%;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      padding: var(--space-5);
+    }
 
-    .select-wrapper { position: relative; }
-    .select-wrapper select { -webkit-appearance: none; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
-    
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
-    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
-    .btn-secondary:hover { filter: brightness(0.95); }
-    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
-    .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .control-group+.control-group {
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-5);
+    }
+
+    .note {
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-4);
+    }
+
+    /* Form Elements & Buttons */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .form-group label {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .form-control,
+    .select-wrapper select,
+    input[type="color"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      resize: vertical;
+      min-height: 40px;
+    }
+
+    textarea.form-control {
+      min-height: 80px;
+    }
+
+    input[type="number"] {
+      text-align: right;
+      width: 80px;
+    }
+
+    input[type="color"] {
+      height: 40px;
+      padding: 4px;
+      border-radius: var(--radius-sm);
+    }
+
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-webkit-color-swatch {
+      border-radius: var(--radius-sm);
+      border: none;
+    }
+
+    input[type="color"]::-moz-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    input[type="color"]::-moz-color-swatch {
+      border-radius: var(--radius-sm);
+      border: none;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      cursor: pointer;
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      height: 40px;
+      padding: 0 var(--space-4);
+      border: 1px solid transparent;
+      transition: all var(--duration-standard) ease;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background-color: var(--accent-color-tint);
+      color: var(--accent-color);
+      border-color: transparent;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    .btn:disabled {
+      background-color: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
 
     /* Main Canvas/Content Area */
-    main.panel { display: flex; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; }
-    
+    main.panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-5);
+      min-height: 0;
+    }
+
     /* Popups & Modals */
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
-    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
-    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      display: none;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wiki-modal-content {
+      background: var(--surface-alt);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 2001;
+      width: 800px;
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     .wiki-header {
       display: flex;
       justify-content: space-between;
@@ -104,18 +389,25 @@
       background-size: cover;
       background-position: center bottom;
     }
+
     .wiki-header::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
       z-index: 1;
     }
-    .wiki-header h3, #wiki-close-btn {
+
+    .wiki-header h3,
+    #wiki-close-btn {
       position: relative;
       z-index: 2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
+
     #wiki-close-btn {
       background: none;
       border: none;
@@ -129,27 +421,31 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
+
     #wiki-close-btn:hover {
-      background-color: rgba(255,255,255,0.1);
+      background-color: rgba(255, 255, 255, 0.1);
     }
+
     #wiki-content {
-        padding: var(--space-5);
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-        gap: var(--space-5);
+      padding: var(--space-5);
+      overflow: hidden;
+      flex-grow: 1;
+      display: flex;
+      gap: var(--space-5);
     }
+
     .wiki-column {
-        flex: 1;
-        min-width: 0;
+      flex: 1;
+      min-width: 0;
     }
+
     #wiki-content h4 {
-        margin-top: 0;
-        margin-bottom: var(--space-3);
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
     }
-    
+
     /* Splash Screen Modal */
     .splash-overlay {
       position: fixed;
@@ -157,7 +453,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0,0,0,0.1);
+      background-color: rgba(0, 0, 0, 0.1);
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       z-index: 9999;
@@ -168,10 +464,12 @@
       transition: opacity 0.5s ease-out;
       cursor: pointer;
     }
+
     .splash-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
+
     .splash-content {
       display: flex;
       width: 800px;
@@ -185,69 +483,78 @@
       cursor: default;
       position: relative;
     }
+
     #splash-close-btn {
-        position: absolute;
-        top: var(--space-3);
-        right: var(--space-3);
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 50%;
-        background-color: var(--surface);
-        color: var(--muted);
-        border: 1px solid var(--border-color);
-        font-size: 24px;
-        line-height: 1;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: all var(--duration-standard) ease;
-        z-index: 10;
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border-color);
+      font-size: 24px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      z-index: 10;
     }
+
     #splash-close-btn:hover {
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        transform: scale(1.1);
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      transform: scale(1.1);
     }
+
     .splash-info {
-        flex: 0 0 300px;
-        padding: var(--space-5);
-        display: flex;
-        flex-direction: column;
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        border-left: 4px solid var(--accent-color);
+      flex: 0 0 300px;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      border-left: 4px solid var(--accent-color);
     }
+
     .splash-icon {
-        font-size: 32px;
-        margin-bottom: var(--space-4);
+      font-size: 32px;
+      margin-bottom: var(--space-4);
     }
+
     .splash-title {
-        font-size: 24px;
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
-        margin-bottom: var(--space-5);
+      font-size: 24px;
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
+      margin-bottom: var(--space-5);
     }
+
     .splash-tech {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.6;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
     }
+
     .splash-credits {
-        margin-top: auto;
-        font-size: var(--font-size-caption);
-        color: var(--muted);
+      margin-top: auto;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
     }
+
     .splash-image {
-        flex: 1;
-        background-color: var(--surface);
+      flex: 1;
+      background-color: var(--surface);
     }
+
     .splash-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    
+
     /* === 1. AÑADIR ESTILO PARA EL CONTADOR FLOTANTE === */
     .floating-visitor-badge {
       position: fixed;
@@ -257,23 +564,58 @@
       opacity: 0.7;
       transition: opacity var(--duration-standard) ease;
     }
+
     .floating-visitor-badge:hover {
       opacity: 1;
     }
 
     /* Responsive Adjustments */
-    @media (max-width: 800px) { 
-        body { padding: var(--space-4); } 
-        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
-        aside.controls { position: static; max-height: none; } 
-        main.panel { min-height: 50vh; } 
-        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
-        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
-        .splash-image { width: 100%; height: 200px; }
-        #wiki-content { flex-direction: column; }
+    @media (max-width: 800px) {
+      body {
+        padding: var(--space-4);
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        height: auto;
+        gap: var(--space-4);
+      }
+
+      aside.controls {
+        position: static;
+        max-height: none;
+      }
+
+      main.panel {
+        min-height: 50vh;
+      }
+
+      .splash-content {
+        flex-direction: column;
+        width: 90vw;
+        height: auto;
+        max-height: 90vh;
+      }
+
+      .splash-info {
+        flex-basis: auto;
+        border-left: none;
+        border-top: 4px solid var(--accent-color);
+      }
+
+      .splash-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      #wiki-content {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
@@ -293,7 +635,10 @@
   <div class="container loading" id="app-container">
     <header class="panel">
       <a href="../index.html" class="back-to-home" title="Return to Home">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
       </a>
       <h1>[App Name Placeholder]</h1>
       <div class="sub">[App Subtitle Placeholder]</div>
@@ -305,11 +650,11 @@
 
     <aside class="panel controls" id="controls">
       <div class="control-group">
-          <div class="form-group">
-              <label for="example-input">Example Input</label>
-              <input type="text" id="example-input" class="form-control" placeholder="Type something...">
-          </div>
-          <button class="btn btn-primary">Do Something</button>
+        <div class="form-group">
+          <label for="example-input">Example Input</label>
+          <input type="text" id="example-input" class="form-control" placeholder="Type something...">
+        </div>
+        <button class="btn btn-primary">Do Something</button>
       </div>
       <div class="note">Tip: App specific tips go here.</div>
     </aside>
@@ -318,9 +663,9 @@
       <div style="text-align: center; color: var(--muted);">Your app content will be displayed here.</div>
     </main>
   </div>
-  
+
   <div id="wiki-overlay" class="popup-overlay"></div>
-  
+
   <script type="module">
     // --- App Specific Logic Starts Here ---
     const WIKI_DATA = {
@@ -365,16 +710,16 @@
       },
 
       hideSplashScreen() {
-          if (!this.state.splashHidden) {
-              this.state.splashHidden = true;
-              this.el.splashScreen.classList.add('hidden');
-              this.el.appContainer.classList.remove('loading');
-          }
+        if (!this.state.splashHidden) {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
       },
 
       cacheDOMElements() {
         const ids = [
-          'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen', 
+          'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen',
           'app-container', 'splash-close-btn',
           'visitor-badge-container' // === 3. AÑADIR EL CONTENEDOR AL CACHÉ ===
         ];
@@ -386,21 +731,21 @@
       },
 
       bindEvents() {
-        if(this.el.themeToggle) this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
-        if(this.el.wikiOpenBtn) this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
-        
-        if(this.el.splashScreen) this.el.splashScreen.addEventListener('click', (e) => {
-            if (e.target === this.el.splashScreen) {
-                this.hideSplashScreen();
-            }
+        if (this.el.themeToggle) this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        if (this.el.wikiOpenBtn) this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+
+        if (this.el.splashScreen) this.el.splashScreen.addEventListener('click', (e) => {
+          if (e.target === this.el.splashScreen) {
+            this.hideSplashScreen();
+          }
         });
-        if(this.el.splashCloseBtn) this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+        if (this.el.splashCloseBtn) this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
       },
-      
+
       render() {
         // App-specific rendering logic goes here.
       },
-      
+
       // === 4. AÑADIR NUEVA FUNCIÓN PARA EL CONTADOR ===
       initVisitorCounter() {
         if (!this.el.visitorBadgeContainer) return;
@@ -409,7 +754,7 @@
         const title = document.title;
         // 2. Crear un 'path' limpio (ej. "any2svg")
         const pagePath = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/--+/g, '-');
-        
+
         // 3. Combinarlo con el ID de tu toolkit
         const fullPath = `ealfaro29.toolkit.${pagePath}`;
 
@@ -418,7 +763,7 @@
         if (!accentColor || accentColor.length < 6) {
           accentColor = '4f46e5'; // Fallback al morado por defecto
         }
-        
+
         // 5. Crear la URL de la imagen y el enlace
         const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}&labelColor=%23555555&countColor=%23${accentColor}`;
         const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}`;
@@ -438,7 +783,7 @@
       },
       setTheme(theme, save = true) {
         if (save) localStorage.setItem('creative-toolkit-theme', theme);
-        if(this.el.themeToggle) this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        if (this.el.themeToggle) this.el.themeToggle.textContent = this.THEME_ICONS[theme];
         this.applyTheme(theme);
       },
       cycleTheme() {
@@ -453,68 +798,66 @@
 
       // --- Wiki Logic ---
       openWiki() {
-          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.innerHTML = `
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+          const wikiModal = document.createElement('div');
+          wikiModal.className = 'wiki-modal-content';
+          wikiModal.innerHTML = `
                   <div class="wiki-header">
                     <h3 id="wiki-title">Info</h3>
                     <button id="wiki-close-btn" title="Close">×</button>
                   </div>
                   <div id="wiki-content"></div>
               `;
-              this.el.wikiOverlay.appendChild(wikiModal);
-              wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+          this.el.wikiOverlay.appendChild(wikiModal);
+          wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
+
+        if (!this.state.isWikiLoaded) {
+          const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+          const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+          if (titleEl) titleEl.textContent = WIKI_DATA.title;
+
+          const col1 = document.createElement('div');
+          col1.className = 'wiki-column';
+          const col2 = document.createElement('div');
+          col2.className = 'wiki-column';
+
+          WIKI_DATA.sections.forEach((s, index) => {
+            const sectionContainer = document.createElement('div');
+            const h4 = document.createElement('h4'); h4.textContent = s.title;
+            sectionContainer.appendChild(h4);
+            s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+
+            // Basic distribution logic
+            if (index < Math.ceil(WIKI_DATA.sections.length / 2)) {
+              col1.appendChild(sectionContainer);
+            } else {
+              col2.appendChild(sectionContainer);
+            }
+          });
+
+          if (contentEl) {
+            contentEl.innerHTML = '';
+            contentEl.appendChild(col1);
+            contentEl.appendChild(col2);
           }
 
-          if (!this.state.isWikiLoaded) {
-              const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-              const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-              if(titleEl) titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div');
-              col1.className = 'wiki-column';
-              const col2 = document.createElement('div');
-              col2.className = 'wiki-column';
-
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                  
-                  // Basic distribution logic
-                  if (index < Math.ceil(WIKI_DATA.sections.length / 2)) {
-                      col1.appendChild(sectionContainer);
-                  } else {
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              if(contentEl) {
-                contentEl.innerHTML = '';
-                contentEl.appendChild(col1);
-                contentEl.appendChild(col2);
-              }
-
-              this.state.isWikiLoaded = true;
-          }
-          if(this.el.wikiOverlay) this.el.wikiOverlay.classList.add('show');
+          this.state.isWikiLoaded = true;
+        }
+        if (this.el.wikiOverlay) this.el.wikiOverlay.classList.add('show');
       },
       closeWiki() {
-        if(this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show');
+        if (this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show');
       }
     };
 
     document.addEventListener('DOMContentLoaded', () => BaseApp.init());
   </script>
 
-  <a id="visitor-badge-container" 
-     class="floating-visitor-badge" 
-     href="https://api.visitorbadge.io" 
-     target="_blank" 
-     title="Visitor counter">
+  <a id="visitor-badge-container" class="floating-visitor-badge" href="https://api.visitorbadge.io" target="_blank"
+    title="Visitor counter">
   </a>
 
 </body>
+
 </html>

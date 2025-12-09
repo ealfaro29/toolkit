@@ -1,95 +1,461 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Moodboard Studio</title>
   <script>
-    (function() {
+    (function () {
       try {
         let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
         if (theme === 'system') {
           theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
         document.documentElement.dataset.theme = theme;
-      } catch (e) {}
+      } catch (e) { }
     })();
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  
+
   <style>
     :root {
-      --accent-color: #FFD300; /* Amarillo */
-      --accent-color-tint: #fff2b3;
-      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
-      --color-accent-text: #1C1C1E; 
+      --accent-color: #E72F2F;
+      /* Red */
+      --accent-color-tint: rgba(231, 47, 47, 0.1);
+      --accent-yellow: #F7CF27;
+      --color-cream: #FAF6F0;
+      --color-text-primary-light: #1C1C1E;
+      --color-text-secondary-light: #3A3A3C;
+      --color-surface-light: #FAF6F0;
+      --color-background-light: #FFFFFF;
+      --color-divider-light: #E8E1D8;
+      --color-text-primary-dark: #EAEAEB;
+      --color-text-secondary-dark: #9A9A9E;
+      --color-surface-dark: #1a1815;
+      --color-background-dark: #0d0c0a;
+      --color-divider-dark: #3A3A3C;
+      --color-accent-text: #1C1C1E;
       --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
       --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-      --font-weight-emphasis: 600; --font-weight-medium: 500;
-      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
-      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06);
-      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+      --font-size-h1: 20px;
+      --font-size-body: 14px;
+      --font-size-caption: 12px;
+      --font-weight-emphasis: 600;
+      --font-weight-medium: 500;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --radius-sm: 6px;
+      --radius-md: 8px;
+      --radius-xl: 16px;
+      --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
       --duration-standard: 200ms;
     }
-    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
-    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
-    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
-    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out;}
-    .container.loading { filter: blur(5px); pointer-events: none; }
-    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
-    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
-    main.panel { padding: var(--space-5); min-height: 0; overflow-y: auto; transition: border-color 0.2s ease; }
-    main.panel.drag-over { border-color: var(--accent-color); background-color: var(--accent-color-tint);}
-    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
-    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-    header .sub { color: var(--muted); }
-    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
-    .back-to-home:hover { background-color: var(--surface-alt); }
-    .back-to-home svg { width: 18px; height: 18px; }
-    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
-    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-    .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
-    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
-    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
-    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
-    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
-    .btn-secondary:hover { filter: brightness(0.95); }
-    .btn:disabled { background-color: var(--surface); color: var(--muted); cursor: not-allowed; }
-    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
-    .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
-    .form-group label { font-weight: var(--font-weight-medium); }
-    .form-control { width: 100%; box-sizing: border-box; background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px 12px; }
-    #color-palette { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-    .color-circle { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border-color); transition: transform 0.2s ease; }
-    .color-circle:hover { transform: scale(1.1); }
-    .logo-upload { width: 100%; height: 60px; border: 2px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); overflow: hidden; }
-    .logo-upload img { width: 100%; height: 100%; object-fit: contain; }
-    #moodboard-canvas { column-count: 5; column-gap: var(--space-4); }
-    .moodboard-card { display: inline-block; width: 100%; margin-bottom: var(--space-4); position: relative; break-inside: avoid; cursor: grab; background-color: var(--surface); }
-    .moodboard-card.dragging { opacity: 0.5; }
-    .moodboard-card img { width: 100%; height: auto; display: block; border-radius: var(--radius-md); opacity: 0; transition: opacity 0.5s ease; }
-    .moodboard-card img.loaded { opacity: 1; }
-    .moodboard-card .spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border: 3px solid var(--accent-color-tint); border-top-color: var(--accent-color); border-radius: 50%; animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-    .moodboard-card:hover .delete-btn { opacity: 1; }
-    .add-card-btn { width: 100%; padding: var(--space-5) 0; border: 2px dashed var(--border-color); border-radius: var(--radius-md); background-color: var(--surface); color: var(--muted); font-size: 24px; cursor: pointer; text-align: center; }
-    .delete-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity var(--duration-standard); }
-    
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
-    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
-    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+
+    html[data-theme="light"] {
+      --ink: var(--color-text-primary-light);
+      --muted: var(--color-text-secondary-light);
+      --surface: var(--color-surface-light);
+      --surface-alt: var(--color-background-light);
+      --border-color: var(--color-divider-light);
+      --panel-shadow: var(--shadow-raised-2);
+      color-scheme: light;
+    }
+
+    html[data-theme="dark"] {
+      --ink: var(--color-text-primary-dark);
+      --muted: var(--color-text-secondary-dark);
+      --surface: var(--color-surface-dark);
+      --surface-alt: var(--color-background-dark);
+      --border-color: var(--color-divider-dark);
+      --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color-scheme: dark;
+    }
+
+    html {
+      box-sizing: border-box;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--surface);
+      font: var(--font-size-body)/1.5 var(--font-family-sans);
+      padding: 25px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 25px;
+      height: calc(100vh - 50px);
+      transition: filter 0.5s ease-in-out;
+    }
+
+    .container.loading {
+      filter: blur(5px);
+      pointer-events: none;
+    }
+
+    header.panel {
+      grid-column: 1 / -1;
+      height: 65px;
+      flex-shrink: 0
+    }
+
+    aside.panel.controls {
+      position: sticky;
+      top: 0;
+      max-height: 100%;
+      overflow-y: auto;
+    }
+
+    main.panel {
+      padding: var(--space-5);
+      min-height: 0;
+      overflow-y: auto;
+      transition: border-color 0.2s ease;
+    }
+
+    main.panel.drag-over {
+      border-color: var(--accent-color);
+      background-color: var(--accent-color-tint);
+    }
+
+    .panel {
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--panel-shadow);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+    }
+
+    header h1 {
+      font-size: var(--font-size-h1);
+      font-weight: var(--font-weight-emphasis);
+      margin: 0;
+    }
+
+    header .sub {
+      color: var(--muted);
+    }
+
+    .theme-switcher {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-to-home {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      text-decoration: none;
+    }
+
+    .back-to-home:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .back-to-home svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    #theme-toggle,
+    #wiki-open-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+    }
+
+    #theme-toggle:hover,
+    #wiki-open-btn:hover {
+      background-color: var(--surface-alt);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      padding: var(--space-5);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .control-group+.control-group {
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-5);
+    }
+
+    .note {
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      border-top: 1px solid var(--border-color);
+      padding-top: var(--space-4);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      cursor: pointer;
+      font-weight: var(--font-weight-emphasis);
+      font-size: 14px;
+      border-radius: var(--radius-md);
+      height: 40px;
+      padding: 0 var(--space-4);
+      border: 1px solid transparent;
+      transition: all var(--duration-standard) ease;
+    }
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: var(--color-accent-text);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background-color: var(--accent-color-tint);
+      color: var(--accent-color);
+      border-color: transparent;
+    }
+
+    .btn-secondary:hover {
+      filter: brightness(0.95);
+    }
+
+    .btn:disabled {
+      background-color: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .btn:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent-color);
+      outline-offset: 2px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .form-group label {
+      font-weight: var(--font-weight-medium);
+    }
+
+    .form-control {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+    }
+
+    #color-palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .color-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--border-color);
+      transition: transform 0.2s ease;
+    }
+
+    .color-circle:hover {
+      transform: scale(1.1);
+    }
+
+    .logo-upload {
+      width: 100%;
+      height: 60px;
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      overflow: hidden;
+    }
+
+    .logo-upload img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #moodboard-canvas {
+      column-count: 5;
+      column-gap: var(--space-4);
+    }
+
+    .moodboard-card {
+      display: inline-block;
+      width: 100%;
+      margin-bottom: var(--space-4);
+      position: relative;
+      break-inside: avoid;
+      cursor: grab;
+      background-color: var(--surface);
+    }
+
+    .moodboard-card.dragging {
+      opacity: 0.5;
+    }
+
+    .moodboard-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: var(--radius-md);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .moodboard-card img.loaded {
+      opacity: 1;
+    }
+
+    .moodboard-card .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--accent-color-tint);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    .moodboard-card:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .add-card-btn {
+      width: 100%;
+      padding: var(--space-5) 0;
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      background-color: var(--surface);
+      color: var(--muted);
+      font-size: 24px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity var(--duration-standard);
+    }
+
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      display: none;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wiki-modal-content {
+      background: var(--surface-alt);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      z-index: 2001;
+      width: 800px;
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
     .wiki-header {
       display: flex;
       justify-content: space-between;
@@ -103,18 +469,25 @@
       background-size: cover;
       background-position: center bottom;
     }
+
     .wiki-header::before {
       content: '';
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
       z-index: 1;
     }
-    .wiki-header h3, #wiki-close-btn {
+
+    .wiki-header h3,
+    #wiki-close-btn {
       position: relative;
       z-index: 2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
+
     #wiki-close-btn {
       background: none;
       border: none;
@@ -128,44 +501,103 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
+
     #wiki-close-btn:hover {
-      background-color: rgba(255,255,255,0.1);
-    }
-    #wiki-content {
-        padding: var(--space-5);
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-        gap: var(--space-5);
-    }
-    .wiki-column {
-        flex: 1;
-        min-width: 0;
-    }
-    #wiki-content h4 {
-        margin-top: 0;
-        margin-bottom: var(--space-3);
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
+      background-color: rgba(255, 255, 255, 0.1);
     }
 
-    .modal-content { background: var(--surface-alt); padding: var(--space-5); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); width: 90%; max-width: 300px; border: 1px solid var(--border-color); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
-    .modal-header h2 { margin: 0; font-size: 1.2rem; }
-    .modal-footer { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4); }
-    #color-picker-body { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
-    #color-picker-native { width: 150px; height: 150px; border: none; padding: 0; background: none; cursor: pointer; }
-    #color-picker-native::-webkit-color-swatch-wrapper { padding: 0; }
-    #color-picker-native::-webkit-color-swatch { border-radius: 50%; border: 1px solid var(--border-color); }
-    #color-picker-native::-moz-color-swatch { border-radius: 50%; border: 1px solid var(--border-color); }
-    .hex-input { font-family: var(--font-family-mono); text-align: center; text-transform: uppercase; }
+    #wiki-content {
+      padding: var(--space-5);
+      overflow: hidden;
+      flex-grow: 1;
+      display: flex;
+      gap: var(--space-5);
+    }
+
+    .wiki-column {
+      flex: 1;
+      min-width: 0;
+    }
+
+    #wiki-content h4 {
+      margin-top: 0;
+      margin-bottom: var(--space-3);
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
+    }
+
+    .modal-content {
+      background: var(--surface-alt);
+      padding: var(--space-5);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-floating-3);
+      width: 90%;
+      max-width: 300px;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      margin-top: var(--space-4);
+    }
+
+    #color-picker-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    #color-picker-native {
+      width: 150px;
+      height: 150px;
+      border: none;
+      padding: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    #color-picker-native::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    #color-picker-native::-webkit-color-swatch {
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+    }
+
+    #color-picker-native::-moz-color-swatch {
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+    }
+
+    .hex-input {
+      font-family: var(--font-family-mono);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
     .splash-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0,0,0,0.1);
+      background-color: rgba(0, 0, 0, 0.1);
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       z-index: 9999;
@@ -176,10 +608,12 @@
       transition: opacity 0.5s ease-out;
       cursor: pointer;
     }
+
     .splash-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
+
     .splash-content {
       display: flex;
       width: 800px;
@@ -193,81 +627,124 @@
       cursor: default;
       position: relative;
     }
-     #splash-close-btn {
-        position: absolute;
-        top: var(--space-3);
-        right: var(--space-3);
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 50%;
-        background-color: var(--surface);
-        color: var(--muted);
-        border: 1px solid var(--border-color);
-        font-size: 24px;
-        line-height: 1;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: all var(--duration-standard) ease;
-        z-index: 10;
+
+    #splash-close-btn {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 50%;
+      background-color: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border-color);
+      font-size: 24px;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+      z-index: 10;
     }
+
     #splash-close-btn:hover {
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        transform: scale(1.1);
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      transform: scale(1.1);
     }
+
     .splash-info {
-        flex: 0 0 300px;
-        padding: var(--space-5);
-        display: flex;
-        flex-direction: column;
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        border-left: 4px solid var(--accent-color);
+      flex: 0 0 300px;
+      padding: var(--space-5);
+      display: flex;
+      flex-direction: column;
+      background-color: var(--surface-alt);
+      color: var(--ink);
+      border-left: 4px solid var(--accent-color);
     }
+
     .splash-icon {
-        font-size: 32px;
-        margin-bottom: var(--space-4);
+      font-size: 32px;
+      margin-bottom: var(--space-4);
     }
+
     .splash-title {
-        font-size: 24px;
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
-        margin-bottom: var(--space-5);
+      font-size: 24px;
+      font-weight: var(--font-weight-emphasis);
+      color: var(--accent-color);
+      margin-bottom: var(--space-5);
     }
+
     .splash-tech {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.6;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
     }
+
     .splash-credits {
-        margin-top: auto;
-        font-size: var(--font-size-caption);
-        color: var(--muted);
+      margin-top: auto;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
     }
+
     .splash-image {
-        flex: 1;
-        background-color: var(--surface);
+      flex: 1;
+      background-color: var(--surface);
     }
+
     .splash-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    
-    @media (max-width: 800px) { 
-        body { padding: var(--space-4); } 
-        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
-        aside.controls { position: static; max-height: none; } 
-        main.panel { min-height: 50vh; } 
-        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
-        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
-        .splash-image { width: 100%; height: 200px; }
-        #wiki-content { flex-direction: column; }
+
+    @media (max-width: 800px) {
+      body {
+        padding: var(--space-4);
+      }
+
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+        height: auto;
+        gap: var(--space-4);
+      }
+
+      aside.controls {
+        position: static;
+        max-height: none;
+      }
+
+      main.panel {
+        min-height: 50vh;
+      }
+
+      .splash-content {
+        flex-direction: column;
+        width: 90vw;
+        height: auto;
+        max-height: 90vh;
+      }
+
+      .splash-info {
+        flex-basis: auto;
+        border-left: none;
+        border-top: 4px solid var(--accent-color);
+      }
+
+      .splash-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      #wiki-content {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
@@ -275,7 +752,8 @@
       <div class="splash-info">
         <span class="splash-icon">🖼️</span>
         <h2 class="splash-title">Moodboard Studio</h2>
-        <p class="splash-tech">Visualizes ideas and concepts using html2canvas for exports and a client-side color palette generator.</p>
+        <p class="splash-tech">Visualizes ideas and concepts using html2canvas for exports and a client-side color
+          palette generator.</p>
         <p class="splash-credits">2025. Toolkit by e</p>
       </div>
       <div class="splash-image">
@@ -287,7 +765,10 @@
   <div class="container loading" id="app-container">
     <header class="panel">
       <a href="../index.html" class="back-to-home" title="Return to Home">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
       </a>
       <h1>Moodboard Studio</h1>
       <div class="sub">Create and export beautiful, inspiring moodboards.</div>
@@ -299,13 +780,13 @@
 
     <aside class="panel controls" id="controls">
       <div class="control-group">
-          <div class="form-group">
-              <label for="logo-input">Logo</label>
-              <div class="logo-upload" id="logo-upload-container">
-                  <span>Upload Logo</span>
-                  <input type="file" id="logo-input" accept="image/*" style="display:none;">
-              </div>
+        <div class="form-group">
+          <label for="logo-input">Logo</label>
+          <div class="logo-upload" id="logo-upload-container">
+            <span>Upload Logo</span>
+            <input type="file" id="logo-input" accept="image/*" style="display:none;">
           </div>
+        </div>
       </div>
       <div class="control-group">
         <div class="form-group">
@@ -314,18 +795,19 @@
         </div>
       </div>
       <div class="control-group">
-          <div class="form-group">
-              <label>Auto-Generated Palette</label>
-              <div id="color-palette"></div>
-          </div>
+        <div class="form-group">
+          <label>Auto-Generated Palette</label>
+          <div id="color-palette"></div>
+        </div>
       </div>
       <div class="control-group" style="margin-top: auto;">
         <button id="reset-btn" class="btn btn-secondary">Reset</button>
       </div>
       <div class="control-group">
-          <button id="export-btn" class="btn btn-primary">Download</button>
+        <button id="export-btn" class="btn btn-primary">Download</button>
       </div>
-      <div class="note">Tip: Drag images onto the main panel to add them. The color palette will update automatically.</div>
+      <div class="note">Tip: Drag images onto the main panel to add them. The color palette will update automatically.
+      </div>
     </aside>
 
     <main class="panel" id="main-panel">
@@ -333,18 +815,20 @@
       <div class="add-card-btn" id="add-card-btn">+</div>
     </main>
   </div>
-  
+
   <div class="popup-overlay" id="color-picker-modal">
     <div class="modal-content">
-        <div class="modal-header"> <h2>Edit Color</h2> </div>
-        <div class="modal-body" id="color-picker-body">
-            <input type="color" id="color-picker-native">
-            <input type="text" id="color-picker-hex" class="form-control hex-input">
-        </div>
-        <div class="modal-footer">
-            <button id="cancel-color-btn" class="btn btn-secondary">Cancel</button>
-            <button id="save-color-btn" class="btn btn-primary">Save</button>
-        </div>
+      <div class="modal-header">
+        <h2>Edit Color</h2>
+      </div>
+      <div class="modal-body" id="color-picker-body">
+        <input type="color" id="color-picker-native">
+        <input type="text" id="color-picker-hex" class="form-control hex-input">
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-color-btn" class="btn btn-secondary">Cancel</button>
+        <button id="save-color-btn" class="btn btn-primary">Save</button>
+      </div>
     </div>
   </div>
 
@@ -352,27 +836,27 @@
 
   <script type="module">
     const WIKI_DATA = {
-        "title": "Moodboard Studio Info",
-        "sections":[
-            {
-                "title":"How to Use",
-                "content":[
-                    "<b>1. Add Content:</b> Click the '+' button or drag images directly onto the main canvas to add them to your moodboard.",
-                    "<b>2. Customize Branding:</b> Upload a client's logo and edit the project title in the sidebar.",
-                    "<b>3. Automatic Palette:</b> As you add images, the app analyzes them and automatically generates a representative color palette.",
-                    "<b>4. Download:</b> Click the 'Download' button to export your complete moodboard as a high-quality PNG, perfect for sharing."
-                ]
-            },
-            {
-                "title":"Features",
-                "content":[
-                   "<b>Instant Feedback:</b> Images appear on the board instantly while they load, making the app feel fast and responsive.",
-                   "<b>Smart Color Extraction:</b> A client-side algorithm finds the most dominant and relevant colors from your images to build a cohesive palette.",
-                   "<b>Drag & Drop:</b> Easily reorder images on the canvas by dragging them into a new position.",
-                   "<b>Local & Private:</b> All your images and data are processed in your browser. Nothing is ever uploaded to a server."
-                ]
-            }
-        ]
+      "title": "Moodboard Studio Info",
+      "sections": [
+        {
+          "title": "How to Use",
+          "content": [
+            "<b>1. Add Content:</b> Click the '+' button or drag images directly onto the main canvas to add them to your moodboard.",
+            "<b>2. Customize Branding:</b> Upload a client's logo and edit the project title in the sidebar.",
+            "<b>3. Automatic Palette:</b> As you add images, the app analyzes them and automatically generates a representative color palette.",
+            "<b>4. Download:</b> Click the 'Download' button to export your complete moodboard as a high-quality PNG, perfect for sharing."
+          ]
+        },
+        {
+          "title": "Features",
+          "content": [
+            "<b>Instant Feedback:</b> Images appear on the board instantly while they load, making the app feel fast and responsive.",
+            "<b>Smart Color Extraction:</b> A client-side algorithm finds the most dominant and relevant colors from your images to build a cohesive palette.",
+            "<b>Drag & Drop:</b> Easily reorder images on the canvas by dragging them into a new position.",
+            "<b>Local & Private:</b> All your images and data are processed in your browser. Nothing is ever uploaded to a server."
+          ]
+        }
+      ]
     };
 
     const App = {
@@ -399,20 +883,20 @@
       },
 
       hideSplashScreen() {
-          if (!this.state.splashHidden) {
-              this.state.splashHidden = true;
-              this.el.splashScreen.classList.add('hidden');
-              this.el.appContainer.classList.remove('loading');
-          }
+        if (!this.state.splashHidden) {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
       },
-      
+
       cacheDOMElements() {
         const ids = [
-            'theme-toggle', 'wiki-open-btn', 'board-title', 'color-palette', 
-            'logo-upload-container', 'logo-input', 'export-btn', 'reset-btn', 
-            'main-panel', 'moodboard-canvas', 'add-card-btn', 'splash-screen', 
-            'app-container', 'splash-close-btn', 'wiki-overlay', 
-            'color-picker-modal', 'color-picker-native', 'color-picker-hex', 'cancel-color-btn', 'save-color-btn'
+          'theme-toggle', 'wiki-open-btn', 'board-title', 'color-palette',
+          'logo-upload-container', 'logo-input', 'export-btn', 'reset-btn',
+          'main-panel', 'moodboard-canvas', 'add-card-btn', 'splash-screen',
+          'app-container', 'splash-close-btn', 'wiki-overlay',
+          'color-picker-modal', 'color-picker-native', 'color-picker-hex', 'cancel-color-btn', 'save-color-btn'
         ];
         ids.forEach(id => {
           const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
@@ -423,9 +907,9 @@
       bindEvents() {
         this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
         this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
-        
+
         this.el.splashScreen.addEventListener('click', (e) => {
-            if (e.target === this.el.splashScreen) this.hideSplashScreen();
+          if (e.target === this.el.splashScreen) this.hideSplashScreen();
         });
         this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
 
@@ -434,10 +918,10 @@
         this.el.logoUploadContainer.addEventListener('click', () => this.el.logoInput.click());
         this.el.addCardBtn.addEventListener('click', () => this.addImage());
         this.el.moodboardCanvas.addEventListener('click', (e) => {
-            if (e.target.closest('.delete-btn')) {
-                const card = e.target.closest('.moodboard-card');
-                if (card) this.removeImage(card.dataset.id);
-            }
+          if (e.target.closest('.delete-btn')) {
+            const card = e.target.closest('.moodboard-card');
+            if (card) this.removeImage(card.dataset.id);
+          }
         });
         this.el.resetBtn.addEventListener('click', () => this.resetState());
         this.el.exportBtn.addEventListener('click', (e) => this.exportToImage(e.target));
@@ -445,8 +929,8 @@
         this.el.mainPanel.addEventListener('dragleave', (e) => this.handleDragLeave(e));
         this.el.mainPanel.addEventListener('drop', (e) => this.handleFileDrop(e));
         this.el.colorPalette.addEventListener('click', e => {
-            const circle = e.target.closest('.color-circle');
-            if (circle) this.openColorPickerModal(parseInt(circle.dataset.index, 10));
+          const circle = e.target.closest('.color-circle');
+          if (circle) this.openColorPickerModal(parseInt(circle.dataset.index, 10));
         });
         this.el.saveColorBtn.addEventListener('click', () => this.saveColorFromModal());
         this.el.cancelColorBtn.addEventListener('click', () => this.closeModal('colorPickerModal'));
@@ -459,7 +943,7 @@
         this.saveState();
         this.render();
       },
-      
+
       saveState() {
         const stateToSave = {
           title: this.el.boardTitle.value,
@@ -483,86 +967,86 @@
           }
         }
       },
-      
+
       resetState() {
         if (confirm('Are you sure you want to clear the entire moodboard?')) {
-            this.state = { 
-                ...this.state,
-                title: "My Project Inspiration", 
-                colors: [], 
-                logo: null, 
-                images: [] 
-            };
-            localStorage.removeItem('moodboardState_v3');
-            this.saveAndRender();
+          this.state = {
+            ...this.state,
+            title: "My Project Inspiration",
+            colors: [],
+            logo: null,
+            images: []
+          };
+          localStorage.removeItem('moodboardState_v3');
+          this.saveAndRender();
         }
       },
 
       render() {
         this.el.boardTitle.value = this.state.title;
-        
+
         this.el.colorPalette.innerHTML = '';
         this.state.colors.forEach((color, index) => {
-            const circle = document.createElement('div');
-            circle.className = 'color-circle';
-            circle.style.backgroundColor = color;
-            circle.title = `Edit ${color}`;
-            circle.dataset.index = index;
-            this.el.colorPalette.appendChild(circle);
+          const circle = document.createElement('div');
+          circle.className = 'color-circle';
+          circle.style.backgroundColor = color;
+          circle.title = `Edit ${color}`;
+          circle.dataset.index = index;
+          this.el.colorPalette.appendChild(circle);
         });
 
         this.el.logoUploadContainer.innerHTML = this.state.logo ? `<img src="${this.state.logo}" alt="Client Logo">` : `<span>Upload Logo</span>`;
-        
+
         const canvas = this.el.moodboardCanvas;
         const existingCardIds = new Set(Array.from(canvas.children).map(c => c.dataset.id));
         const stateImageIds = new Set(this.state.images.map(i => i.id.toString()));
         existingCardIds.forEach(id => {
-            if (!stateImageIds.has(id)) {
-                canvas.querySelector(`[data-id="${id}"]`)?.remove();
-            }
+          if (!stateImageIds.has(id)) {
+            canvas.querySelector(`[data-id="${id}"]`)?.remove();
+          }
         });
 
         this.state.images.forEach(image => {
-            let card = canvas.querySelector(`[data-id="${image.id}"]`);
-            if (!card) {
-                card = this.createImageCard(image);
-                canvas.appendChild(card);
-            }
+          let card = canvas.querySelector(`[data-id="${image.id}"]`);
+          if (!card) {
+            card = this.createImageCard(image);
+            canvas.appendChild(card);
+          }
         });
       },
-      
+
       createImageCard(image) {
-          const card = document.createElement('div');
-          card.className = 'moodboard-card';
-          card.dataset.id = image.id;
-          card.draggable = true;
+        const card = document.createElement('div');
+        card.className = 'moodboard-card';
+        card.dataset.id = image.id;
+        card.draggable = true;
 
-          card.addEventListener('dragstart', (e) => this.handleItemDragStart(e));
-          card.addEventListener('dragend', (e) => this.handleItemDragEnd(e));
-          card.addEventListener('dragover', (e) => this.handleItemDragOver(e));
-          card.addEventListener('drop', (e) => this.handleItemDrop(e));
+        card.addEventListener('dragstart', (e) => this.handleItemDragStart(e));
+        card.addEventListener('dragend', (e) => this.handleItemDragEnd(e));
+        card.addEventListener('dragover', (e) => this.handleItemDragOver(e));
+        card.addEventListener('drop', (e) => this.handleItemDrop(e));
 
-          const spinner = document.createElement('div');
-          spinner.className = 'spinner';
-          
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = image.src;
-          img.alt = "Moodboard image";
-          img.onload = () => {
-              spinner.remove();
-              img.classList.add('loaded');
-          };
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner';
 
-          card.innerHTML = `<button class="delete-btn" title="Remove image">×</button>`;
-          card.prepend(spinner);
-          card.prepend(img);
-          return card;
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = image.src;
+        img.alt = "Moodboard image";
+        img.onload = () => {
+          spinner.remove();
+          img.classList.add('loaded');
+        };
+
+        card.innerHTML = `<button class="delete-btn" title="Remove image">×</button>`;
+        card.prepend(spinner);
+        card.prepend(img);
+        return card;
       },
 
       openModal(modalId) { this.el[modalId].classList.add('show'); },
       closeModal(modalId) { this.el[modalId].classList.remove('show'); },
-      
+
       openColorPickerModal(index) {
         this.currentColorIndex = index;
         const color = this.state.colors[index];
@@ -570,12 +1054,12 @@
         this.el.colorPickerHex.value = color;
         this.openModal('colorPickerModal');
       },
-      
+
       saveColorFromModal() {
         const newColor = this.el.colorPickerHex.value.toUpperCase();
         if (this.currentColorIndex !== null) {
-            this.state.colors[this.currentColorIndex] = newColor;
-            this.saveAndRender();
+          this.state.colors[this.currentColorIndex] = newColor;
+          this.saveAndRender();
         }
         this.closeModal('colorPickerModal');
       },
@@ -583,37 +1067,37 @@
       syncColorInputs(source) {
         const hexRegex = /^#([0-9A-F]{3}){1,2}$/i;
         if (source === 'native') {
-            this.el.colorPickerHex.value = this.el.colorPickerNative.value.toUpperCase();
+          this.el.colorPickerHex.value = this.el.colorPickerNative.value.toUpperCase();
         } else if (hexRegex.test(this.el.colorPickerHex.value)) {
-            this.el.colorPickerNative.value = this.el.colorPickerHex.value;
+          this.el.colorPickerNative.value = this.el.colorPickerHex.value;
         }
       },
-      
+
       handleFileUploads(files, isLogo = false) {
         if (!files || files.length === 0) return;
 
         if (isLogo) {
-            const file = files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.state.logo = e.target.result;
-                this.saveAndRender();
-            };
-            reader.readAsDataURL(file);
+          const file = files[0];
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.state.logo = e.target.result;
+            this.saveAndRender();
+          };
+          reader.readAsDataURL(file);
         } else {
-            const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-            
-            const newImages = imageFiles.map(file => ({
-                id: Date.now() + Math.random(),
-                src: URL.createObjectURL(file),
-            }));
-            
-            this.state.images.push(...newImages);
-            this.render(); 
-            this.regeneratePalette();
+          const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+
+          const newImages = imageFiles.map(file => ({
+            id: Date.now() + Math.random(),
+            src: URL.createObjectURL(file),
+          }));
+
+          this.state.images.push(...newImages);
+          this.render();
+          this.regeneratePalette();
         }
       },
-      
+
       addImage() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -627,12 +1111,12 @@
         const idToRemove = parseFloat(id);
         const imageToRemove = this.state.images.find(img => img.id === idToRemove);
         if (imageToRemove && imageToRemove.src.startsWith('blob:')) {
-            URL.revokeObjectURL(imageToRemove.src);
+          URL.revokeObjectURL(imageToRemove.src);
         }
         this.state.images = this.state.images.filter(img => img.id !== idToRemove);
         this.regeneratePalette();
       },
-      
+
       handleDragOver(e) { e.preventDefault(); this.el.mainPanel.classList.add('drag-over'); },
       handleDragLeave(e) { this.el.mainPanel.classList.remove('drag-over'); },
       handleFileDrop(e) {
@@ -665,66 +1149,66 @@
       },
 
       async regeneratePalette() {
-          if (this.state.images.length === 0) {
-              this.state.colors = [];
-              this.saveAndRender();
-              return;
-          }
-          const colorPromises = this.state.images.map(image => this.extractColorsFromImage(image.src));
-          const colorSets = await Promise.all(colorPromises);
-          
-          const colorCounts = new Map();
-          colorSets.flat().forEach(color => {
-              colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
-          });
-          
-          const sortedColors = Array.from(colorCounts.entries())
-              .sort((a, b) => b[1] - a[1])
-              .map(entry => entry[0]);
-
-          this.state.colors = sortedColors.slice(0, 6);
+        if (this.state.images.length === 0) {
+          this.state.colors = [];
           this.saveAndRender();
+          return;
+        }
+        const colorPromises = this.state.images.map(image => this.extractColorsFromImage(image.src));
+        const colorSets = await Promise.all(colorPromises);
+
+        const colorCounts = new Map();
+        colorSets.flat().forEach(color => {
+          colorCounts.set(color, (colorCounts.get(color) || 0) + 1);
+        });
+
+        const sortedColors = Array.from(colorCounts.entries())
+          .sort((a, b) => b[1] - a[1])
+          .map(entry => entry[0]);
+
+        this.state.colors = sortedColors.slice(0, 6);
+        this.saveAndRender();
       },
 
       extractColorsFromImage(imageSrc) {
         return new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 100;
-                const scale = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scale;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-                const colorCounts = {};
-                for (let i = 0; i < imageData.length; i += 4) {
-                    const r = imageData[i]; const g = imageData[i + 1]; const b = imageData[i + 2]; const a = imageData[i + 3];
-                    if (a < 125) continue;
-                    const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-                    if (l > 245 || l < 10) continue; 
-                    const key = [r, g, b].join(',');
-                    colorCounts[key] = (colorCounts[key] || 0) + 1;
-                }
-                const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]);
-                const topColors = sortedColors.slice(0, 10).map(key => {
-                    const [r, g, b] = key.split(',');
-                    return `#${(+r).toString(16).padStart(2,'0')}${(+g).toString(16).padStart(2,'0')}${(+b).toString(16).padStart(2,'0')}`;
-                });
-                resolve(topColors);
-            };
-            img.onerror = () => resolve([]);
-            img.src = imageSrc;
+          const img = new Image();
+          img.crossOrigin = "Anonymous";
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 100;
+            const scale = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            const colorCounts = {};
+            for (let i = 0; i < imageData.length; i += 4) {
+              const r = imageData[i]; const g = imageData[i + 1]; const b = imageData[i + 2]; const a = imageData[i + 3];
+              if (a < 125) continue;
+              const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+              if (l > 245 || l < 10) continue;
+              const key = [r, g, b].join(',');
+              colorCounts[key] = (colorCounts[key] || 0) + 1;
+            }
+            const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]);
+            const topColors = sortedColors.slice(0, 10).map(key => {
+              const [r, g, b] = key.split(',');
+              return `#${(+r).toString(16).padStart(2, '0')}${(+g).toString(16).padStart(2, '0')}${(+b).toString(16).padStart(2, '0')}`;
+            });
+            resolve(topColors);
+          };
+          img.onerror = () => resolve([]);
+          img.src = imageSrc;
         });
       },
-      
+
       async exportToImage(button) {
         button.textContent = 'Generating...'; button.disabled = true;
         const exportContainer = document.createElement('div');
         const themeStyles = getComputedStyle(document.documentElement);
-        
+
         const logoHtml = this.state.logo ? `<img src="${this.state.logo}" style="height: 40px; max-width: 120px; object-fit: contain; margin-left: 24px;">` : '';
         const colorsHtml = this.state.colors.map(c => `<div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${c};"></div>`).join('');
         const imagesHtml = this.state.images.map(img => `<img src="${img.src}" style="width: 100%; display: block; break-inside: avoid; margin-bottom: 16px; border-radius: 8px;">`).join('');
@@ -732,20 +1216,20 @@
         exportContainer.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${themeStyles.getPropertyValue('--border-color').trim()}; padding-bottom: 24px; margin-bottom: 24px;"><h1 style="font-size: 32px; font-weight: 600; margin: 0;">${this.state.title}</h1><div style="display: flex; gap: 12px; align-items: center;">${colorsHtml}${logoHtml}</div></div><div style="column-count: 4; column-gap: 16px;">${imagesHtml}</div>`;
         document.body.appendChild(exportContainer);
         try {
-            const canvas = await html2canvas(exportContainer, { scale: 2, useCORS: true, allowTaint: true });
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = `${this.state.title.replace(/\s+/g, '-')}-moodboard.png`;
-            link.click();
-        } catch(error) {
-            console.error("Error exporting to image:", error);
-            alert("An error occurred while generating the image.");
+          const canvas = await html2canvas(exportContainer, { scale: 2, useCORS: true, allowTaint: true });
+          const link = document.createElement('a');
+          link.href = canvas.toDataURL('image/png');
+          link.download = `${this.state.title.replace(/\s+/g, '-')}-moodboard.png`;
+          link.click();
+        } catch (error) {
+          console.error("Error exporting to image:", error);
+          alert("An error occurred while generating the image.");
         } finally {
-            document.body.removeChild(exportContainer);
-            button.textContent = 'Download'; button.disabled = false;
+          document.body.removeChild(exportContainer);
+          button.textContent = 'Download'; button.disabled = false;
         }
       },
-      
+
       initTheme() {
         const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
         this.setTheme(savedTheme, false);
@@ -769,53 +1253,54 @@
         const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
         document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
       },
-      
+
       openWiki() {
-          if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.innerHTML = `
+        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+          const wikiModal = document.createElement('div');
+          wikiModal.className = 'wiki-modal-content';
+          wikiModal.innerHTML = `
                   <div class="wiki-header">
                     <h3 id="wiki-title">Info</h3>
                     <button id="wiki-close-btn" title="Close">×</button>
                   </div>
                   <div id="wiki-content"></div>`;
-              this.el.wikiOverlay.appendChild(wikiModal);
-              wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
-          }
+          this.el.wikiOverlay.appendChild(wikiModal);
+          wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+        }
 
-          if (!this.state.isWikiLoaded) {
-              const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-              const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-              titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div'); col1.className = 'wiki-column';
-              const col2 = document.createElement('div'); col2.className = 'wiki-column';
+        if (!this.state.isWikiLoaded) {
+          const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+          const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+          titleEl.textContent = WIKI_DATA.title;
 
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                  if (index < WIKI_DATA.sections.length / 2) {
-                      col1.appendChild(sectionContainer);
-                  } else {
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              contentEl.innerHTML = '';
-              contentEl.appendChild(col1);
-              contentEl.appendChild(col2);
+          const col1 = document.createElement('div'); col1.className = 'wiki-column';
+          const col2 = document.createElement('div'); col2.className = 'wiki-column';
 
-              this.state.isWikiLoaded = true;
-          }
-          this.el.wikiOverlay.classList.add('show');
+          WIKI_DATA.sections.forEach((s, index) => {
+            const sectionContainer = document.createElement('div');
+            const h4 = document.createElement('h4'); h4.textContent = s.title;
+            sectionContainer.appendChild(h4);
+            s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+            if (index < WIKI_DATA.sections.length / 2) {
+              col1.appendChild(sectionContainer);
+            } else {
+              col2.appendChild(sectionContainer);
+            }
+          });
+
+          contentEl.innerHTML = '';
+          contentEl.appendChild(col1);
+          contentEl.appendChild(col2);
+
+          this.state.isWikiLoaded = true;
+        }
+        this.el.wikiOverlay.classList.add('show');
       },
-      closeWiki(){ this.el.wikiOverlay.classList.remove('show'); },
+      closeWiki() { this.el.wikiOverlay.classList.remove('show'); },
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
   </script>
 </body>
+
 </html>

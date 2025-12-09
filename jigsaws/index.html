@@ -1,277 +1,646 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Jigsaw Generator</title>
     <script>
-    // This script is placed in the <head> to prevent a theme flash on load.
-    (function() {
-      try {
-        let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
-        if (theme === 'system') {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.dataset.theme = theme;
-      } catch (e) { /* Gracefully handle potential errors */ }
-    })();
+        // This script is placed in the <head> to prevent a theme flash on load.
+        (function () {
+            try {
+                let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.dataset.theme = theme;
+            } catch (e) { /* Gracefully handle potential errors */ }
+        })();
     </script>
     <style>
-    :root {
-      --accent-color: #00B5AD; /* Verde turquesa */
-      --accent-color-tint: #a0e2e5;
-      --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
-      --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-      --font-weight-emphasis: 600; --font-weight-medium: 500;
-      --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-      --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
-      --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06); --duration-standard: 200ms;
-      --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
-    }
-    html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
-    html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
-    html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
-    body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out;}
-    .container.loading { filter: blur(5px); pointer-events: none; }
-    header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
-    aside.panel.controls { position: sticky; top: 0; max-height: 100%; overflow-y: auto; }
-    main.panel.grid { display: flex; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; overflow: hidden; }
-    .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-    header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
-    header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-    header .sub { color: var(--muted); }
-    .theme-switcher { margin-left: auto; display: flex; align-items: center; gap: 8px;}
-    .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; }
-    .back-to-home:hover { background-color: var(--surface-alt); }
-    .back-to-home svg { width: 18px; height: 18px; }
-    #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; }
-    #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-    .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); }
-    .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
-    .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
-    .note { font-size: var(--font-size-caption); color: var(--muted); border-top: 1px solid var(--border-color); padding-top: var(--space-4); }
-    .num-input { background: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0 var(--space-3); height: 36px; width: 100%; text-align: center; box-sizing: border-box; }
-    .btn:focus-visible, input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all var(--duration-standard) ease; }
-    .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
-    .btn-primary:hover { filter: brightness(1.1); }
-    .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
-    .btn-secondary:hover { filter: brightness(0.95); }
-    .slider-row { display: flex; align-items: center; gap: var(--space-4); }
-    .slider-row label { flex: 0 0 90px; }
-    .slider-row input[type="range"] { flex: 1 1 auto; }
-    .slider-row .num-input { width: 60px; text-align: right; }
-    input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; margin: 0; background: transparent; padding: 0; border: none; cursor: pointer; height: 16px; }
-    input[type="range"]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: var(--surface); border-radius: 2px; }
-    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; height: 16px; width: 16px; background: var(--surface-alt); border-radius: 50%; border: 2px solid var(--accent-color); margin-top: -6px; }
-    main.panel.grid { background-size: 40px 40px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
-    #svg-preview-container { max-width: 100%; max-height: 100%; aspect-ratio: var(--aspect-ratio, 1 / 1); }
-    #svg-preview-container svg { display: block; width: 100%; height: 100%; }
-    #svg-preview-container path { transition: fill var(--duration-standard) ease; fill: var(--accent-color); }
-    
-    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
-    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
-    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
-    .wiki-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: var(--space-4);
-      flex-shrink: 0;
-      position: relative;
-      height: 80px;
-      color: white;
-      background-image: url('modal.png');
-      background-size: cover;
-      background-position: center bottom;
-    }
-    .wiki-header::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
-      z-index: 1;
-    }
-    .wiki-header h3, #wiki-close-btn {
-      position: relative;
-      z-index: 2;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-    #wiki-close-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      line-height: 1;
-      padding: 0;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      color: var(--color-accent-text);
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-    #wiki-close-btn:hover {
-      background-color: rgba(255,255,255,0.1);
-    }
-    #wiki-content {
-        padding: var(--space-5);
-        overflow: hidden;
-        flex-grow: 1;
-        display: flex;
-        gap: var(--space-5);
-    }
-    .wiki-column {
-        flex: 1;
-        min-width: 0;
-    }
-    #wiki-content h4 {
-        margin-top: 0;
-        margin-bottom: var(--space-3);
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
-    }
+        :root {
+            --accent-color: #E72F2F;
+            /* Red */
+            --accent-color-tint: rgba(231, 47, 47, 0.1);
+            --accent-yellow: #F7CF27;
+            --color-cream: #FAF6F0;
+            --color-text-primary-light: #1C1C1E;
+            --color-text-secondary-light: #3A3A3C;
+            --color-surface-light: #FAF6F0;
+            --color-background-light: #FFFFFF;
+            --color-divider-light: #E8E1D8;
+            --color-text-primary-dark: #EAEAEB;
+            --color-text-secondary-dark: #9A9A9E;
+            --color-surface-dark: #1a1815;
+            --color-background-dark: #0d0c0a;
+            --color-divider-dark: #3A3A3C;
+            --color-accent-text: #FFFFFF;
+            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            --font-size-h1: 20px;
+            --font-size-body: 14px;
+            --font-size-caption: 12px;
+            --font-weight-emphasis: 600;
+            --font-weight-medium: 500;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-xl: 16px;
+            --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --duration-standard: 200ms;
+            --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
 
-    /* Splash Screen Modal */
-    .splash-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0,0,0,0.1);
-      -webkit-backdrop-filter: blur(4px);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 1;
-      transition: opacity 0.5s ease-out;
-      cursor: pointer;
-    }
-    .splash-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .splash-content {
-      display: flex;
-      width: 800px;
-      height: 450px;
-      max-width: 90vw;
-      max-height: 80vh;
-      background: var(--surface-alt);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-floating-3);
-      overflow: hidden;
-      cursor: default;
-      position: relative;
-    }
-     #splash-close-btn {
-        position: absolute;
-        top: var(--space-3);
-        right: var(--space-3);
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        border-radius: 50%;
-        background-color: var(--surface);
-        color: var(--muted);
-        border: 1px solid var(--border-color);
-        font-size: 24px;
-        line-height: 1;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        transition: all var(--duration-standard) ease;
-        z-index: 10;
-    }
-    #splash-close-btn:hover {
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        transform: scale(1.1);
-    }
-    .splash-info {
-        flex: 0 0 300px;
-        padding: var(--space-5);
-        display: flex;
-        flex-direction: column;
-        background-color: var(--surface-alt);
-        color: var(--ink);
-        border-left: 4px solid var(--accent-color);
-    }
-    .splash-icon {
-        font-size: 32px;
-        margin-bottom: var(--space-4);
-    }
-    .splash-title {
-        font-size: 24px;
-        font-weight: var(--font-weight-emphasis);
-        color: var(--accent-color);
-        margin-bottom: var(--space-5);
-    }
-    .splash-tech {
-        margin: 0;
-        color: var(--muted);
-        line-height: 1.6;
-    }
-    .splash-credits {
-        margin-top: auto;
-        font-size: var(--font-size-caption);
-        color: var(--muted);
-    }
-    .splash-image {
-        flex: 1;
-        background-color: var(--surface);
-    }
-    .splash-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    @media (max-width: 800px) { 
-        body { padding: var(--space-4); } 
-        .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } 
-        aside.controls { position: static; max-height: none; } main.grid { min-height: 50vh; } 
-        .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
-        .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
-        .splash-image { width: 100%; height: 200px; }
-        #wiki-content { flex-direction: column; }
-    }
+        html[data-theme="light"] {
+            --ink: var(--color-text-primary-light);
+            --muted: var(--color-text-secondary-light);
+            --surface: var(--color-surface-light);
+            --surface-alt: var(--color-background-light);
+            --border-color: var(--color-divider-light);
+            --panel-shadow: var(--shadow-raised-2);
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            --ink: var(--color-text-primary-dark);
+            --muted: var(--color-text-secondary-dark);
+            --surface: var(--color-surface-dark);
+            --surface-alt: var(--color-background-dark);
+            --border-color: var(--color-divider-dark);
+            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color-scheme: dark;
+        }
+
+        html {
+            box-sizing: border-box;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background-color: var(--surface);
+            font: var(--font-size-body)/1.5 var(--font-family-sans);
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 25px;
+            height: calc(100vh - 50px);
+            transition: filter 0.5s ease-in-out;
+        }
+
+        .container.loading {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        header.panel {
+            grid-column: 1 / -1;
+            height: 65px;
+            flex-shrink: 0
+        }
+
+        aside.panel.controls {
+            position: sticky;
+            top: 0;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        main.panel.grid {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-5);
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .panel {
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--panel-shadow);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        header h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+            margin: 0;
+        }
+
+        header .sub {
+            color: var(--muted);
+        }
+
+        .theme-switcher {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            text-decoration: none;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        #theme-toggle,
+        #wiki-open-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+        }
+
+        #theme-toggle:hover,
+        #wiki-open-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+            padding: var(--space-5);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .control-group+.control-group {
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-5);
+        }
+
+        .note {
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-4);
+        }
+
+        .num-input {
+            background: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0 var(--space-3);
+            height: 36px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .btn:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        button:focus-visible {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            cursor: pointer;
+            font-weight: var(--font-weight-emphasis);
+            font-size: 14px;
+            border-radius: var(--radius-md);
+            height: 40px;
+            padding: 0 var(--space-4);
+            border: 1px solid transparent;
+            transition: all var(--duration-standard) ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--color-accent-text);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color-tint);
+            color: var(--accent-color);
+            border-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            filter: brightness(0.95);
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .slider-row label {
+            flex: 0 0 90px;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1 1 auto;
+        }
+
+        .slider-row .num-input {
+            width: 60px;
+            text-align: right;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            margin: 0;
+            background: transparent;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+            height: 16px;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: var(--surface);
+            border-radius: 2px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 16px;
+            width: 16px;
+            background: var(--surface-alt);
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+            margin-top: -6px;
+        }
+
+        main.panel.grid {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+        }
+
+        #svg-preview-container {
+            max-width: 100%;
+            max-height: 100%;
+            aspect-ratio: var(--aspect-ratio, 1 / 1);
+        }
+
+        #svg-preview-container svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #svg-preview-container path {
+            transition: fill var(--duration-standard) ease;
+            fill: var(--accent-color);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wiki-modal-content {
+            background: var(--surface-alt);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-floating-3);
+            z-index: 2001;
+            width: 800px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .wiki-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4);
+            flex-shrink: 0;
+            position: relative;
+            height: 80px;
+            color: white;
+            background-image: url('modal.png');
+            background-size: cover;
+            background-position: center bottom;
+        }
+
+        .wiki-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+            z-index: 1;
+        }
+
+        .wiki-header h3,
+        #wiki-close-btn {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        #wiki-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--color-accent-text);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #wiki-close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #wiki-content {
+            padding: var(--space-5);
+            overflow: hidden;
+            flex-grow: 1;
+            display: flex;
+            gap: var(--space-5);
+        }
+
+        .wiki-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #wiki-content h4 {
+            margin-top: 0;
+            margin-bottom: var(--space-3);
+            font-weight: var(--font-weight-emphasis);
+            color: var(--accent-color);
+        }
+
+        /* Splash Screen Modal */
+        .splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            cursor: pointer;
+        }
+
+        .splash-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            width: 800px;
+            height: 450px;
+            max-width: 90vw;
+            max-height: 80vh;
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-floating-3);
+            overflow: hidden;
+            cursor: default;
+            position: relative;
+        }
+
+        #splash-close-btn {
+            position: absolute;
+            top: var(--space-3);
+            right: var(--space-3);
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border-color);
+            font-size: 24px;
+            line-height: 1;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            z-index: 10;
+        }
+
+        #splash-close-btn:hover {
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            transform: scale(1.1);
+        }
+
+        .splash-info {
+            flex: 0 0 300px;
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .splash-icon {
+            font-size: 32px;
+            margin-bottom: var(--space-4);
+        }
+
+        .splash-title {
+            font-size: 24px;
+            font-weight: var(--font-weight-emphasis);
+            color: var(--accent-color);
+            margin-bottom: var(--space-5);
+        }
+
+        .splash-tech {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .splash-credits {
+            margin-top: auto;
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+        }
+
+        .splash-image {
+            flex: 1;
+            background-color: var(--surface);
+        }
+
+        .splash-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: var(--space-4);
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                height: auto;
+                gap: var(--space-4);
+            }
+
+            aside.controls {
+                position: static;
+                max-height: none;
+            }
+
+            main.grid {
+                min-height: 50vh;
+            }
+
+            .splash-content {
+                flex-direction: column;
+                width: 90vw;
+                height: auto;
+                max-height: 90vh;
+            }
+
+            .splash-info {
+                flex-basis: auto;
+                border-left: none;
+                border-top: 4px solid var(--accent-color);
+            }
+
+            .splash-image {
+                width: 100%;
+                height: 200px;
+            }
+
+            #wiki-content {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="splash-overlay" id="splash-screen">
-      <div class="splash-content">
-        <button id="splash-close-btn" title="Close">&times;</button>
-        <div class="splash-info">
-          <span class="splash-icon">🧩</span>
-          <h2 class="splash-title">Jigsaw Generator</h2>
-          <p class="splash-tech">Creates unique puzzles by procedurally generating SVG paths directly in your browser.</p>
-          <p class="splash-credits">2025. Toolkit by e</p>
+        <div class="splash-content">
+            <button id="splash-close-btn" title="Close">&times;</button>
+            <div class="splash-info">
+                <span class="splash-icon">🧩</span>
+                <h2 class="splash-title">Jigsaw Generator</h2>
+                <p class="splash-tech">Creates unique puzzles by procedurally generating SVG paths directly in your
+                    browser.</p>
+                <p class="splash-credits">2025. Toolkit by e</p>
+            </div>
+            <div class="splash-image">
+                <img src="modal.png" alt="Jigsaw Generator Splash Image">
+            </div>
         </div>
-        <div class="splash-image">
-          <img src="modal.png" alt="Jigsaw Generator Splash Image">
-        </div>
-      </div>
     </div>
-    
+
     <div class="container loading" id="app-container">
         <header class="panel">
-          <a href="../index.html" class="back-to-home" title="Return to Home">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-          </a>
-          <h1>Jigsaw Generator</h1>
-          <div class="sub">Generate and export custom SVG jigsaws.</div>
-          <div class="theme-switcher">
-            <button id="wiki-open-btn" title="Info">ⓘ</button>
-            <button id="theme-toggle" title="Change theme"></button>
-          </div>
+            <a href="../index.html" class="back-to-home" title="Return to Home">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </a>
+            <h1>Jigsaw Generator</h1>
+            <div class="sub">Generate and export custom SVG jigsaws.</div>
+            <div class="theme-switcher">
+                <button id="wiki-open-btn" title="Info">ⓘ</button>
+                <button id="theme-toggle" title="Change theme"></button>
+            </div>
         </header>
         <aside class="panel controls" id="controls">
             <div class="control-group">
@@ -279,24 +648,24 @@
             </div>
             <div class="control-group">
                 <div class="slider-row">
-                  <label for="cols">Columns</label>
-                  <input id="cols" type="range" min="1" max="12" value="5" step="1">
-                  <input class="num-input" id="cols_num" type="number" min="1" max="12" step="1" value="5">
+                    <label for="cols">Columns</label>
+                    <input id="cols" type="range" min="1" max="12" value="5" step="1">
+                    <input class="num-input" id="cols_num" type="number" min="1" max="12" step="1" value="5">
                 </div>
                 <div class="slider-row">
-                  <label for="rows">Rows</label>
-                  <input id="rows" type="range" min="1" max="12" value="2" step="1">
-                  <input class="num-input" id="rows_num" type="number" min="1" max="12" step="1" value="2">
+                    <label for="rows">Rows</label>
+                    <input id="rows" type="range" min="1" max="12" value="2" step="1">
+                    <input class="num-input" id="rows_num" type="number" min="1" max="12" step="1" value="2">
                 </div>
                 <div class="slider-row">
-                  <label for="gap">Gap</label>
-                  <input id="gap" type="range" min="0" max="25" value="5" step="1">
-                  <input class="num-input" id="gap_num" type="number" min="0" max="25" step="1" value="5">
+                    <label for="gap">Gap</label>
+                    <input id="gap" type="range" min="0" max="25" value="5" step="1">
+                    <input class="num-input" id="gap_num" type="number" min="0" max="25" step="1" value="5">
                 </div>
                 <div class="slider-row">
-                  <label for="tabSize">Tab Size</label>
-                  <input id="tabSize" type="range" min="15" max="35" value="25" step="1">
-                  <input class="num-input" id="tabSize_num" type="number" min="15" max="35" step="1" value="25">
+                    <label for="tabSize">Tab Size</label>
+                    <input id="tabSize" type="range" min="15" max="35" value="25" step="1">
+                    <input class="num-input" id="tabSize_num" type="number" min="15" max="35" step="1" value="25">
                 </div>
             </div>
             <div class="control-group" style="margin-top: auto;">
@@ -312,10 +681,10 @@
     <script>
         const WIKI_DATA = {
             "title": "Jigsaw Generator Info",
-            "sections":[
+            "sections": [
                 {
-                    "title":"How to Use",
-                    "content":[
+                    "title": "How to Use",
+                    "content": [
                         "<b>1. Adjust Grid:</b> Use the 'Columns' and 'Rows' sliders to define the size of your puzzle.",
                         "<b>2. Customize Pieces:</b> Control the 'Gap' between pieces and the 'Tab Size' to change the puzzle's difficulty and style.",
                         "<b>3. Generate:</b> Click 'Generate' to create a new, unique random layout with your current settings.",
@@ -323,96 +692,96 @@
                     ]
                 },
                 {
-                    "title":"Features",
-                    "content":[
-                       "<b>Procedural Generation:</b> Every click of 'Generate' creates a completely unique puzzle layout; no two are ever the same.",
-                       "<b>Vector Output:</b> The exported SVG is perfect for laser cutters, vinyl cutters, or for use in digital design software.",
-                       "<b>Real-time Preview:</b> See your changes instantly in the main preview area.",
-                       "<b>Local & Private:</b> All puzzle generation happens in your browser. Nothing is ever uploaded."
+                    "title": "Features",
+                    "content": [
+                        "<b>Procedural Generation:</b> Every click of 'Generate' creates a completely unique puzzle layout; no two are ever the same.",
+                        "<b>Vector Output:</b> The exported SVG is perfect for laser cutters, vinyl cutters, or for use in digital design software.",
+                        "<b>Real-time Preview:</b> See your changes instantly in the main preview area.",
+                        "<b>Local & Private:</b> All puzzle generation happens in your browser. Nothing is ever uploaded."
                     ]
                 }
             ]
         };
-        const JigsawApp = { 
-            el: {}, 
-            state: { 
-                rows: 2, cols: 5, gap: 5, tabSize: 25, 
-                currentSvgString: null, currentWidth: 0, currentHeight: 0, 
-                currentShapes: [], splashHidden: false, isWikiLoaded: false 
-            }, 
-            PIECE_BASE_SIZE: 160, 
-            THEMES: ['light', 'dark', 'system'], 
-            THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' }, 
-            
-            init() { 
-                this.cacheDOMElements(); 
-                this.initTheme(); 
-                this.bindEvents(); 
+        const JigsawApp = {
+            el: {},
+            state: {
+                rows: 2, cols: 5, gap: 5, tabSize: 25,
+                currentSvgString: null, currentWidth: 0, currentHeight: 0,
+                currentShapes: [], splashHidden: false, isWikiLoaded: false
+            },
+            PIECE_BASE_SIZE: 160,
+            THEMES: ['light', 'dark', 'system'],
+            THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+            init() {
+                this.cacheDOMElements();
+                this.initTheme();
+                this.bindEvents();
                 this.initState();
-                this.resetAndGenerateAll(); 
-            }, 
-            
-            cacheDOMElements() { 
-                const ids = ['theme-toggle', 'wiki-open-btn', 'controls', 'regenerate', 'cols', 'cols_num', 'rows', 'rows_num', 'gap', 'gap_num', 'tabSize', 'tabSize_num', 'download-svg-btn', 'svg-preview-container', 'splash-screen', 'splash-close-btn', 'app-container', 'wiki-overlay']; 
-                ids.forEach(id => this.el[id.replace(/-(\w)/g, (_,c) => c.toUpperCase())] = document.getElementById(id)); 
-            }, 
-            
-            initState() { 
-                this.state.cols = parseInt(this.el.cols.value); 
-                this.state.rows = parseInt(this.el.rows.value); 
-                this.state.gap = parseInt(this.el.gap.value); 
-                this.state.tabSize = parseInt(this.el.tabSize.value); 
-            }, 
-            
-            bindEvents() { 
-                this.el.themeToggle.addEventListener('click', () => this.cycleTheme()); 
+                this.resetAndGenerateAll();
+            },
+
+            cacheDOMElements() {
+                const ids = ['theme-toggle', 'wiki-open-btn', 'controls', 'regenerate', 'cols', 'cols_num', 'rows', 'rows_num', 'gap', 'gap_num', 'tabSize', 'tabSize_num', 'download-svg-btn', 'svg-preview-container', 'splash-screen', 'splash-close-btn', 'app-container', 'wiki-overlay'];
+                ids.forEach(id => this.el[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id));
+            },
+
+            initState() {
+                this.state.cols = parseInt(this.el.cols.value);
+                this.state.rows = parseInt(this.el.rows.value);
+                this.state.gap = parseInt(this.el.gap.value);
+                this.state.tabSize = parseInt(this.el.tabSize.value);
+            },
+
+            bindEvents() {
+                this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
                 this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
                 this.el.splashScreen.addEventListener('click', (e) => { if (e.target === this.el.splashScreen) this.hideSplashScreen(); });
                 this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
-                
-                this.el.regenerate.addEventListener('click', () => { this.regenerateShapes(); this.generatePreview(); }); 
-                this.el.downloadSvgBtn.addEventListener('click', () => this.downloadSvg()); 
-                
-                this.el.controls.addEventListener('input', e => { 
-                    if (!e.target.id || e.target.type === 'button') return; 
-                    const { id, value } = e.target; 
-                    const stateKey = id.replace('_num', ''); 
-                    if (this.state.hasOwnProperty(stateKey)) { this.state[stateKey] = +value; } 
-                    this.syncUIProperty(stateKey); 
-                    const isGridChange = stateKey === 'rows' || stateKey === 'cols'; 
-                    if (isGridChange) { this.resetAndGenerateAll(); } else { this.generatePreview(); } 
-                }); 
-            }, 
-            
-            hideSplashScreen() {
-              if (!this.state.splashHidden) {
-                  this.state.splashHidden = true;
-                  this.el.splashScreen.classList.add('hidden');
-                  this.el.appContainer.classList.remove('loading');
-              }
+
+                this.el.regenerate.addEventListener('click', () => { this.regenerateShapes(); this.generatePreview(); });
+                this.el.downloadSvgBtn.addEventListener('click', () => this.downloadSvg());
+
+                this.el.controls.addEventListener('input', e => {
+                    if (!e.target.id || e.target.type === 'button') return;
+                    const { id, value } = e.target;
+                    const stateKey = id.replace('_num', '');
+                    if (this.state.hasOwnProperty(stateKey)) { this.state[stateKey] = +value; }
+                    this.syncUIProperty(stateKey);
+                    const isGridChange = stateKey === 'rows' || stateKey === 'cols';
+                    if (isGridChange) { this.resetAndGenerateAll(); } else { this.generatePreview(); }
+                });
             },
 
-            initTheme() { 
-                const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; 
-                this.setTheme(savedTheme, false); 
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system'); }); 
-            }, 
-            setTheme(theme, save = true) { 
-                if (save) { localStorage.setItem('creative-toolkit-theme', theme); } 
-                this.el.themeToggle.textContent = this.THEME_ICONS[theme]; 
-                this.applyTheme(theme); 
-            }, 
-            cycleTheme() { 
-                const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; 
-                const currentIndex = this.THEMES.indexOf(currentTheme); 
-                const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length]; 
-                this.setTheme(nextTheme); 
-            }, 
-            applyTheme(theme) { 
-                const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark'; 
-                document.documentElement.dataset.theme = isDark ? 'dark' : 'light'; 
-            }, 
-            
+            hideSplashScreen() {
+                if (!this.state.splashHidden) {
+                    this.state.splashHidden = true;
+                    this.el.splashScreen.classList.add('hidden');
+                    this.el.appContainer.classList.remove('loading');
+                }
+            },
+
+            initTheme() {
+                const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                this.setTheme(savedTheme, false);
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system'); });
+            },
+            setTheme(theme, save = true) {
+                if (save) { localStorage.setItem('creative-toolkit-theme', theme); }
+                this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+                this.applyTheme(theme);
+            },
+            cycleTheme() {
+                const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                const currentIndex = this.THEMES.indexOf(currentTheme);
+                const nextTheme = this.THEMES[(currentIndex + 1) % this.THEMES.length];
+                this.setTheme(nextTheme);
+            },
+            applyTheme(theme) {
+                const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+                document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+            },
+
             openWiki() {
                 if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
                     const wikiModal = document.createElement('div');
@@ -431,7 +800,7 @@
                     const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
                     const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
                     titleEl.textContent = WIKI_DATA.title;
-                    
+
                     const col1 = document.createElement('div'); col1.className = 'wiki-column';
                     const col2 = document.createElement('div'); col2.className = 'wiki-column';
 
@@ -440,10 +809,10 @@
                         const h4 = document.createElement('h4'); h4.textContent = s.title;
                         sectionContainer.appendChild(h4);
                         s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                        if (index < 1) { col1.appendChild(sectionContainer); } 
+                        if (index < 1) { col1.appendChild(sectionContainer); }
                         else { col2.appendChild(sectionContainer); }
                     });
-                    
+
                     contentEl.innerHTML = '';
                     contentEl.appendChild(col1);
                     contentEl.appendChild(col2);
@@ -453,108 +822,109 @@
             },
             closeWiki() { this.el.wikiOverlay.classList.remove('show'); },
 
-            syncUIProperty(key) { 
-                const elRange = this.el[key]; 
-                const elNum = this.el[`${key}Num`]; 
-                if (this.state.hasOwnProperty(key)) { 
-                    const value = this.state[key]; 
-                    if (elRange) elRange.value = value; 
-                    if (elNum) elNum.value = value; 
-                } 
-            }, 
+            syncUIProperty(key) {
+                const elRange = this.el[key];
+                const elNum = this.el[`${key}Num`];
+                if (this.state.hasOwnProperty(key)) {
+                    const value = this.state[key];
+                    if (elRange) elRange.value = value;
+                    if (elNum) elNum.value = value;
+                }
+            },
 
-            regenerateShapes() { 
-                const { rows, cols } = this.state; 
-                const shapes = Array.from({ length: rows }, () => Array.from({ length: cols }, () => null)); 
-                for (let r = 0; r < rows; r++) { 
-                    for (let c = 0; c < cols; c++) { 
-                        const top = r > 0 ? -shapes[r - 1][c].bottom : 0; 
-                        const left = c > 0 ? -shapes[r][c - 1].right : 0; 
-                        const bottom = r < rows - 1 ? (Math.random() > 0.5 ? 1 : -1) : 0; 
-                        const right = c < cols - 1 ? (Math.random() > 0.5 ? 1 : -1) : 0; 
-                        shapes[r][c] = { top, right, bottom, left }; 
-                    } 
-                } 
-                this.state.currentShapes = shapes; 
-            }, 
-            generatePreview() { 
-                const { currentWidth, currentHeight, currentShapes } = this.state; 
-                this.el.svgPreviewContainer.style.setProperty('--aspect-ratio', `${currentWidth} / ${currentHeight}`); 
-                this.state.currentSvgString = this.generateSvgString(currentWidth, currentHeight, currentShapes); 
-                this.el.svgPreviewContainer.innerHTML = this.state.currentSvgString; 
-            }, 
-            resetAndGenerateAll() { 
-                this.state.currentWidth = this.state.cols * this.PIECE_BASE_SIZE; 
-                this.state.currentHeight = this.state.rows * this.PIECE_BASE_SIZE; 
-                this.regenerateShapes(); 
-                this.generatePreview(); 
-            }, 
-            generateSvgString(totalWidth, totalHeight, shapes) { 
-                const { rows, cols, gap, tabSize } = this.state; 
-                const tabRatio = tabSize / 100; 
-                const pieceWidth = totalWidth / cols; 
-                const pieceHeight = totalHeight / rows; 
-                const shorterSide = Math.min(pieceWidth, pieceHeight); 
-                const protrusion = shorterSide * tabRatio; 
-                const padding = protrusion * 1.1; 
-                const gridWidth = (cols * pieceWidth) + Math.max(0, cols - 1) * gap; 
-                const gridHeight = (rows * pieceHeight) + Math.max(0, rows - 1) * gap; 
-                const viewBox = `${-padding} ${-padding} ${gridWidth + 2 * padding} ${gridHeight + 2 * padding}`; 
-                let pieces = '<g>'; 
-                for (let r = 0; r < rows; r++) { 
-                    for (let c = 0; c < cols; c++) { 
-                        const pathData = this.generatePiecePath(pieceWidth, pieceHeight, shapes[r][c], gap, protrusion); 
-                        const x = c * (pieceWidth + gap); 
-                        const y = r * (pieceHeight + gap); 
-                        pieces += `<path d="${pathData}" transform="translate(${x}, ${y})"/>`; 
-                    } 
-                } 
-                pieces += '</g>'; 
-                return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="${viewBox}">${pieces}</svg>`; 
-            }, 
-            generatePiecePath(w, h, shape, gap, p) { 
-                const neck = p * 0.85; 
-                const getFeatureWidth = (dir, baseSize) => { if (dir === 0) return 0; if (dir < 0) return baseSize + gap; return baseSize; }; 
-                let d = 'M 0,0 '; 
-                const topWidth = getFeatureWidth(shape.top, neck); 
-                const topShoulder = topWidth * 0.2; 
-                d += `l ${w/2 - topWidth/2},0 c ${topShoulder},${-p*shape.top*0.8} ${topWidth-topShoulder},${-p*shape.top*0.8} ${topWidth},0 l ${w/2 - topWidth/2},0 `; 
-                const rightWidth = getFeatureWidth(shape.right, neck); 
-                const rightShoulder = rightWidth * 0.2; 
-                d += `l 0,${h/2 - rightWidth/2} c ${p*shape.right*0.8},${rightShoulder} ${p*shape.right*0.8},${rightWidth - rightShoulder} 0,${rightWidth} l 0,${h/2 - rightWidth/2} `; 
-                const bottomWidth = getFeatureWidth(shape.bottom, neck); 
-                const bottomShoulder = bottomWidth * 0.2; 
-                d += `l -${w/2 - bottomWidth/2},0 c -${bottomShoulder},${p*shape.bottom*0.8} -${bottomWidth - bottomShoulder},${p*shape.bottom*0.8} -${bottomWidth},0 l -${w/2 - bottomWidth/2},0 `; 
-                const leftWidth = getFeatureWidth(shape.left, neck); 
-                const leftShoulder = leftWidth * 0.2; 
-                d += `l 0,-${h/2 - leftWidth/2} c ${-p*shape.left*0.8},-${leftShoulder} ${-p*shape.left*0.8},-${leftWidth - leftShoulder} 0,-${leftWidth} `; 
-                d += 'Z'; 
-                return d; 
-            }, 
-            downloadSvg() { 
-                const previewSvg = this.el.svgPreviewContainer.querySelector('svg'); 
-                const group = previewSvg ? previewSvg.querySelector('g') : null; 
-                if (!group) { console.error("Could not find SVG group to download."); return; } 
-                const bbox = group.getBBox(); 
-                const tightViewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`; 
-                const fillColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(); 
-                const clonedGroup = group.cloneNode(true); 
-                clonedGroup.querySelectorAll('path').forEach(path => { path.style.fill = ''; path.setAttribute('fill', fillColor); }); 
-                const finalSvgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${tightViewBox}">${clonedGroup.outerHTML}</svg>`; 
-                this.triggerDownload(finalSvgString, 'jigsaw.svg', 'image/svg+xml'); 
-            }, 
-            triggerDownload(data, filename, type) { 
-                const a = document.createElement('a'); 
-                if (type) { const blob = new Blob([data], { type }); a.href = URL.createObjectURL(blob); } 
-                else { a.href = data; } 
-                a.download = filename; 
-                document.body.appendChild(a); a.click(); document.body.removeChild(a); 
-                if (type) URL.revokeObjectURL(a.href); 
-            } 
+            regenerateShapes() {
+                const { rows, cols } = this.state;
+                const shapes = Array.from({ length: rows }, () => Array.from({ length: cols }, () => null));
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const top = r > 0 ? -shapes[r - 1][c].bottom : 0;
+                        const left = c > 0 ? -shapes[r][c - 1].right : 0;
+                        const bottom = r < rows - 1 ? (Math.random() > 0.5 ? 1 : -1) : 0;
+                        const right = c < cols - 1 ? (Math.random() > 0.5 ? 1 : -1) : 0;
+                        shapes[r][c] = { top, right, bottom, left };
+                    }
+                }
+                this.state.currentShapes = shapes;
+            },
+            generatePreview() {
+                const { currentWidth, currentHeight, currentShapes } = this.state;
+                this.el.svgPreviewContainer.style.setProperty('--aspect-ratio', `${currentWidth} / ${currentHeight}`);
+                this.state.currentSvgString = this.generateSvgString(currentWidth, currentHeight, currentShapes);
+                this.el.svgPreviewContainer.innerHTML = this.state.currentSvgString;
+            },
+            resetAndGenerateAll() {
+                this.state.currentWidth = this.state.cols * this.PIECE_BASE_SIZE;
+                this.state.currentHeight = this.state.rows * this.PIECE_BASE_SIZE;
+                this.regenerateShapes();
+                this.generatePreview();
+            },
+            generateSvgString(totalWidth, totalHeight, shapes) {
+                const { rows, cols, gap, tabSize } = this.state;
+                const tabRatio = tabSize / 100;
+                const pieceWidth = totalWidth / cols;
+                const pieceHeight = totalHeight / rows;
+                const shorterSide = Math.min(pieceWidth, pieceHeight);
+                const protrusion = shorterSide * tabRatio;
+                const padding = protrusion * 1.1;
+                const gridWidth = (cols * pieceWidth) + Math.max(0, cols - 1) * gap;
+                const gridHeight = (rows * pieceHeight) + Math.max(0, rows - 1) * gap;
+                const viewBox = `${-padding} ${-padding} ${gridWidth + 2 * padding} ${gridHeight + 2 * padding}`;
+                let pieces = '<g>';
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const pathData = this.generatePiecePath(pieceWidth, pieceHeight, shapes[r][c], gap, protrusion);
+                        const x = c * (pieceWidth + gap);
+                        const y = r * (pieceHeight + gap);
+                        pieces += `<path d="${pathData}" transform="translate(${x}, ${y})"/>`;
+                    }
+                }
+                pieces += '</g>';
+                return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="${viewBox}">${pieces}</svg>`;
+            },
+            generatePiecePath(w, h, shape, gap, p) {
+                const neck = p * 0.85;
+                const getFeatureWidth = (dir, baseSize) => { if (dir === 0) return 0; if (dir < 0) return baseSize + gap; return baseSize; };
+                let d = 'M 0,0 ';
+                const topWidth = getFeatureWidth(shape.top, neck);
+                const topShoulder = topWidth * 0.2;
+                d += `l ${w / 2 - topWidth / 2},0 c ${topShoulder},${-p * shape.top * 0.8} ${topWidth - topShoulder},${-p * shape.top * 0.8} ${topWidth},0 l ${w / 2 - topWidth / 2},0 `;
+                const rightWidth = getFeatureWidth(shape.right, neck);
+                const rightShoulder = rightWidth * 0.2;
+                d += `l 0,${h / 2 - rightWidth / 2} c ${p * shape.right * 0.8},${rightShoulder} ${p * shape.right * 0.8},${rightWidth - rightShoulder} 0,${rightWidth} l 0,${h / 2 - rightWidth / 2} `;
+                const bottomWidth = getFeatureWidth(shape.bottom, neck);
+                const bottomShoulder = bottomWidth * 0.2;
+                d += `l -${w / 2 - bottomWidth / 2},0 c -${bottomShoulder},${p * shape.bottom * 0.8} -${bottomWidth - bottomShoulder},${p * shape.bottom * 0.8} -${bottomWidth},0 l -${w / 2 - bottomWidth / 2},0 `;
+                const leftWidth = getFeatureWidth(shape.left, neck);
+                const leftShoulder = leftWidth * 0.2;
+                d += `l 0,-${h / 2 - leftWidth / 2} c ${-p * shape.left * 0.8},-${leftShoulder} ${-p * shape.left * 0.8},-${leftWidth - leftShoulder} 0,-${leftWidth} `;
+                d += 'Z';
+                return d;
+            },
+            downloadSvg() {
+                const previewSvg = this.el.svgPreviewContainer.querySelector('svg');
+                const group = previewSvg ? previewSvg.querySelector('g') : null;
+                if (!group) { console.error("Could not find SVG group to download."); return; }
+                const bbox = group.getBBox();
+                const tightViewBox = `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`;
+                const fillColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+                const clonedGroup = group.cloneNode(true);
+                clonedGroup.querySelectorAll('path').forEach(path => { path.style.fill = ''; path.setAttribute('fill', fillColor); });
+                const finalSvgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${tightViewBox}">${clonedGroup.outerHTML}</svg>`;
+                this.triggerDownload(finalSvgString, 'jigsaw.svg', 'image/svg+xml');
+            },
+            triggerDownload(data, filename, type) {
+                const a = document.createElement('a');
+                if (type) { const blob = new Blob([data], { type }); a.href = URL.createObjectURL(blob); }
+                else { a.href = data; }
+                a.download = filename;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                if (type) URL.revokeObjectURL(a.href);
+            }
         };
         document.addEventListener('DOMContentLoaded', () => {
             JigsawApp.init();
         });
     </script>
 </body>
+
 </html>

@@ -9,18 +9,20 @@
     <style>
         /* Global CSS Variables */
         :root {
-            --accent-color: #8b5cf6;
-            /* Purple for mockups */
-            --accent-color-tint: #ddd6fe;
+            --accent-color: #E72F2F;
+            /* Red for mockups */
+            --accent-color-tint: rgba(231, 47, 47, 0.1);
+            --accent-yellow: #F7CF27;
+            --color-cream: #FAF6F0;
             --color-text-primary-light: #1C1C1E;
             --color-text-secondary-light: #3A3A3C;
-            --color-surface-light: #F5F5F7;
+            --color-surface-light: #FAF6F0;
             --color-background-light: #FFFFFF;
-            --color-divider-light: #EAEAEA;
+            --color-divider-light: #E8E1D8;
             --color-text-primary-dark: #EAEAEB;
             --color-text-secondary-dark: #9A9A9E;
-            --color-surface-dark: #121212;
-            --color-background-dark: #1E1E1E;
+            --color-surface-dark: #1a1815;
+            --color-background-dark: #0d0c0a;
             --color-divider-dark: #3A3A3C;
             --color-accent-text: #FFFFFF;
             --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
@@ -523,6 +525,32 @@
             opacity: 1;
         }
 
+        /* Floating Controls */
+        .canvas-floating-btn {
+            position: absolute;
+            bottom: var(--space-4);
+            right: var(--space-4);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-raised-2);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            color: var(--ink);
+            transition: all var(--duration-standard);
+            z-index: 10;
+        }
+
+        .canvas-floating-btn:hover {
+            transform: scale(1.1);
+            background: var(--surface-alt);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
         /* Wiki Modal */
         .popup-overlay {
             position: fixed;
@@ -805,7 +833,7 @@
 
     <div class="container loading" id="app-container">
         <header class="panel">
-            <a href="index.html" class="back-to-home" title="Return to Home">
+            <a href="../index.html" class="back-to-home" title="Return to Home">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -873,6 +901,16 @@
 
         <main class="panel">
             <canvas id="mockup-canvas"></canvas>
+
+            <!-- Status Bar Toggle (Phone Portrait only) -->
+            <button id="status-bar-toggle" class="canvas-floating-btn" title="Toggle Status Bar"
+                style="display: none; bottom: 60px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="9" y1="6" x2="15" y2="6"></line>
+                </svg>
+            </button>
 
             <!-- Orientation Toggle Button -->
             <button id="orientation-toggle" class="canvas-floating-btn" title="Rotate Device">

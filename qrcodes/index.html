@@ -1,138 +1,694 @@
 <!doctype html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator</title>
     <script>
-    (function() {
-      try {
-        let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
-        if (theme === 'system') {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.dataset.theme = theme;
-      } catch (e) {}
-    })();
+        (function () {
+            try {
+                let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.dataset.theme = theme;
+            } catch (e) { }
+        })();
     </script>
     <style>
         :root {
-          --accent-color: #2BA24C;
-          --accent-color-tint: #bcf0cb;
-          --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-          --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-          --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-          --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-          --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
-          --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-          --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-          --font-weight-emphasis: 600; --font-weight-medium: 500;
-          --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-          --radius-sm: 6px; --radius-md: 8px; --radius-xl: 16px;
-          --shadow-raised-2: 0 4px 12px rgba(0,0,0,0.06); --shadow-floating-3: 0 8px 20px rgba(0,0,0,0.12);
+            --accent-color: #E72F2F;
+            --accent-color-tint: rgba(231, 47, 47, 0.1);
+            --accent-yellow: #F7CF27;
+            --color-cream: #FAF6F0;
+            --color-text-primary-light: #1C1C1E;
+            --color-text-secondary-light: #3A3A3C;
+            --color-surface-light: #FAF6F0;
+            --color-background-light: #FFFFFF;
+            --color-divider-light: #E8E1D8;
+            --color-text-primary-dark: #EAEAEB;
+            --color-text-secondary-dark: #9A9A9E;
+            --color-surface-dark: #1a1815;
+            --color-background-dark: #0d0c0a;
+            --color-divider-dark: #3A3A3C;
+            --color-accent-text: #FFFFFF;
+            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            --font-size-h1: 20px;
+            --font-size-body: 14px;
+            --font-size-caption: 12px;
+            --font-weight-emphasis: 600;
+            --font-weight-medium: 500;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-xl: 16px;
+            --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
         }
-        html[data-theme="light"] { --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light); --surface: var(--color-surface-light); --surface-alt: var(--color-background-light); --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2); color-scheme: light; }
-        html[data-theme="dark"] { --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark); --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark); --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); color-scheme: dark; }
-        html { box-sizing: border-box; } *, *:before, *:after { box-sizing: inherit; }
-        body { margin: 0; color: var(--ink); background-color: var(--surface); font: var(--font-size-body)/1.5 var(--font-family-sans); padding: 25px; }
-        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap: 25px; height: calc(100vh - 50px); transition: filter 0.5s ease-in-out; }
-        .container.loading { filter: blur(5px); pointer-events: none; }
-        header.panel { grid-column: 1 / -1; height:65px; flex-shrink: 0}
-        aside.panel.controls { position: sticky; top: 0; max-height: 100%; }
-        main.panel.canvas { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-5); min-height: 0; }
-        .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); }
-        header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
-        header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-        header .sub { color: var(--muted); }
-        .theme-switcher { margin-left: auto; display:flex; align-items:center; gap: 8px;}
-        .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all 200ms ease; text-decoration: none; }
-        .back-to-home:hover { background-color: var(--surface-alt); }
-        .back-to-home svg { width: 18px; height: 18px; }
-        #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all 200ms ease; }
-        #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
-        .controls { display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-5); height: 100%; box-sizing: border-box; }
-        .control-group { display: flex; flex-direction: column; gap: var(--space-4); }
-        .control-group + .control-group { border-top: 1px solid var(--border-color); padding-top: var(--space-5); }
-        .note { font-size: var(--font-size-caption); color: var(--muted); padding-top: var(--space-4); border-top: 1px solid var(--border-color); }
-        .form-group { display: flex; flex-direction: column; gap: var(--space-2); }
-        .form-group label { font-weight: var(--font-weight-medium); color: var(--ink); }
-        .form-control, .select-wrapper select { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 12px; transition: border-color 200ms ease; font-family: inherit; font-size: inherit; }
-        .select-wrapper { position: relative; }
-        .select-wrapper select { width: 100%; padding-right: 32px; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; }
-        .form-control { width: 100%; box-sizing: border-box; }
-        .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { border-color: var(--accent-color); outline: 2px solid var(--accent-color); outline-offset: 2px; }
-        textarea.form-control { min-height: 80px; resize: vertical; }
-        .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); font-size: 14px; border-radius: var(--radius-md); height: 40px; padding: 0 var(--space-4); border: 1px solid transparent; transition: all 200ms ease; text-decoration: none; }
-        .btn-primary { background-color: var(--accent-color); color: var(--color-accent-text); }
-        .btn-primary:hover { filter: brightness(1.1); }
-        .btn-secondary { background-color: var(--accent-color-tint); color: var(--accent-color); border-color: transparent; }
-        .btn-secondary:hover { filter: brightness(0.95); }
-        .btn[disabled] { background-color: var(--surface); color: var(--muted); border-color: var(--border-color); pointer-events: none; filter: none; }
-        .slider-row { display: flex; align-items: center; gap: var(--space-4); }
-        .slider-row label { flex: 0 0 90px; }
-        .slider-row .select-wrapper { flex: 1 1 auto; }
-        #input-forms { overflow-y: auto; padding-right: 4px; flex-grow: 1; }
-        main.panel.canvas { background-size: 40px 40px; background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px); }
-        #qrcode-container { width: 100%; max-width: 400px; aspect-ratio: 1 / 1; padding: var(--space-4); background-color: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-md); }
-        #qrcode { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
-        #qrcode img, #qrcode canvas { max-width: 100%; max-height: 100%; }
-        .hidden { display: none !important; }
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .popup-overlay.show { display: flex; }
-        .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
-        .wiki-header { display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); flex-shrink: 0; position: relative; height: 80px; color: white; background-image: url('modal.png'); background-size: cover; background-position: center bottom; }
-        .wiki-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%); z-index: 1; }
-        .wiki-header h3, #wiki-close-btn { position: relative; z-index: 2; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        #wiki-close-btn { background: none; border: none; font-size: 24px; line-height: 1; padding: 0; width: 36px; height: 36px; border-radius: 50%; color: var(--color-accent-text); cursor: pointer; transition: background-color 0.2s ease; }
-        #wiki-close-btn:hover { background-color: rgba(255,255,255,0.1); }
-        #wiki-content { padding: var(--space-5); overflow: hidden; flex-grow: 1; display: flex; gap: var(--space-5); }
-        .wiki-column { flex: 1; min-width: 0; }
-        #wiki-content h4 { margin-top: 0; margin-bottom: var(--space-3); font-weight: var(--font-weight-emphasis); color: var(--accent-color); }
-        .dialog-content { width: 90%; max-width: 400px; padding: var(--space-5); text-align: center; }
-        #dialog-message { margin: 0 0 var(--space-5); font-size: 16px; line-height: 1.6; }
-        #dialog-actions { justify-content: center; }
-        #dialog-actions .btn { width: auto; min-width: 100px; }
-        .splash-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.1); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); z-index: 9999; display: flex; justify-content: center; align-items: center; opacity: 1; transition: opacity 0.5s ease-out; cursor: pointer; }
-        .splash-overlay.hidden { opacity: 0; pointer-events: none; }
-        .splash-content { display: flex; width: 800px; height: 450px; max-width: 90vw; max-height: 80vh; background: var(--surface-alt); border-radius: var(--radius-md); box-shadow: var(--shadow-floating-3); overflow: hidden; cursor: default; position: relative; }
-        #splash-close-btn { position: absolute; top: var(--space-3); right: var(--space-3); width: 32px; height: 32px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); font-size: 24px; line-height: 1; display: grid; place-items: center; cursor: pointer; transition: all 200ms ease; z-index: 10; }
-        #splash-close-btn:hover { background-color: var(--surface-alt); color: var(--ink); transform: scale(1.1); }
-        .splash-info { flex: 0 0 300px; padding: var(--space-5); display: flex; flex-direction: column; background-color: var(--surface-alt); color: var(--ink); border-left: 4px solid var(--accent-color); }
-        .splash-icon { font-size: 32px; margin-bottom: var(--space-4); }
-        .splash-title { font-size: 24px; font-weight: var(--font-weight-emphasis); color: var(--accent-color); margin-bottom: var(--space-5); }
-        .splash-tech { margin: 0; color: var(--muted); line-height: 1.6; }
-        .splash-credits { margin-top: auto; font-size: var(--font-size-caption); color: var(--muted); }
-        .splash-image { flex: 1; background-color: var(--surface); }
-        .splash-image img { width: 100%; height: 100%; object-fit: cover; }
-        @media (max-width: 800px) { body { padding: var(--space-4); } .container { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; height: auto; gap: var(--space-4); } aside.controls { position: static; max-height: none; } main.canvas { min-height: 50vh; } .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; } .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); } .splash-image { width: 100%; height: 200px; } #wiki-content { flex-direction: column; } }
+
+        html[data-theme="light"] {
+            --ink: var(--color-text-primary-light);
+            --muted: var(--color-text-secondary-light);
+            --surface: var(--color-surface-light);
+            --surface-alt: var(--color-background-light);
+            --border-color: var(--color-divider-light);
+            --panel-shadow: var(--shadow-raised-2);
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            --ink: var(--color-text-primary-dark);
+            --muted: var(--color-text-secondary-dark);
+            --surface: var(--color-surface-dark);
+            --surface-alt: var(--color-background-dark);
+            --border-color: var(--color-divider-dark);
+            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color-scheme: dark;
+        }
+
+        html {
+            box-sizing: border-box;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background-color: var(--surface);
+            font: var(--font-size-body)/1.5 var(--font-family-sans);
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 25px;
+            height: calc(100vh - 50px);
+            transition: filter 0.5s ease-in-out;
+        }
+
+        .container.loading {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        header.panel {
+            grid-column: 1 / -1;
+            height: 65px;
+            flex-shrink: 0
+        }
+
+        aside.panel.controls {
+            position: sticky;
+            top: 0;
+            max-height: 100%;
+        }
+
+        main.panel.canvas {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-5);
+            min-height: 0;
+        }
+
+        .panel {
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--panel-shadow);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        header h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+            margin: 0;
+        }
+
+        header .sub {
+            color: var(--muted);
+        }
+
+        .theme-switcher {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all 200ms ease;
+            text-decoration: none;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        #theme-toggle,
+        #wiki-open-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all 200ms ease;
+        }
+
+        #theme-toggle:hover,
+        #wiki-open-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+            padding: var(--space-5);
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .control-group+.control-group {
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-5);
+        }
+
+        .note {
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .form-group label {
+            font-weight: var(--font-weight-medium);
+            color: var(--ink);
+        }
+
+        .form-control,
+        .select-wrapper select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            transition: border-color 200ms ease;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper select {
+            width: 100%;
+            padding-right: 32px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        .form-control {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        button:focus-visible {
+            border-color: var(--accent-color);
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            cursor: pointer;
+            font-weight: var(--font-weight-emphasis);
+            font-size: 14px;
+            border-radius: var(--radius-md);
+            height: 40px;
+            padding: 0 var(--space-4);
+            border: 1px solid transparent;
+            transition: all 200ms ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--color-accent-text);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color-tint);
+            color: var(--accent-color);
+            border-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            filter: brightness(0.95);
+        }
+
+        .btn[disabled] {
+            background-color: var(--surface);
+            color: var(--muted);
+            border-color: var(--border-color);
+            pointer-events: none;
+            filter: none;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .slider-row label {
+            flex: 0 0 90px;
+        }
+
+        .slider-row .select-wrapper {
+            flex: 1 1 auto;
+        }
+
+        #input-forms {
+            overflow-y: auto;
+            padding-right: 4px;
+            flex-grow: 1;
+        }
+
+        main.panel.canvas {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, var(--border-color) 1px, transparent 1px), linear-gradient(to bottom, var(--border-color) 1px, transparent 1px);
+        }
+
+        #qrcode-container {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1 / 1;
+            padding: var(--space-4);
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        #qrcode {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #qrcode img,
+        #qrcode canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .wiki-modal-content {
+            background: var(--surface-alt);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-floating-3);
+            z-index: 2001;
+            width: 800px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .wiki-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4);
+            flex-shrink: 0;
+            position: relative;
+            height: 80px;
+            color: white;
+            background-image: url('modal.png');
+            background-size: cover;
+            background-position: center bottom;
+        }
+
+        .wiki-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+            z-index: 1;
+        }
+
+        .wiki-header h3,
+        #wiki-close-btn {
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        #wiki-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--color-accent-text);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #wiki-close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #wiki-content {
+            padding: var(--space-5);
+            overflow: hidden;
+            flex-grow: 1;
+            display: flex;
+            gap: var(--space-5);
+        }
+
+        .wiki-column {
+            flex: 1;
+            min-width: 0;
+        }
+
+        #wiki-content h4 {
+            margin-top: 0;
+            margin-bottom: var(--space-3);
+            font-weight: var(--font-weight-emphasis);
+            color: var(--accent-color);
+        }
+
+        .dialog-content {
+            width: 90%;
+            max-width: 400px;
+            padding: var(--space-5);
+            text-align: center;
+        }
+
+        #dialog-message {
+            margin: 0 0 var(--space-5);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        #dialog-actions {
+            justify-content: center;
+        }
+
+        #dialog-actions .btn {
+            width: auto;
+            min-width: 100px;
+        }
+
+        .splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            cursor: pointer;
+        }
+
+        .splash-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            width: 800px;
+            height: 450px;
+            max-width: 90vw;
+            max-height: 80vh;
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-floating-3);
+            overflow: hidden;
+            cursor: default;
+            position: relative;
+        }
+
+        #splash-close-btn {
+            position: absolute;
+            top: var(--space-3);
+            right: var(--space-3);
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border-color);
+            font-size: 24px;
+            line-height: 1;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all 200ms ease;
+            z-index: 10;
+        }
+
+        #splash-close-btn:hover {
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            transform: scale(1.1);
+        }
+
+        .splash-info {
+            flex: 0 0 300px;
+            padding: var(--space-5);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface-alt);
+            color: var(--ink);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .splash-icon {
+            font-size: 32px;
+            margin-bottom: var(--space-4);
+        }
+
+        .splash-title {
+            font-size: 24px;
+            font-weight: var(--font-weight-emphasis);
+            color: var(--accent-color);
+            margin-bottom: var(--space-5);
+        }
+
+        .splash-tech {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .splash-credits {
+            margin-top: auto;
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+        }
+
+        .splash-image {
+            flex: 1;
+            background-color: var(--surface);
+        }
+
+        .splash-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: var(--space-4);
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                height: auto;
+                gap: var(--space-4);
+            }
+
+            aside.controls {
+                position: static;
+                max-height: none;
+            }
+
+            main.canvas {
+                min-height: 50vh;
+            }
+
+            .splash-content {
+                flex-direction: column;
+                width: 90vw;
+                height: auto;
+                max-height: 90vh;
+            }
+
+            .splash-info {
+                flex-basis: auto;
+                border-left: none;
+                border-top: 4px solid var(--accent-color);
+            }
+
+            .splash-image {
+                width: 100%;
+                height: 200px;
+            }
+
+            #wiki-content {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="splash-overlay" id="splash-screen">
-      <div class="splash-content">
-        <button id="splash-close-btn" title="Close">&times;</button>
-        <div class="splash-info">
-          <span class="splash-icon">📱</span>
-          <h2 class="splash-title">QR Code Generator</h2>
-          <p class="splash-tech">Creates custom QR codes for URLs, WiFi, and more. All data is generated locally in your browser.</p>
-          <p class="splash-credits">2025. Toolkit by e</p>
+        <div class="splash-content">
+            <button id="splash-close-btn" title="Close">&times;</button>
+            <div class="splash-info">
+                <span class="splash-icon">📱</span>
+                <h2 class="splash-title">QR Code Generator</h2>
+                <p class="splash-tech">Creates custom QR codes for URLs, WiFi, and more. All data is generated locally
+                    in your browser.</p>
+                <p class="splash-credits">2025. Toolkit by e</p>
+            </div>
+            <div class="splash-image">
+                <img src="modal.png" alt="QR Code Generator Splash Image">
+            </div>
         </div>
-        <div class="splash-image">
-          <img src="modal.png" alt="QR Code Generator Splash Image">
-        </div>
-      </div>
     </div>
 
     <div class="container loading" id="app-container">
         <header class="panel">
             <a href="../index.html" class="back-to-home" title="Return to Home">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
             </a>
             <h1>QR Code Generator</h1>
             <div class="sub">Create and download custom QR codes for any purpose.</div>
             <div class="theme-switcher">
-              <button id="wiki-open-btn" title="Info">ⓘ</button>
-              <button id="theme-toggle" title="Change theme"></button>
+                <button id="wiki-open-btn" title="Info">ⓘ</button>
+                <button id="theme-toggle" title="Change theme"></button>
             </div>
         </header>
         <aside class="panel controls">
@@ -143,36 +699,84 @@
                 <div class="slider-row">
                     <label for="qr-type">QR Type</label>
                     <div class="select-wrapper">
-                      <select id="qr-type" class="form-control">
-                          <option value="url" selected>URL / Plain Text</option> <option value="email">Email</option> <option value="phone">Phone Number</option> <option value="sms">SMS</option> <option value="wifi">WiFi Network</option> <option value="vcard">vCard (Contact)</option>
-                      </select>
+                        <select id="qr-type" class="form-control">
+                            <option value="url" selected>URL / Plain Text</option>
+                            <option value="email">Email</option>
+                            <option value="phone">Phone Number</option>
+                            <option value="sms">SMS</option>
+                            <option value="wifi">WiFi Network</option>
+                            <option value="vcard">vCard (Contact)</option>
+                        </select>
                     </div>
                 </div>
             </div>
             <div class="control-group" style="flex-grow: 1; min-height: 0;">
                 <div id="input-forms">
-                    <div id="form-url"><div class="form-group"><label for="url-text">Text or URL</label><textarea id="url-text" class="form-control" placeholder="e.g., https://www.example.com">https://www.brokenorbit.art</textarea></div></div>
-                    <div id="form-email" class="hidden"><div class="form-group"><label for="email-to">To</label><input type="email" id="email-to" class="form-control" placeholder="recipient@example.com"></div><div class="form-group"><label for="email-subject">Subject</label><input type="text" id="email-subject" class="form-control"></div><div class="form-group"><label for="email-body">Body</label><textarea id="email-body" class="form-control"></textarea></div></div>
-                    <div id="form-phone" class="hidden"><div class="form-group"><label for="phone-number">Phone Number</label><input type="tel" id="phone-number" class="form-control" placeholder="+15551234567"></div></div>
-                    <div id="form-sms" class="hidden"><div class="form-group"><label for="sms-number">Phone Number</label><input type="tel" id="sms-number" class="form-control" placeholder="+15551234567"></div><div class="form-group"><label for="sms-message">Message</label><textarea id="sms-message" class="form-control"></textarea></div></div>
-                    <div id="form-wifi" class="hidden"><div class="form-group"><label for="wifi-ssid">Network Name (SSID)</label><input type="text" id="wifi-ssid" class="form-control"></div><div class="form-group"><label for="wifi-password">Password</label><input type="password" id="wifi-password" class="form-control"></div><div class="form-group"><label for="wifi-encryption">Encryption</label><div class="select-wrapper"><select id="wifi-encryption" class="form-control"><option value="WPA" selected>WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">None</option></select></div></div></div>
-                    <div id="form-vcard" class="hidden"><div class="form-group"><label for="vcard-name">Full Name</label><input type="text" id="vcard-name" class="form-control"></div><div class="form-group"><label for="vcard-phone">Phone Number</label><input type="tel" id="vcard-phone" class="form-control"></div><div class="form-group"><label for="vcard-email">Email</label><input type="email" id="vcard-email" class="form-control"></div></div>
+                    <div id="form-url">
+                        <div class="form-group"><label for="url-text">Text or URL</label><textarea id="url-text"
+                                class="form-control"
+                                placeholder="e.g., https://www.example.com">https://www.brokenorbit.art</textarea></div>
+                    </div>
+                    <div id="form-email" class="hidden">
+                        <div class="form-group"><label for="email-to">To</label><input type="email" id="email-to"
+                                class="form-control" placeholder="recipient@example.com"></div>
+                        <div class="form-group"><label for="email-subject">Subject</label><input type="text"
+                                id="email-subject" class="form-control"></div>
+                        <div class="form-group"><label for="email-body">Body</label><textarea id="email-body"
+                                class="form-control"></textarea></div>
+                    </div>
+                    <div id="form-phone" class="hidden">
+                        <div class="form-group"><label for="phone-number">Phone Number</label><input type="tel"
+                                id="phone-number" class="form-control" placeholder="+15551234567"></div>
+                    </div>
+                    <div id="form-sms" class="hidden">
+                        <div class="form-group"><label for="sms-number">Phone Number</label><input type="tel"
+                                id="sms-number" class="form-control" placeholder="+15551234567"></div>
+                        <div class="form-group"><label for="sms-message">Message</label><textarea id="sms-message"
+                                class="form-control"></textarea></div>
+                    </div>
+                    <div id="form-wifi" class="hidden">
+                        <div class="form-group"><label for="wifi-ssid">Network Name (SSID)</label><input type="text"
+                                id="wifi-ssid" class="form-control"></div>
+                        <div class="form-group"><label for="wifi-password">Password</label><input type="password"
+                                id="wifi-password" class="form-control"></div>
+                        <div class="form-group"><label for="wifi-encryption">Encryption</label>
+                            <div class="select-wrapper"><select id="wifi-encryption" class="form-control">
+                                    <option value="WPA" selected>WPA/WPA2</option>
+                                    <option value="WEP">WEP</option>
+                                    <option value="nopass">None</option>
+                                </select></div>
+                        </div>
+                    </div>
+                    <div id="form-vcard" class="hidden">
+                        <div class="form-group"><label for="vcard-name">Full Name</label><input type="text"
+                                id="vcard-name" class="form-control"></div>
+                        <div class="form-group"><label for="vcard-phone">Phone Number</label><input type="tel"
+                                id="vcard-phone" class="form-control"></div>
+                        <div class="form-group"><label for="vcard-email">Email</label><input type="email"
+                                id="vcard-email" class="form-control"></div>
+                    </div>
                 </div>
             </div>
-            <div class="control-group" style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: var(--space-5);">
+            <div class="control-group"
+                style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: var(--space-5);">
                 <a id="download-link" class="btn btn-primary" disabled>Download</a>
             </div>
             <div class="note"> Tip: All QR codes are generated locally. No data is sent to any server. </div>
         </aside>
-        <main class="panel canvas"> <div id="qrcode-container" class="hidden"> <div id="qrcode"></div> </div> </main>
+        <main class="panel canvas">
+            <div id="qrcode-container" class="hidden">
+                <div id="qrcode"></div>
+            </div>
+        </main>
     </div>
-    
+
     <div id="wiki-overlay" class="popup-overlay"></div>
     <div id="dialog-overlay" class="popup-overlay">
-      <div class="dialog-content panel">
-        <p id="dialog-message"></p>
-        <div id="dialog-actions" class="btn-group"></div>
-      </div>
+        <div class="dialog-content panel">
+            <p id="dialog-message"></p>
+            <div id="dialog-actions" class="btn-group"></div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js"></script>
@@ -228,7 +832,7 @@
             cacheDOMElements() {
                 const ids = [
                     'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'splash-screen',
-                    'app-container', 'splash-close-btn', 'dialog-overlay', 
+                    'app-container', 'splash-close-btn', 'dialog-overlay',
                     'dialog-message', 'dialog-actions', 'qr-type', 'input-forms',
                     'generate-btn', 'qrcode-container', 'qrcode', 'download-link'
                 ];
@@ -256,7 +860,7 @@
                 this.el.generateBtn.addEventListener('click', () => this.generateQRCode());
             },
 
-            showDialog(message, { buttons = [], onConfirm = () => {} } = {}) {
+            showDialog(message, { buttons = [], onConfirm = () => { } } = {}) {
                 this.el.dialogMessage.textContent = message;
                 this.el.dialogActions.innerHTML = '';
                 buttons.forEach(buttonInfo => {
@@ -289,20 +893,20 @@
                 let data = '';
                 switch (type) {
                     case 'url': data = this.el.urlText.value; break;
-                    case 'email': 
-                        data = `mailto:${this.el.emailTo.value}?subject=${encodeURIComponent(this.el.emailSubject.value)}&body=${encodeURIComponent(this.el.emailBody.value)}`; 
+                    case 'email':
+                        data = `mailto:${this.el.emailTo.value}?subject=${encodeURIComponent(this.el.emailSubject.value)}&body=${encodeURIComponent(this.el.emailBody.value)}`;
                         break;
                     case 'phone': data = `tel:${this.el.phoneNumber.value}`; break;
                     case 'sms': data = `smsto:${this.el.smsNumber.value}:${encodeURIComponent(this.el.smsMessage.value)}`; break;
-                    case 'wifi': 
+                    case 'wifi':
                         if (!this.el.wifiSsid.value) {
                             this.showAlert("Network Name (SSID) is required.");
                             return null;
                         }
-                        data = `WIFI:T:${this.el.wifiEncryption.value};S:${this.el.wifiSsid.value};P:${this.el.wifiPassword.value};;`; 
+                        data = `WIFI:T:${this.el.wifiEncryption.value};S:${this.el.wifiSsid.value};P:${this.el.wifiPassword.value};;`;
                         break;
-                    case 'vcard': 
-                        data = `BEGIN:VCARD\nVERSION:3.0\nFN:${this.el.vcardName.value}\nTEL:${this.el.vcardPhone.value}\nEMAIL:${this.el.vcardEmail.value}\nEND:VCARD`; 
+                    case 'vcard':
+                        data = `BEGIN:VCARD\nVERSION:3.0\nFN:${this.el.vcardName.value}\nTEL:${this.el.vcardPhone.value}\nEMAIL:${this.el.vcardEmail.value}\nEND:VCARD`;
                         break;
                 }
                 return data.trim();
@@ -318,7 +922,7 @@
 
                 this.el.qrcode.innerHTML = "";
                 this.el.qrcodeContainer.classList.remove('hidden');
-                
+
                 this.qrInstance = new QRCode(this.el.qrcode, {
                     text: text,
                     width: 400,
@@ -339,19 +943,19 @@
                         ctx.fillStyle = '#ffffff';
                         ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
                         ctx.drawImage(canvas, margin, margin);
-                        
+
                         this.el.downloadLink.href = newCanvas.toDataURL('image/png');
                         this.el.downloadLink.download = 'qrcode.png';
                         this.el.downloadLink.removeAttribute('disabled');
                     }
                 }, 100);
             },
-            
+
             initTheme() {
                 const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
                 this.setTheme(savedTheme, false);
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+                    if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
                 });
             },
             setTheme(theme, save = true) {
@@ -404,8 +1008,9 @@
                 this.el.wikiOverlay.classList.remove('show');
             }
         };
-        
+
         document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
 </body>
+
 </html>

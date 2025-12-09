@@ -1,176 +1,423 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Icon Factory</title>
     <script>
-    // This script is placed in the <head> to prevent a theme flash on load.
-    (function() {
-      try {
-        let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
-        if (theme === 'system') {
-          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
-        document.documentElement.dataset.theme = theme;
-      } catch (e) { /* Gracefully handle potential errors */ }
-    })();
+        // This script is placed in the <head> to prevent a theme flash on load.
+        (function () {
+            try {
+                let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                if (theme === 'system') {
+                    theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.dataset.theme = theme;
+            } catch (e) { /* Gracefully handle potential errors */ }
+        })();
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         :root {
-            --accent-color: #3B4352; /* Gris oscuro */
-            --accent-color-tint: #cdd1d8;
-            --color-text-primary-light: #1C1C1E; --color-text-secondary-light: #3A3A3C;
-            --color-surface-light: #F5F5F7; --color-background-light: #FFFFFF;
-            --color-divider-light: #EAEAEA; --color-text-primary-dark: #EAEAEB;
-            --color-text-secondary-dark: #9A9A9E; --color-surface-dark: #121212;
-            --color-background-dark: #1E1E1E; --color-divider-dark: #3A3A3C;
-            --color-accent-text: #FFFFFF; --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-            --font-size-h1: 20px; --font-size-body: 14px; --font-size-caption: 12px;
-            --font-weight-emphasis: 600; --font-weight-medium: 500;
-            --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px;
-            --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
+            --accent-color: #E72F2F;
+            /* Red */
+            --accent-color-tint: rgba(231, 47, 47, 0.1);
+            --accent-yellow: #F7CF27;
+            --color-cream: #FAF6F0;
+            --color-text-primary-light: #1C1C1E;
+            --color-text-secondary-light: #3A3A3C;
+            --color-surface-light: #FAF6F0;
+            --color-background-light: #FFFFFF;
+            --color-divider-light: #E8E1D8;
+            --color-text-primary-dark: #EAEAEB;
+            --color-text-secondary-dark: #9A9A9E;
+            --color-surface-dark: #1a1815;
+            --color-background-dark: #0d0c0a;
+            --color-divider-dark: #3A3A3C;
+            --color-accent-text: #FFFFFF;
+            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            --font-size-h1: 20px;
+            --font-size-body: 14px;
+            --font-size-caption: 12px;
+            --font-weight-emphasis: 600;
+            --font-weight-medium: 500;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
             --radius-xl: 16px;
             --shadow-raised-2: 0 4px 12px rgba(104, 104, 104, 0.1);
             --duration-standard: 200ms;
         }
+
         html[data-theme="light"] {
-            --ink: var(--color-text-primary-light); --muted: var(--color-text-secondary-light);
-            --surface: var(--color-surface-light); --surface-alt: var(--color-background-light);
-            --border-color: var(--color-divider-light); --panel-shadow: var(--shadow-raised-2);
-            --preview-panel-bg: #a4aac5;
+            --ink: var(--color-text-primary-light);
+            --muted: var(--color-text-secondary-light);
+            --surface: var(--color-surface-light);
+            --surface-alt: var(--color-background-light);
+            --border-color: var(--color-divider-light);
+            --panel-shadow: var(--shadow-raised-2);
+            --preview-panel-bg: var(--accent-yellow);
             --icon-stroke-color: var(--accent-color);
             color-scheme: light;
         }
+
         html[data-theme="dark"] {
-            --ink: var(--color-text-primary-dark); --muted: var(--color-text-secondary-dark);
-            --surface: var(--color-surface-dark); --surface-alt: var(--color-background-dark);
-            --border-color: var(--color-divider-dark); --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --preview-panel-bg: #343a55;
-            --icon-stroke-color: #9BAADD;
+            --ink: var(--color-text-primary-dark);
+            --muted: var(--color-text-secondary-dark);
+            --surface: var(--color-surface-dark);
+            --surface-alt: var(--color-background-dark);
+            --border-color: var(--color-divider-dark);
+            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --preview-panel-bg: #8B7518;
+            --icon-stroke-color: var(--accent-yellow);
             color-scheme: dark;
         }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { height: 100vh; margin: 0; background-color: var(--surface); font-family: var(--font-family-sans); color: var(--ink); overflow: hidden; padding: 25px; }
-        
-        .container { 
-            max-width: 1200px; margin: 0 auto; display: grid; 
-            grid-template-columns: 3fr 2fr; 
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100vh;
+            margin: 0;
+            background-color: var(--surface);
+            font-family: var(--font-family-sans);
+            color: var(--ink);
+            overflow: hidden;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 3fr 2fr;
             grid-template-rows: auto 1fr;
-            gap: 20px; height: calc(100vh - 50px);
+            gap: 20px;
+            height: calc(100vh - 50px);
             transition: filter 0.5s ease-in-out;
         }
-        .container.loading { filter: blur(5px); pointer-events: none; }
-        
-        .panel { background: var(--surface-alt); border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--panel-shadow); overflow: hidden; display: flex; flex-direction: column; }
-        header.panel { grid-column: 1 / -1; height: 65px; display: flex; flex-direction: row; align-items: center; gap: var(--space-3); padding: var(--space-4); overflow: visible; }
-        header h1 { font-size: var(--font-size-h1); font-weight: var(--font-weight-emphasis); margin: 0; }
-        header .sub { color: var(--muted); }
-        .theme-switcher { margin-left: auto; display:flex; align-items:center; gap: 8px;}
-        .back-to-home { width: 36px; height: 36px; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; text-decoration: none; flex-shrink: 0; }
-        .back-to-home:hover { background-color: var(--surface-alt); }
-        .back-to-home svg { width: 18px; height: 18px; }
-        #theme-toggle, #wiki-open-btn { width: 36px; height: 36px; padding: 0; border-radius: 50%; background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); font-size: 18px; display: grid; place-items: center; cursor: pointer; transition: all var(--duration-standard) ease; flex-shrink: 0; }
-        #theme-toggle:hover, #wiki-open-btn:hover { background-color: var(--surface-alt); }
 
-        .controls-panel { gap: 0; }
-        .panel-section { padding: var(--space-4); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-        .panel-section-selectors-container { display: flex; gap: 20px; flex-grow: 1; min-height: 0; padding: var(--space-4) var(--space-4); }
-        .panel-section-selectors-container .control-section { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-        .panel-section-selectors-container .section-content { flex-grow: 1; }
+        .container.loading {
+            filter: blur(5px);
+            pointer-events: none;
+        }
 
-        .search-bar { display: flex; align-items: center; gap: 10px; background-color: var(--surface); border-radius: var(--radius-md); padding: 0 12px; height: 40px; }
-        .search-bar svg { width: 16px; height: 16px; stroke: var(--muted); flex-shrink: 0; }
-        #search-input { width: 100%; height: 100%; border: none; background: transparent; outline: none; color: var(--ink); font-size: 14px; }
-        .selector-item.hidden { display: none; }
+        .panel {
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--panel-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header.panel {
+            grid-column: 1 / -1;
+            height: 65px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            overflow: visible;
+        }
+
+        header h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+            margin: 0;
+        }
+
+        header .sub {
+            color: var(--muted);
+        }
+
+        .theme-switcher {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        #theme-toggle,
+        #wiki-open-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            flex-shrink: 0;
+        }
+
+        #theme-toggle:hover,
+        #wiki-open-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .controls-panel {
+            gap: 0;
+        }
+
+        .panel-section {
+            padding: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .panel-section-selectors-container {
+            display: flex;
+            gap: 20px;
+            flex-grow: 1;
+            min-height: 0;
+            padding: var(--space-4) var(--space-4);
+        }
+
+        .panel-section-selectors-container .control-section {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-section-selectors-container .section-content {
+            flex-grow: 1;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--surface);
+            border-radius: var(--radius-md);
+            padding: 0 12px;
+            height: 40px;
+        }
+
+        .search-bar svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--muted);
+            flex-shrink: 0;
+        }
+
+        #search-input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            color: var(--ink);
+            font-size: 14px;
+        }
+
+        .selector-item.hidden {
+            display: none;
+        }
 
         .control-section .section-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding-bottom: 12px; border-bottom: 1px solid var(--border-color);
-            margin-bottom: 12px; flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            flex-shrink: 0;
         }
-        .control-section h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 0; padding: 0; border: none; }
-        
+
+        .control-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
         .section-content {
             overflow-y: auto;
             padding-right: 8px;
         }
 
-        .section-content::-webkit-scrollbar { width: 2px; }
-        .section-content::-webkit-scrollbar-track { background: transparent; }
-        .section-content::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 5px; }
-        .section-content::-webkit-scrollbar-thumb:hover { background-color: var(--muted); }
+        .section-content::-webkit-scrollbar {
+            width: 2px;
+        }
 
-        .selector-grid { display: grid; grid-template-columns: repeat(auto-fill, 48px); gap: 16px; justify-content: start; }
-        .selector-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px; border-radius: var(--radius-md); }
-        
+        .section-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .section-content::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 5px;
+        }
+
+        .section-content::-webkit-scrollbar-thumb:hover {
+            background-color: var(--muted);
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 48px);
+            gap: 16px;
+            justify-content: start;
+        }
+
+        .selector-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            border-radius: var(--radius-md);
+        }
+
         .selector-icon {
-            width: 40px; height: 40px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
             cursor: pointer;
             border-radius: var(--radius-sm);
             border: 0px solid transparent;
             padding: 2px;
         }
+
         .selector-item.active {
             background-color: var(--accent-color-tint);
         }
+
         .selector-item.active .selector-icon {
             border-color: var(--accent-color);
         }
+
         html[data-theme="dark"] .selector-item.active {
-            background-color: rgba(73, 86, 140, 0.4);
+            background-color: var(--accent-color-tint);
         }
-        
-        .selector-name { font-size: 9px; color: var(--muted); text-transform: capitalize; }
-        
-        .canvas-panel { background-image: none; }
-        
-        #saved-icons-container { 
-            flex-grow: 1; 
-            min-height: 0; 
-            overflow-y: auto; 
+
+        .selector-name {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: capitalize;
+        }
+
+        .canvas-panel {
+            background-image: none;
+        }
+
+        #saved-icons-container {
+            flex-grow: 1;
+            min-height: 0;
+            overflow-y: auto;
             padding: var(--space-4);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
-        #saved-icons-grid { 
-            display: flex; 
+
+        #saved-icons-grid {
+            display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 12px; 
-            width: 398px; /* (70px * 5) + (12px * 4) */
+            gap: 12px;
+            width: 398px;
+            /* (70px * 5) + (12px * 4) */
         }
 
-        .saved-icon-card { 
-            position: relative; width: 70px; height: 70px; border: none; padding: 6px;
-            border-radius: 8px; box-shadow: 0 2px 6px rgba(50, 48, 79, 0.15); 
-            cursor: pointer; transition: all 0.2s ease; background-color: var(--surface-alt);
+        .saved-icon-card {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            border: none;
+            padding: 6px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(50, 48, 79, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--surface-alt);
             flex-shrink: 0;
         }
-        .saved-icon-card.selected { box-shadow: 0 0 0 2px var(--accent-color); }
-        .saved-icon-card img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .delete-icon-btn { 
-            position: absolute; top: -4px; right: -4px; 
-            width: 16px; height: 16px; border-radius: 50%; 
-            background-color: #ffffff; color: var(--muted); 
-            border: 0px solid var(--border-color); box-shadow: 0 1px 3px rgba(44, 41, 54, 0.515);
-            font-size: 16px; color: #3d405a; cursor: pointer; 
-            display: grid; place-items: center; transition: all 0.2s ease;
+
+        .saved-icon-card.selected {
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .saved-icon-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .delete-icon-btn {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            color: var(--muted);
+            border: 0px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(44, 41, 54, 0.515);
+            font-size: 16px;
+            color: #3d405a;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s ease;
             opacity: 0;
             transform: scale(0.8);
         }
+
         .saved-icon-card:hover .delete-icon-btn {
             opacity: 1;
             transform: scale(1);
         }
-        .delete-icon-btn:hover { transform: scale(1.1); color: var(--ink); border-color: var(--muted); }
-        
+
+        .delete-icon-btn:hover {
+            transform: scale(1.1);
+            color: var(--ink);
+            border-color: var(--muted);
+        }
+
         .empty-state {
             display: flex;
             align-items: center;
@@ -201,7 +448,7 @@
             gap: 10px;
             min-height: 70px;
         }
-        
+
         .panel-section-preview {
             display: flex;
             justify-content: space-between;
@@ -209,23 +456,28 @@
             background-color: var(--preview-panel-bg);
             border-bottom-color: transparent;
         }
+
         .panel-section-preview .icon-name {
             color: var(--color-accent-text);
         }
+
         .panel-section-preview .preview-viewer-container {
             border-color: rgba(255, 255, 255, 0.2);
             box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.3);
         }
+
         .panel-section-preview .btn-secondary-on-dark {
             background-color: transparent;
             color: var(--color-accent-text);
             border: 1px solid rgba(255, 255, 255, 0.8);
             box-shadow: none;
         }
+
         .panel-section-preview .btn-secondary-on-dark:hover:not(:disabled) {
             background-color: rgba(255, 255, 255, 0.1);
             border-color: var(--color-accent-text);
         }
+
         .panel-section-preview .btn-secondary-on-dark:disabled {
             background-color: transparent;
             border-color: rgba(255, 255, 255, 0.4);
@@ -234,106 +486,221 @@
         }
 
 
-        .preview-group { display: flex; align-items: center; gap: 12px; }
+        .preview-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .preview-viewer-container {
-            width: 100px; height: 100px;
-            background-color: var(--surface); border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg); display: grid; place-items: center;
+            width: 100px;
+            height: 100px;
+            background-color: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            display: grid;
+            place-items: center;
             box-shadow: 0 4px 12px -2px rgba(104, 104, 104, 0.15);
             margin-top: 0px;
             flex-shrink: 0;
         }
+
         .preview-viewer {
             width: 70px;
             height: 70px;
             object-fit: contain;
             visibility: hidden;
         }
-        .icon-name { font-size: 18px; font-weight: 500; color: var(--ink); }
-        .footer-actions { display: flex; align-items: center; gap: 8px; }
-        
-        .btn { 
-            display: inline-flex; align-items: center; justify-content: center; 
-            width: 100%; cursor: pointer; font-weight: var(--font-weight-emphasis); 
-            font-size: 12px;
-            border-radius: var(--radius-md); height: 36px;
-            padding: 0 16px;
-            border: none; transition: all 150ms ease; flex-shrink: 0;
-        }
-        #add-icon-btn, #copy-svg-btn { width: auto; }
-        
-        .btn:hover:not(:disabled) { transform: translateY(-1px); }
-        .btn:disabled { cursor: not-allowed; transform: none; }
-        
-        .btn-primary { 
-            background-color: var(--accent-color); 
-            color: var(--color-accent-text); box-shadow: 0 4px 10px -2px rgba(73, 86, 140, 0.4); 
-        }
-        .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
-        .btn-primary:disabled {
-            background-color: var(--accent-color);
-            opacity: 0.5; color: var(--color-accent-text); border: none;
-        }
-        
-        .btn-secondary { background-color: var(--surface); color: var(--ink); border: 1px solid var(--border-color); }
-        .btn-secondary:disabled { background-color: var(--surface); color: var(--muted); border: 1px solid var(--border-color); opacity: 1; }
-        
-        .toast {
-            position: fixed; bottom: 20px; left: 50%;
-            transform: translateX(-50%); background-color: #333; color: white;
-            padding: 12px 24px; border-radius: var(--radius-md);
-            font-size: 14px; z-index: 1000;
-            animation: fade-in-out 3s ease-in-out forwards;
-        }
-        @keyframes fade-in-out {
-            0% { opacity: 0; bottom: 0px; } 10% { opacity: 1; bottom: 20px; }
-            90% { opacity: 1; bottom: 20px; } 100% { opacity: 0; bottom: 0px; }
+
+        .icon-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--ink);
         }
 
-        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
-        .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
-        .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
+        .footer-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            cursor: pointer;
+            font-weight: var(--font-weight-emphasis);
+            font-size: 12px;
+            border-radius: var(--radius-md);
+            height: 36px;
+            padding: 0 16px;
+            border: none;
+            transition: all 150ms ease;
+            flex-shrink: 0;
+        }
+
+        #add-icon-btn,
+        #copy-svg-btn {
+            width: auto;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--color-accent-text);
+            box-shadow: 0 4px 10px -2px var(--accent-color-tint);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:disabled {
+            background-color: var(--accent-color);
+            opacity: 0.5;
+            color: var(--color-accent-text);
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:disabled {
+            background-color: var(--surface);
+            color: var(--muted);
+            border: 1px solid var(--border-color);
+            opacity: 1;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            z-index: 1000;
+            animation: fade-in-out 3s ease-in-out forwards;
+        }
+
+        @keyframes fade-in-out {
+            0% {
+                opacity: 0;
+                bottom: 0px;
+            }
+
+            10% {
+                opacity: 1;
+                bottom: 20px;
+            }
+
+            90% {
+                opacity: 1;
+                bottom: 20px;
+            }
+
+            100% {
+                opacity: 0;
+                bottom: 0px;
+            }
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wiki-modal-content {
+            background: var(--surface-alt);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-floating-3);
+            z-index: 2001;
+            width: 800px;
+            max-width: 90vw;
+            max-height: 80vh;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         .wiki-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: var(--space-4);
-          flex-shrink: 0;
-          position: relative;
-          height: 80px;
-          color: white;
-          background-image: url('modal.png');
-          background-size: cover;
-          background-position: center bottom;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-4);
+            flex-shrink: 0;
+            position: relative;
+            height: 80px;
+            color: white;
+            background-image: url('modal.png');
+            background-size: cover;
+            background-position: center bottom;
         }
+
         .wiki-header::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
-          z-index: 1;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+            z-index: 1;
         }
-        .wiki-header h3, #wiki-close-btn {
-          position: relative;
-          z-index: 2;
-          text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
+
+        .wiki-header h3,
         #wiki-close-btn {
-          background: none;
-          border: none;
-          font-size: 24px;
-          line-height: 1;
-          padding: 0;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          color: var(--color-accent-text);
-          cursor: pointer;
-          transition: background-color 0.2s ease;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
+
+        #wiki-close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--color-accent-text);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
         #wiki-close-btn:hover {
-          background-color: rgba(255,255,255,0.1);
+            background-color: rgba(255, 255, 255, 0.1);
         }
+
         #wiki-content {
             padding: var(--space-5);
             overflow: hidden;
@@ -341,52 +708,57 @@
             display: flex;
             gap: var(--space-5);
         }
+
         .wiki-column {
             flex: 1;
             min-width: 0;
         }
+
         #wiki-content h4 {
             margin-top: 0;
             margin-bottom: var(--space-3);
             font-weight: var(--font-weight-emphasis);
             color: var(--accent-color);
         }
-        
+
         .splash-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background-color: rgba(0,0,0,0.1);
-          -webkit-backdrop-filter: blur(4px);
-          backdrop-filter: blur(4px);
-          z-index: 9999;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          opacity: 1;
-          transition: opacity 0.5s ease-out;
-          cursor: pointer;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            cursor: pointer;
         }
+
         .splash-overlay.hidden {
-          opacity: 0;
-          pointer-events: none;
+            opacity: 0;
+            pointer-events: none;
         }
+
         .splash-content {
-          display: flex;
-          width: 800px;
-          height: 450px;
-          max-width: 90vw;
-          max-height: 80vh;
-          background: var(--surface-alt);
-          border-radius: var(--radius-md);
-          box-shadow: var(--shadow-floating-3);
-          overflow: hidden;
-          cursor: default;
-          position: relative;
+            display: flex;
+            width: 800px;
+            height: 450px;
+            max-width: 90vw;
+            max-height: 80vh;
+            background: var(--surface-alt);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-floating-3);
+            overflow: hidden;
+            cursor: default;
+            position: relative;
         }
-         #splash-close-btn {
+
+        #splash-close-btn {
             position: absolute;
             top: var(--space-3);
             right: var(--space-3);
@@ -405,11 +777,13 @@
             transition: all var(--duration-standard) ease;
             z-index: 10;
         }
+
         #splash-close-btn:hover {
             background-color: var(--surface-alt);
             color: var(--ink);
             transform: scale(1.1);
         }
+
         .splash-info {
             flex: 0 0 300px;
             padding: var(--space-5);
@@ -419,45 +793,54 @@
             color: var(--ink);
             border-left: 4px solid var(--accent-color);
         }
+
         .splash-icon {
             font-size: 32px;
             margin-bottom: var(--space-4);
         }
+
         .splash-title {
             font-size: 24px;
             font-weight: var(--font-weight-emphasis);
             color: var(--accent-color);
             margin-bottom: var(--space-5);
         }
+
         .splash-tech {
             margin: 0;
             color: var(--muted);
             line-height: 1.6;
         }
+
         .splash-credits {
             margin-top: auto;
             font-size: var(--font-size-caption);
             color: var(--muted);
         }
+
         .splash-image {
             flex: 1;
             background-color: var(--surface);
         }
+
         .splash-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
         .splash-progress {
             margin-top: var(--space-4);
             width: 100%;
         }
+
         #splash-progress-text {
             font-size: var(--font-size-caption);
             color: var(--muted);
             margin-bottom: var(--space-2);
             display: block;
         }
+
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -465,6 +848,7 @@
             border-radius: 4px;
             overflow: hidden;
         }
+
         .progress-bar-inner {
             width: 0%;
             height: 100%;
@@ -472,42 +856,46 @@
             border-radius: 4px;
             transition: width 0.3s ease;
         }
-        
     </style>
 </head>
+
 <body>
     <div class="splash-overlay" id="splash-screen">
-      <div class="splash-content">
-        <button id="splash-close-btn" title="Close" disabled>&times;</button>
-        <div class="splash-info">
-          <span class="splash-icon">🛠️</span>
-          <h2 class="splash-title">Icon Factory</h2>
-          <p class="splash-tech">Combines pre-designed vector shapes locally in your browser. Your creations are never uploaded.</p>
-          <div class="splash-progress">
-              <span id="splash-progress-text">Loading assets...</span>
-              <div class="progress-bar">
-                  <div id="progress-bar-inner" class="progress-bar-inner"></div>
-              </div>
-          </div>
-          <p class="splash-credits">2025. Toolkit by e</p>
+        <div class="splash-content">
+            <button id="splash-close-btn" title="Close" disabled>&times;</button>
+            <div class="splash-info">
+                <span class="splash-icon">🛠️</span>
+                <h2 class="splash-title">Icon Factory</h2>
+                <p class="splash-tech">Combines pre-designed vector shapes locally in your browser. Your creations are
+                    never uploaded.</p>
+                <div class="splash-progress">
+                    <span id="splash-progress-text">Loading assets...</span>
+                    <div class="progress-bar">
+                        <div id="progress-bar-inner" class="progress-bar-inner"></div>
+                    </div>
+                </div>
+                <p class="splash-credits">2025. Toolkit by e</p>
+            </div>
+            <div class="splash-image">
+                <img src="modal.png" alt="Icon Factory Splash Image">
+            </div>
         </div>
-        <div class="splash-image">
-          <img src="modal.png" alt="Icon Factory Splash Image">
-        </div>
-      </div>
     </div>
 
     <div class="container loading" id="app-container">
         <header class="panel">
-          <a href="../index.html" class="back-to-home" title="Return to Home">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
-          </a>
-          <h1>Icon Factory</h1>
-          <div class="sub">Combine shapes to create custom icons.</div>
-          <div class="theme-switcher">
-            <button id="wiki-open-btn" title="Info">ⓘ</button>
-            <button id="theme-toggle" title="Change theme"></button>
-          </div>
+            <a href="../index.html" class="back-to-home" title="Return to Home">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </a>
+            <h1>Icon Factory</h1>
+            <div class="sub">Combine shapes to create custom icons.</div>
+            <div class="theme-switcher">
+                <button id="wiki-open-btn" title="Info">ⓘ</button>
+                <button id="theme-toggle" title="Change theme"></button>
+            </div>
         </header>
 
         <div class="controls-panel panel">
@@ -525,7 +913,10 @@
             </div>
             <div class="panel-section">
                 <div class="search-bar">
-                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
                     <input type="text" id="search-input" placeholder="Search icons...">
                 </div>
             </div>
@@ -564,45 +955,45 @@
         </main>
     </div>
     <div id="wiki-overlay" class="popup-overlay"></div>
-    
+
     <script>
         const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
-        
+
         let ICON_NAMES = {};
-        let KEYWORDS = {}; 
+        let KEYWORDS = {};
         let SVG_CACHE = { frames: {}, particles: {} };
 
         const AVAILABLE_FRAMES = [
-            'book.svg', 'box.svg', 'brain.svg', 'calendar.svg', 'cart.svg', 'caution.svg', 
-            'cloud.svg', 'company.svg', 'compass.svg', 'cube.svg', 'cuecards.svg', 
-            'database.svg', 'destination.svg', 'exchange.svg', 'factory.svg', 'folder.svg', 'gear.svg', 
-            'glass.svg', 'heart.svg', 'house.svg', 'institute.svg', 'internet.svg', 'items.svg', 
-            'laptop.svg', 'linechart.svg', 'list.svg', 'magnifying.svg', 'mail.svg', 
-            'map.svg', 'message.svg', 'notepad.svg', 'page.svg', 'person.svg', 'phone.svg', 
-            'piechart.svg', 'portfolio.svg', 'postit.svg', 'profile.svg', 'shield.svg', 'star.svg', 
-            'storage.svg', 'store.svg', 'survey.svg', 'swap.svg', 'tablet.svg', 'team.svg', 
-            'tool.svg', 'trifold.svg', 'umbrella.svg', 'wall.svg', 'warehouse.svg', 'web.svg', 
+            'book.svg', 'box.svg', 'brain.svg', 'calendar.svg', 'cart.svg', 'caution.svg',
+            'cloud.svg', 'company.svg', 'compass.svg', 'cube.svg', 'cuecards.svg',
+            'database.svg', 'destination.svg', 'exchange.svg', 'factory.svg', 'folder.svg', 'gear.svg',
+            'glass.svg', 'heart.svg', 'house.svg', 'institute.svg', 'internet.svg', 'items.svg',
+            'laptop.svg', 'linechart.svg', 'list.svg', 'magnifying.svg', 'mail.svg',
+            'map.svg', 'message.svg', 'notepad.svg', 'page.svg', 'person.svg', 'phone.svg',
+            'piechart.svg', 'portfolio.svg', 'postit.svg', 'profile.svg', 'shield.svg', 'star.svg',
+            'storage.svg', 'store.svg', 'survey.svg', 'swap.svg', 'tablet.svg', 'team.svg',
+            'tool.svg', 'trifold.svg', 'umbrella.svg', 'wall.svg', 'warehouse.svg', 'web.svg',
             'world1.svg', 'world2.svg', 'world3.svg'
         ];
-        
+
         const AVAILABLE_PARTICLES = [
-            'agile.svg', 'art.svg', 'atom.svg', 'barcode.svg', 'basketball.svg', 'bill.svg', 
-            'bolt.svg', 'brain1.svg', 'brain2.svg', 'broken.svg', 'bullseye.svg', 'camera.svg', 
+            'agile.svg', 'art.svg', 'atom.svg', 'barcode.svg', 'basketball.svg', 'bill.svg',
+            'bolt.svg', 'brain1.svg', 'brain2.svg', 'broken.svg', 'bullseye.svg', 'camera.svg',
             'card.svg', 'cart.svg', 'cat.svg', 'caution.svg', 'certification.svg', 'chain.svg',
-            'chart.svg', 'chat.svg', 'chess.svg', 'city.svg', 'clip.svg', 'clock.svg', 'cloud.svg', 
-            'cog.svg', 'coins.svg', 'controls.svg', 'cube.svg', 'dead.svg', 'decrease.svg', 
-            'design.svg', 'diamond.svg', 'direction.svg', 'dish.svg', 'dna.svg', 'dog.svg', 
-            'expand.svg', 'factory.svg', 'fingerprint.svg', 'flag.svg', 'funnel.svg', 'government.svg', 
-            'happy.svg', 'health.svg', 'heart.svg', 'honeycomb.svg', 'house.svg', 'increase.svg', 
-            'key.svg', 'laptop.svg', 'leaf.svg', 'lightbulb.svg', 'loop.svg', 'magnifier.svg', 
-            'megaphone.svg', 'meter.svg', 'money.svg', 'music.svg', 'no.svg', 'package.svg', 
-            'phone.svg', 'piechart.svg', 'pin.svg', 'puzzle.svg', 'question.svg', 'recycle.svg', 
-            'robot.svg', 'rocket.svg', 'sad.svg', 'safe.svg', 'signature.svg', 'soccer.svg', 
-            'storage.svg', 'tag.svg', 'tap.svg', 'target.svg', 'time.svg', 'tools.svg', 
-            'trash.svg', 'tree.svg', 'trophy.svg', 'truck.svg', 'umbrella.svg', 'venn.svg', 
+            'chart.svg', 'chat.svg', 'chess.svg', 'city.svg', 'clip.svg', 'clock.svg', 'cloud.svg',
+            'cog.svg', 'coins.svg', 'controls.svg', 'cube.svg', 'dead.svg', 'decrease.svg',
+            'design.svg', 'diamond.svg', 'direction.svg', 'dish.svg', 'dna.svg', 'dog.svg',
+            'expand.svg', 'factory.svg', 'fingerprint.svg', 'flag.svg', 'funnel.svg', 'government.svg',
+            'happy.svg', 'health.svg', 'heart.svg', 'honeycomb.svg', 'house.svg', 'increase.svg',
+            'key.svg', 'laptop.svg', 'leaf.svg', 'lightbulb.svg', 'loop.svg', 'magnifier.svg',
+            'megaphone.svg', 'meter.svg', 'money.svg', 'music.svg', 'no.svg', 'package.svg',
+            'phone.svg', 'piechart.svg', 'pin.svg', 'puzzle.svg', 'question.svg', 'recycle.svg',
+            'robot.svg', 'rocket.svg', 'sad.svg', 'safe.svg', 'signature.svg', 'soccer.svg',
+            'storage.svg', 'tag.svg', 'tap.svg', 'target.svg', 'time.svg', 'tools.svg',
+            'trash.svg', 'tree.svg', 'trophy.svg', 'truck.svg', 'umbrella.svg', 'venn.svg',
             'virus.svg', 'volleyball.svg', 'wifi.svg', 'world.svg', 'yes.svg'
         ];
-        
+
         const state = {
             selectedFrame: null,
             selectedParticle: null,
@@ -626,8 +1017,8 @@
 
         const dom = {};
         const ids = ['frame-grid', 'particle-grid', 'preview-viewer', 'add-icon-btn', 'download-all-btn', 'copy-svg-btn', 'saved-icons-grid', 'empty-state-message', 'app-container', 'theme-toggle', 'icon-name-display', 'search-input', 'clean-collection-btn', 'splash-screen', 'splash-close-btn', 'wiki-open-btn', 'wiki-overlay', 'splash-progress-text', 'progress-bar-inner'];
-        ids.forEach(id => dom[id.replace(/-(\w)/g, (_,c)=>c.toUpperCase())] = document.getElementById(id));
-        
+        ids.forEach(id => dom[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id));
+
         function showToast(message) {
             const toast = document.createElement('div');
             toast.className = 'toast';
@@ -641,7 +1032,7 @@
         const saveCollectionToLocalStorage = () => {
             localStorage.setItem('iconFactoryCollection', JSON.stringify(savedIcons));
         };
-        
+
         const loadCollectionFromLocalStorage = () => {
             const storedIcons = localStorage.getItem('iconFactoryCollection');
             if (storedIcons) {
@@ -680,32 +1071,32 @@
                     const name = item.querySelector('.selector-name').textContent.toLowerCase();
                     const fileName = name + '.svg';
                     const keywords = keywordData[fileName] || [];
-                    
-                    const isMatch = searchWords.some(word => 
+
+                    const isMatch = searchWords.some(word =>
                         name.includes(word) || keywords.some(kw => kw.toLowerCase().includes(word))
                     );
-                    
+
                     item.classList.toggle('hidden', !isMatch);
                 });
             };
             filterGrid('frame-grid', KEYWORDS.frames || {});
             filterGrid('particle-grid', KEYWORDS.particles || {});
-            
+
             autoSelectFirstVisible();
             mainUpdater();
         }
-        
+
         async function createIconCard(icon) {
             const card = document.createElement('div');
             card.className = 'saved-icon-card';
             card.dataset.iconId = icon.id;
             card.classList.toggle('selected', selectedIconIds.includes(icon.id));
             card.addEventListener('click', () => handleSelectIcon(icon.id));
-            
+
             const img = document.createElement('img');
             const previewSvgText = await generateFinalSvg({ ...icon, outputSize: 100 });
             img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(previewSvgText)}`;
-            
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-icon-btn';
             deleteBtn.innerHTML = '&times;';
@@ -713,7 +1104,7 @@
                 e.stopPropagation();
                 handleDeleteIcon(icon.id);
             });
-            
+
             card.appendChild(img);
             card.appendChild(deleteBtn);
             return card;
@@ -725,29 +1116,29 @@
                 return;
             }
             if (!state.selectedFrame || !state.selectedParticle) return;
-            
+
             const newIcon = { id: Date.now(), frame: state.selectedFrame, particle: state.selectedParticle };
             savedIcons.push(newIcon);
             selectedIconIds = [newIcon.id];
-            
+
             if (savedIcons.length === 1) {
                 dom.savedIconsGrid.innerHTML = '';
             }
-            
+
             const newCard = await createIconCard(newIcon);
             dom.savedIconsGrid.appendChild(newCard);
-            
+
             document.querySelectorAll('.saved-icon-card.selected').forEach(c => c.classList.remove('selected'));
             newCard.classList.add('selected');
 
             saveCollectionToLocalStorage();
             mainUpdater();
         }
-        
+
         function handleDeleteIcon(idToDelete) {
             savedIcons = savedIcons.filter(icon => icon.id !== idToDelete);
             selectedIconIds = selectedIconIds.filter(id => id !== idToDelete);
-            
+
             const cardToRemove = dom.savedIconsGrid.querySelector(`[data-icon-id="${idToDelete}"]`);
             if (cardToRemove) {
                 cardToRemove.remove();
@@ -756,7 +1147,7 @@
             if (savedIcons.length === 0) {
                 dom.savedIconsGrid.appendChild(dom.emptyStateMessage);
             }
-            
+
             saveCollectionToLocalStorage();
             mainUpdater();
         }
@@ -769,28 +1160,28 @@
             }
 
             selectedIconIds = [idToSelect];
-            
+
             document.querySelectorAll('.saved-icon-card.selected').forEach(c => c.classList.remove('selected'));
             const cardToSelect = dom.savedIconsGrid.querySelector(`[data-icon-id="${idToSelect}"]`);
             if (cardToSelect) {
                 cardToSelect.classList.add('selected');
             }
-            
+
             mainUpdater();
         }
 
-        async function fullRenderSavedIcons() { 
+        async function fullRenderSavedIcons() {
             const grid = dom.savedIconsGrid;
-            grid.innerHTML = ''; 
-            if (savedIcons.length === 0) { 
-                grid.appendChild(dom.emptyStateMessage); 
+            grid.innerHTML = '';
+            if (savedIcons.length === 0) {
+                grid.appendChild(dom.emptyStateMessage);
             } else {
                 const cardPromises = savedIcons.map(icon => createIconCard(icon));
                 const cards = await Promise.all(cardPromises);
                 cards.forEach(card => grid.appendChild(card));
             }
         }
-        
+
         function handleCleanCollection() {
             if (savedIcons.length === 0) return;
             savedIcons = [];
@@ -803,7 +1194,7 @@
 
         async function handleCopyAction() {
             if (!state.selectedFrame || !state.selectedParticle) return;
-            
+
             try {
                 const svgText = await generateFinalSvg({
                     frame: state.selectedFrame,
@@ -828,7 +1219,7 @@
                 showToast("Failed to copy SVG.");
             }
         }
-        
+
         async function handleDownloadAll() {
             if (savedIcons.length < 2) {
                 showToast("You need to add at least 2 icons to download a collection.");
@@ -836,7 +1227,7 @@
             }
             dom.downloadAllBtn.disabled = true; dom.downloadAllBtn.textContent = "Processing..."; const zip = new JSZip(); const generationPromises = savedIcons.map(iconConfig => generateFinalSvg({ ...iconConfig, outputSize: 64, color: '#000000' })); try { const svgs = await Promise.all(generationPromises); svgs.forEach((svgText, index) => { const iconConfig = savedIcons[index]; const filename = getCustomIconName(iconConfig.frame, iconConfig.particle) + ".svg"; zip.file(filename, svgText); }); const content = await zip.generateAsync({ type: "blob" }); downloadFile(content, "icons_collection.zip", "application/zip"); } catch (error) { console.error("Error generating ZIP file:", error); showToast("An error occurred while generating the ZIP."); } finally { mainUpdater(); dom.downloadAllBtn.textContent = "Download Collection"; }
         }
-        
+
         async function updatePreview() {
             if (state.selectedFrame && state.selectedParticle) {
                 const name = getCustomIconName(state.selectedFrame, state.selectedParticle);
@@ -847,7 +1238,7 @@
                 await updateViewerWithIconConfig({ frame: 'book.svg', particle: 'agile.svg', isPlaceholder: true });
             }
         }
-        
+
         async function updateViewerWithIconConfig(iconConfig) {
             try {
                 const svgText = await generateFinalSvg({ ...iconConfig, outputSize: 100 });
@@ -868,7 +1259,7 @@
             finalSvg.setAttribute('xmlns', SVG_NAMESPACE);
             const masterGroup = document.createElementNS(SVG_NAMESPACE, 'g');
             masterGroup.setAttribute('transform', 'translate(5, 5)');
-            
+
             const strokeColor = color ? color : getComputedStyle(document.body).getPropertyValue('--icon-stroke-color').trim();
             masterGroup.setAttribute('stroke', isPlaceholder ? '#9A9A9E' : strokeColor);
 
@@ -883,7 +1274,7 @@
         }
 
         function createTransformedGroup(sourceSvg, targetX, targetY, targetWidth, targetHeight) { let viewBox = sourceSvg.getAttribute('viewBox'); if (!viewBox) { const w = sourceSvg.getAttribute('width')?.replace('px', ''); const h = sourceSvg.getAttribute('height')?.replace('px', ''); if (!w || !h) throw new Error('Source SVG has no viewBox or width/height.'); viewBox = `0 0 ${w} ${h}`; } const [vx, vy, vw, vh] = viewBox.split(' ').map(parseFloat); const scale = Math.min(targetWidth / vw, targetHeight / vh); const finalX = targetX + (targetWidth - vw * scale) / 2; const finalY = targetY + (targetHeight - vh * scale) / 2; const transform = `translate(${finalX}, ${finalY}) scale(${scale}) translate(${-vx}, ${-vy})`; const group = document.createElementNS(SVG_NAMESPACE, 'g'); group.setAttribute('transform', transform); const allowedTags = ['path', 'g', 'circle', 'rect', 'polygon', 'polyline', 'line']; for (const node of sourceSvg.children) { if (allowedTags.includes(node.tagName.toLowerCase())) { const clone = node.cloneNode(true); clone.querySelectorAll('*').forEach(el => el.removeAttribute('style')); clone.removeAttribute('style'); group.appendChild(clone); } } return group; }
-        
+
         function mainUpdater() {
             const isEditorSelectionComplete = state.selectedFrame && state.selectedParticle;
             dom.addIconBtn.disabled = !isEditorSelectionComplete;
@@ -892,7 +1283,7 @@
             updatePreview();
             updateActiveStates();
         }
-        
+
         async function generateSelectorIconSvg(iconFile, svgText, strokeWidth) {
             const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml').documentElement;
             const finalSvg = document.createElementNS(SVG_NAMESPACE, 'svg');
@@ -919,15 +1310,15 @@
             for (const itemFile of items) {
                 const itemWrapper = document.createElement('div');
                 itemWrapper.className = 'selector-item';
-                
+
                 const img = document.createElement('img');
                 img.className = 'selector-icon';
                 img.src = await generateSelectorIconSvg(itemFile, svgData[itemFile], config.strokeWidth);
-                
+
                 const name = document.createElement('span');
                 name.className = 'selector-name';
                 name.textContent = itemFile.replace('.svg', '');
-                
+
                 itemWrapper.appendChild(img);
                 itemWrapper.appendChild(name);
                 itemWrapper.addEventListener('click', () => {
@@ -938,7 +1329,7 @@
                 container.appendChild(itemWrapper);
             }
         }
-        
+
         function updateActiveStates() {
             document.querySelectorAll('#frame-grid .selector-item').forEach((item, i) => {
                 item.classList.toggle('active', AVAILABLE_FRAMES[i] === state.selectedFrame);
@@ -949,13 +1340,13 @@
         }
 
         function downloadFile(content, fileName, contentType = 'application/zip') { const blob = new Blob([content], { type: contentType }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); }
-        
+
         function updateViewer(svgText) {
             dom.previewViewer.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgText);
             dom.previewViewer.style.visibility = 'visible';
         }
         function showPlaceholder(message) { const placeholderSvg = `<svg xmlns="${SVG_NAMESPACE}" width="100%" height="100%"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16px" fill="#6c757d">${message}</text></svg>`; updateViewer(placeholderSvg); }
-        
+
         function formatIconName(frame, particle) {
             const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
             return `${capitalize(frame.replace('.svg', ''))} ${capitalize(particle.replace('.svg', ''))}`;
@@ -966,32 +1357,32 @@
             }
             return formatIconName(frame, particle);
         }
-        
-        const ThemeApp = { 
-            THEMES: ['light', 'dark', 'system'], 
+
+        const ThemeApp = {
+            THEMES: ['light', 'dark', 'system'],
             THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
-            
+
             init(rerenderCallback) {
                 this.rerenderCallback = rerenderCallback;
                 const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
                 this.setTheme(savedTheme, false);
                 dom.themeToggle.addEventListener('click', () => this.cycleTheme());
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { 
-                    if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system'); 
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
                 });
             },
-            
-            setTheme(theme, save = true) { 
-                if (save) localStorage.setItem('creative-toolkit-theme', theme); 
+
+            setTheme(theme, save = true) {
+                if (save) localStorage.setItem('creative-toolkit-theme', theme);
                 this.applyTheme(theme);
-            }, 
-            
-            cycleTheme() { 
-                const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; 
-                const nextTheme = this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]; 
+            },
+
+            cycleTheme() {
+                const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                const nextTheme = this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length];
                 this.setTheme(nextTheme);
-            }, 
-            
+            },
+
             applyTheme(theme) {
                 dom.themeToggle.textContent = this.THEME_ICONS[theme];
                 const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
@@ -999,9 +1390,9 @@
                 if (this.rerenderCallback && state.appReady) {
                     this.rerenderCallback();
                 }
-            } 
+            }
         };
-        
+
         const Db = {
             DB_NAME: 'IconFactoryDB',
             STORE_NAME: 'svgCache',
@@ -1057,7 +1448,7 @@
                 let loadedCount = 0;
                 const totalCount = allFiles.length;
 
-                const fetchPromises = allFiles.map(fileInfo => 
+                const fetchPromises = allFiles.map(fileInfo =>
                     fetch(`./${fileInfo.type}/${fileInfo.name}`)
                         .then(res => res.text())
                         .then(text => {
@@ -1069,14 +1460,14 @@
                 );
 
                 const svgs = await Promise.all(fetchPromises);
-                
+
                 frames = {};
                 particles = {};
                 svgs.forEach(svg => {
                     if (svg.type === 'frames') frames[svg.name] = svg.text;
                     else particles[svg.name] = svg.text;
                 });
-                
+
                 progressCallback(95, "Storing icons in cache...");
                 await Promise.all([
                     Db.set('frames', frames),
@@ -1087,7 +1478,7 @@
             SVG_CACHE.particles = particles;
             progressCallback(100, "Assets ready!");
         }
-        
+
         async function rerenderAllDynamicIcons() {
             await renderSelectorGrid(dom.frameGrid, AVAILABLE_FRAMES, 'selectedFrame', SVG_CACHE.frames);
             await renderSelectorGrid(dom.particleGrid, AVAILABLE_PARTICLES, 'selectedParticle', SVG_CACHE.particles);
@@ -1117,19 +1508,19 @@
         async function init() {
             dom.splashCloseBtn.disabled = true;
             await Promise.all([loadIconNames(), loadKeywords()]);
-            
+
             ThemeApp.init(rerenderAllDynamicIcons);
-            
+
             await loadIconAssets(updateProgress);
             state.appReady = true;
 
             loadCollectionFromLocalStorage();
-            
+
             await renderSelectorGrid(dom.frameGrid, AVAILABLE_FRAMES, 'selectedFrame', SVG_CACHE.frames);
             await renderSelectorGrid(dom.particleGrid, AVAILABLE_PARTICLES, 'selectedParticle', SVG_CACHE.particles);
 
             autoSelectFirstVisible();
-            
+
             dom.addIconBtn.addEventListener('click', handleAddIcon);
             dom.downloadAllBtn.addEventListener('click', handleDownloadAll);
             dom.copySvgBtn.addEventListener('click', handleCopyAction);
@@ -1138,10 +1529,10 @@
             dom.wikiOpenBtn.addEventListener('click', () => openWiki());
             dom.splashScreen.addEventListener('click', (e) => { if (e.target === dom.splashScreen) hideSplashScreen(); });
             dom.splashCloseBtn.addEventListener('click', () => hideSplashScreen());
-            
+
             await fullRenderSavedIcons();
             mainUpdater();
-            
+
             dom.splashCloseBtn.disabled = false;
             dom.appContainer.classList.remove('loading');
         }
@@ -1153,75 +1544,75 @@
                 dom.appContainer.classList.remove('loading');
             }
         }
-        
+
         function openWiki() {
-          if (!dom.wikiOverlay.querySelector('.wiki-modal-content')) {
-              const wikiModal = document.createElement('div');
-              wikiModal.className = 'wiki-modal-content';
-              wikiModal.innerHTML = `
+            if (!dom.wikiOverlay.querySelector('.wiki-modal-content')) {
+                const wikiModal = document.createElement('div');
+                wikiModal.className = 'wiki-modal-content';
+                wikiModal.innerHTML = `
                   <div class="wiki-header">
                     <h3 id="wiki-title">Info</h3>
                     <button id="wiki-close-btn" title="Close">×</button>
                   </div>
                   <div id="wiki-content"></div>`;
-              dom.wikiOverlay.appendChild(wikiModal);
-              dom.wikiOverlay.querySelector('#wiki-close-btn').addEventListener('click', () => closeWiki());
-          }
+                dom.wikiOverlay.appendChild(wikiModal);
+                dom.wikiOverlay.querySelector('#wiki-close-btn').addEventListener('click', () => closeWiki());
+            }
 
-          if (!state.isWikiLoaded) {
-              const WIKI_DATA = {
-                "title": "Icon Factory Info",
-                "sections":[
-                    {
-                        "title":"How to Use",
-                        "content":[
-                            "<b>1. Select Shapes:</b> Choose a 'Frame' and a 'Particle' from the side panels. The preview will update instantly.",
-                            "<b>2. Add to Collection:</b> Click the '+ Add to collection' button to save your new icon design to the right panel.",
-                            "<b>3. Build & Download:</b> Create multiple icons and then click 'Download Collection' to get them all in a single ZIP file."
-                        ]
-                    },
-                    {
-                        "title":"Features",
-                        "content":[
-                           "<b>Instant Previews:</b> See your icon combinations in real-time.",
-                           "<b>Local Caching:</b> Icon assets are cached in your browser for significantly faster load times on subsequent visits.",
-                           "<b>Search & Filter:</b> Use the search bar to quickly find specific frames or particles by name or keyword.",
-                           "<b>Copy & Clean:</b> Click an icon in your collection to edit it, or copy individual icons to your clipboard as SVG."
-                        ]
+            if (!state.isWikiLoaded) {
+                const WIKI_DATA = {
+                    "title": "Icon Factory Info",
+                    "sections": [
+                        {
+                            "title": "How to Use",
+                            "content": [
+                                "<b>1. Select Shapes:</b> Choose a 'Frame' and a 'Particle' from the side panels. The preview will update instantly.",
+                                "<b>2. Add to Collection:</b> Click the '+ Add to collection' button to save your new icon design to the right panel.",
+                                "<b>3. Build & Download:</b> Create multiple icons and then click 'Download Collection' to get them all in a single ZIP file."
+                            ]
+                        },
+                        {
+                            "title": "Features",
+                            "content": [
+                                "<b>Instant Previews:</b> See your icon combinations in real-time.",
+                                "<b>Local Caching:</b> Icon assets are cached in your browser for significantly faster load times on subsequent visits.",
+                                "<b>Search & Filter:</b> Use the search bar to quickly find specific frames or particles by name or keyword.",
+                                "<b>Copy & Clean:</b> Click an icon in your collection to edit it, or copy individual icons to your clipboard as SVG."
+                            ]
+                        }
+                    ]
+                };
+                const titleEl = dom.wikiOverlay.querySelector('#wiki-title');
+                const contentEl = dom.wikiOverlay.querySelector('#wiki-content');
+                titleEl.textContent = WIKI_DATA.title;
+
+                const col1 = document.createElement('div'); col1.className = 'wiki-column';
+                const col2 = document.createElement('div'); col2.className = 'wiki-column';
+
+                WIKI_DATA.sections.forEach((s, index) => {
+                    const sectionContainer = document.createElement('div');
+                    const h4 = document.createElement('h4'); h4.textContent = s.title;
+                    sectionContainer.appendChild(h4);
+                    s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+                    if (index < WIKI_DATA.sections.length / 2) {
+                        col1.appendChild(sectionContainer);
+                    } else {
+                        col2.appendChild(sectionContainer);
                     }
-                ]
-              };
-              const titleEl = dom.wikiOverlay.querySelector('#wiki-title');
-              const contentEl = dom.wikiOverlay.querySelector('#wiki-content');
-              titleEl.textContent = WIKI_DATA.title;
-              
-              const col1 = document.createElement('div'); col1.className = 'wiki-column';
-              const col2 = document.createElement('div'); col2.className = 'wiki-column';
+                });
 
-              WIKI_DATA.sections.forEach((s, index) => {
-                  const sectionContainer = document.createElement('div');
-                  const h4 = document.createElement('h4'); h4.textContent = s.title;
-                  sectionContainer.appendChild(h4);
-                  s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                  if (index < WIKI_DATA.sections.length / 2) {
-                      col1.appendChild(sectionContainer);
-                  } else {
-                      col2.appendChild(sectionContainer);
-                  }
-              });
-              
-              contentEl.innerHTML = '';
-              contentEl.appendChild(col1);
-              contentEl.appendChild(col2);
+                contentEl.innerHTML = '';
+                contentEl.appendChild(col1);
+                contentEl.appendChild(col2);
 
-              state.isWikiLoaded = true;
-          }
-          dom.wikiOverlay.classList.add('show');
+                state.isWikiLoaded = true;
+            }
+            dom.wikiOverlay.classList.add('show');
         }
-        function closeWiki(){ dom.wikiOverlay.classList.remove('show'); }
-        
+        function closeWiki() { dom.wikiOverlay.classList.remove('show'); }
+
         init();
     </script>
 </body>
-</html>
 
+</html>

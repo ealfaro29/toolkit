@@ -24,6 +24,120 @@ const WIKI_DATA = {
     ]
 };
 
+/*
+ * SVG Generator Class
+ * Mimics CanvasRenderingContext2D for SVG export
+ */
+class SvgGenerator {
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        this.xml = [];
+        this.defs = [];
+        this.currentPath = '';
+        this.idCounter = 0;
+
+        // State stack for save/restore
+        this.stack = [];
+        // Current state
+        this.state = {
+            fill: 'transparent',
+            stroke: 'none',
+            shadow: null,
+            openTags: 0
+        };
+
+        this.xml.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`);
+    }
+
+    getXml() {
+        return this.xml.join('') + (this.defs.length ? `<defs>${this.defs.join('')}</defs>` : '') + '</svg>';
+    }
+
+    // Canvas API Mocks
+    save() {
+        this.stack.push(JSON.parse(JSON.stringify(this.state)));
+        this.state.openTags = 0;
+    }
+
+    restore() {
+        for (let i = 0; i < this.state.openTags; i++) {
+            this.xml.push('</g>');
+        }
+        if (this.stack.length > 0) {
+            this.state = this.stack.pop();
+        }
+    }
+
+    translate(x, y) {
+        this.xml.push(`<g transform="translate(${x}, ${y})">`);
+        this.state.openTags++;
+    }
+
+    scale(x, y) {
+        this.xml.push(`<g transform="scale(${x}, ${y})">`);
+        this.state.openTags++;
+    }
+
+    // Shadow properties
+    get shadowColor() { return (this.state.shadow && this.state.shadow.color) || 'transparent'; }
+    set shadowColor(c) { this.initShadow(); this.state.shadow.color = c; }
+
+    get shadowBlur() { return (this.state.shadow && this.state.shadow.blur) || 0; }
+    set shadowBlur(b) { this.initShadow(); this.state.shadow.blur = b; }
+
+    get shadowOffsetY() { return (this.state.shadow && this.state.shadow.offsetY) || 0; }
+    set shadowOffsetY(y) { this.initShadow(); this.state.shadow.offsetY = y; }
+
+    initShadow() { if (!this.state.shadow) this.state.shadow = { color: 'transparent', blur: 0, offsetY: 0, offsetX: 0 }; }
+
+    get fillStyle() { return this.state.fill; }
+    set fillStyle(v) { this.state.fill = v; }
+
+    // Path methods
+    beginPath() { this.currentPath = ''; }
+    moveTo(x, y) { this.currentPath += `M ${x} ${y} `; }
+    lineTo(x, y) { this.currentPath += `L ${x} ${y} `; }
+    quadraticCurveTo(cpx, cpy, x, y) { this.currentPath += `Q ${cpx} ${cpy} ${x} ${y} `; }
+    bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) { this.currentPath += `C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y} `; }
+    closePath() { this.currentPath += 'Z '; }
+
+    rect(x, y, w, h) { this.currentPath += `M ${x} ${y} H ${x + w} V ${y + h} H ${x} Z`; }
+
+    fillRect(x, y, w, h) {
+        this.xml.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${this.state.fill}" />`);
+    }
+
+    arc(x, y, r, start, end) {
+        // Assume full circle for this app usage
+        this.xml.push(`<circle cx="${x}" cy="${y}" r="${r}" fill="${this.state.fill}" />`);
+    }
+
+    fill() {
+        let filterAttr = '';
+        if (this.state.shadow && this.state.shadow.color !== 'transparent' && this.state.shadow.blur > 0) {
+            const id = 'shadow-' + (this.idCounter++);
+            const s = this.state.shadow;
+            this.defs.push(`<filter id="${id}" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="${s.offsetX || 0}" dy="${s.offsetY}" stdDeviation="${s.blur / 2}" flood-color="${s.color}" />
+            </filter>`);
+            filterAttr = `filter="url(#${id})"`;
+        }
+        this.xml.push(`<path d="${this.currentPath}" fill="${this.state.fill}" ${filterAttr} />`);
+    }
+
+    clip() {
+        const id = 'clip-' + (this.idCounter++);
+        this.defs.push(`<clipPath id="${id}"><path d="${this.currentPath}" /></clipPath>`);
+        this.xml.push(`<g clip-path="url(#${id})">`);
+        this.state.openTags++;
+    }
+
+    drawImage(img, x, y, w, h) {
+        this.xml.push(`<image href="${img.src}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none" />`);
+    }
+}
+
 const MockupApp = {
     el: {},
     state: {
@@ -32,6 +146,7 @@ const MockupApp = {
         currentDevice: 'phone',
         currentOrientation: 'portrait',
         currentColor: 'white',
+        showStatusBar: false,
 
         uploadedImage: null,
         imageScale: 1.0,
@@ -53,7 +168,7 @@ const MockupApp = {
             radius: 40,
             notch: 'island',
             colors: {
-                white: { frame: '#f5f5f5', bezel: '#ffffff', shadow: '#e0e0e0' },
+                white: { frame: '#ffffff', bezel: '#ffffff', shadow: '#f0f0f0' },
                 black: { frame: '#1a1a1a', bezel: '#0a0a0a', shadow: '#000000' },
                 silver: { frame: '#c0c0c0', bezel: '#d0d0d0', shadow: '#a0a0a0' }
             }
@@ -64,7 +179,7 @@ const MockupApp = {
             screenWidth: 620, screenHeight: 420,
             radius: 20,
             colors: {
-                white: { frame: '#f5f5f5', bezel: '#ffffff', shadow: '#e0e0e0' },
+                white: { frame: '#ffffff', bezel: '#ffffff', shadow: '#f0f0f0' },
                 black: { frame: '#1a1a1a', bezel: '#0a0a0a', shadow: '#000000' },
                 silver: { frame: '#c0c0c0', bezel: '#d0d0d0', shadow: '#a0a0a0' }
             }
@@ -76,7 +191,7 @@ const MockupApp = {
             radius: 10,
             hasStand: true,
             colors: {
-                white: { frame: '#d4d4d4', bezel: '#1a1a1a', shadow: '#a8a8a8', base: '#c0c0c0' },
+                white: { frame: '#f0f0f0', bezel: '#1a1a1a', shadow: '#e0e0e0', base: '#e8e8e8' },
                 black: { frame: '#2a2a2a', bezel: '#0a0a0a', shadow: '#1a1a1a', base: '#1a1a1a' },
                 silver: { frame: '#c8c8c8', bezel: '#1a1a1a', shadow: '#a0a0a0', base: '#b0b0b0' }
             }
@@ -87,7 +202,7 @@ const MockupApp = {
             screenWidth: 200, screenHeight: 200,
             radius: 40,
             colors: {
-                white: { frame: '#f5f5f5', bezel: '#ffffff', shadow: '#e0e0e0' },
+                white: { frame: '#ffffff', bezel: '#ffffff', shadow: '#f0f0f0' },
                 black: { frame: '#1a1a1a', bezel: '#0a0a0a', shadow: '#000000' },
                 silver: { frame: '#c0c0c0', bezel: '#d0d0d0', shadow: '#a0a0a0' }
             }
@@ -100,7 +215,7 @@ const MockupApp = {
             hasStand: true,
             standHeight: 70,
             colors: {
-                white: { frame: '#e8e8e8', bezel: '#1a1a1a', shadow: '#c0c0c0', stand: '#d0d0d0' },
+                white: { frame: '#f5f5f5', bezel: '#1a1a1a', shadow: '#e0e0e0', stand: '#ebebeb' },
                 black: { frame: '#1a1a1a', bezel: '#0a0a0a', shadow: '#000000', stand: '#2a2a2a' },
                 silver: { frame: '#c8c8c8', bezel: '#1a1a1a', shadow: '#a0a0a0', stand: '#b0b0b0' }
             }
@@ -111,7 +226,20 @@ const MockupApp = {
         this.cacheDOMElements();
         this.initTheme();
         this.bindEvents();
+        this.loadDefaultBackground();
         this.renderCanvas();
+    },
+
+    loadDefaultBackground() {
+        const img = new Image();
+        img.onload = () => {
+            this.state.uploadedImage = img;
+            this.state.imageScale = 1.0; // Cover mode will auto-fill screen
+            this.el.downloadBtn.disabled = false;
+            this.el.mockupCanvas.classList.add('has-image');
+            this.renderCanvas();
+        };
+        img.src = 'background.png';
     },
 
     cacheDOMElements() {
@@ -188,6 +316,22 @@ const MockupApp = {
             });
         }
 
+        // Status Bar Toggle (Floating button for Phone Portrait only)
+        const statusBarToggle = document.getElementById('status-bar-toggle');
+        if (statusBarToggle) {
+            statusBarToggle.addEventListener('click', () => {
+                this.state.showStatusBar = !this.state.showStatusBar;
+                // Update button appearance based on state
+                if (this.state.showStatusBar) {
+                    statusBarToggle.style.background = 'var(--accent-color)';
+                    statusBarToggle.style.color = 'white';
+                } else {
+                    statusBarToggle.style.background = 'var(--surface)';
+                    statusBarToggle.style.color = 'var(--ink)';
+                }
+                this.renderCanvas();
+            });
+        }
 
 
         // Color Buttons
@@ -253,10 +397,7 @@ const MockupApp = {
         // Download
         if (this.el.downloadBtn) {
             this.el.downloadBtn.addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.download = `mockup-${this.state.currentDevice}-${Date.now()}.png`;
-                link.href = this.el.mockupCanvas.toDataURL('image/png');
-                link.click();
+                this.downloadMockup();
             });
         }
 
@@ -328,85 +469,49 @@ const MockupApp = {
         ctx.closePath();
     },
 
-    renderCanvas() {
-        const canvas = this.el.mockupCanvas;
-        if (!canvas) return;
-
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        const device = this.devices[this.state.currentDevice];
-
-        // Show/Hide orientation toggle
-        if (this.el.orientationToggle) {
-            const supportsRotation = ['phone', 'tablet'].includes(this.state.currentDevice);
-            this.el.orientationToggle.style.display = supportsRotation ? 'flex' : 'none';
+    // Unified drawing logic for both Canvas and SVG
+    drawDevice(ctx, width, height, scale, offsetX, offsetY, dims, colors, uploadedImage, imageScale, imageOffsetX, imageOffsetY) {
+        // Background handling (only for Canvas context usually, but good for safety)
+        if (ctx instanceof CanvasRenderingContext2D) {
+            ctx.clearRect(0, 0, width, height);
         }
-
-        const dims = this.getDeviceDims();
-        const colors = device.colors[this.state.currentColor];
-
-        // Get available space from the main panel
-        const mainPanel = canvas.parentElement;
-
-        // Full canvas size - now matches parent exactly
-        canvas.width = mainPanel.clientWidth;
-        canvas.height = mainPanel.clientHeight;
-
-        // Calculate scale to fit the device within the full canvas (with margin)
-        const margin = 50;
-        const availableWidth = canvas.width - margin * 2;
-        const availableHeight = canvas.height - margin * 2;
-
-        // Add extra height for monitor stand
-        const extraHeight = this.state.currentDevice === 'monitor' ? 70 : 0;
-        const totalDeviceHeight = dims.height + extraHeight;
-
-        const scaleX = availableWidth / dims.width;
-        const scaleY = availableHeight / totalDeviceHeight;
-        const scale = Math.min(scaleX, scaleY, 2.5); // Cap max scale
-
-        const scaledWidth = dims.width * scale;
-        const scaledHeight = totalDeviceHeight * scale;
-
-        // Background handling
-        // Clear canvas first - if transparent, this leaves it transparent (CSS shows checkerboard)
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-
 
         ctx.save();
 
         // Center the device in the full canvas
-        const offsetX = (canvas.width - scaledWidth) / 2;
-        const offsetY = (canvas.height - scaledHeight) / 2;
+        const scaledWidth = dims.width * scale;
+        const scaledHeight = (dims.height + (this.state.currentDevice === 'monitor' ? (this.devices.monitor.standHeight || 70) : 0)) * scale;
 
-        ctx.translate(offsetX, offsetY);
+        const centerX = (width - scaledWidth) / 2;
+        const centerY = (height - scaledHeight) / 2;
+
+        ctx.translate(centerX, centerY);
         ctx.scale(scale, scale);
 
+        // Shadow for the whole device group
         ctx.shadowColor = 'rgba(0,0,0,0.25)';
         ctx.shadowBlur = 30 / scale;
         ctx.shadowOffsetY = 15 / scale;
 
         // Device-specific rendering
         if (this.state.currentDevice === 'laptop') {
-            // LAPTOP: MacBook Pro style - screen panel with thin base
-            const sideOverhang = 20; // How much the base sticks out on each side
-            const frameWidth = 12; // Gray outer frame
-            const bezelWidth = 8; // Black bezel inside frame
-            const baseHeight = 18; // Bottom aluminum base
+            // LAPTOP: MacBook Pro style
+            const sideOverhang = 20;
+            const frameWidth = 12;
+            const bezelWidth = 8;
+            const baseHeight = 18;
             const screenPanelH = dims.height - baseHeight;
 
             const screenPanelX = sideOverhang;
             const screenPanelW = dims.width - (sideOverhang * 2);
 
-            // Outer aluminum frame (rounded rectangle for screen panel)
+            // Outer aluminum frame
             ctx.fillStyle = colors.frame;
             this.drawRoundedRect(ctx, screenPanelX, 0, screenPanelW, screenPanelH, dims.radius);
             ctx.fill();
-            ctx.shadowColor = 'transparent';
+            ctx.shadowColor = 'transparent'; // Reset shadow for inner elements
 
-            // Black bezel layer (inside the frame)
+            // Black bezel layer
             ctx.fillStyle = colors.bezel;
             const bezelX = screenPanelX + frameWidth - 3;
             const bezelY = frameWidth - 3;
@@ -427,31 +532,33 @@ const MockupApp = {
             ctx.fill();
 
             // Draw uploaded image in screen
-            if (this.state.uploadedImage) {
+            if (uploadedImage) {
                 ctx.save();
                 this.drawRoundedRect(ctx, screenX, screenY, screenW, screenH, 2);
                 ctx.clip();
 
-                const imgRatio = this.state.uploadedImage.width / this.state.uploadedImage.height;
+                const imgRatio = uploadedImage.width / uploadedImage.height;
                 const screenRatio = screenW / screenH;
 
                 let drawW, drawH, drawX, drawY;
+
+                // Cover mode: image always fills the screen completely
                 if (imgRatio > screenRatio) {
-                    drawW = screenW * this.state.imageScale;
-                    drawH = drawW / imgRatio;
-                } else {
-                    drawH = screenH * this.state.imageScale;
+                    drawH = screenH * imageScale;
                     drawW = drawH * imgRatio;
+                } else {
+                    drawW = screenW * imageScale;
+                    drawH = drawW / imgRatio;
                 }
 
-                drawX = screenX + (screenW - drawW) / 2 + (this.state.imageOffsetX / scale);
-                drawY = screenY + (screenH - drawH) / 2 + (this.state.imageOffsetY / scale);
+                drawX = screenX + (screenW - drawW) / 2 + (imageOffsetX / scale);
+                drawY = screenY + (screenH - drawH) / 2 + (imageOffsetY / scale);
 
-                ctx.drawImage(this.state.uploadedImage, drawX, drawY, drawW, drawH);
+                ctx.drawImage(uploadedImage, drawX, drawY, drawW, drawH);
                 ctx.restore();
             }
 
-            // Webcam area at top center (small black oval in the black bezel)
+            // Webcam area
             ctx.fillStyle = '#000';
             const camW = 45;
             const camH = 12;
@@ -466,12 +573,11 @@ const MockupApp = {
             ctx.arc(dims.width / 2, camY + camH / 2, 3, 0, Math.PI * 2);
             ctx.fill();
 
-            // Bottom aluminum base (Keyboard deck edge)
+            // Bottom aluminum base
             ctx.fillStyle = colors.base || colors.frame;
             const baseY = screenPanelH;
 
-            // Draw base as a clean rounded rectangle bottom
-            // The base spans the FULL dims.width, making it wider than the screen panel
+            // Draw base
             ctx.beginPath();
             ctx.moveTo(0, baseY);
             ctx.lineTo(dims.width, baseY);
@@ -482,8 +588,8 @@ const MockupApp = {
             ctx.closePath();
             ctx.fill();
 
-            // Thumb groove / Opening notch (Smooth curve in the center top of the base)
-            ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Subtle shadow for the groove
+            // Thumb groove
+            ctx.fillStyle = (colors.frame === '#2a2a2a') ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.1)';
             const notchW = 120;
             const notchH = 8;
             const notchX = (dims.width - notchW) / 2;
@@ -494,9 +600,9 @@ const MockupApp = {
             ctx.fill();
 
         } else if (this.state.currentDevice === 'monitor') {
-            // MONITOR: Clean design with stand
+            // MONITOR
             const frameSize = 12;
-            const panelH = dims.height; // Screen panel height
+            const panelH = dims.height;
 
             // Screen panel frame
             ctx.fillStyle = colors.frame;
@@ -509,7 +615,7 @@ const MockupApp = {
             this.drawRoundedRect(ctx, frameSize, frameSize, dims.width - frameSize * 2, panelH - frameSize * 2, dims.radius - 4);
             ctx.fill();
 
-            // Screen area (white background)
+            // Screen area
             const screenX = frameSize + 8;
             const screenY = frameSize + 8;
             const screenW = dims.width - (frameSize + 8) * 2;
@@ -520,31 +626,33 @@ const MockupApp = {
             ctx.fill();
 
             // Draw uploaded image
-            if (this.state.uploadedImage) {
+            if (uploadedImage) {
                 ctx.save();
                 this.drawRoundedRect(ctx, screenX, screenY, screenW, screenH, 2);
                 ctx.clip();
 
-                const imgRatio = this.state.uploadedImage.width / this.state.uploadedImage.height;
+                const imgRatio = uploadedImage.width / uploadedImage.height;
                 const screenRatio = screenW / screenH;
 
                 let drawW, drawH, drawX, drawY;
+
+                // Cover mode: image always fills the screen completely
                 if (imgRatio > screenRatio) {
-                    drawW = screenW * this.state.imageScale;
-                    drawH = drawW / imgRatio;
-                } else {
-                    drawH = screenH * this.state.imageScale;
+                    drawH = screenH * imageScale;
                     drawW = drawH * imgRatio;
+                } else {
+                    drawW = screenW * imageScale;
+                    drawH = drawW / imgRatio;
                 }
 
-                drawX = screenX + (screenW - drawW) / 2 + (this.state.imageOffsetX / scale);
-                drawY = screenY + (screenH - drawH) / 2 + (this.state.imageOffsetY / scale);
+                drawX = screenX + (screenW - drawW) / 2 + (imageOffsetX / scale);
+                drawY = screenY + (screenH - drawH) / 2 + (imageOffsetY / scale);
 
-                ctx.drawImage(this.state.uploadedImage, drawX, drawY, drawW, drawH);
+                ctx.drawImage(uploadedImage, drawX, drawY, drawW, drawH);
                 ctx.restore();
             }
 
-            // Stand neck (vertical part)
+            // Stand neck
             ctx.fillStyle = colors.stand || colors.shadow;
             const neckW = 50;
             const neckH = 45;
@@ -552,7 +660,7 @@ const MockupApp = {
             const neckY = panelH;
             ctx.fillRect(neckX, neckY, neckW, neckH);
 
-            // Stand base (horizontal ellipse-like base)
+            // Stand base
             ctx.fillStyle = colors.stand || colors.shadow;
             const baseW = 180;
             const baseH = 12;
@@ -562,16 +670,16 @@ const MockupApp = {
             ctx.fill();
 
         } else {
-            // PHONE, TABLET, WATCH: Modern edge-to-edge design
-            const frameThickness = 4; // Thin outer frame
+            // PHONE, TABLET, WATCH
+            const frameThickness = 4;
 
-            // Outer frame (device body)
+            // Outer frame
             ctx.fillStyle = colors.frame;
             this.drawRoundedRect(ctx, 0, 0, dims.width, dims.height, dims.radius);
             ctx.fill();
             ctx.shadowColor = 'transparent';
 
-            // Screen area (directly inside frame - edge to edge)
+            // Screen area
             const screenX = frameThickness;
             const screenY = frameThickness;
             const screenW = dims.width - frameThickness * 2;
@@ -584,58 +692,118 @@ const MockupApp = {
             ctx.fill();
 
             // Draw uploaded image
-            if (this.state.uploadedImage) {
+            if (uploadedImage) {
                 ctx.save();
                 this.drawRoundedRect(ctx, screenX, screenY, screenW, screenH, screenRadius);
                 ctx.clip();
 
-                const imgRatio = this.state.uploadedImage.width / this.state.uploadedImage.height;
+                const imgRatio = uploadedImage.width / uploadedImage.height;
                 const screenRatio = screenW / screenH;
 
                 let drawW, drawH, drawX, drawY;
+
+                // Cover mode: image always fills the screen completely
                 if (imgRatio > screenRatio) {
-                    drawW = screenW * this.state.imageScale;
-                    drawH = drawW / imgRatio;
-                } else {
-                    drawH = screenH * this.state.imageScale;
+                    // Image is wider - scale by height to cover
+                    drawH = screenH * imageScale;
                     drawW = drawH * imgRatio;
+                } else {
+                    // Image is taller - scale by width to cover
+                    drawW = screenW * imageScale;
+                    drawH = drawW / imgRatio;
                 }
 
-                drawX = screenX + (screenW - drawW) / 2 + (this.state.imageOffsetX / scale);
-                drawY = screenY + (screenH - drawH) / 2 + (this.state.imageOffsetY / scale);
+                drawX = screenX + (screenW - drawW) / 2 + (imageOffsetX / scale);
+                drawY = screenY + (screenH - drawH) / 2 + (imageOffsetY / scale);
 
-                ctx.drawImage(this.state.uploadedImage, drawX, drawY, drawW, drawH);
+                ctx.drawImage(uploadedImage, drawX, drawY, drawW, drawH);
                 ctx.restore();
             }
 
             // Device-specific details
             if (this.state.currentDevice === 'phone') {
-                // Dynamic Island
+                // Dynamic Island / Notch
                 ctx.fillStyle = '#000';
-
                 if (this.state.currentOrientation === 'landscape') {
-                    // Landscape: Notch on the left (island rotates with phone)
                     const notchW = 24;
                     const notchH = 80;
-                    const notchX = 25; // Approximate margin
+                    const notchX = 25;
                     const notchY = (dims.height - notchH) / 2;
                     this.drawRoundedRect(ctx, notchX, notchY, notchW, notchH, 12);
                     ctx.fill();
                 } else {
-                    // Portrait: Notch at top
                     const notchW = 80;
                     const notchH = 24;
                     const notchX = (dims.width - notchW) / 2;
                     const notchY = screenY + 10;
                     this.drawRoundedRect(ctx, notchX, notchY, notchW, notchH, 12);
                     ctx.fill();
+
+                    // Status Bar (Portrait only)
+                    if (this.state.showStatusBar && this.state.currentOrientation === 'portrait') {
+                        const barY = screenY + 17;
+
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '600 15px -apple-system, BlinkMacSystemFont, sans-serif';
+                        ctx.textBaseline = 'middle';
+
+                        // Time (left side)
+                        ctx.textAlign = 'left';
+                        ctx.fillText('9:41', screenX + 28, barY);
+
+                        // Right side icons with proper spacing
+                        let x = screenX + screenW - 28;
+
+                        // Battery icon
+                        const batteryW = 22;
+                        const batteryH = 10;
+                        x -= batteryW;
+                        const batteryY = barY - batteryH / 2;
+
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 1;
+                        this.drawRoundedRect(ctx, x, batteryY, batteryW, batteryH, 2);
+                        ctx.stroke();
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(x + 2, batteryY + 2, batteryW - 4, batteryH - 4);
+                        ctx.fillRect(x + batteryW, batteryY + 2.5, 1.5, 5);
+
+                        x -= 8; // gap
+
+                        // WiFi icon - simple fan shape
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 1.5;
+                        const wifiX = x - 6;
+
+                        ctx.beginPath();
+                        ctx.arc(wifiX, barY + 4, 1.5, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.arc(wifiX, barY + 4, 5, -Math.PI * 0.75, -Math.PI * 0.25);
+                        ctx.stroke();
+
+                        ctx.beginPath();
+                        ctx.arc(wifiX, barY + 4, 8, -Math.PI * 0.75, -Math.PI * 0.25);
+                        ctx.stroke();
+
+                        x = wifiX - 14; // gap after wifi
+
+                        // Signal bars
+                        ctx.fillStyle = '#fff';
+                        for (let i = 0; i < 4; i++) {
+                            const h = 4 + i * 2;
+                            const bx = x - (3 - i) * 4;
+                            ctx.fillRect(bx, barY + 5 - h, 3, h);
+                        }
+                    }
+
                 }
 
             } else if (this.state.currentDevice === 'watch') {
-                // Digital Crown
+                // Crown and button
                 ctx.fillStyle = colors.shadow;
                 ctx.fillRect(dims.width - 2, dims.height / 2 - 15, 10, 30);
-                // Side button
                 ctx.fillRect(dims.width - 2, dims.height / 2 + 20, 8, 15);
             }
         }
@@ -643,7 +811,118 @@ const MockupApp = {
         ctx.restore();
     },
 
-    // Theme Logic (from baseapp.html)
+    renderCanvas() {
+        const canvas = this.el.mockupCanvas;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const device = this.devices[this.state.currentDevice];
+
+        if (this.el.orientationToggle) {
+            const supportsRotation = ['phone', 'tablet'].includes(this.state.currentDevice);
+            this.el.orientationToggle.style.display = supportsRotation ? 'flex' : 'none';
+        }
+
+        // Status Bar toggle button visibility (Phone Portrait only)
+        const statusBarToggle = document.getElementById('status-bar-toggle');
+        if (statusBarToggle) {
+            const showStatusBarToggle = this.state.currentDevice === 'phone' && this.state.currentOrientation === 'portrait';
+            statusBarToggle.style.display = showStatusBarToggle ? 'flex' : 'none';
+            // Update button appearance based on current state
+            if (showStatusBarToggle) {
+                if (this.state.showStatusBar) {
+                    statusBarToggle.style.background = 'var(--accent-color)';
+                    statusBarToggle.style.color = 'white';
+                } else {
+                    statusBarToggle.style.background = 'var(--surface)';
+                    statusBarToggle.style.color = 'var(--ink)';
+                }
+            }
+        }
+
+        const dims = this.getDeviceDims();
+        const colors = device.colors[this.state.currentColor];
+        const mainPanel = canvas.parentElement;
+
+        canvas.width = mainPanel.clientWidth;
+        canvas.height = mainPanel.clientHeight;
+
+        const margin = 50;
+        const availableWidth = canvas.width - margin * 2;
+        const availableHeight = canvas.height - margin * 2;
+        const extraHeight = this.state.currentDevice === 'monitor' ? (device.standHeight || 70) : 0;
+        const totalDeviceHeight = dims.height + extraHeight;
+
+        const scaleX = availableWidth / dims.width;
+        const scaleY = availableHeight / totalDeviceHeight;
+        const scale = Math.min(scaleX, scaleY, 2.5);
+
+        // Call unified drawing logic
+        this.drawDevice(
+            ctx,
+            canvas.width,
+            canvas.height,
+            scale,
+            0, 0, // No extra offset needed as it calculates center
+            dims,
+            colors,
+            this.state.uploadedImage,
+            this.state.imageScale,
+            this.state.imageOffsetX,
+            this.state.imageOffsetY
+        );
+    },
+
+    downloadMockup() {
+        const device = this.devices[this.state.currentDevice];
+        const dims = this.getDeviceDims();
+        const colors = device.colors[this.state.currentColor];
+        const margin = 50;
+        const extraHeight = this.state.currentDevice === 'monitor' ? (device.standHeight || 70) : 0;
+        const totalW = dims.width + margin * 2;
+        const totalH = dims.height + extraHeight + margin * 2;
+
+        // Use 1.0 scale relative to device size for high-res output
+        // We set canvas size to fit the device perfectly with margin
+
+        const svgGen = new SvgGenerator(totalW, totalH);
+
+        // Calculate scale that fits this 'virtual' SVG canvas (which is based on device size anyway)
+        // Since we sized the canvas to fit the device + margin, scale can be 1.0 (or slightly less to ensure margin)
+        // Actually, renderCanvas logic calculates scale based on available space. 
+        // Here available space IS device size + margin, so scale should effectively be 1.0.
+
+        const availableW = totalW - margin * 2;
+        const availableH = totalH - margin * 2;
+        // Re-use logic or just hard set scale=1 if we sized it perfectly
+        const scale = 1.0;
+
+        this.drawDevice(
+            svgGen,
+            totalW,
+            totalH,
+            scale,
+            0, 0,
+            dims,
+            colors,
+            this.state.uploadedImage,
+            this.state.imageScale,
+            this.state.imageOffsetX,
+            this.state.imageOffsetY
+        );
+
+        const svgContent = svgGen.getXml();
+        const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.download = `mockup-${this.state.currentDevice}-${Date.now()}.svg`;
+        link.href = url;
+        link.click();
+
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+    },
+
     initTheme() {
         const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
         this.setTheme(savedTheme, false);
@@ -671,6 +950,7 @@ const MockupApp = {
             this.state.splashHidden = true;
             this.el.splashScreen.classList.add('hidden');
             this.el.appContainer.classList.remove('loading');
+            this.renderCanvas(); // Ensure status bar control visibility is set correctly
         }
     },
 
