@@ -136,6 +136,44 @@ class SvgGenerator {
     drawImage(img, x, y, w, h) {
         this.xml.push(`<image href="${img.src}" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="none" />`);
     }
+
+    // Text properties
+    get font() { return this.state.font || '14px sans-serif'; }
+    set font(v) { this.state.font = v; }
+
+    get textAlign() { return this.state.textAlign || 'left'; }
+    set textAlign(v) { this.state.textAlign = v; }
+
+    get textBaseline() { return this.state.textBaseline || 'alphabetic'; }
+    set textBaseline(v) { this.state.textBaseline = v; }
+
+    fillText(text, x, y) {
+        // Parse font to get size
+        const fontMatch = this.state.font?.match(/(\d+)px/) || ['14px', '14'];
+        const fontSize = fontMatch[1];
+        const fontFamily = this.state.font?.includes('sans-serif') ? 'sans-serif' : 'serif';
+
+        let anchor = 'start';
+        if (this.state.textAlign === 'center') anchor = 'middle';
+        else if (this.state.textAlign === 'right') anchor = 'end';
+
+        let dy = '0';
+        if (this.state.textBaseline === 'middle') dy = '0.35em';
+        else if (this.state.textBaseline === 'top') dy = '0.8em';
+
+        this.xml.push(`<text x="${x}" y="${y}" fill="${this.state.fill}" font-size="${fontSize}" font-family="${fontFamily}" text-anchor="${anchor}" dy="${dy}">${text}</text>`);
+    }
+
+    // Stroke properties
+    get strokeStyle() { return this.state.stroke || 'none'; }
+    set strokeStyle(v) { this.state.stroke = v; }
+
+    get lineWidth() { return this.state.lineWidth || 1; }
+    set lineWidth(v) { this.state.lineWidth = v; }
+
+    stroke() {
+        this.xml.push(`<path d="${this.currentPath}" fill="none" stroke="${this.state.stroke}" stroke-width="${this.state.lineWidth}" />`);
+    }
 }
 
 const MockupApp = {
@@ -225,6 +263,7 @@ const MockupApp = {
     init() {
         this.cacheDOMElements();
         this.initTheme();
+        this.checkSplashPreference();
         this.bindEvents();
         this.loadDefaultBackground();
         this.renderCanvas();
@@ -259,10 +298,16 @@ const MockupApp = {
         // Splash
         if (this.el.splashScreen) {
             this.el.splashScreen.addEventListener('click', (e) => {
-                if (e.target === this.el.splashScreen) this.hideSplashScreen();
+                if (e.target === this.el.splashScreen) {
+                    const cb = document.getElementById('splash-dont-show-checkbox');
+                    this.hideSplashScreen(cb?.checked || false);
+                }
             });
         }
-        if (this.el.splashCloseBtn) this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+        if (this.el.splashCloseBtn) this.el.splashCloseBtn.addEventListener('click', () => {
+            const cb = document.getElementById('splash-dont-show-checkbox');
+            this.hideSplashScreen(cb?.checked || false);
+        });
 
         // Upload
         if (this.el.uploadZone) {
@@ -945,12 +990,23 @@ const MockupApp = {
         this.renderCanvas();
     },
 
-    hideSplashScreen() {
+    hideSplashScreen(dontShowAgain = false) {
         if (!this.state.splashHidden) {
             this.state.splashHidden = true;
             this.el.splashScreen.classList.add('hidden');
             this.el.appContainer.classList.remove('loading');
-            this.renderCanvas(); // Ensure status bar control visibility is set correctly
+            this.renderCanvas();
+            if (dontShowAgain) {
+                localStorage.setItem('mockups-splash-hidden', 'true');
+            }
+        }
+    },
+
+    checkSplashPreference() {
+        if (localStorage.getItem('mockups-splash-hidden') === 'true') {
+            this.state.splashHidden = true;
+            this.el.splashScreen.classList.add('hidden');
+            this.el.appContainer.classList.remove('loading');
         }
     },
 

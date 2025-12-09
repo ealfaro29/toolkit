@@ -35,6 +35,13 @@ export const App = {
     },
 
     checkSplashScreen() {
+        // Check permanent hide preference
+        if (localStorage.getItem('brickbuilder-splash-hidden') === 'true') {
+            this.el['app-container'].classList.remove('loading');
+            this.el['splash-screen'].classList.add('hidden');
+            return;
+        }
+
         const SPLASH_KEY = 'brickbuilder_last_splash';
         const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
@@ -186,7 +193,21 @@ export const App = {
             this.setTheme(next);
         };
 
-        this.el['splash-close-btn'].onclick = () => this.el['splash-screen'].classList.add('hidden');
+        const hideSplash = () => {
+            const checkbox = document.getElementById('splash-dont-show-checkbox');
+            if (checkbox && checkbox.checked) {
+                localStorage.setItem('brickbuilder-splash-hidden', 'true');
+            }
+            this.el['splash-screen'].classList.add('hidden');
+        };
+
+        this.el['splash-close-btn'].onclick = hideSplash;
+        this.el['splash-screen'].addEventListener('click', (e) => {
+            if (e.target === this.el['splash-screen']) {
+                hideSplash();
+            }
+        });
+
         this.el['wiki-open-btn'].onclick = () => this.el['wiki-overlay'].classList.add('show');
         this.el['wiki-close-btn'].onclick = () => this.el['wiki-overlay'].classList.remove('show');
         this.el['shortcuts-close-btn'].onclick = () => this.el['shortcuts-overlay'].classList.remove('show');

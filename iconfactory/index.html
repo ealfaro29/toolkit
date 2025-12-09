@@ -812,6 +812,20 @@
             line-height: 1.6;
         }
 
+        .splash-dont-show {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+            cursor: pointer;
+        }
+
+        .splash-dont-show input {
+            cursor: pointer;
+        }
+
         .splash-credits {
             margin-top: auto;
             font-size: var(--font-size-caption);
@@ -875,6 +889,10 @@
                     </div>
                 </div>
                 <p class="splash-credits">2025. Toolkit by e</p>
+                <label class="splash-dont-show">
+                    <input type="checkbox" id="splash-dont-show-checkbox">
+                    Dont show again
+                </label>
             </div>
             <div class="splash-image">
                 <img src="modal.png" alt="Icon Factory Splash Image">
@@ -1507,6 +1525,7 @@
 
         async function init() {
             dom.splashCloseBtn.disabled = true;
+            checkSplashPreference();
             await Promise.all([loadIconNames(), loadKeywords()]);
 
             ThemeApp.init(rerenderAllDynamicIcons);
@@ -1527,8 +1546,8 @@
             dom.searchInput.addEventListener('input', handleSearch);
             dom.cleanCollectionBtn.addEventListener('click', handleCleanCollection);
             dom.wikiOpenBtn.addEventListener('click', () => openWiki());
-            dom.splashScreen.addEventListener('click', (e) => { if (e.target === dom.splashScreen) hideSplashScreen(); });
-            dom.splashCloseBtn.addEventListener('click', () => hideSplashScreen());
+            dom.splashScreen.addEventListener('click', (e) => { if (e.target === dom.splashScreen) { const cb = document.getElementById('splash-dont-show-checkbox'); hideSplashScreen(cb?.checked || false); } });
+            dom.splashCloseBtn.addEventListener('click', () => { const cb = document.getElementById('splash-dont-show-checkbox'); hideSplashScreen(cb?.checked || false); });
 
             await fullRenderSavedIcons();
             mainUpdater();
@@ -1537,8 +1556,19 @@
             dom.appContainer.classList.remove('loading');
         }
 
-        function hideSplashScreen() {
+        function hideSplashScreen(dontShowAgain = false) {
             if (!state.splashHidden) {
+                state.splashHidden = true;
+                dom.splashScreen.classList.add('hidden');
+                dom.appContainer.classList.remove('loading');
+                if (dontShowAgain) {
+                    localStorage.setItem('iconfactory-splash-hidden', 'true');
+                }
+            }
+        }
+
+        function checkSplashPreference() {
+            if (localStorage.getItem('iconfactory-splash-hidden') === 'true') {
                 state.splashHidden = true;
                 dom.splashScreen.classList.add('hidden');
                 dom.appContainer.classList.remove('loading');

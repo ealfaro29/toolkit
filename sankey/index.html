@@ -558,7 +558,21 @@
             line-height: 1.6;
         }
 
-        .splash-credits {
+        .splash-dont-show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .splash-dont-show input {
+      cursor: pointer;
+    }
+
+    .splash-credits {
             margin-top: auto;
             font-size: var(--font-size-caption);
             color: var(--muted);
@@ -989,6 +1003,7 @@
             init() {
                 this.cacheDOMElements();
                 this.initTheme();
+        this.checkSplashPreference();
                 this.bindEvents();
                 this.renderInputForm();
                 this.renderDiagram();
@@ -996,11 +1011,22 @@
                 this.initResizeObserver();
             },
 
-            hideSplashScreen() {
+            hideSplashScreen(dontShowAgain = false) {
                 if (!this.state.splashHidden) {
                     this.state.splashHidden = true;
                     this.el.splashScreen.classList.add('hidden');
                     this.el.appContainer.classList.remove('loading');
+          if (dontShowAgain) {
+            localStorage.setItem('sankey-splash-hidden', 'true');
+          }
+
+      checkSplashPreference() {
+        if (localStorage.getItem('sankey-splash-hidden') === 'true') {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
+      },
                 }
             },
 
@@ -1031,11 +1057,11 @@
 
                 if (this.el.splashScreen) {
                     this.el.splashScreen.addEventListener('click', (e) => {
-                        if (e.target === this.el.splashScreen) this.hideSplashScreen();
+                        if (e.target === this.el.splashScreen) { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); }
                     });
                 }
                 if (this.el.splashCloseBtn) {
-                    this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+                    this.el.splashCloseBtn.addEventListener('click', () => { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); });
                 }
             },
 

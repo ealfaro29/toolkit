@@ -485,6 +485,20 @@
       color: var(--muted);
     }
 
+    .splash-dont-show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .splash-dont-show input {
+      cursor: pointer;
+    }
+
     .splash-image {
       flex: 1;
       background-color: var(--surface);
@@ -547,6 +561,10 @@
         <p class="splash-tech">Utilizes a local machine learning model to process images directly in your browser for
           maximum speed and full privacy. Risk free. First load can take a minute.</p>
         <p class="splash-credits">2025. Toolkit by e</p>
+        <label class="splash-dont-show">
+          <input type="checkbox" id="splash-dont-show-checkbox">
+          Don't show again
+        </label>
       </div>
       <div class="splash-image">
         <img src="modal.png" alt="Background Remover Splash Image">
@@ -624,12 +642,24 @@
       init() {
         this.cacheDOMElements();
         this.initTheme();
+        this.checkSplashPreference();
         this.bindEvents();
         this.initSession();
       },
 
-      hideSplashScreen() {
+      hideSplashScreen(dontShowAgain = false) {
         if (!this.state.splashHidden) {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+          if (dontShowAgain) {
+            localStorage.setItem('bgremover-splash-hidden', 'true');
+          }
+        }
+      },
+
+      checkSplashPreference() {
+        if (localStorage.getItem('bgremover-splash-hidden') === 'true') {
           this.state.splashHidden = true;
           this.el.splashScreen.classList.add('hidden');
           this.el.appContainer.classList.remove('loading');
@@ -653,9 +683,15 @@
         this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
         this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
         this.el.splashScreen.addEventListener('click', (e) => {
-          if (e.target === this.el.splashScreen) this.hideSplashScreen();
+          if (e.target === this.el.splashScreen) {
+            const cb = document.getElementById('splash-dont-show-checkbox');
+            this.hideSplashScreen(cb?.checked || false);
+          }
         });
-        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+        this.el.splashCloseBtn.addEventListener('click', () => {
+          const cb = document.getElementById('splash-dont-show-checkbox');
+          this.hideSplashScreen(cb?.checked || false);
+        });
 
         this.el.zone.addEventListener('click', () => this.el.file.click());
         this.el.file.addEventListener('change', e => this.handleFiles(e.target.files));

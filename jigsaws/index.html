@@ -547,7 +547,21 @@
             line-height: 1.6;
         }
 
-        .splash-credits {
+        .splash-dont-show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .splash-dont-show input {
+      cursor: pointer;
+    }
+
+    .splash-credits {
             margin-top: auto;
             font-size: var(--font-size-caption);
             color: var(--muted);
@@ -620,6 +634,10 @@
                 <p class="splash-tech">Creates unique puzzles by procedurally generating SVG paths directly in your
                     browser.</p>
                 <p class="splash-credits">2025. Toolkit by e</p>
+        <label class="splash-dont-show">
+          <input type="checkbox" id="splash-dont-show-checkbox">
+          Dont show again
+        </label>
             </div>
             <div class="splash-image">
                 <img src="modal.png" alt="Jigsaw Generator Splash Image">
@@ -716,6 +734,7 @@
             init() {
                 this.cacheDOMElements();
                 this.initTheme();
+        this.checkSplashPreference();
                 this.bindEvents();
                 this.initState();
                 this.resetAndGenerateAll();
@@ -736,8 +755,8 @@
             bindEvents() {
                 this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
                 this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
-                this.el.splashScreen.addEventListener('click', (e) => { if (e.target === this.el.splashScreen) this.hideSplashScreen(); });
-                this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+                this.el.splashScreen.addEventListener('click', (e) => { if (e.target === this.el.splashScreen) { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); } });
+                this.el.splashCloseBtn.addEventListener('click', () => { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); });
 
                 this.el.regenerate.addEventListener('click', () => { this.regenerateShapes(); this.generatePreview(); });
                 this.el.downloadSvgBtn.addEventListener('click', () => this.downloadSvg());
@@ -753,11 +772,22 @@
                 });
             },
 
-            hideSplashScreen() {
+            hideSplashScreen(dontShowAgain = false) {
                 if (!this.state.splashHidden) {
                     this.state.splashHidden = true;
                     this.el.splashScreen.classList.add('hidden');
                     this.el.appContainer.classList.remove('loading');
+          if (dontShowAgain) {
+            localStorage.setItem('jigsaws-splash-hidden', 'true');
+          }
+
+      checkSplashPreference() {
+        if (localStorage.getItem('jigsaws-splash-hidden') === 'true') {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
+      },
                 }
             },
 

@@ -78,6 +78,24 @@
       padding: 25px;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('pattern.jpg');
+      background-repeat: repeat;
+      z-index: -1;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    html[data-theme="dark"] body::before {
+      opacity: 0.1;
+    }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -94,16 +112,25 @@
     }
 
     header.panel {
+      position: sticky;
+      top: 0;
+      z-index: 100;
       height: 65px;
       display: flex;
       align-items: center;
       gap: var(--space-3);
       padding: 0 var(--space-4);
-      background-color: var(--accent-yellow);
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
     html[data-theme="dark"] header.panel {
-      background-color: #8B7518;
+      background: rgba(26, 24, 21, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     html[data-theme="dark"] header.panel h1,
@@ -222,7 +249,11 @@
       flex-direction: column;
       justify-content: flex-end;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      background-color: var(--accent-yellow);
+      background-color: #FFFFFF;
+    }
+
+    html[data-theme="dark"] .app-card {
+      background-color: #1a1815;
     }
 
     .app-card::before {
@@ -232,8 +263,12 @@
       background: var(--card-bg-image) center/cover no-repeat;
       z-index: 0;
       transition: transform 0.4s ease;
-      opacity: 0.2;
+      opacity: 0.75;
       mix-blend-mode: multiply;
+    }
+
+    html[data-theme="dark"] .app-card::before {
+      mix-blend-mode: screen;
     }
 
     .app-card:hover::before {

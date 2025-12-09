@@ -516,6 +516,20 @@
       line-height: 1.6;
     }
 
+    .splash-dont-show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .splash-dont-show input {
+      cursor: pointer;
+    }
+
     .splash-credits {
       margin-top: auto;
       font-size: var(--font-size-caption);
@@ -643,6 +657,10 @@
           </div>
         </div>
         <p class="splash-credits">2025. Toolkit by e</p>
+        <label class="splash-dont-show">
+          <input type="checkbox" id="splash-dont-show-checkbox">
+          Dont show again
+        </label>
       </div>
       <div class="splash-image">
         <img src="modal.png" alt="Any2SVG Splash Image">
@@ -751,6 +769,7 @@
         this.cache();
         this.el.splashCloseBtn.disabled = true;
         this.initTheme();
+        this.checkSplashPreference();
         this.bind();
         this.initVisitorCounter(); // === 2. LLAMAR A LA NUEVA FUNCIÓN ===
 
@@ -794,11 +813,22 @@
         }, 15000);
       },
 
-      hideSplashScreen() {
+      hideSplashScreen(dontShowAgain = false) {
         if (!this.state.splashHidden) {
           this.state.splashHidden = true;
           this.el.splashScreen.classList.add('hidden');
           this.el.appContainer.classList.remove('loading');
+          if (dontShowAgain) {
+            localStorage.setItem('any2svg-splash-hidden', 'true');
+          }
+
+      checkSplashPreference() {
+        if (localStorage.getItem('any2svg-splash-hidden') === 'true') {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
+      },
         }
       },
 
@@ -823,7 +853,7 @@
             this.hideSplashScreen();
           }
         });
-        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+        this.el.splashCloseBtn.addEventListener('click', () => { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); });
         this.el.reloadEngineBtn.addEventListener('click', () => this.reloadEngine());
       },
 

@@ -667,7 +667,21 @@
             line-height: 1.6;
         }
 
-        .splash-credits {
+        .splash-dont-show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .splash-dont-show input {
+      cursor: pointer;
+    }
+
+    .splash-credits {
             margin-top: auto;
             font-size: var(--font-size-caption);
             color: var(--muted);
@@ -774,6 +788,10 @@
                     </div>
                 </div>
                 <p class="splash-credits">2025. Toolkit by e</p>
+        <label class="splash-dont-show">
+          <input type="checkbox" id="splash-dont-show-checkbox">
+          Dont show again
+        </label>
             </div>
             <div class="splash-image">
                 <img src="modal.png" alt="Locator Splash Image">
@@ -873,11 +891,22 @@
                 if (this.el.splashProgressText) this.el.splashProgressText.textContent = message;
             },
 
-            hideSplashScreen() {
+            hideSplashScreen(dontShowAgain = false) {
                 if (!this.state.splashHidden) {
                     this.state.splashHidden = true;
                     this.el.splashScreen.classList.add('hidden');
                     this.el.appContainer.classList.remove('loading');
+          if (dontShowAgain) {
+            localStorage.setItem('locator-splash-hidden', 'true');
+          }
+
+      checkSplashPreference() {
+        if (localStorage.getItem('locator-splash-hidden') === 'true') {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+        }
+      },
                 }
             },
 
@@ -924,8 +953,8 @@
                 this.el.ambiguityPopupOk.addEventListener('click', () => this.resolveAmbiguity());
                 this.el.ambiguityPopupSkip.addEventListener('click', () => this.skipAmbiguity());
                 this.el.wikiOpenBtn.addEventListener('click', (e) => { e.preventDefault(); this.openWiki(); });
-                this.el.splashScreen.addEventListener('click', (e) => { if (e.target === this.el.splashScreen) this.hideSplashScreen(); });
-                this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+                this.el.splashScreen.addEventListener('click', (e) => { if (e.target === this.el.splashScreen) { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); } });
+                this.el.splashCloseBtn.addEventListener('click', () => { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); });
             },
             handleDownload() {
                 this.showToast("Generating vector SVG...");

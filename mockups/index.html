@@ -744,7 +744,21 @@
             line-height: 1.6;
         }
 
-        .splash-credits {
+        .splash-dont-show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: var(--font-size-caption);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .splash-dont-show input {
+      cursor: pointer;
+    }
+
+    .splash-credits {
             margin-top: auto;
             font-size: var(--font-size-caption);
             color: var(--muted);
@@ -824,6 +838,10 @@
                     and position them on phones, tablets, laptops, smartwatches, or desktop monitors. Direct canvas
                     manipulation for precise control.</p>
                 <p class="splash-credits">2025. Toolkit by e</p>
+        <label class="splash-dont-show">
+          <input type="checkbox" id="splash-dont-show-checkbox">
+          Dont show again
+        </label>
             </div>
             <div class="splash-image">
                 <img src="modal.png" alt="Device Mockups">
