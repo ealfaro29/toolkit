@@ -89,21 +89,34 @@
       object-fit: contain;
     }
 
-    /* Moodboard canvas - masonry layout */
+    /* Moodboard canvas - masonry layout using CSS Grid */
     #moodboard-canvas {
-      column-count: 5;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       column-gap: var(--space-4);
+      row-gap: 0;
+      /* aligned with 1px grid rows */
+      grid-auto-rows: 1px;
+      align-items: start;
+    }
+
+    @media (max-width: 600px) {
+      #moodboard-canvas {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Moodboard card */
     .moodboard-card {
-      display: inline-block;
+      display: block;
       width: 100%;
-      margin-bottom: var(--space-4);
       position: relative;
-      break-inside: avoid;
       cursor: grab;
       background-color: var(--surface);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: var(--space-4);
+      /* needed for visual gap in 1px grid */
     }
 
     .moodboard-card.dragging {
@@ -159,6 +172,13 @@
       font-size: 24px;
       cursor: pointer;
       text-align: center;
+      margin-bottom: var(--space-4);
+      /* needed for visual gap in 1px grid */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      /* Explicit height */
     }
 
     /* Delete button */
@@ -324,8 +344,9 @@
     </aside>
 
     <main class="panel" id="main-panel">
-      <div id="moodboard-canvas"></div>
-      <div class="add-card-btn" id="add-card-btn">+</div>
+      <div id="moodboard-canvas">
+        <div class="add-card-btn" id="add-card-btn" onclick="document.getElementById('file-input').click()">+</div>
+      </div>
     </main>
   </div>
 
@@ -393,7 +414,21 @@
         this.checkSplashPreference();
         this.loadState();
         this.bindEvents();
+        // Initial resize for masonry
+        window.addEventListener('resize', this.debounce(() => this.resizeAllMasonryItems(), 100));
         this.render();
+      },
+
+      debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
       },
 
       hideSplashScreen(dontShowAgain = false) {
@@ -561,18 +596,48 @@
         spinner.className = 'spinner';
 
         const img = new Image();
-        img.crossOrigin = "anonymous";
+        // Removed crossOrigin = "anonymous" to prevent issues with Data URLs
         img.src = image.src;
         img.alt = "Moodboard image";
         img.onload = () => {
           spinner.remove();
           img.classList.add('loaded');
+          // Calculate masonry row span based on image height
+          this.resizeMasonryItem(card);
         };
 
         card.innerHTML = `<button class="delete-btn" title="Remove image">×</button>`;
         card.prepend(spinner);
         card.prepend(img);
         return card;
+      },
+
+      // Resize masonry items for proper CSS Grid masonry layout
+      resizeMasonryItem(card) {
+        const grid = this.el.moodboardCanvas;
+        // const rowHeight = 1; // 1px
+        const rowGap = 0; // we set row-gap to 0 in CSS
+
+        // We want a visual gap bottom, which is defined by the card's margin-bottom
+        // Let's assume the gap is same as column-gap (var(--space-4) usually 16px)
+        const gapStyles = getComputedStyle(grid).columnGap || '16px';
+        const gap = parseInt(gapStyles) || 16;
+
+        // Ensure the card has the margin set
+        card.style.marginBottom = `${gap}px`;
+
+        const contentHeight = card.getBoundingClientRect().height;
+        // Total height needed = content + gap
+        // Since row height is 1px and row-gap is 0, span is just total pixel height
+        const rowSpan = Math.ceil(contentHeight + gap);
+
+        card.style.gridRowEnd = `span ${rowSpan}`;
+      },
+
+      resizeAllMasonryItems() {
+        // Include the add-card-btn in the resizing logic
+        const allItems = this.el.moodboardCanvas.querySelectorAll('.moodboard-card, .add-card-btn');
+        allItems.forEach(item => this.resizeMasonryItem(item));
       },
 
       openModal(modalId) { this.el[modalId].classList.add('show'); },
@@ -617,15 +682,26 @@
           reader.readAsDataURL(file);
         } else {
           const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+          let loadedCount = 0;
+          const totalFiles = imageFiles.length;
 
-          const newImages = imageFiles.map(file => ({
-            id: Date.now() + Math.random(),
-            src: URL.createObjectURL(file),
-          }));
-
-          this.state.images.push(...newImages);
-          this.render();
-          this.regeneratePalette();
+          imageFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const newImage = {
+                id: Date.now() + Math.random(),
+                src: e.target.result // data URL instead of blob URL
+              };
+              this.state.images.push(newImage);
+              loadedCount++;
+              this.render();
+              // Regenerate palette after all images are loaded
+              if (loadedCount === totalFiles) {
+                setTimeout(() => this.regeneratePalette(), 100);
+              }
+            };
+            reader.readAsDataURL(file);
+          });
         }
       },
 
@@ -640,11 +716,8 @@
 
       removeImage(id) {
         const idToRemove = parseFloat(id);
-        const imageToRemove = this.state.images.find(img => img.id === idToRemove);
-        if (imageToRemove && imageToRemove.src.startsWith('blob:')) {
-          URL.revokeObjectURL(imageToRemove.src);
-        }
         this.state.images = this.state.images.filter(img => img.id !== idToRemove);
+        this.render();
         this.regeneratePalette();
       },
 
@@ -685,7 +758,18 @@
           this.saveAndRender();
           return;
         }
-        const colorPromises = this.state.images.map(image => this.extractColorsFromImage(image.src));
+
+        // Extract colors from images already loaded in the DOM
+        const canvas = this.el.moodboardCanvas;
+        const imgElements = canvas.querySelectorAll('.moodboard-card img.loaded');
+
+        if (imgElements.length === 0) {
+          // Wait for images to load
+          setTimeout(() => this.regeneratePalette(), 200);
+          return;
+        }
+
+        const colorPromises = Array.from(imgElements).map(img => this.extractColorsFromElement(img));
         const colorSets = await Promise.all(colorPromises);
 
         const colorCounts = new Map();
@@ -701,37 +785,83 @@
         this.saveAndRender();
       },
 
-      extractColorsFromImage(imageSrc) {
+      // Extract colors directly from an img element already in the DOM
+      extractColorsFromElement(imgElement) {
         return new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = "Anonymous";
-          img.onload = () => {
+          try {
             const canvas = document.createElement('canvas');
             const MAX_WIDTH = 100;
-            const scale = MAX_WIDTH / img.width;
+            const scale = MAX_WIDTH / imgElement.naturalWidth;
             canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.height = Math.max(1, Math.floor(imgElement.naturalHeight * scale));
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             const colorCounts = {};
+            let nonTransparentPixels = 0;
+
             for (let i = 0; i < imageData.length; i += 4) {
-              const r = imageData[i]; const g = imageData[i + 1]; const b = imageData[i + 2]; const a = imageData[i + 3];
+              const r = imageData[i];
+              const g = imageData[i + 1];
+              const b = imageData[i + 2];
+              const a = imageData[i + 3];
+
+              // Skip transparent pixels
               if (a < 125) continue;
+              nonTransparentPixels++;
+
+              // Skip very dark or very light pixels (increased thresholds)
               const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-              if (l > 245 || l < 10) continue;
-              const key = [r, g, b].join(',');
+              if (l > 230 || l < 30) continue;
+
+              // Skip grayscale/low saturation pixels
+              const maxC = Math.max(r, g, b);
+              const minC = Math.min(r, g, b); // CORRECTED from min to minC in logic
+              const saturation = maxC === 0 ? 0 : (maxC - minC) / maxC;
+              if (saturation < 0.15) continue;
+
+              // Quantize colors (group by 32 for better variation)
+              const qr = Math.round(r / 32) * 32;
+              const qg = Math.round(g / 32) * 32;
+              const qb = Math.round(b / 32) * 32;
+
+              // Skip if quantized result is too dark (near black)
+              if (qr + qg + qb < 64) continue;
+
+              const key = `${qr},${qg},${qb}`;
               colorCounts[key] = (colorCounts[key] || 0) + 1;
             }
-            const sortedColors = Object.keys(colorCounts).sort((a, b) => colorCounts[b] - colorCounts[a]);
+
+            // If we found mostly transparent or filtered pixels, try again with relaxed constraints?
+            // For now, if we found NOTHING, let's at least grab the center pixel color as fallback
+            if (Object.keys(colorCounts).length === 0 && nonTransparentPixels > 0) {
+              // Fallback: Sample center pixel
+              const centerIdx = Math.floor(imageData.length / 2) - (Math.floor(imageData.length / 2) % 4);
+              const fr = imageData[centerIdx];
+              const fg = imageData[centerIdx + 1];
+              const fb = imageData[centerIdx + 2];
+              const fkey = `${fr},${fg},${fb}`;
+              colorCounts[fkey] = 1;
+            }
+
+            const sortedColors = Object.keys(colorCounts)
+              .sort((a, b) => colorCounts[b] - colorCounts[a]);
+
             const topColors = sortedColors.slice(0, 10).map(key => {
-              const [r, g, b] = key.split(',');
-              return `#${(+r).toString(16).padStart(2, '0')}${(+g).toString(16).padStart(2, '0')}${(+b).toString(16).padStart(2, '0')}`;
+              const [r, g, b] = key.split(',').map(Number);
+              // Ensure minimum brightness for hex conversion ensures we never return pure black #000000
+              const mr = Math.max(r, 16);
+              const mg = Math.max(g, 16);
+              const mb = Math.max(b, 16);
+              return `#${mr.toString(16).padStart(2, '0')}${mg.toString(16).padStart(2, '0')}${mb.toString(16).padStart(2, '0')}`;
             });
+
             resolve(topColors);
-          };
-          img.onerror = () => resolve([]);
-          img.src = imageSrc;
+          } catch (e) {
+            console.warn('Could not extract colors from image element:', e);
+            resolve([]);
+          }
         });
       },
 

@@ -20,9 +20,24 @@
     <style>
         /* === QRCODES-SPECIFIC STYLES === */
 
+        /* Hide elements */
+        .hidden {
+            display: none !important;
+        }
+
         /* Header grid positioning */
         header.panel {
             grid-column: 1 / -1;
+        }
+
+        /* Fix controls panel alignment */
+        aside.panel.controls {
+            position: relative;
+            top: auto;
+            align-self: stretch;
+            height: 100%;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
         }
 
         /* Canvas with grid background */
@@ -238,14 +253,14 @@
                     if (dontShowAgain) {
                         localStorage.setItem('qrcodes-splash-hidden', 'true');
                     }
+                }
+            },
 
-                    checkSplashPreference() {
-                        if (localStorage.getItem('qrcodes-splash-hidden') === 'true') {
-                            this.state.splashHidden = true;
-                            this.el.splashScreen.classList.add('hidden');
-                            this.el.appContainer.classList.remove('loading');
-                        }
-                    },
+            checkSplashPreference() {
+                if (localStorage.getItem('qrcodes-splash-hidden') === 'true') {
+                    this.state.splashHidden = true;
+                    this.el.splashScreen.classList.add('hidden');
+                    this.el.appContainer.classList.remove('loading');
                 }
             },
 

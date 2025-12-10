@@ -24,13 +24,13 @@
 
         /* App-specific theme variables */
         html[data-theme="light"] {
-            --preview-panel-bg: var(--accent-yellow);
-            --icon-stroke-color: var(--accent-color);
+            --preview-panel-bg: var(--surface-alt);
+            --icon-stroke-color: #1a1a1a;
         }
 
         html[data-theme="dark"] {
-            --preview-panel-bg: #8B7518;
-            --icon-stroke-color: var(--accent-yellow);
+            --preview-panel-bg: var(--surface-alt);
+            --icon-stroke-color: #ffffff;
         }
 
         /* Custom grid layout for iconfactory */
@@ -45,7 +45,10 @@
 
         /* Panel sections */
         .controls-panel {
+            display: flex;
+            flex-direction: column;
             gap: 0;
+            overflow: hidden;
         }
 
         .panel-section {
@@ -57,9 +60,9 @@
         .panel-section-selectors-container {
             display: flex;
             gap: 20px;
-            flex-grow: 1;
+            flex: 1;
             min-height: 0;
-            padding: var(--space-4) var(--space-4);
+            padding: var(--space-4);
         }
 
         .panel-section-selectors-container .control-section {
@@ -67,10 +70,31 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
+            max-height: 100%;
         }
 
         .panel-section-selectors-container .section-content {
-            flex-grow: 1;
+            flex: 1;
+            min-height: 0;
+            overflow-y: scroll;
+            padding-right: 8px;
+        }
+
+        .panel-section-selectors-container .section-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel-section-selectors-container .section-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .panel-section-selectors-container .section-content::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .panel-section-selectors-container .section-content::-webkit-scrollbar-thumb:hover {
+            background: var(--muted);
         }
 
         /* Search bar */
@@ -127,11 +151,11 @@
 
         .section-content {
             overflow-y: auto;
-            padding-right: 8px;
+            padding-right: 6px;
         }
 
         .section-content::-webkit-scrollbar {
-            width: 2px;
+            width: 4px;
         }
 
         .section-content::-webkit-scrollbar-track {
@@ -140,7 +164,8 @@
 
         .section-content::-webkit-scrollbar-thumb {
             background-color: var(--border-color);
-            border-radius: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
         }
 
         .section-content::-webkit-scrollbar-thumb:hover {
@@ -191,6 +216,9 @@
         /* Canvas panel */
         .canvas-panel {
             background-image: none;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
         #saved-icons-container {
@@ -207,8 +235,10 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            align-content: flex-start;
             gap: 12px;
-            width: 398px;
+            width: 100%;
+            max-width: 350px;
         }
 
         .saved-icon-card {
@@ -297,41 +327,41 @@
             min-height: 70px;
         }
 
-        /* Preview panel with colored background */
+        /* Preview panel with neutral background */
         .panel-section-preview {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: var(--preview-panel-bg);
-            border-bottom-color: transparent;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .panel-section-preview .icon-name {
-            color: var(--color-accent-text);
+            color: var(--ink);
         }
 
         .panel-section-preview .preview-viewer-container {
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.3);
+            border-color: var(--border-color);
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
         }
 
         .panel-section-preview .btn-secondary-on-dark {
-            background-color: transparent;
-            color: var(--color-accent-text);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
             box-shadow: none;
         }
 
         .panel-section-preview .btn-secondary-on-dark:hover:not(:disabled) {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: var(--color-accent-text);
+            background-color: var(--surface-alt);
+            border-color: var(--accent-color);
         }
 
         .panel-section-preview .btn-secondary-on-dark:disabled {
-            background-color: transparent;
-            border-color: rgba(255, 255, 255, 0.4);
-            color: rgba(255, 255, 255, 0.4);
-            opacity: 1;
+            background-color: var(--surface);
+            border-color: var(--border-color);
+            color: var(--muted);
+            opacity: 0.6;
         }
 
         .preview-group {

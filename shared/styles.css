@@ -486,6 +486,144 @@ input[type="range"]::-moz-range-thumb {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 36px 10px 12px;
+  font-size: var(--font-size-body);
+  font-family: var(--font-family-sans);
+  cursor: pointer;
+  transition: all var(--duration-standard) ease;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+.select-wrapper select:hover {
+  border-color: var(--accent-color);
+}
+
+.select-wrapper select:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Standalone selects (not in wrapper) */
+select {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 36px 10px 12px;
+  font-size: var(--font-size-body);
+  font-family: var(--font-family-sans);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+select:hover {
+  border-color: var(--accent-color);
+}
+
+select:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Number Input Styling */
+input[type="number"] {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: var(--font-size-body);
+  font-family: var(--font-family-sans);
+  width: 100%;
+  box-sizing: border-box;
+  transition: all var(--duration-standard) ease;
+}
+
+input[type="number"]:hover {
+  border-color: var(--accent-color);
+}
+
+input[type="number"]:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Text Input Styling */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"] {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: var(--font-size-body);
+  font-family: var(--font-family-sans);
+  width: 100%;
+  box-sizing: border-box;
+  transition: all var(--duration-standard) ease;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="url"]:hover,
+input[type="password"]:hover,
+input[type="search"]:hover {
+  border-color: var(--accent-color);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Textarea Styling */
+textarea {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: var(--font-size-body);
+  font-family: var(--font-family-sans);
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+  transition: border-color var(--duration-standard) ease;
+}
+
+textarea:hover {
+  border-color: var(--accent-color);
+}
+
+textarea:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+textarea::placeholder {
+  color: var(--muted);
 }
 
 /* ===================================

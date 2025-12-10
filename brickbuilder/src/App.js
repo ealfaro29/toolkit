@@ -81,7 +81,7 @@ export const App = {
             'canvas-container', 'canvas-svg', 'canvas-transform', 'bricks-layer', 'selection-box',
             'dock', 'properties-panel', 'selection-info', 'properties-content', 'color-grid', 'custom-color',
             'prop-width', 'prop-height', 'bring-front-btn', 'send-back-btn',
-            'flip-btn', 'delete-btn', 'clear-btn', 'export-btn', 'export-png-btn', 'save-indicator', 'restore-btn',
+            'flip-btn', 'delete-btn', 'clear-btn', 'export-btn', 'save-indicator', 'restore-btn',
             'zoom-in', 'zoom-out', 'zoom-reset', 'zoom-level',
             'align-left', 'align-center-x', 'align-right', 'align-top', 'align-center-y', 'align-bottom',
             'context-menu', 'ctx-duplicate', 'ctx-rotate', 'ctx-group', 'ctx-ungroup', 'ctx-front', 'ctx-back', 'ctx-delete',
@@ -223,7 +223,6 @@ export const App = {
         this.el['delete-btn'].onclick = () => this.deleteSelected();
         this.el['flip-btn'].onclick = () => this.rotateSelected();
         this.el['export-btn'].onclick = () => this.handleExport();
-        this.el['export-png-btn'].onclick = () => this.exportPNG();
 
         window.onkeydown = (e) => this.handleKeyDown(e);
 
@@ -1353,83 +1352,5 @@ export const App = {
             this.el['restore-btn'].style.display = 'none';
             Storage.clearAutoSave();
         }
-    },
-
-    exportPNG() {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // Calculate bounding box
-        if (this.state.bricks.length === 0) {
-            alert('No bricks to export!');
-            return;
-        }
-
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        this.state.bricks.forEach(brick => {
-            const type = BRICK_TYPES.find(t => t.id === brick.typeId);
-            const w = brick.customWidth || type.width;
-            const h = brick.customHeight || type.height;
-            minX = Math.min(minX, brick.x);
-            minY = Math.min(minY, brick.y);
-            maxX = Math.max(maxX, brick.x + w);
-            maxY = Math.max(maxY, brick.y + h);
-        });
-
-        const padding = 20;
-        canvas.width = (maxX - minX) + padding * 2;
-        canvas.height = (maxY - minY) + padding * 2;
-
-        // White background
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw each brick
-        this.state.bricks.forEach(brick => {
-            const type = BRICK_TYPES.find(t => t.id === brick.typeId);
-            const bWidth = brick.customWidth || type.width;
-            const bHeight = brick.customHeight || type.height;
-            const x = brick.x - minX + padding;
-            const y = brick.y - minY + padding;
-
-            ctx.fillStyle = brick.color;
-            ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-            ctx.lineWidth = 1;
-
-            if (type.shape === 'slope' || type.shape === 'inv-slope') {
-                // Draw as polygon
-                ctx.beginPath();
-                if (type.shape === 'slope') {
-                    ctx.moveTo(x, y + bHeight);
-                    ctx.lineTo(x + bWidth, y + bHeight);
-                    ctx.lineTo(x + bWidth, y + 10);
-                    ctx.lineTo(x, y);
-                } else {
-                    ctx.moveTo(x, y + bHeight);
-                    ctx.lineTo(x + bWidth, y + bHeight);
-                    ctx.lineTo(x + bWidth, y);
-                    ctx.lineTo(x, y + 10);
-                }
-                ctx.closePath();
-                ctx.fill();
-                ctx.stroke();
-            } else {
-                // Rectangle
-                ctx.fillRect(x, y, bWidth, bHeight);
-                ctx.strokeRect(x, y, bWidth, bHeight);
-            }
-        });
-
-        // Download
-        canvas.toBlob(blob => {
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'brick-creation.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        });
     }
 };

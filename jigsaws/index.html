@@ -244,14 +244,14 @@
                     if (dontShowAgain) {
                         localStorage.setItem('jigsaws-splash-hidden', 'true');
                     }
+                }
+            },
 
-                    checkSplashPreference() {
-                        if (localStorage.getItem('jigsaws-splash-hidden') === 'true') {
-                            this.state.splashHidden = true;
-                            this.el.splashScreen.classList.add('hidden');
-                            this.el.appContainer.classList.remove('loading');
-                        }
-                    },
+            checkSplashPreference() {
+                if (localStorage.getItem('jigsaws-splash-hidden') === 'true') {
+                    this.state.splashHidden = true;
+                    this.el.splashScreen.classList.add('hidden');
+                    this.el.appContainer.classList.remove('loading');
                 }
             },
 

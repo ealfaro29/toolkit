@@ -18,11 +18,19 @@
 
     /* Hub Header - override shared styles */
     header.panel {
+      position: relative;
+      top: auto;
+      grid-column: auto;
+      height: auto;
+      min-height: 65px;
       display: flex;
       flex-direction: row;
+      flex-wrap: nowrap;
       align-items: center;
+      gap: var(--space-3);
       width: 100%;
       flex-shrink: 0;
+      padding: var(--space-4);
     }
 
     header.panel h1 {
@@ -32,6 +40,7 @@
 
     header.panel .sub {
       white-space: nowrap;
+      flex-grow: 1;
     }
 
     /* Search Bar */
@@ -39,12 +48,13 @@
       position: relative;
       margin-left: auto;
       margin-right: var(--space-3);
+      flex-shrink: 0;
     }
 
     .search-input {
-      width: 220px;
+      width: 220px !important;
       height: 36px;
-      padding: 0 var(--space-4) 0 36px;
+      padding: 0 var(--space-4) 0 36px !important;
       border: 1px solid var(--border-color);
       border-radius: 18px;
       background-color: var(--surface);
@@ -52,13 +62,14 @@
       font-size: var(--font-size-body);
       font-family: var(--font-family-sans);
       transition: all var(--duration-standard) ease;
+      box-sizing: border-box;
     }
 
     .search-input:focus {
       outline: none;
       border-color: var(--accent-color);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
-      width: 280px;
+      box-shadow: 0 0 0 3px rgba(231, 47, 47, 0.15);
+      width: 280px !important;
     }
 
     .search-input::placeholder {
@@ -1130,89 +1141,6 @@
         transform: translateY(0);
       }
     }
-
-    /* Under Construction Overlay */
-    #construction-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
-      z-index: 99999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 24px;
-    }
-
-    .construction-icon {
-      font-size: 80px;
-      animation: constructionBounce 2s ease-in-out infinite;
-    }
-
-    @keyframes constructionBounce {
-
-      0%,
-      100% {
-        transform: translateY(0) rotate(-5deg);
-      }
-
-      50% {
-        transform: translateY(-15px) rotate(5deg);
-      }
-    }
-
-    .construction-title {
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--ink);
-      text-align: center;
-      margin: 0;
-      background: linear-gradient(135deg, #E72F2F 0%, #F7CF27 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .construction-subtitle {
-      font-size: 18px;
-      color: var(--muted);
-      text-align: center;
-      margin: 0;
-      max-width: 400px;
-      line-height: 1.6;
-    }
-
-    .construction-progress {
-      width: 200px;
-      height: 6px;
-      background: var(--border-color);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 16px;
-    }
-
-    .construction-progress-bar {
-      width: 70%;
-      height: 100%;
-      background: linear-gradient(90deg, #E72F2F, #F7CF27);
-      border-radius: 3px;
-      animation: progressPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes progressPulse {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.6;
-      }
-    }
   </style>
   <script>
     (function () {
@@ -1230,16 +1158,6 @@
 </head>
 
 <body>
-  <!-- Under Construction Overlay -->
-  <div id="construction-overlay">
-    <div class="construction-icon">🚧</div>
-    <h1 class="construction-title">Under Construction</h1>
-    <p class="construction-subtitle">We are almost there, come back soon!</p>
-    <div class="construction-progress">
-      <div class="construction-progress-bar"></div>
-    </div>
-  </div>
-
   <div class="container">
     <header class="panel">
       <h1>VGTools Pro</h1>
@@ -1396,7 +1314,9 @@
 
     <footer class="site-footer-minimal">
       <div class="footer-left">
-        <span class="footer-version">v1.0.0</span>
+        <span class="footer-version">v1.0.2</span>
+        <span class="footer-divider">•</span>
+        <span class="footer-credit">by e. 2025</span>
         <span class="footer-divider">•</span>
         <span class="footer-app-count">15 apps</span>
         <span class="footer-divider">•</span>
