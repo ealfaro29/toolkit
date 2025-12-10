@@ -1,69 +1,99 @@
-# Creative Toolkit: A Universe of Mini-Apps
+# VGTools Pro - A Universe of Creative Mini-Apps
 
-Creative Toolkit is a powerful, client-side collection of mini-apps designed to streamline the daily tasks of creative professionals, such as presentation designers, visual artists, and developers. Born from the need for specific, fast, and secure solutions in a high-paced environment like McKinsey's Visual Graphics, this toolkit provides a suite of tools that run entirely in your browser, ensuring your data remains private and secure.
+<p align="center">
+  <img src="mockups/modal.png" alt="VGTools Pro Preview" width="600"/>
+</p>
 
-No installations, no sign-ups, just a universe of creative power at your fingertips.
+**VGTools Pro** is a powerful, client-side collection of 15 mini-apps designed to streamline the daily tasks of creative professionals, such as presentation designers, visual artists, and developers. Born from the need for specific, fast, and secure solutions, this toolkit provides a suite of tools that run entirely in your browser, ensuring your data remains private and secure.
 
-*(Image: Example of the Moodboard Studio)*
-
----
-
-✨ **Key Features**  
-This toolkit is built with a focus on efficiency and privacy. Here are some of the core principles:
-
-- **100% Client-Side**: All processing is done locally in your browser. Your files and data never leave your computer, making it perfect for handling confidential corporate assets.  
-- **Zero Installation**: Simply open the `index.html` file in a modern browser to get started. It's fully portable and can be shared easily among team members.  
-- **Modern, Intuitive Interface**: Features a clean, responsive design with light and dark themes, plus a drag-and-drop interface to organize the tools your way.  
-- **Tailored for Designers**: Each app solves a real-world problem faced by designers daily, from asset creation to final touches.  
+**No installations, no sign-ups, just a universe of creative power at your fingertips.**
 
 ---
 
-🚀 **The Apps**  
+## ✨ Key Features
 
-| Icon | App Name | Description |
-|------|----------|-------------|
-| 🖼️ | **Moodboard Studio** | Create and export beautiful, inspiring moodboards with custom branding, colors, and images. |
-| 💧 | **Blob Studio** | Generate smooth, organic, and unique SVG blob shapes. Tweak points, variance, and smoothness. |
-| 🧩 | **Jigsaw Generator** | Design and export custom vector jigsaw puzzle grids with control over rows, columns, and tab size. |
-| 🛠️ | **Icon Factory** | Combine shapes to create custom icons. Build your collection and download them as a ZIP file. |
-| 📱 | **QR Code Generator** | Create custom QR codes for URLs, WiFi, and more. All data is generated locally in your browser. |
-| 🌈 | **Color Mixer** | Generate harmonic color palettes and discover beautiful gradients from a single base color. |
-| 📝 | **Notepad & Kanban** | Capture ideas, then drag them into your workflow. Your data is saved automatically in the browser. |
-| 📍 | **Locator** | Geocode a list of locations and visualize the results on an interactive world map. Export as SVG. |
-| ✍️ | **Signature to SVG** | Convert image signatures into clean, scalable SVG vector graphics with adjustable settings. |
-| 🪄 | **Any2SVG** | Convert AI, PSD, PDF, and more to SVG. All files are processed locally in your browser. |
-| ✂️ | **Background Remover** | Client-side AI cutout. Click, drop or paste an image to automatically remove the background. |
-| 🎨 | **SVG Color Grouper (BETA)** | Upload an SVG, define color groups, and drag-and-drop to remap the entire palette. |
+| Feature | Description |
+|---------|-------------|
+| **100% Client-Side** | All processing is done locally in your browser. Your files and data never leave your computer. |
+| **Zero Installation** | Simply open `index.html` in a modern browser to get started. Fully portable and shareable. |
+| **Modern Interface** | Clean, responsive design with light and dark themes, plus drag-and-drop organization. |
+| **PWA Support** | Install as a Progressive Web App for quick access from your desktop or mobile. |
 
 ---
 
-🛠️ **Getting Started**  
+## 🚀 The 15 Apps
 
-No setup is required. To use the toolkit:
-
-1. Clone or download this repository.  
-2. Open the `index.html` file in your favorite modern web browser (like Chrome, Firefox, or Edge).  
-3. Start creating.  
-
----
-
-💡 **Vision & Roadmap**  
-
-The goal is to expand the Creative Toolkit into an indispensable resource for creative teams. Future areas of opportunity include:
-
-- **Deeper Integration**: Allow apps to communicate, such as using a palette from the Color Mixer directly in the Icon Factory.  
-- **Shared Asset Library**: A central place to store icons, blobs, and color palettes for reuse across projects.  
-- **Brand/Client Profiles**: Save client-specific assets (logos, colors, fonts) for quick access.  
-- **New Tools**: Continuously add new micro-apps that solve common design challenges.  
-
----
-
-🤝 **Contributing**  
-
-Contributions are welcome! If you have an idea for a new tool, an improvement to an existing one, or have found a bug, please feel free to open an issue or submit a pull request. Let's make this toolkit even better together.  
+| App | Description |
+|-----|-------------|
+| 🧱 **Brick Builder** | Design and build 2D brick structures with drag-and-drop. Export as SVG or PNG. |
+| 🖼️ **Moodboard Studio** | Create beautiful moodboards with custom branding, colors, and images. |
+| 💧 **Blob Studio** | Generate smooth, organic SVG blob shapes with customizable parameters. |
+| 🧩 **Jigsaw Generator** | Design custom vector jigsaw puzzle grids with full control over styling. |
+| 🛠️ **Icon Factory** | Combine shapes to create custom icons. Download your collection as ZIP. |
+| 📱 **QR Code Generator** | Create custom QR codes for URLs, WiFi, vCards, and more. |
+| 🌈 **Color Mixer** | Generate harmonic color palettes and gradients from a base color. |
+| 📝 **Notepad & Kanban** | Capture ideas and organize them in a Kanban workflow. Auto-saved. |
+| 📍 **Locator** | Geocode locations and visualize them on an interactive world map. |
+| ✍️ **Signature to SVG** | Convert image signatures into clean, scalable vector graphics. |
+| 🪄 **Any2SVG** | Convert AI, PSD, PDF, and more formats to SVG locally. |
+| ✂️ **Background Remover** | AI-powered client-side tool to automatically remove image backgrounds. |
+| ☁️ **Word Cloud Generator** | Generate beautiful word clouds from any text source. |
+| 📊 **Sankey Diagram** | Create professional flow diagrams with proportional arrow widths. |
+| 📱 **Device Mockups** | Create stunning device mockups for phones, tablets, laptops, and monitors. |
 
 ---
 
-📄 **License**  
+## 🛠️ Getting Started
 
-This project is licensed under the MIT License. See the `LICENSE.md` file for details.  
+No setup required. To use the toolkit:
+
+1. Clone or download this repository
+2. Open `index.html` in your favorite modern browser (Chrome, Firefox, Edge)
+3. Start creating!
+
+**Or install as PWA:**
+- Open the site in Chrome/Edge
+- Click the install button in the address bar
+- Access VGTools Pro directly from your desktop
+
+---
+
+## 💡 Vision & Roadmap
+
+Future areas of development include:
+
+- **Deeper Integration**: Allow apps to communicate (e.g., use a palette from Color Mixer in Icon Factory)
+- **Shared Asset Library**: Central storage for icons, blobs, and color palettes
+- **Brand/Client Profiles**: Save client-specific assets for quick access
+- **New Tools**: Continuously adding micro-apps that solve common design challenges
+
+---
+
+## 🔒 Privacy
+
+**Your data stays with you.** All processing happens in your browser:
+- No server uploads
+- No tracking or analytics
+- No accounts required
+- Works offline (PWA mode)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you have an idea for a new tool, an improvement, or have found a bug, please feel free to open an issue or submit a pull request.
+
+See [CONTRIBUTIONS.md](CONTRIBUTIONS.md) for guidelines.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
+
+---
+
+<p align="center">
+  <strong>Made with ❤️ by the VGTools team</strong><br>
+  <em>Version 1.0.2 • 15 Apps • 2025</em>
+</p>

@@ -1,0 +1,60 @@
+{
+  "name": "VGTools Pro",
+  "short_name": "VGTools",
+  "description": "A universe of creative mini-apps for designers. 100% client-side, zero installation required.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF6F0",
+  "theme_color": "#E72F2F",
+  "orientation": "any",
+  "categories": ["graphics", "design", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "mockups/modal.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "VGTools Pro Hub with mini-apps"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Brick Builder",
+      "short_name": "Bricks",
+      "description": "Design 2D brick structures",
+      "url": "/brickbuilder/",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Background Remover",
+      "short_name": "BG Remove",
+      "description": "AI-powered background removal",
+      "url": "/bgremover/",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "QR Code Generator",
+      "short_name": "QR Codes",
+      "description": "Create custom QR codes",
+      "url": "/qrcodes/",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
+    }
+  ]
+}
