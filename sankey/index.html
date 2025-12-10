@@ -964,14 +964,38 @@
                 `;
                 clone.insertBefore(style, clone.firstChild);
 
-                // Process links: bake in the stroke-opacity for WYSIWYG
+                // Remove all gradients (not editable in PowerPoint)
+                const defs = clone.querySelector('defs');
+                if (defs) {
+                    defs.remove();
+                }
+
+                // Process links: replace gradient with solid color from source node
                 const links = clone.querySelectorAll('.sankey-link');
                 links.forEach(link => {
+                    // Get the stroke URL which references the gradient
+                    const strokeUrl = link.getAttribute('stroke');
+                    if (strokeUrl && strokeUrl.startsWith('url(#')) {
+                        // Extract gradient id to find source color
+                        const gradientId = strokeUrl.match(/url\(#(.+)\)/)?.[1];
+                        if (gradientId) {
+                            // Find the corresponding gradient in the original SVG
+                            const originalGradient = svg.querySelector(`#${gradientId}`);
+                            if (originalGradient) {
+                                // Get the first stop color (source node color)
+                                const firstStop = originalGradient.querySelector('stop');
+                                if (firstStop) {
+                                    const color = firstStop.getAttribute('stop-color');
+                                    link.setAttribute('stroke', color);
+                                }
+                            }
+                        }
+                    }
                     link.setAttribute('stroke-opacity', linkOpacity);
-                    link.classList.remove('sankey-link'); // Remove class, keep inline styles
+                    link.classList.remove('sankey-link');
                 });
 
-                // Process link groups: remove blend mode (not supported in most SVG editors)
+                // Process link groups: remove blend mode class
                 const linkGroups = clone.querySelectorAll('.sankey-link-group');
                 linkGroups.forEach(group => {
                     group.classList.remove('sankey-link-group');
@@ -988,7 +1012,6 @@
                 rects.forEach(rect => {
                     const opacity = rect.getAttribute('opacity');
                     if (opacity) {
-                        // Keep the opacity attribute for PowerPoint compatibility
                         rect.setAttribute('fill-opacity', opacity);
                     }
                 });
