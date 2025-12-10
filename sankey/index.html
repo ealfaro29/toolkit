@@ -938,25 +938,63 @@
                 const svg = this.el.sankeySvg;
                 if (!svg) return;
 
+                // Get current theme for text color
+                const isDark = document.documentElement.dataset.theme === 'dark';
+                const textColor = isDark ? '#EAEAEB' : '#1C1C1E';
+                const linkOpacity = isDark ? 0.6 : 0.4;
+
+                // Clone the SVG
                 const clone = svg.cloneNode(true);
-                clone.setAttribute('width', '800');
-                clone.setAttribute('height', '600');
+
+                // Get the viewBox dimensions for proper sizing
+                const viewBox = svg.getAttribute('viewBox');
+                const [, , vbWidth, vbHeight] = viewBox ? viewBox.split(' ').map(Number) : [0, 0, 800, 600];
+
+                clone.setAttribute('width', vbWidth);
+                clone.setAttribute('height', vbHeight);
                 clone.removeAttribute('style');
 
+                // Add xmlns for standalone SVG compatibility
+                clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+                // Embed font styles (no background - transparent)
                 const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
                 style.textContent = `
-          text { font-family: Inter, system-ui, sans-serif; font-size: 12px; font-weight: 500; fill: #1C1C1E; }
-        `;
+                    text { font-family: Inter, system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 500; fill: ${textColor}; }
+                `;
                 clone.insertBefore(style, clone.firstChild);
 
-                const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                bg.setAttribute('width', '100%');
-                bg.setAttribute('height', '100%');
-                bg.setAttribute('fill', '#ffffff');
-                clone.insertBefore(bg, clone.firstChild);
+                // Process links: bake in the stroke-opacity for WYSIWYG
+                const links = clone.querySelectorAll('.sankey-link');
+                links.forEach(link => {
+                    link.setAttribute('stroke-opacity', linkOpacity);
+                    link.classList.remove('sankey-link'); // Remove class, keep inline styles
+                });
+
+                // Process link groups: remove blend mode (not supported in most SVG editors)
+                const linkGroups = clone.querySelectorAll('.sankey-link-group');
+                linkGroups.forEach(group => {
+                    group.classList.remove('sankey-link-group');
+                });
+
+                // Process text elements: set explicit fill color
+                const texts = clone.querySelectorAll('text');
+                texts.forEach(text => {
+                    text.setAttribute('fill', textColor);
+                });
+
+                // Process node rects: ensure opacity is baked in
+                const rects = clone.querySelectorAll('rect');
+                rects.forEach(rect => {
+                    const opacity = rect.getAttribute('opacity');
+                    if (opacity) {
+                        // Keep the opacity attribute for PowerPoint compatibility
+                        rect.setAttribute('fill-opacity', opacity);
+                    }
+                });
 
                 const svgData = new XMLSerializer().serializeToString(clone);
-                const blob = new Blob([`<?xml version="1.0" standalone="no"?>\n${svgData}`], { type: 'image/svg+xml' });
+                const blob = new Blob([`<?xml version="1.0" encoding="UTF-8"?>\n${svgData}`], { type: 'image/svg+xml' });
 
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
