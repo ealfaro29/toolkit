@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Jigsaw Generator</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
     <script>
         // This script is placed in the <head> to prevent a theme flash on load.
         (function () {
@@ -85,26 +86,354 @@
         .wiki-header {
             background-image: url('modal.png');
         }
+
+        /* ----------------------------------------------------- */
+        /*   iOS 26 LIQUID GLASS MIGRATION (Standardized)        */
+        /* ----------------------------------------------------- */
+
+        /* Splash Screen Override - Liquid Glass */
+        html[data-theme="light"] .splash-content,
+        html[data-theme="light"] header.panel,
+        html[data-theme="light"] aside.panel,
+        html[data-theme="light"] .wiki-modal-content {
+            /* iOS 26: Crystal clear, high gloss, rim lighting */
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.45) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+                /* Bright top rim */
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            /* Inner glow */
+        }
+
+        html[data-theme="dark"] .splash-content,
+        html[data-theme="dark"] header.panel,
+        html[data-theme="dark"] aside.panel,
+        html[data-theme="dark"] .wiki-modal-content {
+            background: linear-gradient(145deg, rgba(30, 30, 40, 0.75) 0%, rgba(20, 20, 30, 0.45) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+                /* Strong top rim */
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+            /* Subtle inner glow */
+        }
+
+        /* Ensure texts are legible on glass */
+        html[data-theme="light"] .splash-info h2,
+        html[data-theme="light"] header h1,
+        html[data-theme="light"] .control-group-title,
+        html[data-theme="light"] .level-header {
+            color: #1c1c1e;
+        }
+
+        /* Specific overrides for removing opaque backgrounds to allow glass */
+        header.panel,
+        aside.panel,
+        .splash-image,
+        .splash-info,
+        .wiki-modal-content {
+            background-color: transparent !important;
+            /* Force glass */
+            border: none !important;
+            /* Remove shared borders */
+            box-shadow: none !important;
+        }
+
+        /* Header Background Image overlay */
+        header.panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('modal.png') center / cover no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Ensure content is above */
+        header.panel>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Splash Screen Layout Updates */
+        .splash-content {
+            display: flex;
+            width: 800px;
+            max-width: 95vw;
+            height: 480px;
+            max-height: 90vh;
+            padding: 16px;
+            gap: 24px;
+            overflow: hidden;
+            border-radius: 40px;
+        }
+
+        .splash-image {
+            flex: 1.2;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splash-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 32px;
+            opacity: 0.85;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .splash-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+        }
+
+        .splash-info h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: rgba(125, 125, 125, 0.15);
+            border: 1px solid rgba(125, 125, 125, 0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .splash-info .description {
+            font-size: 16px;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .feature-item span.emoji {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: auto;
+        }
+
+        /* Wiki Modal */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-overlay.show {
+            display: flex;
+        }
+
+        .wiki-modal-content {
+            /* Glass Base */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 32px;
+            /* Match splash */
+            width: 800px;
+            max-width: 90vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Clean up specific wiki glass overrides since they are now handled by the shared class above */
+
+        /* Light Theme Wiki Glass specific cleanup */
+        html[data-theme="light"] .wiki-header h3,
+        html[data-theme="light"] .wiki-body {
+            color: #1c1c1e;
+        }
+
+        /* Dark Theme Wiki Glass specific cleanup */
+        html[data-theme="dark"] .wiki-header h3,
+        html[data-theme="dark"] .wiki-body {
+            color: #FFFFFF;
+        }
+
+        html[data-theme="dark"] .wiki-body ul {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        /* Header Updates */
+        .wiki-header {
+            height: 120px;
+            /* Increased height for better image visibility */
+            background: url('modal.png') center 65% / cover no-repeat;
+            position: relative;
+            padding: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            /* Align to top to give space for image below */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        /* Scrim for text readability */
+        .wiki-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+            z-index: 1;
+        }
+
+        /* Ensure content sits above scrim */
+        .wiki-header h3,
+        .wiki-header button {
+            position: relative;
+            z-index: 2;
+            color: #FFFFFF !important;
+            /* Always white on the image header */
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            /* Drop shadow for potential light spots */
+        }
+
+        .wiki-header button {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .wiki-header button:hover {
+            background: rgba(0, 0, 0, 0.5) !important;
+            transform: scale(1.05);
+        }
+
+        /* Force Remove theme overrides since we are using image */
+        html[data-theme="light"] .wiki-header,
+        html[data-theme="dark"] .wiki-header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        html[data-theme="light"] .wiki-header h3,
+        html[data-theme="dark"] .wiki-header h3 {
+            color: #FFFFFF;
+        }
+
+        .wiki-body {
+            padding: var(--space-5);
+            overflow-y: auto;
+            display: flex;
+            gap: var(--space-5);
+        }
+
+        .wiki-column {
+            flex: 1;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Splash Screen -->
     <div class="splash-overlay" id="splash-screen">
         <div class="splash-content">
-            <button id="splash-close-btn" title="Close">&times;</button>
-            <div class="splash-info">
-                <span class="splash-icon">🧩</span>
-                <h2 class="splash-title">Jigsaw Generator</h2>
-                <p class="splash-tech">Creates unique puzzles by procedurally generating SVG paths directly in your
-                    browser.</p>
-                <p class="splash-credits">2025. Toolkit by e</p>
-                <label class="splash-dont-show">
-                    <input type="checkbox" id="splash-dont-show-checkbox">
-                    Dont show again
-                </label>
-            </div>
+            <!-- Close button -->
+            <button id="splash-close-btn" title="Close">×</button>
+
+            <!-- Left side: Visual showcase -->
             <div class="splash-image">
-                <img src="modal.png" alt="Jigsaw Generator Splash Image">
+                <img src="modal.png" alt="Jigsaw Generator Visual" draggable="false">
+            </div>
+
+            <!-- Right side: Info panel -->
+            <div class="splash-info">
+                <div>
+                    <!-- Title and version -->
+                    <div>
+                        <h2>Jigsaw Generator</h2>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="description">
+                        Creates unique puzzles by procedurally generating SVG paths directly in your browser.
+                        Export scalable vector cuts for laser cutters or digital use.
+                    </p>
+
+                    <!-- Features list -->
+                    <div class="features">
+                        <div class="feature-item">
+                            <span class="emoji">🧩</span>
+                            Procedural Generation
+                        </div>
+                        <div class="feature-item">
+                            <span class="emoji">🎨</span>
+                            Clean SVG Export
+                        </div>
+                        <div class="feature-item">
+                            <span class="emoji">🔒</span>
+                            100% Local & Private
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer with checkbox and credits -->
+                <div class="footer">
+                    <label>
+                        <input type="checkbox" id="splash-dont-show-checkbox">
+                        Don't show again
+                    </label>
+                    <div class="version-badge" style="font-size: 9px; padding: 2px 8px; border-width: 1px;">V 1.0.0
+                    </div>
+                    <span class="credits">2025 · VGTools</span>
+                </div>
             </div>
         </div>
     </div>
@@ -161,29 +490,7 @@
     </div>
     <div id="wiki-overlay" class="popup-overlay"></div>
     <script>
-        const WIKI_DATA = {
-            "title": "Jigsaw Generator Info",
-            "sections": [
-                {
-                    "title": "How to Use",
-                    "content": [
-                        "<b>1. Adjust Grid:</b> Use the 'Columns' and 'Rows' sliders to define the size of your puzzle.",
-                        "<b>2. Customize Pieces:</b> Control the 'Gap' between pieces and the 'Tab Size' to change the puzzle's difficulty and style.",
-                        "<b>3. Generate:</b> Click 'Generate' to create a new, unique random layout with your current settings.",
-                        "<b>4. Download:</b> Export your final puzzle as a clean, scalable SVG file, ready for cutters or digital use."
-                    ]
-                },
-                {
-                    "title": "Features",
-                    "content": [
-                        "<b>Procedural Generation:</b> Every click of 'Generate' creates a completely unique puzzle layout; no two are ever the same.",
-                        "<b>Vector Output:</b> The exported SVG is perfect for laser cutters, vinyl cutters, or for use in digital design software.",
-                        "<b>Real-time Preview:</b> See your changes instantly in the main preview area.",
-                        "<b>Local & Private:</b> All puzzle generation happens in your browser. Nothing is ever uploaded."
-                    ]
-                }
-            ]
-        };
+        const WIKI_DATA = {}; // Deprecated: Using direct HTML injection for parity with other apps
         const JigsawApp = {
             el: {},
             state: {
@@ -193,7 +500,7 @@
             },
             PIECE_BASE_SIZE: 160,
             THEMES: ['light', 'dark', 'system'],
-            THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+            THEME_ICONS: { light: '☀️', dark: '🌙', system: '⚙️' },
 
             init() {
                 this.cacheDOMElements();
@@ -280,37 +587,47 @@
                 if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
                     const wikiModal = document.createElement('div');
                     wikiModal.className = 'wiki-modal-content';
+                    // Standardized HTML Structure (Brick Builder/Mockups/Sankey parity)
                     wikiModal.innerHTML = `
-                        <div class="wiki-header">
-                          <h3 id="wiki-title">Info</h3>
-                          <button id="wiki-close-btn" title="Close">×</button>
+                    <div class="wiki-header">
+                        <h3 style="margin: 0;">Info</h3>
+                        <button id="wiki-close-btn" class="icon-btn" style="background: rgba(255,255,255,0.2); border: none; color: white;">&times;</button>
+                    </div>
+                    <div class="wiki-body">
+                        <div class="wiki-column">
+                            <h4 style="color: var(--accent-color); margin-bottom: 16px;">How to Use</h4>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                                <li><b>Adjust Grid:</b> Use Columns/Rows sliders to set size.</li>
+                                <li><b>Customize:</b> Tweak Gap and Tab Size for style.</li>
+                                <li><b>Generate:</b> Click to create a unique random layout.</li>
+                                <li><b>Download:</b> Export as clean SVG for cutting.</li>
+                            </ul>
+
+                            <h4 style="color: var(--accent-color); margin-top: 24px; margin-bottom: 16px;">Shortcuts</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; color: var(--ink);">
+                                <div><span>Generate</span> <b style="float: right; opacity: 0.7;">Click</b></div>
+                                <div><span>Download</span> <b style="float: right; opacity: 0.7;">Click</b></div>
+                                <div><span>Theme</span> <b style="float: right; opacity: 0.7;">Click</b></div>
+                            </div>
                         </div>
-                        <div id="wiki-content"></div>`;
+
+                        <div class="wiki-column">
+                            <h4 style="color: var(--accent-color); margin-bottom: 16px;">Techniques</h4>
+                            <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                                <li><b>Laser Cutting:</b> Downloaded SVGs are perfect for laser cutters (Red/Vector lines).</li>
+                                <li><b>Vinyl:</b> Use for creating custom vinyl decals.</li>
+                                <li><b>Print:</b> Scale to any size without quality loss for printing templates.</li>
+                            </ul>
+
+                            <div style="margin-top: 20px; padding: 16px; background: rgba(79, 70, 229, 0.1); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 12px; font-size: 13px; color: var(--ink);">
+                                <b>🚀 Pro Tip</b><br>
+                                Need a specific aspect ratio? Adjust rows/cols to approximate it, then scale the SVG in your design software.
+                            </div>
+                        </div>
+                    </div>`;
+
                     this.el.wikiOverlay.appendChild(wikiModal);
                     wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
-                }
-
-                if (!this.state.isWikiLoaded) {
-                    const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-                    const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-                    titleEl.textContent = WIKI_DATA.title;
-
-                    const col1 = document.createElement('div'); col1.className = 'wiki-column';
-                    const col2 = document.createElement('div'); col2.className = 'wiki-column';
-
-                    WIKI_DATA.sections.forEach((s, index) => {
-                        const sectionContainer = document.createElement('div');
-                        const h4 = document.createElement('h4'); h4.textContent = s.title;
-                        sectionContainer.appendChild(h4);
-                        s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-                        if (index < 1) { col1.appendChild(sectionContainer); }
-                        else { col2.appendChild(sectionContainer); }
-                    });
-
-                    contentEl.innerHTML = '';
-                    contentEl.appendChild(col1);
-                    contentEl.appendChild(col2);
-                    this.state.isWikiLoaded = true;
                 }
                 this.el.wikiOverlay.classList.add('show');
             },
@@ -419,6 +736,8 @@
             JigsawApp.init();
         });
     </script>
+    <a id="visitor-badge" class="visitor-badge" href="#" target="_blank" title="Visitors"></a>
+    <script src="../shared/visitor-badge.js"></script>
 </body>
 
 </html>

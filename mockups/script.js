@@ -2,24 +2,26 @@ const WIKI_DATA = {
     "title": "Device Mockups",
     "sections": [
         {
-            "title": "How to Use",
-            "content": [
-                "<b>1. Upload Image:</b> Click or drag-drop your screenshot into the upload zone.",
-                "<b>2. Select Device:</b> Choose from Phone, Tablet, Laptop, Watch, or Monitor.",
-                "<b>3. Adjust Position:</b> Drag directly on the canvas to reposition your image.",
-                "<b>4. Zoom:</b> Use your mouse wheel to scale the image up or down.",
-                "<b>5. Customize:</b> Change orientation (for phones/tablets) and select frame color.",
-                "<b>6. Download:</b> Click 'Download Mockup' to save your high-resolution PNG."
-            ]
+            "title": "Quick Start",
+            "content": `
+                <p>Create professional device mockups in seconds.</p>
+                <ul>
+                    <li><b>Upload:</b> Drag & drop your screenshot or click the upload zone.</li>
+                    <li><b>Device:</b> Select from Phone, Tablet, Laptop, Watch, or Monitor.</li>
+                    <li><b>Position:</b> Drag canvas to pan, scroll to zoom.</li>
+                </ul>
+            `
         },
         {
-            "title": "Features",
-            "content": [
-                "<b>5 Devices:</b> Modern phone, tablet, laptop, smartwatch, and desktop monitor.",
-                "<b>Realistic Materials:</b> Choose between white (glossy plastic), black (matte), or silver (metallic) finishes.",
-                "<b>Direct Manipulation:</b> No sliders—just drag and scroll for intuitive control.",
-                "<b>Transparent Export:</b> Perfect for presentations and marketing materials."
-            ]
+            "title": "Customization",
+            "content": `
+                <p>Fine-tune the appearance to match your brand.</p>
+                <ul>
+                    <li><b>Materials:</b> Toggle between White (Gloss), Black (Matte), or Silver (Alum).</li>
+                    <li><b>Orientation:</b> Rotate phones/tablets with the <span style="font-size:16px">↻</span> button.</li>
+                    <li><b>Export:</b> Download high-res PNGs with transparent backgrounds.</li>
+                </ul>
+            `
         }
     ]
 };
@@ -1015,52 +1017,54 @@ const MockupApp = {
         if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
             const wikiModal = document.createElement('div');
             wikiModal.className = 'wiki-modal-content';
+            // Brick Builder Structure: Fixed HTML injection
             wikiModal.innerHTML = `
-        <div class="wiki-header">
-          <h3 id="wiki-title">Info</h3>
-          <button id="wiki-close-btn" title="Close">×</button>
-        </div>
-        <div id="wiki-content"></div>
-      `;
+            <div class="wiki-header">
+                <h3 style="margin: 0;">Info</h3>
+                <button id="wiki-close-btn" class="icon-btn" style="background: rgba(255,255,255,0.2); border: none; color: white;">&times;</button>
+            </div>
+            <div class="wiki-body">
+                <div class="wiki-column">
+                    <h4 style="color: var(--accent-color); margin-bottom: 16px;">Core Controls</h4>
+                    <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                        <li><b>Upload:</b> Drag & drop your screenshot or click the upload zone.</li>
+                        <li><b>Device:</b> Select from Phone, Tablet, Laptop, Watch, or Monitor.</li>
+                        <li><b>Position:</b> Drag canvas to pan, scroll to zoom.</li>
+                        <li><b>Orientation:</b> Rotate phones/tablets with the <span style="font-size:16px">↻</span> button.</li>
+                    </ul>
+
+                    <h4 style="color: var(--accent-color); margin-top: 24px; margin-bottom: 16px;">Shortcuts</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; font-size: 13px; color: var(--ink);">
+                        <div><span>Download</span> <b style="float: right; opacity: 0.7;">Click</b></div>
+                        <div><span>Rotate</span> <b style="float: right; opacity: 0.7;">Click</b></div>
+                        <div><span>Zoom</span> <b style="float: right; opacity: 0.7;">Scroll</b></div>
+                        <div><span>Pan</span> <b style="float: right; opacity: 0.7;">Drag</b></div>
+                    </div>
+                </div>
+
+                <div class="wiki-column">
+                    <h4 style="color: var(--accent-color); margin-bottom: 16px;">Pro Techniques</h4>
+                    <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                        <li><b>Materials:</b> Toggle between White (Gloss), Black (Matte), or Silver (Alum).</li>
+                        <li><b>Cover Mode:</b> Images auto-scale to fill the screen ("Cover" fit).</li>
+                        <li><b>High Res:</b> Exports are @2x retina quality by default.</li>
+                    </ul>
+
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(79, 70, 229, 0.1); border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 12px; font-size: 13px; color: var(--ink);">
+                        <b>🚀 Exporting Your Work</b><br>
+                        Click "Download Mockup" to save a high-quality PNG with transparent background. Perfect for presentations.
+                    </div>
+                </div>
+            </div>`;
+
             this.el.wikiOverlay.appendChild(wikiModal);
             wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
         }
-
-        if (!this.state.isWikiLoaded) {
-            const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-            const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-            if (titleEl) titleEl.textContent = WIKI_DATA.title;
-
-            const col1 = document.createElement('div');
-            col1.className = 'wiki-column';
-            const col2 = document.createElement('div');
-            col2.className = 'wiki-column';
-
-            WIKI_DATA.sections.forEach((s, index) => {
-                const sectionContainer = document.createElement('div');
-                const h4 = document.createElement('h4'); h4.textContent = s.title;
-                sectionContainer.appendChild(h4);
-                s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-
-                if (index < Math.ceil(WIKI_DATA.sections.length / 2)) {
-                    col1.appendChild(sectionContainer);
-                } else {
-                    col2.appendChild(sectionContainer);
-                }
-            });
-
-            if (contentEl) {
-                contentEl.innerHTML = '';
-                contentEl.appendChild(col1);
-                contentEl.appendChild(col2);
-            }
-
-            this.state.isWikiLoaded = true;
-        }
-        if (this.el.wikiOverlay) this.el.wikiOverlay.classList.add('show');
+        this.el.wikiOverlay.classList.add('show');
     },
+
     closeWiki() {
-        if (this.el.wikiOverlay) this.el.wikiOverlay.classList.remove('show');
+        this.el.wikiOverlay.classList.remove('show');
     }
 };
 

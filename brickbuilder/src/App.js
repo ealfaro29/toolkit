@@ -35,41 +35,39 @@ export const App = {
     },
 
     checkSplashScreen() {
+        // TEMPORARY: Always show splash for testing new design
         // Check permanent hide preference
-        if (localStorage.getItem('brickbuilder-splash-hidden') === 'true') {
-            this.el['app-container'].classList.remove('loading');
-            this.el['splash-screen'].classList.add('hidden');
-            return;
-        }
+        // if (localStorage.getItem('brickbuilder-splash-hidden') === 'true') {
+        //     this.el['app-container'].classList.remove('loading');
+        //     this.el['splash-screen'].classList.add('hidden');
+        //     return;
+        // }
 
-        const SPLASH_KEY = 'brickbuilder_last_splash';
-        const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        // const SPLASH_KEY = 'brickbuilder_last_splash';
+        // const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-        const lastShown = localStorage.getItem(SPLASH_KEY);
-        const now = Date.now();
+        // const lastShown = localStorage.getItem(SPLASH_KEY);
+        // const now = Date.now();
 
-        let shouldShow = false;
+        // let shouldShow = false;
 
-        if (!lastShown) {
-            // First time visit
-            shouldShow = true;
-        } else {
-            const timeSinceLastShown = now - parseInt(lastShown);
-            if (timeSinceLastShown >= TWENTY_FOUR_HOURS) {
-                // Been 24+ hours since last shown
-                shouldShow = true;
-            }
-        }
+        // if (!lastShown) {
+        //     // First time visit
+        //     shouldShow = true;
+        // } else {
+        //     const timeSinceLastShown = now - parseInt(lastShown);
+        //     if (timeSinceLastShown >= TWENTY_FOUR_HOURS) {
+        //         // Been 24+ hours since last shown
+        //         shouldShow = true;
+        //     }
+        // }
 
-        // Remove loading state and show/hide splash
+        // Remove loading state and show splash always
         setTimeout(() => {
-            if (shouldShow) {
-                this.el['splash-screen'].classList.remove('hidden');
-                // Update timestamp when splash is shown
-                localStorage.setItem(SPLASH_KEY, now.toString());
-            } else {
-                this.el['splash-screen'].classList.add('hidden');
-            }
+            // Always show splash
+            this.el['splash-screen'].classList.remove('hidden');
+            // Update timestamp when splash is shown
+            // localStorage.setItem(SPLASH_KEY, now.toString());
             this.el['app-container'].classList.remove('loading');
         }, 100);
     },

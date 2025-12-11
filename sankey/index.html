@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sankey Diagram — Flow Visualization Tool</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
 
     <link rel="stylesheet" href="../shared/styles.css" />
     <style>
@@ -246,7 +247,100 @@
 
         /* Wiki header background */
         .wiki-header {
-            background-image: url('modal.png');
+            height: 120px;
+            /* Increased height for better image visibility */
+            background: url('modal.png') center 65% / cover no-repeat;
+            position: relative;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        /* Scrim for text readability */
+        .wiki-header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+            z-index: 1;
+        }
+
+        .wiki-header h3,
+        .wiki-header button {
+            position: relative;
+            z-index: 2;
+            color: #FFFFFF !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+        }
+
+        .wiki-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .wiki-body {
+            padding: var(--space-5);
+            overflow-y: auto;
+            display: flex;
+            gap: var(--space-5);
+            color: var(--ink);
+        }
+
+        .wiki-column {
+            flex: 1;
+        }
+
+        .wiki-column h4 {
+            color: var(--accent-color);
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .wiki-column ul {
+            padding-left: 20px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .wiki-column li {
+            margin-bottom: 8px;
+        }
+
+        /* Dark mode overrides for wiki text */
+        html[data-theme="dark"] .wiki-body {
+            color: #EAEAEB;
+        }
+
+        .wiki-header button {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            padding: 0;
+        }
+
+        .wiki-header button:hover {
+            background: rgba(0, 0, 0, 0.5) !important;
+            transform: scale(1.05);
+        }
+
+        /* Force Remove theme overrides since we are using image */
+        html[data-theme="light"] .wiki-header,
+        html[data-theme="dark"] .wiki-header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
         }
 
         /* Level card container */
@@ -371,22 +465,245 @@
             color: var(--accent-color);
             background: var(--accent-color-tint);
         }
+
+        /* ----------------------------------------------------- */
+        /*   iOS 26 LIQUID GLASS MIGRATION (from Brickbuilder)   */
+        /* ----------------------------------------------------- */
+
+        /* Splash Screen Override - Liquid Glass */
+        html[data-theme="light"] .splash-content,
+        html[data-theme="light"] header.panel,
+        html[data-theme="light"] aside.panel,
+        /* Matches .controls */
+        html[data-theme="light"] .toast,
+        html[data-theme="light"] .level-card,
+        html[data-theme="light"] .wiki-modal-content {
+            /* iOS 26: Crystal clear, high gloss, rim lighting */
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.45) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+                /* Bright top rim */
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            /* Inner glow */
+        }
+
+        html[data-theme="dark"] .splash-content,
+        html[data-theme="dark"] header.panel,
+        html[data-theme="dark"] aside.panel,
+        html[data-theme="dark"] .toast,
+        html[data-theme="dark"] .level-card,
+        html[data-theme="dark"] .wiki-modal-content {
+            background: linear-gradient(145deg, rgba(30, 30, 40, 0.75) 0%, rgba(20, 20, 30, 0.45) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+                /* Strong top rim */
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+            /* Subtle inner glow */
+        }
+
+        /* Ensure texts are legible on glass */
+        html[data-theme="light"] .splash-info h2,
+        html[data-theme="light"] header h1,
+        html[data-theme="light"] .control-group-title,
+        html[data-theme="light"] .level-header {
+            color: #1c1c1e;
+        }
+
+        /* Specific overrides for removing opaque backgrounds to allow glass */
+        header.panel,
+        aside.panel,
+        .level-card,
+        .splash-image,
+        .splash-info,
+        .wiki-modal-content {
+            background-color: transparent !important;
+            /* Force glass */
+            border: none !important;
+            /* Remove shared borders */
+            box-shadow: none !important;
+        }
+
+        /* Header Background Image overlay */
+        header.panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('modal.png') center / cover no-repeat;
+            opacity: 0.15;
+            /* Reduced for better legibility */
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Ensure content is above */
+        header.panel>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Splash Screen Layout Updates */
+        .splash-content {
+            display: flex;
+            width: 800px;
+            /* Wider for 2 columns */
+            max-width: 95vw;
+            height: 480px;
+            max-height: 90vh;
+            padding: 16px;
+            gap: 24px;
+            overflow: hidden;
+            border-radius: 40px;
+            /* iOS 26 Rounding */
+        }
+
+        .splash-image {
+            flex: 1.2;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splash-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 32px;
+            opacity: 0.85;
+            /* Liquid Glass transparency */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .splash-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+        }
+
+        .splash-info h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: rgba(125, 125, 125, 0.15);
+            border: 1px solid rgba(125, 125, 125, 0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .splash-info .description {
+            font-size: 16px;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .feature-item span.emoji {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: auto;
+        }
     </style>
 </head>
 
 <body>
     <div class="splash-overlay" id="splash-screen">
         <div class="splash-content">
-            <button id="splash-close-btn" title="Close">&times;</button>
-            <div class="splash-info">
-                <span class="splash-icon">📊</span>
-                <h2 class="splash-title">Sankey Diagram</h2>
-                <p class="splash-tech">Create flow diagrams with proportional widths. Perfect for budgets, processes,
-                    and resource flows.</p>
-                <p class="splash-credits">2025. VGTools Pro</p>
+            <!-- Close button -->
+            <button id="splash-close-btn" title="Close">×</button>
+
+            <!-- Left side: Visual showcase -->
+            <div class="splash-image">
+                <img src="modal.png" alt="Sankey Visual" draggable="false">
             </div>
-            <div class="splash-image" id="splash-preview">
-                <!-- Preview will be rendered here -->
+
+            <!-- Right side: Info panel -->
+            <div class="splash-info">
+                <div>
+                    <!-- Title and version -->
+                    <div>
+                        <h2>Sankey Diagram</h2>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="description">
+                        Visualize complex flows and resource distribution with proportional arrows. Budgeting, energy,
+                        and
+                        process mapping made beautiful.
+                    </p>
+
+                    <!-- Features list -->
+                    <div class="features">
+                        <div class="feature-item">
+                            <span class="emoji">📊</span>
+                            Proportional Visualization
+                        </div>
+                        <div class="feature-item">
+                            <span class="emoji">🏗️</span>
+                            Multi-Level Architecture
+                        </div>
+                        <div class="feature-item">
+                            <span class="emoji">📤</span>
+                            High-Res SVG Export
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer with checkbox and credits -->
+                <div class="footer">
+                    <label>
+                        <input type="checkbox" id="splash-dont-show-checkbox">
+                        Don't show again
+                    </label>
+                    <div class="version-badge" style="font-size: 9px; padding: 2px 8px; border-width: 1px;">V 1.2.0
+                    </div>
+                    <span class="credits">2025 · VGTools</span>
+                </div>
             </div>
         </div>
     </div>
@@ -470,10 +787,35 @@
             "title": "Sankey Diagram",
             "sections": [
                 {
-                    "title": "About",
-                    "content": [
-                        "The Sankey Diagram is a powerful visualization tool used to depict flows in a system. The width of the arrows is proportional to the flow quantity."
-                    ]
+                    "title": "Getting Started",
+                    "content": `
+                        <p>The Sankey Diagram visualizes flows in a system, where arrow width equals flow quantity. Perfect for budgets, energy, or supply chains.</p>
+                        <ul>
+                            <li><b>Nodes:</b> Entities like "Income" or "Rent".</li>
+                            <li><b>Flows:</b> Arrows connecting Source → Target.</li>
+                        </ul>
+                    `
+                },
+                {
+                    "title": "Editing Flows",
+                    "content": `
+                        <p>Build your diagram level by level using the sidebar controls:</p>
+                        <ul>
+                            <li><b>Add Level:</b> Creates a new column of nodes to the right.</li>
+                            <li><b>Add Flow:</b> Adds a new link within the current level.</li>
+                            <li><b>Value:</b> Sets the thickness of the connection.</li>
+                        </ul>
+                    `
+                },
+                {
+                    "title": "Pro Tips",
+                    "content": `
+                        <ul>
+                            <li><b>Continuity:</b> Ensure a node's total input equals its total output for a balanced flow.</li>
+                            <li><b>Colors:</b> Nodes are auto-colored by category.</li>
+                            <li><b>Export:</b> Use <span class="emoji">📤</span> <b>Download SVG</b> to save a high-res vector for presentations.</li>
+                        </ul>
+                    `
                 }
             ]
         };
@@ -1034,7 +1376,7 @@
                 if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
                     const wikiModal = document.createElement('div');
                     wikiModal.className = 'wiki-modal-content';
-                    wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content"></div>`;
+                    wikiModal.innerHTML = `<div class="wiki-header"><h3 id="wiki-title">Info</h3><button id="wiki-close-btn" title="Close">×</button></div><div id="wiki-content" class="wiki-body"></div>`;
                     this.el.wikiOverlay.appendChild(wikiModal);
                     wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
                 }
@@ -1045,7 +1387,7 @@
                     const col2 = document.createElement('div'); col2.className = 'wiki-column';
                     WIKI_DATA.sections.forEach((s, index) => {
                         const sectionContainer = document.createElement('div');
-                        sectionContainer.innerHTML = `<h4>${s.title}</h4>${s.content.map(c => `<p>${c}</p>`).join('')}`;
+                        sectionContainer.innerHTML = `<h4>${s.title}</h4><div>${s.content}</div>`;
                         if (index < Math.ceil(WIKI_DATA.sections.length / 2)) col1.appendChild(sectionContainer);
                         else col2.appendChild(sectionContainer);
                     });
@@ -1085,6 +1427,8 @@
 
         document.addEventListener('DOMContentLoaded', () => SankeyApp.init());
     </script>
+    <a id="visitor-badge" class="visitor-badge" href="#" target="_blank" title="Visitors"></a>
+    <script src="../shared/visitor-badge.js"></script>
 </body>
 
 </html>

@@ -5,6 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Color Mixer</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <script>
     // This script is placed in the <head> to prevent a theme flash on load.
     (function () {
@@ -710,6 +711,299 @@
       color: var(--accent-color);
     }
 
+    /* ----------------------------------------------------- */
+    /*   iOS 26 LIQUID GLASS MIGRATION (Standardized)        */
+    /* ----------------------------------------------------- */
+
+    /* Splash Screen Override - Liquid Glass */
+    html[data-theme="light"] .splash-content,
+    html[data-theme="light"] header.panel,
+    html[data-theme="light"] aside.panel,
+    html[data-theme="light"] .wiki-modal-content {
+      /* iOS 26: Crystal clear, high gloss, rim lighting */
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.45) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+        /* Bright top rim */
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+      /* Inner glow */
+    }
+
+    html[data-theme="dark"] .splash-content,
+    html[data-theme="dark"] header.panel,
+    html[data-theme="dark"] aside.panel,
+    html[data-theme="dark"] .wiki-modal-content {
+      background: linear-gradient(145deg, rgba(30, 30, 40, 0.75) 0%, rgba(20, 20, 30, 0.45) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+        /* Strong top rim */
+        inset 0 0 20px rgba(255, 255, 255, 0.05);
+      /* Subtle inner glow */
+    }
+
+    /* Ensure texts are legible on glass */
+    html[data-theme="light"] .splash-info h2,
+    html[data-theme="light"] header h1,
+    html[data-theme="light"] .control-group-title,
+    html[data-theme="light"] .level-header {
+      color: #1c1c1e;
+    }
+
+    /* Specific overrides for removing opaque backgrounds to allow glass */
+    header.panel,
+    aside.panel,
+    .splash-image,
+    .splash-info,
+    .wiki-modal-content {
+      background-color: transparent !important;
+      /* Force glass */
+      border: none !important;
+      /* Remove shared borders */
+      box-shadow: none !important;
+    }
+
+    /* Header Background Image overlay */
+    header.panel {
+      position: relative;
+      overflow: hidden;
+    }
+
+    header.panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('modal.png') center / cover no-repeat;
+      opacity: 0.15;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Ensure content is above */
+    header.panel>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Splash Screen Layout Updates */
+    .splash-content {
+      display: flex;
+      width: 800px;
+      max-width: 95vw;
+      height: 480px;
+      max-height: 90vh;
+      padding: 16px;
+      gap: 24px;
+      overflow: hidden;
+      border-radius: 40px;
+    }
+
+    .splash-image {
+      flex: 1.2;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .splash-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 32px;
+      opacity: 0.85;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .splash-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+    }
+
+    .splash-info h2 {
+      font-size: 32px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      background: rgba(125, 125, 125, 0.15);
+      border: 1px solid rgba(125, 125, 125, 0.2);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .splash-info .description {
+      font-size: 16px;
+      opacity: 0.8;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .feature-item span.emoji {
+      font-size: 20px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      opacity: 0.8;
+      margin-top: auto;
+    }
+
+    /* Wiki Modal */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    /* Additional override for wiki content handled by shared class but ensuring priority */
+    .wiki-modal-content {
+      /* Glass Base */
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 32px;
+      /* Match splash */
+      width: 800px;
+      max-width: 90vw;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* Clean up specific wiki glass overrides since they are now handled by the shared class above */
+
+    /* Light Theme Wiki Glass specific cleanup */
+    html[data-theme="light"] .wiki-header h3,
+    html[data-theme="light"] .wiki-body {
+      color: #1c1c1e;
+    }
+
+    /* Dark Theme Wiki Glass specific cleanup */
+    html[data-theme="dark"] .wiki-header h3,
+    html[data-theme="dark"] .wiki-body {
+      color: #FFFFFF;
+    }
+
+    html[data-theme="dark"] .wiki-body ul {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    /* Header Updates */
+    .wiki-header {
+      height: 120px;
+      /* Increased height for better image visibility */
+      background: url('modal.png') center 65% / cover no-repeat;
+      position: relative;
+      padding: var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      /* Align to top to give space for image below */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+
+    /* Scrim for text readability */
+    .wiki-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+      z-index: 1;
+    }
+
+    /* Ensure content sits above scrim */
+    .wiki-header h3,
+    .wiki-header button {
+      position: relative;
+      z-index: 2;
+      color: #FFFFFF !important;
+      /* Always white on the image header */
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      /* Drop shadow for potential light spots */
+    }
+
+    .wiki-header button {
+      background: rgba(0, 0, 0, 0.3) !important;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .wiki-header button:hover {
+      background: rgba(0, 0, 0, 0.5) !important;
+      transform: scale(1.05);
+    }
+
+    /* Force Remove theme overrides since we are using image */
+    html[data-theme="light"] .wiki-header,
+    html[data-theme="dark"] .wiki-header {
+      border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html[data-theme="light"] .wiki-header h3,
+    html[data-theme="dark"] .wiki-header h3 {
+      color: #FFFFFF;
+    }
+
+    .wiki-body {
+      padding: var(--space-5);
+      overflow-y: auto;
+      display: flex;
+      gap: var(--space-5);
+    }
+
+    .wiki-column {
+      flex: 1;
+    }
+
     /* Splash Screen Modal */
     .splash-overlay {
       position: fixed;
@@ -873,16 +1167,53 @@
 <body>
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
-      <button id="splash-close-btn" title="Close">&times;</button>
-      <div class="splash-info">
-        <span class="splash-icon">🌈</span>
-        <h2 class="splash-title">Color Mixer</h2>
-        <p class="splash-tech">Powered by the iro.js color picker and an extensive color name library to generate
-          harmonic palettes.</p>
-        <p class="splash-credits">2025. Toolkit by e</p>
-      </div>
+      <!-- Close button -->
+      <button id="splash-close-btn" title="Close">×</button>
+
+      <!-- Left side: Visual showcase -->
       <div class="splash-image">
-        <img src="modal.png" alt="Color Mixer Splash Image">
+        <img src="modal.png" alt="Color Mixer Visual" draggable="false">
+      </div>
+
+      <!-- Right side: Info panel -->
+      <div class="splash-info">
+        <div>
+          <!-- Title and version -->
+          <div>
+            <div class="version-badge" style="margin-bottom: 8px;">V 2.0</div>
+            <h2>Color Mixer</h2>
+          </div>
+
+          <!-- Description -->
+          <p class="description">
+            Professional color mixing and gradient generation. Blend colors realistically and export palettes instantly.
+          </p>
+
+          <!-- Features list -->
+          <div class="features">
+            <div class="feature-item">
+              <span class="emoji">🎨</span>
+              Advanced Mixing
+            </div>
+            <div class="feature-item">
+              <span class="emoji">🌈</span>
+              Live Gradients
+            </div>
+            <div class="feature-item">
+              <span class="emoji">📤</span>
+              Instant Export
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer with checkbox and credits -->
+        <div class="footer">
+          <label>
+            <input type="checkbox" id="splash-dont-show-checkbox">
+            Don't show again
+          </label>
+          <span class="credits">2025 · VGTools</span>
+        </div>
       </div>
     </div>
   </div>
@@ -963,35 +1294,13 @@
       }
     };
 
-    const WIKI_DATA = {
-      "title": "Color Mixer Info",
-      "sections": [
-        {
-          "title": "How to Use",
-          "content": [
-            "<b>1. Generate:</b> Click 'Generate' for a random color palette, or use the color wheel to select a specific base color.",
-            "<b>2. Lock Color:</b> Click the lock icon 🔒 to keep your base color while generating new harmonic palettes around it.",
-            "<b>3. Change Harmony:</b> Select different rules like 'Analogous' or 'Triadic' to explore various color relationships.",
-            "<b>4. Download:</b> Export your final palette and gradients as a high-quality PNG image."
-          ]
-        },
-        {
-          "title": "Features",
-          "content": [
-            "<b>Harmonic Palettes:</b> Automatically generates beautiful, mathematically sound color schemes.",
-            "<b>Gradient Discovery:</b> Explores interesting gradient combinations based on your selected palette.",
-            "<b>Interactive UI:</b> Click a gradient to cycle its style (linear, radial) or Shift-click to copy its CSS code.",
-            "<b>Local & Private:</b> All color generation happens directly in your browser. No data is ever sent to a server."
-          ]
-        }
-      ]
-    };
+    const WIKI_DATA = {}; // Deprecated: Using direct HTML injection
 
     const StudioApp = {
       state: { palette: [], baseColor: '#6366f1', gradientGrid: [], isBaseColorLocked: false, splashHidden: false, isWikiLoaded: false },
       el: {}, colorPicker: null,
       gradientCycle: [{ type: 'linear', angle: 90 }, { type: 'linear', angle: 135 }, { type: 'linear', angle: 180 }, { type: 'radial' }],
-      THEMES: ['light', 'dark', 'system'], THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+      THEMES: ['light', 'dark', 'system'], ICONS: { light: '☀️', dark: '🌙', system: '⚙️' },
 
       async init() {
         this.cacheDOMElements();
@@ -999,6 +1308,8 @@
         this.initColorWheel();
         this.initTheme();
         this.bindEvents();
+        this.loadState(); // Restore state first
+        this.checkSplashPreference(); // Then check splash
         this.generatePalette();
       },
 
@@ -1013,8 +1324,19 @@
         }
       },
 
-      hideSplashScreen() {
+      hideSplashScreen(dontShowAgain = false) {
         if (!this.state.splashHidden) {
+          this.state.splashHidden = true;
+          this.el.splashScreen.classList.add('hidden');
+          this.el.appContainer.classList.remove('loading');
+          if (dontShowAgain) {
+            localStorage.setItem('palettes-splash-hidden', 'true');
+          }
+        }
+      },
+
+      checkSplashPreference() {
+        if (localStorage.getItem('palettes-splash-hidden') === 'true') {
           this.state.splashHidden = true;
           this.el.splashScreen.classList.add('hidden');
           this.el.appContainer.classList.remove('loading');
@@ -1048,9 +1370,9 @@
         this.el.hexInput.addEventListener('change', e => this.updateColorFromHex(e.target.value));
         this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
         this.el.splashScreen.addEventListener('click', (e) => {
-          if (e.target === this.el.splashScreen) this.hideSplashScreen();
+          if (e.target === this.el.splashScreen) { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); }
         });
-        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+        this.el.splashCloseBtn.addEventListener('click', () => { const cb = document.getElementById('splash-dont-show-checkbox'); this.hideSplashScreen(cb?.checked || false); });
       },
 
       updateColorFromHex(hex) {
@@ -1270,7 +1592,7 @@
         const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(savedTheme, false); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system'); });
       },
       setTheme(theme, save = true) {
-        if (save) localStorage.setItem('creative-toolkit-theme', theme); this.el['themeToggle'].textContent = this.THEME_ICONS[theme]; this.applyTheme(theme);
+        if (save) localStorage.setItem('creative-toolkit-theme', theme); this.el['themeToggle'].textContent = this.ICONS[theme]; this.applyTheme(theme);
       },
       cycleTheme() {
         const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
@@ -1284,40 +1606,42 @@
           const wikiModal = document.createElement('div');
           wikiModal.className = 'wiki-modal-content';
           wikiModal.innerHTML = `
-                  <div class="wiki-header">
-                    <h3 id="wiki-title">Info</h3>
-                    <button id="wiki-close-btn" title="Close">×</button>
-                  </div>
-                  <div id="wiki-content"></div>`;
+            <div class="wiki-header">
+                <h3 style="margin: 0;">Info</h3>
+                <button id="wiki-close-btn" style="background: rgba(255,255,255,0.2); border: none; color: white;">&times;</button>
+            </div>
+            <div class="wiki-body">
+                <div class="wiki-column">
+                    <h4 style="color: var(--accent-color); margin: 0 0 16px 0;">Mixing</h4>
+                    <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                        <li><b>Color Wheel:</b> Drag to pick base colors.</li>
+                        <li><b>Locking:</b> Click the lock icon to freeze a color while mixing others.</li>
+                        <li><b>Hex Input:</b> Type a hex code to set precise colors.</li>
+                    </ul>
+
+                    <h4 style="color: var(--accent-color); margin-top: 24px; margin-bottom: 16px;">Export</h4>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 13px; color: var(--ink);">
+                        <div>• Download full palette as image</div>
+                        <div>• Copy CSS/Hex codes on click</div>
+                    </div>
+                </div>
+
+                <div class="wiki-column">
+                    <h4 style="color: var(--accent-color); margin: 0 0 16px 0;">Features</h4>
+                    <ul style="padding-left: 20px; line-height: 1.6; color: var(--ink);">
+                        <li><b>Live Gradients:</b> Inspect generated gradients in real-time.</li>
+                        <li><b>Persistence:</b> Your last session is saved automatically.</li>
+                        <li><b>Snapshots:</b> Click 'Download' to get a visual spec card.</li>
+                    </ul>
+
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(231, 47, 47, 0.1); border: 1px solid rgba(231, 47, 47, 0.2); border-radius: 12px; font-size: 13px; color: var(--ink);">
+                        <b>🚀 Pro Tip</b><br>
+                        Click any color swatch in the 'Palette' section to copy its Hex code to your clipboard.
+                    </div>
+                </div>
+            </div>`;
           this.el.wikiOverlay.appendChild(wikiModal);
-          this.el.wikiOverlay.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
-        }
-
-        if (!this.state.isWikiLoaded) {
-          const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-          const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-          titleEl.textContent = WIKI_DATA.title;
-
-          const col1 = document.createElement('div'); col1.className = 'wiki-column';
-          const col2 = document.createElement('div'); col2.className = 'wiki-column';
-
-          WIKI_DATA.sections.forEach((s, index) => {
-            const sectionContainer = document.createElement('div');
-            const h4 = document.createElement('h4'); h4.textContent = s.title;
-            sectionContainer.appendChild(h4);
-            s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-            if (index < WIKI_DATA.sections.length / 2) {
-              col1.appendChild(sectionContainer);
-            } else {
-              col2.appendChild(sectionContainer);
-            }
-          });
-
-          contentEl.innerHTML = '';
-          contentEl.appendChild(col1);
-          contentEl.appendChild(col2);
-
-          this.state.isWikiLoaded = true;
+          wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
         }
         this.el.wikiOverlay.classList.add('show');
       },
@@ -1326,6 +1650,8 @@
 
     document.addEventListener('DOMContentLoaded', () => StudioApp.init());
   </script>
+  <a id="visitor-badge" class="visitor-badge" href="#" target="_blank" title="Visitors"></a>
+  <script src="../shared/visitor-badge.js"></script>
 </body>
 
 </html>

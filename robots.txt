@@ -1,0 +1,12 @@
+# VGTools Pro - Robots.txt
+# https://www.robotstxt.org/
+
+User-agent: *
+Allow: /
+
+# Sitemap (add your domain when deployed)
+# Sitemap: https://vgtools.pro/sitemap.xml
+
+# Disallow large binary files from indexing
+Disallow: /bgremover/*.wasm
+Disallow: /bgremover/*.onnx
