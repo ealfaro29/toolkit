@@ -1,13 +1,12 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Background Remover — Client-side</title>
   <script>
     // This script is placed in the <head> to prevent a theme flash on load.
-    (function () {
+    (function() {
       try {
         let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
         if (theme === 'system') {
@@ -18,321 +17,74 @@
     })();
   </script>
   <style>
-    :root {
-      --accent-color: #E63946;
-      /* Rojo */
-      --accent-color-tint: #fbc6ca;
-      --color-text-primary-light: #1C1C1E;
-      --color-text-secondary-light: #3A3A3C;
-      --color-surface-light: #F5F5F7;
-      --color-background-light: #FFFFFF;
-      --color-divider-light: #EAEAEA;
-      --color-text-primary-dark: #EAEAEB;
-      --color-text-secondary-dark: #9A9A9E;
-      --color-surface-dark: #121212;
-      --color-background-dark: #1E1E1E;
-      --color-divider-dark: #3A3A3C;
-      --color-accent-text: #FFFFFF;
-      --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      --font-size-h1: 20px;
-      --font-size-body: 14px;
-      --font-size-caption: 12px;
-      --font-weight-emphasis: 600;
-      --font-weight-medium: 500;
-      --space-2: 8px;
-      --space-3: 12px;
-      --space-4: 16px;
-      --space-5: 24px;
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-xl: 16px;
-      --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, .06);
-      --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, .12);
-      --duration-standard: 200ms;
+    :root{
+      --accent-color:#E63946; /* Rojo */
+      --accent-color-tint:#fbc6ca;
+      --color-text-primary-light:#1C1C1E; --color-text-secondary-light:#3A3A3C;
+      --color-surface-light:#F5F5F7; --color-background-light:#FFFFFF; --color-divider-light:#EAEAEA;
+      --color-text-primary-dark:#EAEAEB; --color-text-secondary-dark:#9A9A9E;
+      --color-surface-dark:#121212; --color-background-dark:#1E1E1E; --color-divider-dark:#3A3A3C;
+      --color-accent-text:#FFFFFF; --font-family-sans:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      --font-size-h1:20px; --font-size-body:14px; --font-size-caption:12px; --font-weight-emphasis:600; --font-weight-medium:500;
+      --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px;
+      --radius-sm:6px; --radius-md:8px; --radius-xl:16px;
+      --shadow-raised-2:0 4px 12px rgba(0,0,0,.06); --shadow-floating-3:0 8px 20px rgba(0,0,0,.12);
+      --duration-standard:200ms;
+    }
+    html[data-theme="light"]{--ink:var(--color-text-primary-light);--muted:var(--color-text-secondary-light);--surface:var(--color-surface-light);--surface-alt:var(--color-background-light);--border-color:var(--color-divider-light);--panel-shadow:var(--shadow-raised-2);color-scheme:light;}
+    html[data-theme="dark"]{--ink:var(--color-text-primary-dark);--muted:var(--color-text-secondary-dark);--surface:var(--color-surface-dark);--surface-alt:var(--color-background-dark);--border-color:var(--color-divider-dark);--panel-shadow:0 4px 12px rgba(0,0,0,.3);color-scheme:dark;}
+    html{box-sizing:border-box}*,*:before,*:after{box-sizing:inherit}
+    body{margin:0;color:var(--ink);background-color:var(--surface);font:var(--font-size-body)/1.5 var(--font-family-sans);padding:25px}
+
+    .container{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:25px;height:calc(100vh - 50px); transition: filter 0.5s ease-in-out;}
+    .container.loading { filter: blur(5px); pointer-events: none; }
+    .panel{background:var(--surface-alt);border:1px solid var(--border-color);border-radius:var(--radius-xl);box-shadow:var(--panel-shadow);}
+    header.panel{height:65px;display:flex;align-items:center;gap:var(--space-3);padding:var(--space-4);}
+    header h1{font-size:var(--font-size-h1);font-weight:var(--font-weight-emphasis);margin:0;}
+    header .sub{color:var(--muted);}
+    .back-to-home{width:36px;height:36px;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--border-color);display:grid;place-items:center;cursor:pointer;transition:all var(--duration-standard) ease;text-decoration:none;}
+    .back-to-home:hover{background:var(--surface-alt);}
+    .back-to-home svg{width:18px;height:18px}
+    .theme-switcher{margin-left:auto;display:flex;align-items:center;gap:8px}
+    #theme-toggle,#wiki-open-btn{width:36px;height:36px;padding:0;border-radius:50%;background:var(--surface);color:var(--ink);border:1px solid var(--border-color);font-size:18px;display:grid;place-items:center;cursor:pointer;transition:all var(--duration-standard) ease;}
+    #theme-toggle:hover,#wiki-open-btn:hover{background:var(--surface-alt);}
+
+    main.panel.workspace{
+      padding:0;
+      display:grid;
+      place-items:stretch;
+      min-height:0; overflow:hidden;
     }
 
-    html[data-theme="light"] {
-      --ink: var(--color-text-primary-light);
-      --muted: var(--color-text-secondary-light);
-      --surface: var(--color-surface-light);
-      --surface-alt: var(--color-background-light);
-      --border-color: var(--color-divider-light);
-      --panel-shadow: var(--shadow-raised-2);
-      color-scheme: light;
-    }
-
-    html[data-theme="dark"] {
-      --ink: var(--color-text-primary-dark);
-      --muted: var(--color-text-secondary-dark);
-      --surface: var(--color-surface-dark);
-      --surface-alt: var(--color-background-dark);
-      --border-color: var(--color-divider-dark);
-      --panel-shadow: 0 4px 12px rgba(0, 0, 0, .3);
-      color-scheme: dark;
-    }
-
-    html {
-      box-sizing: border-box
-    }
-
-    *,
-    *:before,
-    *:after {
-      box-sizing: inherit
-    }
-
-    body {
-      margin: 0;
-      color: var(--ink);
-      background-color: var(--surface);
-      font: var(--font-size-body)/1.5 var(--font-family-sans);
-      padding: 25px
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('../pattern.jpg');
-      background-repeat: repeat;
-      z-index: -1;
-      opacity: 1;
-      pointer-events: none;
-    }
-
-    html[data-theme="dark"] body::before {
-      opacity: 0.1;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
-      gap: 25px;
-      height: calc(100vh - 50px);
-      transition: filter 0.5s ease-in-out;
-    }
-
-    .container.loading {
-      filter: blur(5px);
-      pointer-events: none;
-    }
-
-    .panel {
-      background: var(--surface-alt);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--panel-shadow);
-    }
-
-    header.panel {
-      height: 65px;
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: var(--space-4);
-    }
-
-    header h1 {
-      font-size: var(--font-size-h1);
-      font-weight: var(--font-weight-emphasis);
-      margin: 0;
-    }
-
-    header .sub {
-      color: var(--muted);
-    }
-
-    .back-to-home {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--border-color);
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all var(--duration-standard) ease;
-      text-decoration: none;
-    }
-
-    .back-to-home:hover {
-      background: var(--surface-alt);
-    }
-
-    .back-to-home svg {
-      width: 18px;
-      height: 18px
-    }
-
-    .theme-switcher {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 8px
-    }
-
-    #theme-toggle,
-    #wiki-open-btn {
-      width: 36px;
-      height: 36px;
-      padding: 0;
-      border-radius: 50%;
-      background: var(--surface);
-      color: var(--ink);
-      border: 1px solid var(--border-color);
-      font-size: 18px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all var(--duration-standard) ease;
-    }
-
-    #theme-toggle:hover,
-    #wiki-open-btn:hover {
-      background: var(--surface-alt);
-    }
-
-    main.panel.workspace {
-      padding: 0;
-      display: grid;
-      place-items: stretch;
-      min-height: 0;
-      overflow: hidden;
-    }
-
-    .workcard {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      overflow: hidden;
+    .workcard{
+      position:relative; width:100%; height:100%;
+      border-radius:inherit; overflow:hidden;
       background:
         linear-gradient(to right, color-mix(in oklab, var(--ink) 12%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
         linear-gradient(to bottom, color-mix(in oklab, var(--ink) 12%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
         var(--surface-alt);
     }
 
-    #zone {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
+    #zone{position:relative; width:100%; height:100%;}
+    #zone.drag{outline:3px solid color-mix(in oklab, var(--accent-color) 60%, black 0%);outline-offset:-3px;}
 
-    #zone.drag {
-      outline: 3px solid color-mix(in oklab, var(--accent-color) 60%, black 0%);
-      outline-offset: -3px;
-    }
+    canvas#view{position:absolute; inset:0; width:100%; height:100%; display:block; background:transparent}
 
-    canvas#view {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: transparent
-    }
+    .overlay{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+    .status{padding:8px 16px;border-radius:10px;border:1px solid var(--border-color);background:color-mix(in oklab, var(--surface-alt) 92%, black 8%);font-size:.9rem;display:none;gap:12px;align-items:center;font-weight:500;}
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      pointer-events: none
-    }
+    .spinner {animation: rotate 2s linear infinite; width: 20px; height: 20px;}
+    .spinner .path {stroke: var(--accent-color); stroke-linecap: round; animation: dash 1.5s ease-in-out infinite;}
+    @keyframes rotate { 100% { transform: rotate(360deg); } }
+    @keyframes dash { 0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; } 100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; } }
 
-    .status {
-      padding: 8px 16px;
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      background: color-mix(in oklab, var(--surface-alt) 92%, black 8%);
-      font-size: .9rem;
-      display: none;
-      gap: 12px;
-      align-items: center;
-      font-weight: 500;
-    }
+    .bar{display:none}
 
-    .spinner {
-      animation: rotate 2s linear infinite;
-      width: 20px;
-      height: 20px;
-    }
-
-    .spinner .path {
-      stroke: var(--accent-color);
-      stroke-linecap: round;
-      animation: dash 1.5s ease-in-out infinite;
-    }
-
-    @keyframes rotate {
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes dash {
-      0% {
-        stroke-dasharray: 1, 150;
-        stroke-dashoffset: 0;
-      }
-
-      50% {
-        stroke-dasharray: 90, 150;
-        stroke-dashoffset: -35;
-      }
-
-      100% {
-        stroke-dasharray: 90, 150;
-        stroke-dashoffset: -124;
-      }
-    }
-
-    .bar {
-      display: none
-    }
-
-    input[type=file] {
-      display: none
-    }
-
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      z-index: 2000;
-      display: none;
-    }
-
-    .popup-overlay.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .wiki-modal-content {
-      background: var(--surface-alt);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-floating-3);
-      z-index: 2001;
-      width: 800px;
-      max-width: 90vw;
-      max-height: 80vh;
-      border: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
+    input[type=file]{display:none}
+    
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 2000; display: none; }
+    .popup-overlay.show { display: flex; align-items: center; justify-content: center; }
+    .wiki-modal-content { background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden; }
     .wiki-header {
       display: flex;
       justify-content: space-between;
@@ -346,25 +98,18 @@
       background-size: cover;
       background-position: center bottom;
     }
-
     .wiki-header::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);
       z-index: 1;
     }
-
-    .wiki-header h3,
-    #wiki-close-btn {
+    .wiki-header h3, #wiki-close-btn {
       position: relative;
       z-index: 2;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
-
     #wiki-close-btn {
       background: none;
       border: none;
@@ -378,29 +123,25 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
-
     #wiki-close-btn:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255,255,255,0.1);
     }
-
     #wiki-content {
-      padding: var(--space-5);
-      overflow: hidden;
-      flex-grow: 1;
-      display: flex;
-      gap: var(--space-5);
+        padding: var(--space-5);
+        overflow: hidden;
+        flex-grow: 1;
+        display: flex;
+        gap: var(--space-5);
     }
-
     .wiki-column {
-      flex: 1;
-      min-width: 0;
+        flex: 1;
+        min-width: 0;
     }
-
     #wiki-content h4 {
-      margin-top: 0;
-      margin-bottom: var(--space-3);
-      font-weight: var(--font-weight-emphasis);
-      color: var(--accent-color);
+        margin-top: 0;
+        margin-bottom: var(--space-3);
+        font-weight: var(--font-weight-emphasis);
+        color: var(--accent-color);
     }
 
     /* Splash Screen Modal */
@@ -410,7 +151,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: rgba(0,0,0,0.1);
       -webkit-backdrop-filter: blur(4px);
       backdrop-filter: blur(4px);
       z-index: 9999;
@@ -421,12 +162,10 @@
       transition: opacity 0.5s ease-out;
       cursor: pointer;
     }
-
     .splash-overlay.hidden {
       opacity: 0;
       pointer-events: none;
     }
-
     .splash-content {
       display: flex;
       width: 800px;
@@ -440,119 +179,80 @@
       cursor: default;
       position: relative;
     }
-
-    #splash-close-btn {
-      position: absolute;
-      top: var(--space-3);
-      right: var(--space-3);
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      border-radius: 50%;
-      background-color: var(--surface);
-      color: var(--muted);
-      border: 1px solid var(--border-color);
-      font-size: 24px;
-      line-height: 1;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      transition: all var(--duration-standard) ease;
-      z-index: 10;
+     #splash-close-btn {
+        position: absolute;
+        top: var(--space-3);
+        right: var(--space-3);
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 50%;
+        background-color: var(--surface);
+        color: var(--muted);
+        border: 1px solid var(--border-color);
+        font-size: 24px;
+        line-height: 1;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: all var(--duration-standard) ease;
+        z-index: 10;
     }
-
     #splash-close-btn:hover {
-      background-color: var(--surface-alt);
-      color: var(--ink);
-      transform: scale(1.1);
+        background-color: var(--surface-alt);
+        color: var(--ink);
+        transform: scale(1.1);
     }
-
     .splash-info {
-      flex: 0 0 300px;
-      padding: var(--space-5);
-      display: flex;
-      flex-direction: column;
-      background-color: var(--surface-alt);
-      color: var(--ink);
-      border-left: 4px solid var(--accent-color);
+        flex: 0 0 300px;
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        background-color: var(--surface-alt);
+        color: var(--ink);
+        border-left: 4px solid var(--accent-color);
     }
-
     .splash-icon {
-      font-size: 32px;
-      margin-bottom: var(--space-4);
+        font-size: 32px;
+        margin-bottom: var(--space-4);
     }
-
     .splash-title {
-      font-size: 24px;
-      font-weight: var(--font-weight-emphasis);
-      color: var(--accent-color);
-      margin-bottom: var(--space-5);
+        font-size: 24px;
+        font-weight: var(--font-weight-emphasis);
+        color: var(--accent-color);
+        margin-bottom: var(--space-5);
     }
-
     .splash-tech {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
     }
-
     .splash-credits {
-      margin-top: auto;
-      font-size: var(--font-size-caption);
-      color: var(--muted);
+        margin-top: auto;
+        font-size: var(--font-size-caption);
+        color: var(--muted);
     }
-
     .splash-image {
-      flex: 1;
-      background-color: var(--surface);
+        flex: 1;
+        background-color: var(--surface);
     }
-
     .splash-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    @media(max-width:800px) {
-      body {
-        padding: var(--space-4)
-      }
-
-      .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        height: auto;
-        gap: var(--space-4)
-      }
-
-      main.panel.workspace {
-        min-height: 50vh
-      }
-
-      .splash-content {
-        flex-direction: column;
-        width: 90vw;
-        height: auto;
-        max-height: 90vh;
-      }
-
-      .splash-info {
-        flex-basis: auto;
-        border-left: none;
-        border-top: 4px solid var(--accent-color);
-      }
-
-      .splash-image {
         width: 100%;
-        height: 200px;
-      }
-
-      #wiki-content {
-        flex-direction: column;
-      }
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    @media(max-width:800px){
+      body{padding:var(--space-4)}
+      .container{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto;gap:var(--space-4)}
+      main.panel.workspace{min-height:50vh}
+      .splash-content { flex-direction: column; width: 90vw; height: auto; max-height: 90vh; }
+      .splash-info { flex-basis: auto; border-left: none; border-top: 4px solid var(--accent-color); }
+      .splash-image { width: 100%; height: 200px; }
+      #wiki-content { flex-direction: column; }
     }
   </style>
 </head>
-
 <body>
   <div class="splash-overlay" id="splash-screen">
     <div class="splash-content">
@@ -560,8 +260,7 @@
       <div class="splash-info">
         <span class="splash-icon">✂️</span>
         <h2 class="splash-title">Background Remover</h2>
-        <p class="splash-tech">Utilizes a local machine learning model to process images directly in your browser for
-          maximum speed and full privacy. Risk free. First load can take a minute.</p>
+        <p class="splash-tech">Utilizes a local machine learning model to process images directly in your browser for maximum speed and full privacy. Risk free. First load can take a minute.</p>
         <p class="splash-credits">2025. Toolkit by e</p>
       </div>
       <div class="splash-image">
@@ -573,10 +272,7 @@
   <div class="container loading" id="app-container">
     <header class="panel">
       <a href="../index.html" class="back-to-home" title="Return to Home">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-          stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12 15.75 4.5" />
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12 15.75 4.5"/></svg>
       </a>
       <h1>Background Remover</h1>
       <div class="sub">Client-side AI cutout, click, drop or paste to start</div>
@@ -592,9 +288,7 @@
           <canvas id="view" width="1" height="1" aria-label="Image viewer"></canvas>
           <div class="overlay">
             <div class="status" id="status">
-              <svg class="spinner" viewBox="0 0 50 50">
-                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-              </svg>
+              <svg class="spinner" viewBox="0 0 50 50"><circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle></svg>
               <span id="statusText">Loading model…</span>
             </div>
           </div>
@@ -609,297 +303,296 @@
   <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.js"></script>
   <script type="module">
     const WIKI_DATA = {
-      "title": "Background Remover",
-      "sections": [
-        {
-          "title": "How it works",
-          "content": ["Runs a quantized RMBG-1.4 model in your browser via ONNX Runtime Web.", "All processing is local; first load caches ~44 MB."]
-        },
-        {
-          "title": "Usage",
-          "content": ["Click the card, drop a file, or paste with Ctrl+V.", "Processing starts automatically; a transparent PNG is downloaded when ready."]
-        },
-        {
-          "title": "Hints",
-          "content": ["Subjects with clear edges give the best results.", "WebGPU is used if available, else optimized WASM (threads + SIMD)."]
-        }
-      ]
+        "title": "Background Remover",
+        "sections":[
+            {
+                "title":"How it works",
+                "content":["Runs a quantized RMBG-1.4 model in your browser via ONNX Runtime Web.","All processing is local; first load caches ~44 MB."]
+            },
+            {
+                "title":"Usage",
+                "content":["Click the card, drop a file, or paste with Ctrl+V.","Processing starts automatically; a transparent PNG is downloaded when ready."]
+            },
+            {
+                "title":"Hints",
+                "content":["Subjects with clear edges give the best results.","WebGPU is used if available, else optimized WASM (threads + SIMD)."]
+            }
+        ]
     };
 
     const App = {
-      el: {},
-      state: {
-        splashHidden: false,
-        isWikiLoaded: false,
-        session: null,
-        lastBitmap: null
-      },
-      THEMES: ['light', 'dark', 'system'],
-      ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+        el: {},
+        state: {
+            splashHidden: false,
+            isWikiLoaded: false,
+            session: null,
+            lastBitmap: null
+        },
+        THEMES:['light','dark','system'], 
+        ICONS:{light:'☀️',dark:'🌔',system:'⚙️'},
+        
+        init() {
+            this.cacheDOMElements();
+            this.initTheme();
+            this.bindEvents();
+            this.initSession();
+        },
 
-      init() {
-        this.cacheDOMElements();
-        this.initTheme();
-        this.bindEvents();
-        this.initSession();
-      },
+        hideSplashScreen() {
+            if (!this.state.splashHidden) {
+                this.state.splashHidden = true;
+                this.el.splashScreen.classList.add('hidden');
+                this.el.appContainer.classList.remove('loading');
+            }
+        },
 
-      hideSplashScreen() {
-        if (!this.state.splashHidden) {
-          this.state.splashHidden = true;
-          this.el.splashScreen.classList.add('hidden');
-          this.el.appContainer.classList.remove('loading');
-        }
-      },
+        cacheDOMElements() {
+            const ids = [
+                'theme-toggle', 'wiki-open-btn', 'wiki-overlay',
+                'workspace', 'workcard', 'zone', 'file', 'view', 'status', 'statusText',
+                'splash-screen', 'app-container', 'splash-close-btn'
+            ];
+            ids.forEach(id => {
+                const key = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+                this.el[key] = document.getElementById(id);
+            });
+            this.el.ctx = this.el.view.getContext('2d',{willReadFrequently:true});
+        },
+        
+        bindEvents() {
+            this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+            this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+            this.el.splashScreen.addEventListener('click', (e) => {
+                if (e.target === this.el.splashScreen) this.hideSplashScreen();
+            });
+            this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
 
-      cacheDOMElements() {
-        const ids = [
-          'theme-toggle', 'wiki-open-btn', 'wiki-overlay',
-          'workspace', 'workcard', 'zone', 'file', 'view', 'status', 'statusText',
-          'splash-screen', 'app-container', 'splash-close-btn'
-        ];
-        ids.forEach(id => {
-          const key = id.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-          this.el[key] = document.getElementById(id);
-        });
-        this.el.ctx = this.el.view.getContext('2d', { willReadFrequently: true });
-      },
+            this.el.zone.addEventListener('click', ()=> this.el.file.click());
+            this.el.file.addEventListener('change', e=> this.handleFiles(e.target.files));
+            this.el.zone.addEventListener('dragover', e=>{ e.preventDefault(); this.el.zone.classList.add('drag'); });
+            this.el.zone.addEventListener('dragleave', ()=> this.el.zone.classList.remove('drag'));
+            this.el.zone.addEventListener('drop', e=>{ e.preventDefault(); this.el.zone.classList.remove('drag'); const dt=e.dataTransfer; if(dt.files && dt.files.length) this.handleFiles(dt.files); });
+            window.addEventListener('paste', e=>{ const items=e.clipboardData && e.clipboardData.items; if(!items) return; for(const it of items){ if(it.type && it.type.startsWith('image/')){ const b=it.getAsFile(); if(b) this.handleFiles([b]); break; } } });
 
-      bindEvents() {
-        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
-        this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
-        this.el.splashScreen.addEventListener('click', (e) => {
-          if (e.target === this.el.splashScreen) this.hideSplashScreen();
-        });
-        this.el.splashCloseBtn.addEventListener('click', () => this.hideSplashScreen());
+            const ro = new ResizeObserver(() => {
+                this.sizeCanvasToZone();
+                if(this.state.lastBitmap) this.drawIntoPaddedInnerRect(this.state.lastBitmap);
+            });
+            ro.observe(this.el.workspace);
+        },
 
-        this.el.zone.addEventListener('click', () => this.el.file.click());
-        this.el.file.addEventListener('change', e => this.handleFiles(e.target.files));
-        this.el.zone.addEventListener('dragover', e => { e.preventDefault(); this.el.zone.classList.add('drag'); });
-        this.el.zone.addEventListener('dragleave', () => this.el.zone.classList.remove('drag'));
-        this.el.zone.addEventListener('drop', e => { e.preventDefault(); this.el.zone.classList.remove('drag'); const dt = e.dataTransfer; if (dt.files && dt.files.length) this.handleFiles(dt.files); });
-        window.addEventListener('paste', e => { const items = e.clipboardData && e.clipboardData.items; if (!items) return; for (const it of items) { if (it.type && it.type.startsWith('image/')) { const b = it.getAsFile(); if (b) this.handleFiles([b]); break; } } });
+        initTheme(){
+            const s=localStorage.getItem('creative-toolkit-theme')||'system'; this.setTheme(s,false); 
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ if((localStorage.getItem('creative-toolkit-theme')||'system')==='system') this.applyTheme('system');});
+        },
+        setTheme(t,s=true){ if(s) localStorage.setItem('creative-toolkit-theme',t); this.el.themeToggle.textContent=this.ICONS[t]; this.applyTheme(t); },
+        cycleTheme(){const c=localStorage.getItem('creative-toolkit-theme')||'system'; this.setTheme(this.THEMES[(this.THEMES.indexOf(c)+1)%this.THEMES.length]);},
+        applyTheme(t){const d=(t==='system')?window.matchMedia('(prefers-color-scheme: dark)').matches:(t==='dark');document.documentElement.dataset.theme=d?'dark':'light';},
 
-        const ro = new ResizeObserver(() => {
-          this.sizeCanvasToZone();
-          if (this.state.lastBitmap) this.drawIntoPaddedInnerRect(this.state.lastBitmap);
-        });
-        ro.observe(this.el.workspace);
-      },
-
-      initTheme() {
-        const s = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(s, false);
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') this.applyTheme('system'); });
-      },
-      setTheme(t, s = true) { if (s) localStorage.setItem('creative-toolkit-theme', t); this.el.themeToggle.textContent = this.ICONS[t]; this.applyTheme(t); },
-      cycleTheme() { const c = localStorage.getItem('creative-toolkit-theme') || 'system'; this.setTheme(this.THEMES[(this.THEMES.indexOf(c) + 1) % this.THEMES.length]); },
-      applyTheme(t) { const d = (t === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : (t === 'dark'); document.documentElement.dataset.theme = d ? 'dark' : 'light'; },
-
-      openWiki() {
-        if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
-          const wikiModal = document.createElement('div');
-          wikiModal.className = 'wiki-modal-content';
-          wikiModal.innerHTML = `
+        openWiki() {
+            if (!this.el.wikiOverlay.querySelector('.wiki-modal-content')) {
+                const wikiModal = document.createElement('div');
+                wikiModal.className = 'wiki-modal-content';
+                wikiModal.innerHTML = `
                     <div class="wiki-header">
                         <h3 id="wiki-title">Info</h3>
                         <button id="wiki-close-btn" title="Close">×</button>
                     </div>
                     <div id="wiki-content"></div>`;
-          this.el.wikiOverlay.appendChild(wikiModal);
-          wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+                this.el.wikiOverlay.appendChild(wikiModal);
+                wikiModal.querySelector('#wiki-close-btn').addEventListener('click', () => this.closeWiki());
+            }
+
+            if (!this.state.isWikiLoaded) {
+                const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
+                const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
+                titleEl.textContent = WIKI_DATA.title;
+                
+                const col1 = document.createElement('div'); col1.className = 'wiki-column';
+                const col2 = document.createElement('div'); col2.className = 'wiki-column';
+
+                WIKI_DATA.sections.forEach((s, index) => {
+                    const sectionContainer = document.createElement('div');
+                    const h4 = document.createElement('h4'); h4.textContent = s.title;
+                    sectionContainer.appendChild(h4);
+                    s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
+                    if (index < 2) { col1.appendChild(sectionContainer); } 
+                    else { col2.appendChild(sectionContainer); }
+                });
+                
+                contentEl.innerHTML = '';
+                contentEl.appendChild(col1);
+                contentEl.appendChild(col2);
+                this.state.isWikiLoaded = true;
+            }
+            this.el.wikiOverlay.classList.add('show');
+        },
+        closeWiki(){ this.el.wikiOverlay.classList.remove('show'); },
+        
+        showLoader(text) { this.el.statusText.textContent = text; this.el.status.style.display = 'inline-flex'; },
+        hideLoader() { this.el.status.style.display = 'none'; },
+
+        async initSession(){
+            try{
+                this.showLoader('Initializing…');
+                ort.env.wasm.simd=true; ort.env.wasm.proxy=true; ort.env.wasm.numThreads=Math.min(4, navigator.hardwareConcurrency||2);
+                const providers=(navigator.gpu)?['webgpu','wasm']:['wasm'];
+                this.state.session=await ort.InferenceSession.create('./model_quantized.onnx',{executionProviders:providers});
+                this.showLoader('Ready');
+                setTimeout(() => this.hideLoader(), 500);
+            }catch(e){ console.error(e); this.showLoader('Model load failed'); }
+        },
+
+        fitSquareGeometry(w,h){
+            const s=Math.min(1024/w, 1024/h);
+            const newW=Math.round(w*s), newH=Math.round(h*s);
+            const offX=Math.floor((1024-newW)/2), offY=Math.floor((1024-newH)/2);
+            return {newW,newH,offX,offY};
+        },
+
+        async toBitmap(srcLike){
+            return new Promise((resolve,reject)=>{
+                const img=new Image();
+                const url=(typeof srcLike==='string')?srcLike:URL.createObjectURL(srcLike);
+                img.onload=async()=>{ try{ const bmp=await createImageBitmap(img,{colorSpaceConversion:'default'}); if(url.startsWith('blob:')) URL.revokeObjectURL(url); resolve(bmp);}catch(e){reject(e);} };
+                img.onerror=reject; img.src=url;
+            });
+        },
+
+        sizeCanvasToZone(){
+            const rect = this.el.zone.getBoundingClientRect();
+            const dpr = Math.max(1, window.devicePixelRatio || 1);
+            const pxW = Math.max(1, Math.floor(rect.width * dpr));
+            const pxH = Math.max(1, Math.floor(rect.height * dpr));
+            if (this.el.view.width !== pxW || this.el.view.height !== pxH){
+                this.el.view.width = pxW; this.el.view.height = pxH;
+            }
+            this.el.ctx.setTransform(dpr,0,0,dpr,0,0);
+            this.el.ctx.clearRect(0,0,rect.width,rect.height);
+        },
+
+        drawIntoPaddedInnerRect(src){
+            const rect = this.el.zone.getBoundingClientRect();
+            const cw = rect.width, ch = rect.height;
+            const iw = src.width, ih = src.height;
+            const PADDING = 24;
+            const innerW = Math.max(1, cw - 2*PADDING);
+            const innerH = Math.max(1, ch - 2*PADDING);
+            const scale = Math.min(innerW/iw, innerH/ih);
+            const w = Math.round(iw * scale), h = Math.round(ih * scale);
+            const x = PADDING + Math.round((innerW - w)/2);
+            const y = PADDING + Math.round((innerH - h)/2);
+
+            this.el.ctx.clearRect(0, 0, cw, ch);
+            this.el.ctx.drawImage(src, 0,0, iw,ih, x,y, w,h);
+        },
+
+        async processImageForBackgroundRemoval(bmp) {
+            const geom = this.fitSquareGeometry(bmp.width, bmp.height);
+            const work = new OffscreenCanvas(1024, 1024);
+            const wctx = work.getContext('2d');
+            wctx.clearRect(0, 0, 1024, 1024);
+            wctx.fillStyle = 'black'; wctx.fillRect(0, 0, 1024, 1024);
+            wctx.drawImage(bmp, 0, 0, bmp.width, bmp.height, geom.offX, geom.offY, geom.newW, geom.newH);
+
+            const { data } = wctx.getImageData(0, 0, 1024, 1024);
+            const N = 1024 * 1024;
+            const chw = new Float32Array(3 * N);
+            for (let i = 0; i < N; i++) { const r = data[i*4]/255-.5, g = data[i*4+1]/255-.5, b = data[i*4+2]/255-.5; chw[i]=r; chw[i+N]=g; chw[i+2*N]=b; }
+            const input = new ort.Tensor('float32', chw, [1, 3, 1024, 1024]);
+            
+            const outMap = (await this.state.session.run({ [this.state.session.inputNames[0]]: input }))[this.state.session.outputNames[0]].data;
+
+            let mn = Infinity, mx = -Infinity; for (const v of outMap) { if (v < mn) mn = v; if (v > mx) mx = v; }
+            const scale = (mx > mn) ? 255 / (mx - mn) : 255;
+
+            const maskImg = new ImageData(1024, 1024);
+            for (let i = 0, p = 0; i < outMap.length; i++, p += 4) {
+                const a = Math.max(0, Math.min(255, Math.round((outMap[i] - mn) * scale)));
+                maskImg.data[p]=255; maskImg.data[p+1]=255; maskImg.data[p+2]=255; maskImg.data[p+3]=a;
+            }
+            
+            const maskSq = new OffscreenCanvas(1024,1024);
+            maskSq.getContext('2d').putImageData(maskImg, 0, 0);
+
+            const ratio = bmp.width / bmp.height;
+            let outW = bmp.width > bmp.height ? 1024 : Math.round(1024 * ratio);
+            let outH = bmp.width > bmp.height ? Math.round(1024 / ratio) : 1024;
+
+            const finalCanvas = new OffscreenCanvas(outW, outH);
+            const fctx = finalCanvas.getContext('2d');
+            fctx.drawImage(bmp, 0, 0, outW, outH);
+
+            const alphaRescaled = new OffscreenCanvas(outW, outH);
+            const actx = alphaRescaled.getContext('2d');
+            actx.drawImage(maskSq, geom.offX, geom.offY, geom.newW, geom.newH, 0, 0, outW, outH);
+
+            const mData = actx.getImageData(0, 0, outW, outH).data;
+            const imgData = fctx.getImageData(0, 0, outW, outH);
+            for (let i = 0; i < imgData.data.length; i += 4) imgData.data[i + 3] = mData[i + 3];
+            fctx.putImageData(imgData, 0, 0);
+
+            return finalCanvas.transferToImageBitmap();
+        },
+
+        async handleBitmap(bmp, originalName = 'pasted-image.png') {
+            this.state.lastBitmap = bmp;
+            this.sizeCanvasToZone();
+            this.drawIntoPaddedInnerRect(bmp);
+            
+            let messageInterval = null;
+
+            try {
+                const messages = ["Isolating subject", "Analyzing pixels", "Removing background", "Finalizing details", "Polishing edges"];
+                let messageIndex = 0;
+                this.showLoader(messages[messageIndex]);
+
+                messageInterval = setInterval(() => {
+                    messageIndex = (messageIndex + 1) % messages.length;
+                    this.showLoader(messages[messageIndex]);
+                }, 5000);
+
+                const finalBitmap = await this.processImageForBackgroundRemoval(bmp);
+                
+                clearInterval(messageInterval);
+                this.hideLoader();
+                this.drawIntoPaddedInnerRect(finalBitmap);
+                this.state.lastBitmap = finalBitmap;
+
+                const nameWithoutExt = originalName.lastIndexOf('.') > 0 ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
+                const newFilename = `${nameWithoutExt}-bg-removed.png`;
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = finalBitmap.width; tempCanvas.height = finalBitmap.height;
+                tempCanvas.getContext('2d').drawImage(finalBitmap, 0, 0);
+
+                tempCanvas.toBlob((blob) => {
+                    if (!blob) return;
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = newFilename;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                }, 'image/png');
+            } catch (err) {
+                console.error(err);
+                if(messageInterval) clearInterval(messageInterval);
+                this.hideLoader();
+                this.showLoader('Processing failed');
+            }
+        },
+
+        handleFiles(files){
+            const f = files && files[0];
+            if (!f) return;
+            const originalName = f.name;
+            this.toBitmap(f)
+                .then(bmp => this.handleBitmap(bmp, originalName))
+                .catch(err=>{ console.error(err); this.showLoader('Failed to load image'); });
         }
-
-        if (!this.state.isWikiLoaded) {
-          const titleEl = this.el.wikiOverlay.querySelector('#wiki-title');
-          const contentEl = this.el.wikiOverlay.querySelector('#wiki-content');
-          titleEl.textContent = WIKI_DATA.title;
-
-          const col1 = document.createElement('div'); col1.className = 'wiki-column';
-          const col2 = document.createElement('div'); col2.className = 'wiki-column';
-
-          WIKI_DATA.sections.forEach((s, index) => {
-            const sectionContainer = document.createElement('div');
-            const h4 = document.createElement('h4'); h4.textContent = s.title;
-            sectionContainer.appendChild(h4);
-            s.content.forEach(c => { const p = document.createElement('p'); p.innerHTML = c; sectionContainer.appendChild(p); });
-            if (index < 2) { col1.appendChild(sectionContainer); }
-            else { col2.appendChild(sectionContainer); }
-          });
-
-          contentEl.innerHTML = '';
-          contentEl.appendChild(col1);
-          contentEl.appendChild(col2);
-          this.state.isWikiLoaded = true;
-        }
-        this.el.wikiOverlay.classList.add('show');
-      },
-      closeWiki() { this.el.wikiOverlay.classList.remove('show'); },
-
-      showLoader(text) { this.el.statusText.textContent = text; this.el.status.style.display = 'inline-flex'; },
-      hideLoader() { this.el.status.style.display = 'none'; },
-
-      async initSession() {
-        try {
-          this.showLoader('Initializing…');
-          ort.env.wasm.simd = true; ort.env.wasm.proxy = true; ort.env.wasm.numThreads = Math.min(4, navigator.hardwareConcurrency || 2);
-          const providers = (navigator.gpu) ? ['webgpu', 'wasm'] : ['wasm'];
-          this.state.session = await ort.InferenceSession.create('./model_quantized.onnx', { executionProviders: providers });
-          this.showLoader('Ready');
-          setTimeout(() => this.hideLoader(), 500);
-        } catch (e) { console.error(e); this.showLoader('Model load failed'); }
-      },
-
-      fitSquareGeometry(w, h) {
-        const s = Math.min(1024 / w, 1024 / h);
-        const newW = Math.round(w * s), newH = Math.round(h * s);
-        const offX = Math.floor((1024 - newW) / 2), offY = Math.floor((1024 - newH) / 2);
-        return { newW, newH, offX, offY };
-      },
-
-      async toBitmap(srcLike) {
-        return new Promise((resolve, reject) => {
-          const img = new Image();
-          const url = (typeof srcLike === 'string') ? srcLike : URL.createObjectURL(srcLike);
-          img.onload = async () => { try { const bmp = await createImageBitmap(img, { colorSpaceConversion: 'default' }); if (url.startsWith('blob:')) URL.revokeObjectURL(url); resolve(bmp); } catch (e) { reject(e); } };
-          img.onerror = reject; img.src = url;
-        });
-      },
-
-      sizeCanvasToZone() {
-        const rect = this.el.zone.getBoundingClientRect();
-        const dpr = Math.max(1, window.devicePixelRatio || 1);
-        const pxW = Math.max(1, Math.floor(rect.width * dpr));
-        const pxH = Math.max(1, Math.floor(rect.height * dpr));
-        if (this.el.view.width !== pxW || this.el.view.height !== pxH) {
-          this.el.view.width = pxW; this.el.view.height = pxH;
-        }
-        this.el.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        this.el.ctx.clearRect(0, 0, rect.width, rect.height);
-      },
-
-      drawIntoPaddedInnerRect(src) {
-        const rect = this.el.zone.getBoundingClientRect();
-        const cw = rect.width, ch = rect.height;
-        const iw = src.width, ih = src.height;
-        const PADDING = 24;
-        const innerW = Math.max(1, cw - 2 * PADDING);
-        const innerH = Math.max(1, ch - 2 * PADDING);
-        const scale = Math.min(innerW / iw, innerH / ih);
-        const w = Math.round(iw * scale), h = Math.round(ih * scale);
-        const x = PADDING + Math.round((innerW - w) / 2);
-        const y = PADDING + Math.round((innerH - h) / 2);
-
-        this.el.ctx.clearRect(0, 0, cw, ch);
-        this.el.ctx.drawImage(src, 0, 0, iw, ih, x, y, w, h);
-      },
-
-      async processImageForBackgroundRemoval(bmp) {
-        const geom = this.fitSquareGeometry(bmp.width, bmp.height);
-        const work = new OffscreenCanvas(1024, 1024);
-        const wctx = work.getContext('2d');
-        wctx.clearRect(0, 0, 1024, 1024);
-        wctx.fillStyle = 'black'; wctx.fillRect(0, 0, 1024, 1024);
-        wctx.drawImage(bmp, 0, 0, bmp.width, bmp.height, geom.offX, geom.offY, geom.newW, geom.newH);
-
-        const { data } = wctx.getImageData(0, 0, 1024, 1024);
-        const N = 1024 * 1024;
-        const chw = new Float32Array(3 * N);
-        for (let i = 0; i < N; i++) { const r = data[i * 4] / 255 - .5, g = data[i * 4 + 1] / 255 - .5, b = data[i * 4 + 2] / 255 - .5; chw[i] = r; chw[i + N] = g; chw[i + 2 * N] = b; }
-        const input = new ort.Tensor('float32', chw, [1, 3, 1024, 1024]);
-
-        const outMap = (await this.state.session.run({ [this.state.session.inputNames[0]]: input }))[this.state.session.outputNames[0]].data;
-
-        let mn = Infinity, mx = -Infinity; for (const v of outMap) { if (v < mn) mn = v; if (v > mx) mx = v; }
-        const scale = (mx > mn) ? 255 / (mx - mn) : 255;
-
-        const maskImg = new ImageData(1024, 1024);
-        for (let i = 0, p = 0; i < outMap.length; i++, p += 4) {
-          const a = Math.max(0, Math.min(255, Math.round((outMap[i] - mn) * scale)));
-          maskImg.data[p] = 255; maskImg.data[p + 1] = 255; maskImg.data[p + 2] = 255; maskImg.data[p + 3] = a;
-        }
-
-        const maskSq = new OffscreenCanvas(1024, 1024);
-        maskSq.getContext('2d').putImageData(maskImg, 0, 0);
-
-        const ratio = bmp.width / bmp.height;
-        let outW = bmp.width > bmp.height ? 1024 : Math.round(1024 * ratio);
-        let outH = bmp.width > bmp.height ? Math.round(1024 / ratio) : 1024;
-
-        const finalCanvas = new OffscreenCanvas(outW, outH);
-        const fctx = finalCanvas.getContext('2d');
-        fctx.drawImage(bmp, 0, 0, outW, outH);
-
-        const alphaRescaled = new OffscreenCanvas(outW, outH);
-        const actx = alphaRescaled.getContext('2d');
-        actx.drawImage(maskSq, geom.offX, geom.offY, geom.newW, geom.newH, 0, 0, outW, outH);
-
-        const mData = actx.getImageData(0, 0, outW, outH).data;
-        const imgData = fctx.getImageData(0, 0, outW, outH);
-        for (let i = 0; i < imgData.data.length; i += 4) imgData.data[i + 3] = mData[i + 3];
-        fctx.putImageData(imgData, 0, 0);
-
-        return finalCanvas.transferToImageBitmap();
-      },
-
-      async handleBitmap(bmp, originalName = 'pasted-image.png') {
-        this.state.lastBitmap = bmp;
-        this.sizeCanvasToZone();
-        this.drawIntoPaddedInnerRect(bmp);
-
-        let messageInterval = null;
-
-        try {
-          const messages = ["Isolating subject", "Analyzing pixels", "Removing background", "Finalizing details", "Polishing edges"];
-          let messageIndex = 0;
-          this.showLoader(messages[messageIndex]);
-
-          messageInterval = setInterval(() => {
-            messageIndex = (messageIndex + 1) % messages.length;
-            this.showLoader(messages[messageIndex]);
-          }, 5000);
-
-          const finalBitmap = await this.processImageForBackgroundRemoval(bmp);
-
-          clearInterval(messageInterval);
-          this.hideLoader();
-          this.drawIntoPaddedInnerRect(finalBitmap);
-          this.state.lastBitmap = finalBitmap;
-
-          const nameWithoutExt = originalName.lastIndexOf('.') > 0 ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
-          const newFilename = `${nameWithoutExt}-bg-removed.png`;
-
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = finalBitmap.width; tempCanvas.height = finalBitmap.height;
-          tempCanvas.getContext('2d').drawImage(finalBitmap, 0, 0);
-
-          tempCanvas.toBlob((blob) => {
-            if (!blob) return;
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = newFilename;
-            a.click();
-            URL.revokeObjectURL(a.href);
-          }, 'image/png');
-        } catch (err) {
-          console.error(err);
-          if (messageInterval) clearInterval(messageInterval);
-          this.hideLoader();
-          this.showLoader('Processing failed');
-        }
-      },
-
-      handleFiles(files) {
-        const f = files && files[0];
-        if (!f) return;
-        const originalName = f.name;
-        this.toBitmap(f)
-          .then(bmp => this.handleBitmap(bmp, originalName))
-          .catch(err => { console.error(err); this.showLoader('Failed to load image'); });
-      }
     };
 
     document.addEventListener('DOMContentLoaded', () => App.init());
   </script>
 </body>
-
 </html>
