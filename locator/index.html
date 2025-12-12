@@ -562,31 +562,27 @@
         <div class="splash-content">
             <!-- Close button -->
             <button id="splash-close-btn" title="Close" disabled>
-                <div class="spinner"></div> <!-- Loading indicator inside close button until ready -->
+                <div class="spinner"></div>
                 <span class="close-x" style="display:none;">×</span>
             </button>
 
             <!-- Left side: Visual showcase -->
             <div class="splash-image">
-                <img src="modal.png" alt="Locator Visual" draggable="false">
+                <img src="modal.png" alt="Locator" draggable="false">
             </div>
 
             <!-- Right side: Info panel -->
             <div class="splash-info">
                 <div>
-                    <!-- Title and version -->
                     <div>
-                        <div class="version-badge" style="margin-bottom: 8px;">V 2.1</div>
                         <h2>Locator</h2>
                     </div>
 
-                    <!-- Description -->
                     <p class="description">
                         Visualize world locations privately. Geocode addresses and explore spatial data directly in your
                         browser.
                     </p>
 
-                    <!-- Features list -->
                     <div class="features">
                         <div class="feature-item">
                             <span class="emoji">🌍</span>
@@ -602,7 +598,6 @@
                         </div>
                     </div>
 
-                    <!-- Progress Bar (Keep existing functional) -->
                     <div class="splash-progress">
                         <span id="splash-progress-text">Initializing map...</span>
                         <div class="progress-bar">
@@ -611,12 +606,12 @@
                     </div>
                 </div>
 
-                <!-- Footer with checkbox and credits -->
                 <div class="footer">
                     <label>
                         <input type="checkbox" id="splash-dont-show-checkbox">
                         Don't show again
                     </label>
+                    <div class="version-badge" style="font-size: 9px; padding: 2px 8px; border-width: 1px;">V 2.1</div>
                     <span class="credits">2025 · VGTools</span>
                 </div>
             </div>

@@ -1411,6 +1411,42 @@
     .welcome-overlay.hidden {
       display: none;
     }
+
+    /* ----------------------------------------------------- */
+    /*   iOS 26 LIQUID GLASS MIGRATION (Hub Version)       */
+    /* ----------------------------------------------------- */
+
+    html[data-theme="light"] header.panel,
+    html[data-theme="light"] .feedback-modal-content {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.45) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+
+    html[data-theme="dark"] header.panel,
+    html[data-theme="dark"] .feedback-modal-content {
+      background: linear-gradient(145deg, rgba(30, 30, 40, 0.75) 0%, rgba(20, 20, 30, 0.45) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
+    }
+
+    /* Clear any conflicting backgrounds */
+    header.panel,
+    .feedback-modal-content {
+      background-color: transparent !important;
+    }
+
+    /* Ensure content is visible above glass */
+    header.panel>*,
+    .feedback-header,
+    .feedback-header>* {
+      position: relative;
+      z-index: 1;
+    }
   </style>
   <script>
     (function () {
