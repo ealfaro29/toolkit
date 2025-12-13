@@ -1508,6 +1508,15 @@
           <p class="app-card-description">Design and build 2D brick structures with a simple drag-and-drop interface.
             Export your creations as high-quality SVG or PNG files.</p>
         </a>
+        <!-- SVG Recolor - NEW -->
+        <a href="svgrecolor/" class="app-card app-card-new"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
+          data-id="svgrecolor" data-new="true" draggable="true">
+
+          <h2 class="app-card-title">SVG Recolor</h2>
+          <p class="app-card-description">Powerful tool to analyze and recolor SVG files. Group colors by hue and shift
+            entire palettes with intuitive sliders.</p>
+        </a>
         <a href="moodboards/" class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="moodboards" draggable="true">
@@ -1961,6 +1970,7 @@
         // Transform cards to glass design with background images
         const appImagePaths = {
           brickbuilder: 'brickbuilder/modal.png',
+          svgrecolor: 'svgrecolor/modal.png',
           moodboards: 'moodboards/modal.png',
           blobs: 'blobs/modal.png',
           jigsaws: 'jigsaws/modal.png',
@@ -1980,6 +1990,7 @@
 
         const appTech = {
           brickbuilder: ['2D', 'SVG'],
+          svgrecolor: ['SVG', 'Hue-Shift'],
           moodboards: ['Canvas', 'PNG'],
           blobs: ['SVG', 'Bezier'],
           jigsaws: ['SVG', 'Vector'],

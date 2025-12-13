@@ -1,0 +1,1671 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SVG Recolor - Smart Color Replacement</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Easily recolor SVG files with smart hue-based color grouping. Perfect for branding and PowerPoint presentations. 100% client-side." />
+    <meta name="keywords" content="SVG recolor, color replacement, hue grouping, PowerPoint, branding, design tools" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="../shared/styles.css" />
+
+    <style>
+        /* Global CSS Variables */
+        :root {
+            --accent-color: #E72F2F;
+            --accent-color-tint: rgba(231, 47, 47, 0.1);
+            --accent-yellow: #F7CF27;
+            --color-cream: #FAF6F0;
+            --color-text-primary-light: #1C1C1E;
+            --color-text-secondary-light: #3A3A3C;
+            --color-surface-light: #FAF6F0;
+            --color-background-light: #FFFFFF;
+            --color-divider-light: #E8E1D8;
+            --color-text-primary-dark: #EAEAEB;
+            --color-text-secondary-dark: #9A9A9E;
+            --color-surface-dark: #1a1815;
+            --color-background-dark: #0d0c0a;
+            --color-divider-dark: #3A3A3C;
+            --color-accent-text: #FFFFFF;
+            --font-family-sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+            --font-size-h1: 20px;
+            --font-size-body: 14px;
+            --font-size-caption: 12px;
+            --font-weight-emphasis: 600;
+            --font-weight-medium: 500;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 24px;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-xl: 16px;
+            --shadow-raised-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --shadow-floating-3: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --duration-standard: 200ms;
+        }
+
+        /* Theme Application */
+        html[data-theme="light"] {
+            --ink: var(--color-text-primary-light);
+            --muted: var(--color-text-secondary-light);
+            --surface: var(--color-surface-light);
+            --surface-alt: var(--color-background-light);
+            --border-color: var(--color-divider-light);
+            --panel-shadow: var(--shadow-raised-2);
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            --ink: var(--color-text-primary-dark);
+            --muted: var(--color-text-secondary-dark);
+            --surface: var(--color-surface-dark);
+            --surface-alt: var(--color-background-dark);
+            --border-color: var(--color-divider-dark);
+            --panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color-scheme: dark;
+        }
+
+        /* Base Styles */
+        html {
+            box-sizing: border-box;
+        }
+
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background-color: var(--surface);
+            font: var(--font-size-body)/1.5 var(--font-family-sans);
+            padding: 25px;
+        }
+
+        /* Layout Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 25px;
+            height: calc(100vh - 50px);
+            transition: filter 0.5s ease-in-out;
+        }
+
+        .container.loading {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+
+        /* Panel Styles */
+        .panel {
+            background: var(--surface-alt);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--panel-shadow);
+        }
+
+        /* Header Specifics */
+        header.panel {
+            grid-column: 1 / -1;
+            height: 65px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        header h1 {
+            font-size: var(--font-size-h1);
+            font-weight: var(--font-weight-emphasis);
+            margin: 0;
+        }
+
+        header .sub {
+            color: var(--muted);
+        }
+
+        /* Theme Switcher & Wiki Button */
+        .theme-switcher {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #theme-toggle,
+        #wiki-open-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            font-size: 18px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+        }
+
+        #theme-toggle:hover,
+        #wiki-open-btn:hover {
+            background-color: var(--surface-alt);
+        }
+
+        /* Back to Home Button */
+        .back-to-home {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            text-decoration: none;
+        }
+
+        .back-to-home:hover {
+            background-color: var(--surface-alt);
+        }
+
+        .back-to-home svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Aside Controls Layout */
+        aside.panel.controls {
+            position: sticky;
+            top: 0;
+            max-height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+            padding: var(--space-5);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .control-group+.control-group {
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-5);
+        }
+
+        .note {
+            font-size: var(--font-size-caption);
+            color: var(--muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: var(--space-4);
+        }
+
+        /* Form Elements & Buttons */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .form-group label {
+            font-weight: var(--font-weight-medium);
+        }
+
+        .form-control,
+        .select-wrapper select,
+        input[type="color"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--surface);
+            color: var(--ink);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            resize: vertical;
+            min-height: 40px;
+        }
+
+        textarea.form-control {
+            min-height: 80px;
+        }
+
+        input[type="number"] {
+            text-align: right;
+            width: 80px;
+        }
+
+        input[type="color"] {
+            height: 40px;
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border-radius: var(--radius-sm);
+            border: none;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            cursor: pointer;
+            font-weight: var(--font-weight-emphasis);
+            font-size: 14px;
+            border-radius: var(--radius-md);
+            height: 40px;
+            padding: 0 var(--space-4);
+            border: 1px solid transparent;
+            transition: all var(--duration-standard) ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--color-accent-text);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-color-tint);
+            color: var(--accent-color);
+            border-color: transparent;
+        }
+
+        .btn-secondary:hover {
+            filter: brightness(0.95);
+        }
+
+        .btn:disabled {
+            background-color: var(--surface);
+            color: var(--muted);
+            cursor: not-allowed;
+        }
+
+        /* Main Canvas/Content Area */
+        main.panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* SVG Preview */
+        #svg-preview-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #svg-preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Drop Zone (SVG Canvas) */
+        .drop-zone {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--duration-standard) ease;
+            background: var(--surface);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .drop-zone.has-svg {
+            border: none;
+            background: transparent;
+        }
+
+        .drop-zone.has-svg:hover {
+            background: transparent;
+        }
+
+        .drop-prompt {
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .drop-prompt div:first-child {
+            opacity: 0.5;
+        }
+
+        /* Color Table */
+        .color-table {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .color-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .color-group-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--muted);
+            min-width: 80px;
+        }
+
+        .color-group-badge {
+            opacity: 0.6;
+            font-size: 10px;
+        }
+
+        .color-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .color-group-items {
+            display: none;
+        }
+
+        .color-group-items.collapsed {
+            display: none;
+        }
+
+        .color-row {
+            display: grid;
+            grid-template-columns: 32px 1fr 20px 32px;
+            gap: var(--space-2);
+            align-items: center;
+            padding: var(--space-2);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+        }
+
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .color-swatch-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: var(--radius-sm);
+        }
+
+        .color-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .color-hex {
+            font-family: monospace;
+            font-size: var(--font-size-caption);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .color-usage {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .color-arrow {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* HUE Slider */
+        .hue-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .hue-slider-value {
+            font-family: monospace;
+            font-weight: var(--font-weight-medium);
+            color: var(--ink);
+        }
+
+        /* Hue Slider - Modern & Premium Design */
+        .hue-slider-container .hue-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #bbb !important;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            border: none;
+            margin: 0;
+            position: relative;
+        }
+
+        .hue-slider-container .hue-slider::-webkit-slider-runnable-track {
+            height: 6px;
+            background: #bbb;
+            border-radius: 3px;
+        }
+
+        .hue-slider-container .hue-slider::-moz-range-track {
+            height: 6px;
+            background: #bbb;
+            border-radius: 3px;
+        }
+
+        html[data-theme="dark"] .hue-slider-container .hue-slider {
+            background: rgba(255, 255, 255, 0.25) !important;
+        }
+
+        html[data-theme="dark"] .hue-slider-container .hue-slider::-webkit-slider-runnable-track {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        html[data-theme="dark"] .hue-slider-container .hue-slider::-moz-range-track {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .hue-slider-container .hue-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--thumb-color, #ff0000) !important;
+            border: 2px solid white !important;
+            border-radius: 4px;
+            cursor: grab;
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.2),
+                0 2px 6px rgba(0, 0, 0, 0.1),
+                inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .hue-slider-container .hue-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+            box-shadow:
+                0 2px 6px rgba(0, 0, 0, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 0.5px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .hue-slider-container .hue-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .hue-slider-container .hue-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: var(--thumb-color, #ff0000) !important;
+            border: 2px solid white !important;
+            border-radius: 4px;
+            cursor: grab;
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.2),
+                0 2px 6px rgba(0, 0, 0, 0.1),
+                inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.15s ease;
+        }
+
+        .hue-slider-container .hue-slider::-moz-range-thumb:hover {
+            transform: scale(1.15);
+            box-shadow:
+                0 2px 6px rgba(0, 0, 0, 0.25),
+                0 4px 12px rgba(0, 0, 0, 0.15),
+                inset 0 0.5px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .hue-slider-container .hue-slider::-moz-range-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.1);
+        }
+
+        .hue-slider-container .hue-slider:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .hue-slider-container .hue-slider:disabled::-webkit-slider-thumb {
+            cursor: not-allowed;
+        }
+
+        .hue-slider-container .hue-slider:disabled::-moz-range-thumb {
+            cursor: not-allowed;
+        }
+
+        /* Preset Section Styles */
+        #presets-section {
+            margin-top: 16px;
+        }
+
+        #presets-section h3 {
+            margin-bottom: 12px;
+        }
+
+        .preset-input-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        #preset-name-input {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--ink);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        html[data-theme="light"] #preset-name-input {
+            background-color: #ffffff;
+        }
+
+        html[data-theme="dark"] #preset-name-input {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        #preset-name-input::placeholder {
+            color: var(--muted);
+        }
+
+        #preset-name-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-color-tint);
+        }
+
+        #save-preset-btn {
+            flex-shrink: 0;
+            width: auto;
+            padding: 10px 16px;
+        }
+
+        #presets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .preset-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .preset-item:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .preset-item-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .preset-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .preset-item-btn {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--background);
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-weight: 500;
+        }
+
+        .preset-item-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .preset-item-btn:active {
+            transform: translateY(0);
+        }
+
+        .preset-item-btn.delete {
+            color: #e74c3c;
+        }
+
+        .preset-item-btn.delete:hover {
+            background: #e74c3c;
+            border-color: #e74c3c;
+            color: white;
+        }
+
+        .preset-empty {
+            padding: 20px 12px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            font-style: italic;
+            background: var(--surface);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-sm);
+        }
+
+        .preset-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+
+
+        /* Liquid Glass */
+        html[data-theme="light"] .splash-content,
+        html[data-theme="light"] header.panel,
+        html[data-theme="light"] aside.panel,
+        html[data-theme="light"] .wiki-modal-content {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.45) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.9), inset 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        html[data-theme="dark"] .splash-content,
+        html[data-theme="dark"] header.panel,
+        html[data-theme="dark"] aside.panel,
+        html[data-theme="dark"] .wiki-modal-content {
+            background: linear-gradient(145deg, rgba(30, 30, 40, 0.75) 0%, rgba(20, 20, 30, 0.45) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+
+        header.panel,
+        aside.panel,
+        .splash-image,
+        .splash-info,
+        .wiki-modal-content {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        header.panel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        header.panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('modal.png') center / cover no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header.panel>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .splash-content {
+            display: flex;
+            width: 800px;
+            max-width: 95vw;
+            height: 480px;
+            max-height: 90vh;
+            padding: 16px;
+            gap: 24px;
+            overflow: hidden;
+            border-radius: 40px;
+        }
+
+        .splash-image {
+            flex: 1.2;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .splash-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 32px;
+            opacity: 0.85;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .splash-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+        }
+
+        .splash-info h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            background: rgba(125, 125, 125, 0.15);
+            border: 1px solid rgba(125, 125, 125, 0.2);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .splash-info .description {
+            font-size: 16px;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .feature-item span.emoji {
+            font-size: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            opacity: 0.8;
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            body {
+                padding: var(--space-4);
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto 1fr;
+                height: auto;
+                gap: var(--space-4);
+            }
+
+            aside.controls {
+                position: static;
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="splash-overlay" id="splash-screen">
+        <div class="splash-content">
+            <button id="splash-close-btn" title="Close">×</button>
+            <div class="splash-image">
+                <img src="modal.png" alt="SVG Recolor" draggable="false">
+            </div>
+            <div class="splash-info">
+                <div>
+                    <div>
+                        <h2>SVG Recolor</h2>
+                    </div>
+                    <p class="description">
+                        Powerful tool to analyze and recolor SVG files. Group colors by hue and shift entire palettes
+                        with intuitive sliders.
+                    </p>
+                    <div class="features">
+                        <div class="feature-item">
+                            <span class="emoji">🎨</span>
+                            Hue-based color grouping
+                        </div>
+                        <div class="feature-item">
+                            <span class="emoji">🔀</span>
+                            Batch hue shifting
+                        </div>
+                        <div class="feature-item">
+                            <span class="emoji">💾</span>
+                            Save & load presets
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <label>
+                        <input type="checkbox" id="splash-dont-show-checkbox">
+                        Don't show again
+                    </label>
+                    <div class="version-badge" style="font-size: 9px; padding: 2px 8px; border-width: 1px;">V 1.0.0
+                    </div>
+                    <span class="credits">2025 · VGTools</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container loading" id="app-container">
+        <header class="panel">
+            <a href="../index.html" class="back-to-home" title="Return to Home">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </a>
+            <h1>🎨 SVG Recolor</h1>
+            <div class="sub">Smart color replacement tool</div>
+            <div class="theme-switcher">
+                <button id="wiki-open-btn" title="Info">ⓘ</button>
+                <button id="theme-toggle" title="Change theme"></button>
+            </div>
+        </header>
+
+        <aside class="panel controls" id="controls">
+            <div class="control-group">
+                <div class="control-group">
+                    <label>Hue Shift</label>
+                    <div class="color-table" id="color-table">
+                        <!-- Preset sliders always visible -->
+                        <div class="color-group preset" data-hue="reds">
+                            <div class="color-group-header"><span>Reds</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#e74c3c"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#e74c3c">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="oranges">
+                            <div class="color-group-header"><span>Oranges</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#e67e22"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#e67e22">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="yellows">
+                            <div class="color-group-header"><span>Yellows</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#f1c40f"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#f1c40f">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="greens">
+                            <div class="color-group-header"><span>Greens</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#2ecc71"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#2ecc71">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="cyans">
+                            <div class="color-group-header"><span>Cyans</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#1abc9c"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#1abc9c">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="blues">
+                            <div class="color-group-header"><span>Blues</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#3498db"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#3498db">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="purples">
+                            <div class="color-group-header"><span>Purples</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#9b59b6"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#9b59b6">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="magentas">
+                            <div class="color-group-header"><span>Magentas</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#e91e63"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#e91e63">
+                            </div>
+                        </div>
+                        <div class="color-group preset" data-hue="grays">
+                            <div class="color-group-header"><span>Grays</span></div>
+                            <div class="hue-slider-container">
+                                <div class="color-indicator" style="background:#95a5a6"></div>
+                                <input type="range" class="hue-slider" min="-180" max="180" value="0" step="1" disabled
+                                    style="--thumb-color:#95a5a6">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="actions-section">
+                    <h3>Actions</h3>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <button class="btn btn-secondary" id="reset-btn" style="flex:1">🔄 Reset</button>
+                        <button class="btn btn-primary" id="export-btn" style="flex:1">⬇️ Export</button>
+                    </div>
+                </div>
+
+                <div class="control-group" id="presets-section">
+                    <h3>Presets</h3>
+
+                    <!-- Save new preset -->
+                    <div class="preset-input-row">
+                        <input type="text" id="preset-name-input" placeholder="Enter preset name...">
+                        <button class="btn btn-primary" id="save-preset-btn" title="Save current slider settings">
+                            💾 Save
+                        </button>
+                    </div>
+
+                    <!-- Saved presets list -->
+                    <div id="presets-list">
+                        <!-- Presets will be populated here -->
+                    </div>
+
+                    <div class="preset-hint">
+                        💡 Save slider positions to reuse later
+                    </div>
+                </div>
+                <input type="file" id="file-input" accept=".svg,image/svg+xml" style="display: none;">
+        </aside>
+
+        <main class="panel" id="main-panel">
+            <div id="svg-preview-container" class="drop-zone">
+                <div class="drop-prompt">
+                    <div style="font-size: 48px; margin-bottom: 16px;">📁</div>
+                    <div><strong>Drop SVG here</strong> or click to browse</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="wiki-overlay" class="popup-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: 2000; display: none;">
+        <div class="wiki-modal-content"
+            style="background: var(--surface-alt); border-radius: var(--radius-xl); box-shadow: var(--shadow-floating-3); z-index: 2001; width: 800px; max-width: 90vw; max-height: 80vh; border: 1px solid var(--border-color); display: flex; flex-direction: column; overflow: hidden;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4); border-bottom: 1px solid var(--border-color);">
+                <h3 id="wiki-title" style="margin: 0;">SVG Recolor Info</h3>
+                <button id="wiki-close-btn"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--ink);">×</button>
+            </div>
+            <div id="wiki-content"
+                style="padding: var(--space-5); overflow-y: auto; flex-grow: 1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5);">
+                <div>
+                    <h4 style="color: var(--accent-color); margin-top: 0;">How to Use</h4>
+                    <p><b>1. Upload SVG:</b> Drop an SVG file or click to browse.</p>
+                    <p><b>2. Review Colors:</b> All colors are automatically detected and grouped by hue.</p>
+                    <p><b>3. Change Colors:</b> Click any color swatch to pick a new color.</p>
+                    <p><b>4. Export:</b> Download your recolored SVG file.</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--accent-color); margin-top: 0;">Features</h4>
+                    <p><b>Smart Grouping:</b> Colors are organized by hue (reds, blues, greens, etc.)</p>
+                    <p><b>Real-time Preview:</b> See changes instantly as you pick new colors.</p>
+                    <p><b>PowerPoint Ready:</b> Exported SVGs work perfectly in presentations.</p>
+                    <p><b>100% Private:</b> All processing happens in your browser.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="color-engine.js"></script>
+    <script type="module">
+        import { ColorEngine } from './color-engine.js';
+
+        const SVGRecolorApp = {
+            el: {},
+            state: {
+                svgDocument: null,
+                originalSVG: null,
+                colorMap: new Map(), // oldColor -> newColor
+                colorGroups: null
+            },
+            THEMES: ['light', 'dark', 'system'],
+            THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+
+            init() {
+                this.cacheDOMElements();
+                this.initTheme();
+                this.checkSplashPreference();
+                this.bindEvents();
+            },
+
+            cacheDOMElements() {
+                const ids = [
+                    'theme-toggle', 'wiki-open-btn', 'wiki-overlay', 'wiki-close-btn',
+                    'app-container', 'drop-zone', 'file-input', 'svg-preview-container',
+                    'color-table', 'color-table-section', 'actions-section',
+                    'reset-btn', 'export-btn',
+                    'preset-name-input', 'save-preset-btn', 'presets-list',
+                    'splash-screen', 'splash-close-btn'
+                ];
+                ids.forEach(id => {
+                    const key = id.replace(/-(\w)/g, (_, char) => char.toUpperCase());
+                    const element = document.getElementById(id);
+                    if (element) this.el[key] = element;
+                });
+            },
+
+            bindEvents() {
+                if (this.el.themeToggle) this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+                if (this.el.wikiOpenBtn) this.el.wikiOpenBtn.addEventListener('click', () => this.openWiki());
+                if (this.el.wikiCloseBtn) this.el.wikiCloseBtn.addEventListener('click', () => this.closeWiki());
+                if (this.el.wikiOverlay) this.el.wikiOverlay.addEventListener('click', (e) => {
+                    if (e.target === this.el.wikiOverlay) this.closeWiki();
+                });
+
+                // Splash screen
+                if (this.el.splashScreen) {
+                    this.el.splashScreen.addEventListener('click', (e) => {
+                        if (e.target === this.el.splashScreen) {
+                            const cb = document.getElementById('splash-dont-show-checkbox');
+                            this.hideSplashScreen(cb?.checked || false);
+                        }
+                    });
+                }
+                if (this.el.splashCloseBtn) {
+                    this.el.splashCloseBtn.addEventListener('click', () => {
+                        const cb = document.getElementById('splash-dont-show-checkbox');
+                        this.hideSplashScreen(cb?.checked || false);
+                    });
+                }
+
+                // File upload - use SVG canvas as drop zone
+                const dropTarget = this.el.svgPreviewContainer;
+                if (dropTarget) {
+                    dropTarget.addEventListener('click', (e) => {
+                        if (e.target.closest('.btn')) return; // Don't trigger on button clicks
+                        this.el.fileInput?.click();
+                    });
+                    dropTarget.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        dropTarget.classList.add('drag-over');
+                    });
+                    dropTarget.addEventListener('dragleave', () => {
+                        dropTarget.classList.remove('drag-over');
+                    });
+                    dropTarget.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        dropTarget.classList.remove('drag-over');
+                        const file = e.dataTransfer.files[0];
+                        if (file) this.handleFileUpload(file);
+                    });
+                }
+                if (this.el.fileInput) {
+                    this.el.fileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) this.handleFileUpload(file);
+                    });
+                }
+
+                // Actions
+                if (this.el.resetBtn) this.el.resetBtn.addEventListener('click', () => this.resetColors());
+                if (this.el.exportBtn) this.el.exportBtn.addEventListener('click', () => this.exportSVG());
+
+                // Presets
+                if (this.el.savePresetBtn) this.el.savePresetBtn.addEventListener('click', () => this.savePreset());
+                if (this.el.presetNameInput) {
+                    this.el.presetNameInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') this.savePreset();
+                    });
+                }
+                this.renderPresetsList();
+            },
+
+            async handleFileUpload(file) {
+                if (!file.type.includes('svg')) {
+                    alert('Please upload an SVG file');
+                    return;
+                }
+
+                const text = await file.text();
+                this.loadSVG(text);
+            },
+
+            loadSVG(svgText) {
+                try {
+                    // Parse SVG
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+
+                    if (doc.querySelector('parsererror')) {
+                        throw new Error('Invalid SVG file');
+                    }
+
+                    this.state.svgDocument = doc.documentElement;
+                    this.state.originalSVG = svgText;
+                    this.state.colorMap.clear();
+
+                    // Extract colors
+                    const colors = ColorEngine.extractColorsFromSVG(this.state.svgDocument);
+                    this.state.colorGroups = ColorEngine.groupColorsByHue(colors);
+
+                    // Tag each element with its original color for group tracking
+                    this.tagElementsWithOriginalColors();
+
+                    // Display
+                    this.displaySVG();
+                    this.displayColorTable();
+                    this.showSections();
+                } catch (error) {
+                    alert('Error loading SVG: ' + error.message);
+                }
+            },
+
+            displaySVG() {
+                if (!this.state.svgDocument) return;
+
+                // Only create new element if none exists
+                const existingSvg = this.el.svgPreviewContainer.querySelector('svg');
+                if (existingSvg) {
+                    // Update existing SVG
+                    existingSvg.innerHTML = this.state.svgDocument.innerHTML;
+                    Array.from(this.state.svgDocument.attributes).forEach(attr => {
+                        existingSvg.setAttribute(attr.name, attr.value);
+                    });
+                } else {
+                    // First time: remove drop prompt and add SVG
+                    this.el.svgPreviewContainer.innerHTML = '';
+                    this.el.svgPreviewContainer.classList.add('has-svg');
+                    const clone = this.state.svgDocument.cloneNode(true);
+                    this.el.svgPreviewContainer.appendChild(clone);
+                }
+            },
+
+            displayColorTable() {
+                if (!this.state.colorGroups) return;
+
+                const self = this;
+                const hueOrder = ['reds', 'oranges', 'yellows', 'greens', 'cyans', 'blues', 'purples', 'magentas', 'grays', 'blacks', 'whites'];
+
+                // Update each preset slider
+                hueOrder.forEach(hue => {
+                    const groupEl = this.el.colorTable.querySelector(`[data-hue="${hue}"]`);
+                    if (!groupEl) return;
+
+                    const colors = this.state.colorGroups[hue];
+                    const slider = groupEl.querySelector('.hue-slider');
+                    const indicator = groupEl.querySelector('.color-indicator');
+                    const header = groupEl.querySelector('.color-group-header span');
+
+                    if (!colors || colors.length === 0) {
+                        // Disable slider for groups with no colors
+                        slider.disabled = true;
+                        groupEl.style.opacity = '0.4';
+                        if (header) header.textContent = hue.charAt(0).toUpperCase() + hue.slice(1);
+                    } else {
+                        // Enable and configure slider
+                        slider.disabled = false;
+                        slider.value = 0;
+                        groupEl.style.opacity = '1';
+
+                        // Update header (no count)
+                        if (header) header.textContent = hue.charAt(0).toUpperCase() + hue.slice(1);
+
+                        // Pure symbolic colors for each hue group
+                        const symbolicColors = {
+                            reds: '#e74c3c', oranges: '#e67e22', yellows: '#f1c40f',
+                            greens: '#2ecc71', cyans: '#1abc9c', blues: '#3498db',
+                            purples: '#9b59b6', magentas: '#e91e63', grays: '#95a5a6',
+                            blacks: '#2c3e50', whites: '#ecf0f1'
+                        };
+                        const symbolicColor = symbolicColors[hue] || '#888888';
+
+                        // DON'T modify the header indicator - it stays fixed with the original symbolic color
+                        // Only set slider thumb color
+                        slider.style.setProperty('--thumb-color', symbolicColor);
+
+                        // Remove old event listener and add new one
+                        const newSlider = slider.cloneNode(true);
+                        slider.parentNode.replaceChild(newSlider, slider);
+
+                        // IMPORTANT: Re-apply thumb color after cloning (clone doesn't preserve CSS vars)
+                        newSlider.style.setProperty('--thumb-color', symbolicColor);
+
+                        newSlider.addEventListener('input', function (e) {
+                            const shift = parseInt(e.target.value);
+                            // Shift the symbolic color for visual feedback on thumb only
+                            const shiftedSymbolic = ColorEngine.shiftHue(symbolicColor, shift);
+                            newSlider.style.setProperty('--thumb-color', shiftedSymbolic);
+                            // The indicator stays fixed - we only change the thumb
+
+                            // Debounced SVG update
+                            clearTimeout(self._debounce);
+                            self._debounce = setTimeout(() => {
+                                colors.forEach(colorData => {
+                                    self.state.colorMap.set(colorData.color, ColorEngine.shiftHue(colorData.color, shift));
+                                });
+                                // Reload and apply
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(self.state.originalSVG, 'image/svg+xml');
+                                self.state.svgDocument = doc.documentElement;
+                                ColorEngine.applyColorReplacement(self.state.svgDocument, self.state.colorMap);
+                                self.displaySVG();
+                            }, 16);
+                        });
+                    }
+                });
+            },
+
+            // Tag all SVG elements with their original colors
+            tagElementsWithOriginalColors() {
+                const svg = this.state.svgDocument;
+
+                // Tag fills
+                svg.querySelectorAll('[fill]').forEach(el => {
+                    const fill = el.getAttribute('fill');
+                    if (fill && !fill.startsWith('url(') && fill !== 'none') {
+                        const normalized = ColorEngine.normalizeColor(fill);
+                        if (normalized) el.setAttribute('data-original-fill', normalized);
+                    }
+                });
+
+                // Tag strokes
+                svg.querySelectorAll('[stroke]').forEach(el => {
+                    const stroke = el.getAttribute('stroke');
+                    if (stroke && !stroke.startsWith('url(') && stroke !== 'none') {
+                        const normalized = ColorEngine.normalizeColor(stroke);
+                        if (normalized) el.setAttribute('data-original-stroke', normalized);
+                    }
+                });
+
+                // Tag gradient stops
+                svg.querySelectorAll('stop').forEach(stop => {
+                    const color = stop.getAttribute('stop-color');
+                    if (color) {
+                        const normalized = ColorEngine.normalizeColor(color);
+                        if (normalized) stop.setAttribute('data-original-stop', normalized);
+                    }
+                });
+            },
+
+            // Apply color change by original color (uses data attribute)
+            applyColorByOriginal(svgElement, originalColor, newColor) {
+                const normalizedOriginal = ColorEngine.normalizeColor(originalColor);
+                const normalizedNew = ColorEngine.normalizeColor(newColor);
+                if (!normalizedOriginal || !normalizedNew) return;
+
+                // Find elements by their ORIGINAL fill color (data attributes)
+                svgElement.querySelectorAll(`[data-original-fill="${normalizedOriginal}"]`).forEach(el => {
+                    el.setAttribute('fill', normalizedNew);
+                });
+
+                // Find elements by their ORIGINAL stroke color
+                svgElement.querySelectorAll(`[data-original-stroke="${normalizedOriginal}"]`).forEach(el => {
+                    el.setAttribute('stroke', normalizedNew);
+                });
+
+                // Find gradient stops by their ORIGINAL color
+                svgElement.querySelectorAll(`[data-original-stop="${normalizedOriginal}"]`).forEach(stop => {
+                    stop.setAttribute('stop-color', normalizedNew);
+                });
+
+                // Also replace in embedded CSS style tags
+                svgElement.querySelectorAll('style').forEach(styleEl => {
+                    let cssText = styleEl.textContent;
+                    if (cssText) {
+                        // Get the hex without # for matching
+                        const hexWithoutHash = normalizedOriginal.replace('#', '');
+                        // Create pattern that matches the color with or without #
+                        const pattern = new RegExp(`(fill|stroke|stop-color)\\s*:\\s*#?${hexWithoutHash}\\b`, 'gi');
+                        cssText = cssText.replace(pattern, `$1:${normalizedNew}`);
+                        styleEl.textContent = cssText;
+                    }
+                });
+            },
+
+            shiftGroupHue(groupName, hueDelta) {
+                if (!this.state.colorGroups || !this.state.colorGroups[groupName]) return;
+
+                const colors = this.state.colorGroups[groupName];
+
+                // Clear previous shifts for this group
+                colors.forEach(colorData => {
+                    const originalColor = colorData.color;
+                    const newColor = ColorEngine.shiftHue(originalColor, hueDelta);
+
+                    // Update color map
+                    this.state.colorMap.set(originalColor, newColor);
+                });
+
+                // Apply all color replacements to SVG
+                ColorEngine.applyColorReplacement(this.state.svgDocument, this.state.colorMap);
+                this.displaySVG();
+            },
+
+            changeColor(originalColor, newColor) {
+                this.state.colorMap.set(originalColor, newColor);
+                ColorEngine.applyColorReplacement(this.state.svgDocument, this.state.colorMap);
+                this.displaySVG();
+
+                // Update the swatch preview
+                document.querySelectorAll(`.color-swatch[data-original="${originalColor}"] .color-swatch-inner`).forEach(el => {
+                    el.style.backgroundColor = newColor;
+                });
+            },
+
+            resetColors() {
+                this.state.colorMap.clear();
+                // Reset all sliders to 0
+                this.el.colorTable.querySelectorAll('.hue-slider').forEach(s => s.value = 0);
+                this.loadSVG(this.state.originalSVG);
+            },
+
+            exportSVG() {
+                if (!this.state.svgDocument) return;
+
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(this.state.svgDocument);
+
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'recolored.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+
+            showToast(message) {
+                // Create toast if not exists
+                let toast = document.getElementById('toast');
+                if (!toast) {
+                    toast = document.createElement('div');
+                    toast.id = 'toast';
+                    toast.className = 'toast';
+                    document.body.appendChild(toast);
+                }
+
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2500);
+            },
+
+            // === PRESET MANAGEMENT ===
+            getPresets() {
+                const data = localStorage.getItem('svg-recolor-presets');
+                return data ? JSON.parse(data) : {};
+            },
+
+            savePresets(presets) {
+                localStorage.setItem('svg-recolor-presets', JSON.stringify(presets));
+            },
+
+            renderPresetsList() {
+                if (!this.el.presetsList) return;
+                const presets = this.getPresets();
+                const names = Object.keys(presets);
+
+                if (names.length === 0) {
+                    this.el.presetsList.innerHTML = '<div class="preset-empty">No saved presets yet</div>';
+                    return;
+                }
+
+                this.el.presetsList.innerHTML = names.map(name => `
+                    <div class="preset-item" data-preset="${name}">
+                        <span class="preset-item-name">${name}</span>
+                        <div class="preset-item-actions">
+                            <button class="preset-item-btn load-btn" data-action="load" data-name="${name}" title="Load this preset">
+                                📂 Load
+                            </button>
+                            <button class="preset-item-btn delete-btn delete" data-action="delete" data-name="${name}" title="Delete this preset">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners to the dynamically created buttons
+                this.el.presetsList.querySelectorAll('[data-action="load"]').forEach(btn => {
+                    btn.addEventListener('click', () => this.loadPreset(btn.dataset.name));
+                });
+                this.el.presetsList.querySelectorAll('[data-action="delete"]').forEach(btn => {
+                    btn.addEventListener('click', () => this.deletePreset(btn.dataset.name));
+                });
+            },
+
+            getCurrentSliderValues() {
+                const values = {};
+                this.el.colorTable.querySelectorAll('.color-group.preset').forEach(group => {
+                    const hue = group.dataset.hue;
+                    const slider = group.querySelector('.hue-slider');
+                    if (slider) values[hue] = parseInt(slider.value) || 0;
+                });
+                return values;
+            },
+
+            savePreset() {
+                const name = this.el.presetNameInput?.value?.trim();
+                if (!name) {
+                    this.el.presetNameInput?.focus();
+                    return;
+                }
+
+                const presets = this.getPresets();
+                presets[name] = this.getCurrentSliderValues();
+                this.savePresets(presets);
+                this.el.presetNameInput.value = '';
+                this.renderPresetsList();
+                this.showToast(`Preset "${name}" saved!`);
+            },
+
+            loadPreset(name) {
+                if (!name) return;
+                if (!this.state.originalSVG) return alert('Load an SVG first');
+
+                const presets = this.getPresets();
+                const values = presets[name];
+                if (!values) return;
+
+                const symbolicColors = {
+                    reds: '#e74c3c', oranges: '#e67e22', yellows: '#f1c40f',
+                    greens: '#2ecc71', cyans: '#1abc9c', blues: '#3498db',
+                    purples: '#9b59b6', magentas: '#e91e63', grays: '#95a5a6',
+                    blacks: '#2c3e50', whites: '#ecf0f1'
+                };
+
+                // Apply values to sliders and update colorMap
+                Object.entries(values).forEach(([hue, shift]) => {
+                    const group = this.el.colorTable.querySelector(`[data-hue="${hue}"]`);
+                    if (!group) return;
+
+                    const slider = group.querySelector('.hue-slider');
+                    if (slider) {
+                        slider.value = shift;
+                        // Update thumb color
+                        const symbolicColor = symbolicColors[hue] || '#888888';
+                        const shiftedColor = ColorEngine.shiftHue(symbolicColor, shift);
+                        slider.style.setProperty('--thumb-color', shiftedColor);
+                    }
+
+                    // Update colorMap for this hue group
+                    const colors = this.state.colorGroups?.[hue];
+                    if (colors) {
+                        colors.forEach(colorData => {
+                            this.state.colorMap.set(colorData.color, ColorEngine.shiftHue(colorData.color, shift));
+                        });
+                    }
+                });
+
+                // Reload SVG and apply all colors
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(this.state.originalSVG, 'image/svg+xml');
+                this.state.svgDocument = doc.documentElement;
+                ColorEngine.applyColorReplacement(this.state.svgDocument, this.state.colorMap);
+                this.displaySVG();
+            },
+
+            deletePreset(name) {
+                if (!name) return;
+                if (!confirm(`Delete preset "${name}"?`)) return;
+
+                const presets = this.getPresets();
+                delete presets[name];
+                this.savePresets(presets);
+                this.renderPresetsList();
+                this.showToast(`Preset "${name}" deleted`);
+            },
+
+            // Splash screen handling
+            checkSplashPreference() {
+                if (localStorage.getItem('svgrecolor-splash-hidden') === 'true') {
+                    this.el.splashScreen?.classList.add('hidden');
+                    this.el.appContainer?.classList.remove('loading');
+                }
+            },
+
+            hideSplashScreen(dontShowAgain = false) {
+                if (this.el.splashScreen) {
+                    this.el.splashScreen.classList.add('hidden');
+                }
+                if (this.el.appContainer) {
+                    this.el.appContainer.classList.remove('loading');
+                }
+                if (dontShowAgain) {
+                    localStorage.setItem('svgrecolor-splash-hidden', 'true');
+                }
+            },
+
+            showSections() {
+                if (this.el.colorTableSection) this.el.colorTableSection.style.display = 'block';
+                if (this.el.actionsSection) this.el.actionsSection.style.display = 'block';
+            },
+
+            // Theme Logic
+            initTheme() {
+                const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                this.setTheme(savedTheme, false);
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (localStorage.getItem('creative-toolkit-theme') === 'system') this.applyTheme('system');
+                });
+            },
+            setTheme(theme, save = true) {
+                if (save) localStorage.setItem('creative-toolkit-theme', theme);
+                if (this.el.themeToggle) this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+                this.applyTheme(theme);
+            },
+            cycleTheme() {
+                const currentTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+                this.setTheme(this.THEMES[(this.THEMES.indexOf(currentTheme) + 1) % this.THEMES.length]);
+            },
+            applyTheme(theme) {
+                const isDark = (theme === 'system') ? window.matchMedia('(prefers-color-scheme: dark)').matches : theme === 'dark';
+                document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+            },
+
+            // Wiki Logic
+            openWiki() {
+                if (this.el.wikiOverlay) this.el.wikiOverlay.style.display = 'flex';
+            },
+            closeWiki() {
+                if (this.el.wikiOverlay) this.el.wikiOverlay.style.display = 'none';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => SVGRecolorApp.init());
+    </script>
+</body>
+
+</html>
