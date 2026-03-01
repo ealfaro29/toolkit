@@ -9,9 +9,14 @@ const PRECACHE_ASSETS = [
     '/',
     '/index.html',
     '/shared/styles.css',
+    '/shared/visual-theme.js',
     '/favicon.svg',
     '/manifest.json',
     '/pattern.jpg',
+    '/Theme/comicbook/pattern_comicbook_light.jpg',
+    '/Theme/comicbook/pattern_comicbook_dark.jpg',
+    '/Theme/glassui/pattern_glassui_light.jpg',
+    '/Theme/glassui/pattern_glassui_dark.jpg',
     '/404.html'
 ];
 
@@ -27,6 +32,7 @@ const APP_ROUTES = [
     '/notes/',
     '/locator/',
     '/signatures/',
+    '/svgrecolor/',
     '/any2svg/',
     '/bgremover/',
     '/wordclouds/',

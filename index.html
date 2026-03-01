@@ -19,14 +19,14 @@
   <meta property="og:title" content="VGTools Pro - Creative Mini-Apps for Designers" />
   <meta property="og:description"
     content="A universe of 15 creative mini-apps. 100% client-side, zero installation required." />
-  <meta property="og:image" content="mockups/modal.png" />
+  <meta property="og:image" content="Theme/comicbook/mockups_comicbook.png" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="VGTools Pro - Creative Mini-Apps" />
   <meta name="twitter:description"
     content="15 creative tools for designers. Background remover, QR codes, moodboards & more." />
-  <meta name="twitter:image" content="mockups/modal.png" />
+  <meta name="twitter:image" content="Theme/comicbook/mockups_comicbook.png" />
 
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -34,9 +34,34 @@
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#E72F2F" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="shared/styles.css" />
   <style>
     /* Hub-Specific Styles */
+    :root {
+      --hub-pattern-image: url('Theme/comicbook/pattern_comicbook_light.jpg');
+    }
+
+    html[data-visual-theme="glassui"] {
+      --hub-pattern-image: url('Theme/glassui/pattern_glassui_light.jpg');
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] {
+      --hub-pattern-image: url('Theme/comicbook/pattern_comicbook_dark.jpg');
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] {
+      --hub-pattern-image: url('Theme/glassui/pattern_glassui_dark.jpg');
+    }
+
+    body::before,
+    .welcome-overlay {
+      background-image: var(--hub-pattern-image) !important;
+      background-repeat: repeat !important;
+    }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -114,6 +139,25 @@
       height: 16px;
       color: var(--muted);
       pointer-events: none;
+    }
+
+    .visual-theme-select {
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      background-color: var(--surface);
+      color: var(--ink);
+      font-size: var(--font-size-body);
+      font-family: var(--font-family-sans);
+      cursor: pointer;
+      transition: all var(--duration-standard) ease;
+    }
+
+    .visual-theme-select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(231, 47, 47, 0.15);
     }
 
     /* Stagger Animation */
@@ -359,6 +403,178 @@
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
+    }
+
+    /* Comicbook visual theme: no glassmorphism, rectangular cards */
+    html[data-visual-theme="comicbook"] .app-card {
+      border-radius: 0;
+      border: 4px solid #111111;
+      box-shadow: 8px 8px 0 #111111;
+      background: #fefefe;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card::before {
+      opacity: 1;
+      mix-blend-mode: normal;
+      transform-origin: center;
+      filter: saturate(1.05) contrast(1.05);
+    }
+
+    html[data-visual-theme="comicbook"] .app-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 11px 11px 0 #111111;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card.keyboard-selected {
+      outline: 4px solid #f7cf27;
+      outline-offset: 2px;
+      box-shadow: 10px 10px 0 #111111;
+    }
+
+    html[data-visual-theme="comicbook"] .card-glass-content {
+      border-radius: 0;
+      border-top: 4px solid #111111;
+      background:
+        radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.1) 1px, transparent 0) 0 0 / 8px 8px,
+        #fff3d7;
+      color: #111111;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      padding: 16px;
+      gap: 8px;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-title {
+      font-family: "Bangers", "Impact", sans-serif;
+      font-size: 30px;
+      letter-spacing: 0.8px;
+      color: #111111;
+      text-shadow: none;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-description {
+      font-family: var(--font-family-sans);
+      color: #1f2937;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-tag {
+      background: #ffffff;
+      border: 2px solid #111111;
+      border-radius: 0;
+      color: #111111;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-tag.accent {
+      background: #f7cf27;
+      border-color: #111111;
+      color: #111111;
+    }
+
+    html[data-visual-theme="comicbook"] .card-share-btn {
+      border-radius: 0;
+      border: 3px solid #111111;
+      background: #ffffff;
+      opacity: 1;
+      transform: none;
+    }
+
+    html[data-visual-theme="comicbook"] .card-share-btn svg {
+      stroke: #111111;
+    }
+
+    html[data-visual-theme="comicbook"] .card-share-btn:hover {
+      background: #f7cf27;
+      transform: translate(-1px, -1px);
+    }
+
+    html[data-visual-theme="comicbook"] .new-badge-overlay {
+      border-radius: 0;
+      border: 3px solid #111111;
+      background: #e72f2f;
+      color: #ffffff;
+      box-shadow: 4px 4px 0 #111111;
+      animation: none;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-new {
+      animation: cardEntrance 0.5s ease forwards;
+      border: 4px solid #111111;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-new::after {
+      display: none;
+    }
+
+    html[data-visual-theme="comicbook"] header.panel {
+      background: #f7cf27 !important;
+      border: 4px solid #111111 !important;
+      border-radius: 0 !important;
+      box-shadow: 8px 8px 0 #111111 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    html[data-visual-theme="comicbook"] header.panel h1 {
+      font-family: "Bangers", "Impact", sans-serif;
+      letter-spacing: 0.8px;
+      color: #111111;
+    }
+
+    html[data-visual-theme="comicbook"] header.panel .sub {
+      color: #111111;
+      opacity: 0.9;
+    }
+
+    html[data-visual-theme="comicbook"] .search-input,
+    html[data-visual-theme="comicbook"] .visual-theme-select,
+    html[data-visual-theme="comicbook"] #theme-toggle {
+      background: #fffdf3 !important;
+      color: #111111 !important;
+      border: 2px solid #111111 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    html[data-visual-theme="comicbook"] .search-input:focus,
+    html[data-visual-theme="comicbook"] .visual-theme-select:focus {
+      border-color: #e72f2f !important;
+      box-shadow: 0 0 0 2px rgba(231, 47, 47, 0.2) !important;
+    }
+
+    html[data-visual-theme="glassui"] {
+      --accent-color: #5b7cfa;
+      --accent-yellow: #a56dff;
+    }
+
+    html[data-visual-theme="glassui"] header.panel {
+      border-color: rgba(120, 136, 255, 0.35) !important;
+      box-shadow: 0 8px 26px rgba(48, 68, 180, 0.2) !important;
+    }
+
+    html[data-visual-theme="glassui"] .search-input:focus,
+    html[data-visual-theme="glassui"] .visual-theme-select:focus {
+      border-color: #6f7cff !important;
+      box-shadow: 0 0 0 3px rgba(111, 124, 255, 0.22) !important;
+    }
+
+    html[data-visual-theme="glassui"] .app-card-tag.accent {
+      background: linear-gradient(135deg, #6f7cff 0%, #8d66ff 100%);
+      border-color: rgba(80, 72, 190, 0.45);
+    }
+
+    html[data-visual-theme="glassui"] .new-badge-overlay {
+      background: linear-gradient(135deg, #5b7cfa 0%, #a56dff 100%);
+      box-shadow: 0 4px 12px rgba(80, 72, 190, 0.35);
     }
 
     /* NEW Card Special Styling */
@@ -1179,7 +1395,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: url('pattern.jpg') repeat;
+      background: transparent;
       overflow: hidden;
     }
 
@@ -1493,6 +1709,10 @@
         <input type="text" id="search-input" class="search-input" placeholder="Search apps..." autocomplete="off">
       </div>
       <div class="theme-switcher">
+        <select id="visual-theme-select" class="visual-theme-select" aria-label="Visual theme selector">
+          <option value="comicbook">Comicbook</option>
+          <option value="glassui">Glass UI</option>
+        </select>
         <button id="theme-toggle" title="Change theme"></button>
       </div>
     </header>
@@ -1580,6 +1800,14 @@
           <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with
             adjustable threshold settings.</p>
         </a>
+        <a href="svgrecolor/" class="app-card app-card-new"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
+          data-id="svgrecolor" data-new="true" draggable="true">
+
+          <h2 class="app-card-title">SVG Recolor</h2>
+          <p class="app-card-description">Recolor SVG files using smart hue grouping and quick replacement controls.
+            Great for branding variants and presentation-ready exports.</p>
+        </a>
         <a href="any2svg/" class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="any2svg" draggable="true">
@@ -1618,7 +1846,7 @@
           </div>
         </a>
         <a href="mockups/" class="app-card app-card-new"
-          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15); --card-bg-image: url('mockups/modal.png');"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15); --card-bg-image: url('Theme/comicbook/mockups_comicbook.png');"
           data-id="mockups" data-new="true" draggable="true">
           <div class="new-badge-overlay">NEW</div>
           <div class="card-glass-content">
@@ -1641,7 +1869,7 @@
         <span class="footer-divider">•</span>
         <span class="footer-credit">by e. 2025</span>
         <span class="footer-divider">•</span>
-        <span class="footer-app-count">15 apps</span>
+        <span class="footer-app-count">16 apps</span>
         <span class="footer-divider">•</span>
         <span class="footer-hint">⌨️ Use arrow keys to navigate</span>
       </div>
@@ -1665,6 +1893,8 @@
       el: {},
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
+      VISUAL_THEMES: ['comicbook', 'glassui'],
+      TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
       DRAG_STATE: { dragged: null, over: null },
 
       konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
@@ -1674,6 +1904,7 @@
       init() {
         this.cacheDOMElements();
         this.initTheme();
+        this.initVisualTheme();
         this.loadCardOrder();
         this.sortByUsage();
         this.bindEvents();
@@ -1683,9 +1914,15 @@
 
       cacheDOMElements() {
         this.el.themeToggle = document.getElementById('theme-toggle');
+        this.el.visualThemeSelect = document.getElementById('visual-theme-select');
         this.el.appGrid = document.getElementById('app-grid');
         this.el.appCards = Array.from(this.el.appGrid.children);
         this.el.searchInput = document.getElementById('search-input');
+        this.currentVisualTheme = localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+
+        if (this.el.visualThemeSelect) {
+          this.el.visualThemeSelect.value = this.currentVisualTheme;
+        }
 
         // Show cards immediately - no entrance animation
         this.el.appCards.forEach((card) => {
@@ -1712,6 +1949,9 @@
 
       bindEvents() {
         this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
+        if (this.el.visualThemeSelect) {
+          this.el.visualThemeSelect.addEventListener('change', (e) => this.setVisualTheme(e.target.value));
+        }
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
           if (localStorage.getItem('creative-toolkit-theme') === 'system') {
             this.applyTheme('system');
@@ -1950,23 +2190,7 @@
 
       initTooltips() {
         // Transform cards to glass design with background images
-        const appImagePaths = {
-          brickbuilder: 'brickbuilder/modal.png',
-          moodboards: 'moodboards/modal.png',
-          blobs: 'blobs/modal.png',
-          jigsaws: 'jigsaws/modal.png',
-          iconfactory: 'iconfactory/modal.png',
-          qrcodes: 'qrcodes/modal.png',
-          colors: 'palettes/modal.png',
-          notes: 'notes/modal.png',
-          locator: 'locator/modal.png',
-          signatures: 'signatures/modal.png',
-          any2svg: 'any2svg/modal.png',
-          bgremover: 'bgremover/modal.png',
-          wordclouds: 'wordclouds/modal.png',
-          sankey: 'sankey/modal.png',
-          mockups: 'mockups/modal.png',
-        };
+        const appImagePaths = this.getAppImagePaths(this.currentVisualTheme);
 
         const appTech = {
           brickbuilder: ['2D', 'SVG'],
@@ -1979,6 +2203,7 @@
           notes: ['LocalStorage', 'MD'],
           locator: ['Leaflet', 'Maps'],
           signatures: ['Canvas', 'Trace'],
+          svgrecolor: ['SVG', 'Hue-Shift'],
           any2svg: ['In-Browser', 'PDF'],
           bgremover: ['AI', 'U2Net'],
           wordclouds: ['D3', 'Cloud'],
@@ -2396,6 +2621,44 @@
         this.setTheme(savedTheme, false);
       },
 
+      initVisualTheme() {
+        const savedVisualTheme = localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+        this.setVisualTheme(savedVisualTheme, false);
+      },
+
+      getAppImagePaths(theme) {
+        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const mode = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+        return this.TOOL_IDS.reduce((paths, toolId) => {
+          paths[toolId] = `Theme/${normalizedTheme}/${toolId}_${normalizedTheme}_${mode}.png`;
+          return paths;
+        }, {});
+      },
+
+      setVisualTheme(theme, save = true) {
+        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        this.currentVisualTheme = normalizedTheme;
+        if (save) {
+          localStorage.setItem('vgtools-visual-theme', normalizedTheme);
+        }
+        if (this.el.visualThemeSelect && this.el.visualThemeSelect.value !== normalizedTheme) {
+          this.el.visualThemeSelect.value = normalizedTheme;
+        }
+        this.applyVisualTheme();
+      },
+
+      applyVisualTheme() {
+        document.documentElement.dataset.visualTheme = this.currentVisualTheme;
+        const appImagePaths = this.getAppImagePaths(this.currentVisualTheme);
+        this.el.appCards.forEach(card => {
+          const id = card.dataset.id;
+          const imgPath = appImagePaths[id];
+          if (imgPath) {
+            card.style.setProperty('--card-bg-image', `url('${imgPath}')`);
+          }
+        });
+      },
+
       setTheme(theme, save = true) {
         if (save) {
           localStorage.setItem('creative-toolkit-theme', theme);
@@ -2416,6 +2679,7 @@
           ? window.matchMedia('(prefers-color-scheme: dark)').matches
           : theme === 'dark';
         document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+        this.applyVisualTheme();
       },
 
       handleDragStart(e) {
