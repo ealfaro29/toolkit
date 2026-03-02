@@ -41,19 +41,11 @@
   <style>
     /* Hub-Specific Styles */
     :root {
-      --hub-pattern-image: url('Theme/comicbook/pattern_comicbook_light.jpg');
+      --hub-pattern-image: url('Theme/comicbook/pattern_comicbook.jpg');
     }
 
     html[data-visual-theme="glassui"] {
-      --hub-pattern-image: url('Theme/glassui/pattern_glassui_light.jpg');
-    }
-
-    html[data-theme="dark"][data-visual-theme="comicbook"] {
-      --hub-pattern-image: url('Theme/comicbook/pattern_comicbook_dark.jpg');
-    }
-
-    html[data-theme="dark"][data-visual-theme="glassui"] {
-      --hub-pattern-image: url('Theme/glassui/pattern_glassui_dark.jpg');
+      --hub-pattern-image: url('Theme/glassui/pattern_glassui.jpg');
     }
 
     body::before,
@@ -258,6 +250,109 @@
 
     body.page-return .app-grid {
       animation: pageReturn 0.5s ease forwards;
+    }
+
+    /* Themed app-open transition (hub -> tool) */
+    .app-open-theme-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 210000;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .app-open-theme-overlay.comic {
+      background:
+        radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%), rgba(247, 207, 39, 0.82) 0%, rgba(231, 47, 47, 0.62) 35%, rgba(0, 0, 0, 0) 72%),
+        repeating-radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%), rgba(0, 0, 0, 0.18) 0 2px, transparent 2px 10px);
+      mix-blend-mode: multiply;
+    }
+
+    .app-open-theme-overlay.comic::after {
+      content: 'GO!';
+      position: absolute;
+      left: var(--open-x, 50%);
+      top: var(--open-y, 50%);
+      transform: translate(-50%, -50%) rotate(-8deg) scale(0.7);
+      font-family: "Bangers", "Impact", sans-serif;
+      font-size: clamp(56px, 9vw, 128px);
+      color: #f7cf27;
+      -webkit-text-stroke: 3px #111111;
+      text-shadow: 6px 6px 0 rgba(17, 17, 17, 0.42);
+      opacity: 0;
+    }
+
+    .app-open-theme-overlay.comic.animate {
+      animation: comicAppOpen 880ms cubic-bezier(0.18, 0.9, 0.25, 1) forwards;
+    }
+
+    .app-open-theme-overlay.comic.animate::after {
+      animation: comicAppOpenText 760ms ease-out forwards;
+    }
+
+    @keyframes comicAppOpen {
+      0% {
+        opacity: 0;
+        transform: scale(0.84);
+      }
+
+      30% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.22);
+      }
+    }
+
+    @keyframes comicAppOpenText {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(-8deg) scale(0.62);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(-3deg) scale(1.06);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(-1deg) scale(1.14);
+      }
+    }
+
+    .app-open-theme-overlay.glass {
+      background: linear-gradient(120deg,
+          rgba(190, 205, 255, 0.00) 10%,
+          rgba(188, 166, 255, 0.30) 34%,
+          rgba(255, 255, 255, 0.46) 50%,
+          rgba(164, 182, 255, 0.30) 64%,
+          rgba(190, 205, 255, 0.00) 90%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transform: translateX(-30%) skewX(-6deg);
+    }
+
+    .app-open-theme-overlay.glass.animate {
+      animation: glassAppOpen 920ms cubic-bezier(0.22, 0.75, 0.28, 1) forwards;
+    }
+
+    @keyframes glassAppOpen {
+      0% {
+        opacity: 0;
+        transform: translateX(-30%) skewX(-6deg);
+      }
+
+      30% {
+        opacity: 0.78;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(34%) skewX(-6deg);
+      }
     }
 
     /* Glass overlay content area */
@@ -551,30 +646,155 @@
       box-shadow: 0 0 0 2px rgba(231, 47, 47, 0.2) !important;
     }
 
-    html[data-visual-theme="glassui"] {
+    html[data-theme="dark"][data-visual-theme="comicbook"] header.panel {
+      background: #2a2a2a !important;
+      border-color: #f7cf27 !important;
+      box-shadow: 8px 8px 0 #111111 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] header.panel h1,
+    html[data-theme="dark"][data-visual-theme="comicbook"] header.panel .sub {
+      color: #f7cf27 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] .search-input,
+    html[data-theme="dark"][data-visual-theme="comicbook"] .visual-theme-select,
+    html[data-theme="dark"][data-visual-theme="comicbook"] #theme-toggle {
+      background: #333333 !important;
+      color: #f7cf27 !important;
+      border-color: #f7cf27 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] .card-glass-content {
+      background:
+        radial-gradient(circle at 1px 1px, rgba(247, 207, 39, 0.12) 1px, transparent 0) 0 0 / 8px 8px,
+        #2f2f2f !important;
+      border-top-color: #f7cf27 !important;
+      color: #f7cf27 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] .app-card-title {
+      color: #f7cf27 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] .app-card-description {
+      color: #f6e7a3 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="comicbook"] .app-card-tag {
+      background: #3a3a3a !important;
+      color: #f7cf27 !important;
+      border-color: #f7cf27 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] {
+      --accent-color: #7c95ff;
+      --accent-yellow: #b48cff;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] {
       --accent-color: #5b7cfa;
       --accent-yellow: #a56dff;
     }
 
-    html[data-visual-theme="glassui"] header.panel {
+    html[data-theme="light"][data-visual-theme="glassui"] header.panel {
+      border-color: rgba(148, 166, 255, 0.4) !important;
+      box-shadow: 0 8px 26px rgba(106, 129, 236, 0.17) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] header.panel h1,
+    html[data-theme="light"][data-visual-theme="glassui"] header.panel .sub,
+    html[data-theme="light"][data-visual-theme="glassui"] .search-input,
+    html[data-theme="light"][data-visual-theme="glassui"] .visual-theme-select,
+    html[data-theme="light"][data-visual-theme="glassui"] #theme-toggle {
+      color: #1f2937 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] header.panel {
       border-color: rgba(120, 136, 255, 0.35) !important;
       box-shadow: 0 8px 26px rgba(48, 68, 180, 0.2) !important;
     }
 
-    html[data-visual-theme="glassui"] .search-input:focus,
-    html[data-visual-theme="glassui"] .visual-theme-select:focus {
+    html[data-theme="light"][data-visual-theme="glassui"] .search-input:focus,
+    html[data-theme="light"][data-visual-theme="glassui"] .visual-theme-select:focus {
+      border-color: #8ea3ff !important;
+      box-shadow: 0 0 0 3px rgba(142, 163, 255, 0.2) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .search-input:focus,
+    html[data-theme="dark"][data-visual-theme="glassui"] .visual-theme-select:focus {
       border-color: #6f7cff !important;
       box-shadow: 0 0 0 3px rgba(111, 124, 255, 0.22) !important;
     }
 
-    html[data-visual-theme="glassui"] .app-card-tag.accent {
+    html[data-theme="light"][data-visual-theme="glassui"] .app-card-tag.accent {
+      background: linear-gradient(135deg, #8ea3ff 0%, #b28dff 100%);
+      border-color: rgba(124, 112, 222, 0.35);
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .app-card-tag.accent {
       background: linear-gradient(135deg, #6f7cff 0%, #8d66ff 100%);
       border-color: rgba(80, 72, 190, 0.45);
     }
 
-    html[data-visual-theme="glassui"] .new-badge-overlay {
+    html[data-theme="light"][data-visual-theme="glassui"] .new-badge-overlay {
+      background: linear-gradient(135deg, #7c95ff 0%, #b48cff 100%);
+      box-shadow: 0 4px 12px rgba(124, 112, 222, 0.3);
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .new-badge-overlay {
       background: linear-gradient(135deg, #5b7cfa 0%, #a56dff 100%);
       box-shadow: 0 4px 12px rgba(80, 72, 190, 0.35);
+    }
+
+    /* Glass UI card appearance by mode */
+    html[data-theme="light"][data-visual-theme="glassui"] .card-glass-content {
+      background: linear-gradient(to top,
+          rgba(255, 255, 255, 0.92) 0%,
+          rgba(255, 255, 255, 0.80) 60%,
+          rgba(255, 255, 255, 0.65) 100%) !important;
+      border-top: 1px solid rgba(124, 149, 255, 0.35);
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .app-card-title {
+      color: #1f2937 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .app-card-description {
+      color: #374151 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .app-card-tag {
+      background: rgba(255, 255, 255, 0.86) !important;
+      border: 1px solid rgba(124, 149, 255, 0.35) !important;
+      color: #1f2937 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .card-share-btn {
+      background: rgba(255, 255, 255, 0.88) !important;
+      border: 1px solid rgba(124, 149, 255, 0.35) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .card-share-btn svg {
+      stroke: #374151 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .card-glass-content {
+      background: linear-gradient(to top,
+          rgba(19, 22, 36, 0.90) 0%,
+          rgba(23, 24, 44, 0.78) 60%,
+          rgba(29, 25, 52, 0.62) 100%) !important;
+      border-top: 1px solid rgba(120, 136, 255, 0.35);
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .app-card-title {
+      color: #ffffff !important;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .app-card-description {
+      color: rgba(255, 255, 255, 0.86) !important;
     }
 
     /* NEW Card Special Styling */
@@ -1387,6 +1607,206 @@
       }
     }
 
+    /* Visual theme change transitions */
+    .theme-transition-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200001;
+      pointer-events: none;
+      opacity: 0;
+      backdrop-filter: blur(0px) saturate(100%);
+      -webkit-backdrop-filter: blur(0px) saturate(100%);
+    }
+
+    .theme-transition-overlay.phase-out {
+      animation: themeCleanOut 520ms ease forwards;
+    }
+
+    @keyframes themeCleanOut {
+      0% {
+        opacity: 0;
+        backdrop-filter: blur(0px) saturate(100%);
+        -webkit-backdrop-filter: blur(0px) saturate(100%);
+      }
+
+      100% {
+        opacity: 1;
+        backdrop-filter: blur(7px) saturate(92%);
+        -webkit-backdrop-filter: blur(7px) saturate(92%);
+      }
+    }
+
+    .theme-pattern-morph {
+      position: fixed;
+      inset: 0;
+      z-index: 200000;
+      pointer-events: none;
+      background-image: var(--pattern-current);
+      background-repeat: repeat;
+      opacity: 1;
+    }
+
+    .theme-pattern-morph::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: var(--pattern-target);
+      background-repeat: repeat;
+      opacity: 0;
+      transition: opacity 980ms ease;
+    }
+
+    .theme-pattern-morph.animate::after {
+      opacity: 1;
+    }
+
+    .container {
+      transition: opacity 520ms ease, transform 520ms ease, filter 520ms ease;
+    }
+
+    body.theme-switching-out .container {
+      opacity: 0;
+      transform: scale(0.985);
+      filter: saturate(0.9);
+      pointer-events: none;
+    }
+
+    body.theme-switching-in-comic .container {
+      animation: comicUiReveal 880ms cubic-bezier(0.18, 0.9, 0.25, 1) both;
+    }
+
+    @keyframes comicUiReveal {
+      0% {
+        opacity: 0;
+        transform: scale(0.965) translateY(10px);
+        filter: saturate(0.9);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: saturate(1);
+      }
+    }
+
+    body.theme-switching-in-glass .container {
+      animation: glassUiReveal 900ms cubic-bezier(0.22, 0.75, 0.28, 1) both;
+    }
+
+    @keyframes glassUiReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(8px);
+        filter: blur(1px) saturate(0.94);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0) saturate(1);
+      }
+    }
+
+    .theme-transition-overlay.comic {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(247, 207, 39, 0.72) 0%, rgba(231, 47, 47, 0.48) 38%, rgba(0, 0, 0, 0) 72%),
+        repeating-radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.16) 0 2px, transparent 2px 10px);
+      mix-blend-mode: multiply;
+      transform: scale(0.84) rotate(-1.2deg);
+    }
+
+    .theme-transition-overlay.comic.phase-in {
+      animation: comicThemeBlast 1680ms cubic-bezier(0.18, 0.9, 0.25, 1) forwards;
+    }
+
+    .theme-transition-overlay.comic::after {
+      content: attr(data-burst-text);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-8deg) scale(0.8);
+      font-family: "Bangers", "Impact", sans-serif;
+      font-size: clamp(56px, 10vw, 140px);
+      letter-spacing: 2px;
+      color: #f7cf27;
+      -webkit-text-stroke: 3px #111111;
+      text-shadow: 6px 6px 0 rgba(17, 17, 17, 0.45);
+      opacity: 0;
+    }
+
+    .theme-transition-overlay.comic.phase-in::after {
+      animation: comicBurstText 1520ms ease-out forwards;
+    }
+
+    @keyframes comicThemeBlast {
+      0% {
+        opacity: 0;
+        transform: scale(0.84) rotate(-1.2deg);
+      }
+
+      25% {
+        opacity: 0.98;
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.26) rotate(1.2deg);
+      }
+    }
+
+    @keyframes comicBurstText {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(-8deg) scale(0.62);
+      }
+
+      22% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(-4deg) scale(1.08);
+      }
+
+      70% {
+        opacity: 0.95;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(-2deg) scale(1.18);
+      }
+    }
+
+    .theme-transition-overlay.glass {
+      background: linear-gradient(120deg,
+          rgba(180, 195, 255, 0.00) 10%,
+          rgba(188, 166, 255, 0.24) 34%,
+          rgba(255, 255, 255, 0.38) 50%,
+          rgba(164, 182, 255, 0.26) 64%,
+          rgba(180, 195, 255, 0.00) 90%);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transform: translateX(-32%) skewX(-6deg);
+    }
+
+    .theme-transition-overlay.glass.phase-in {
+      animation: glassThemeSheen 1620ms cubic-bezier(0.22, 0.75, 0.28, 1) forwards;
+    }
+
+    @keyframes glassThemeSheen {
+      0% {
+        opacity: 0;
+        transform: translateX(-32%) skewX(-6deg);
+      }
+
+      24% {
+        opacity: 0.72;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(32%) skewX(-6deg);
+      }
+    }
+
     /* === WELCOME OVERLAY === */
     .welcome-overlay {
       position: fixed;
@@ -1924,14 +2344,9 @@
           this.el.visualThemeSelect.value = this.currentVisualTheme;
         }
 
-        // Show cards immediately - no entrance animation
-        this.el.appCards.forEach((card) => {
-          card.style.animation = 'none';
-          card.style.opacity = '1';
-        });
-
         // Initialize enhanced tooltips
         this.initTooltips();
+        this.animateCardsEntrance();
 
         // === CACHEAR TODOS LOS ELEMENTOS DEL MODAL Y BOTONES ===
         const ids = [
@@ -2013,51 +2428,74 @@
         const href = card.getAttribute('href');
         if (!href) return;
 
-        // Track usage and set returning flag
-        const appId = card.dataset.id;
-        if (appId) this.trackUsage(appId);
-        sessionStorage.setItem('vgtools-returning', 'true');
+        try {
+          // Track usage and set returning flag
+          const appId = card.dataset.id;
+          if (appId) this.trackUsage(appId);
+          sessionStorage.setItem('vgtools-returning', 'true');
 
-        // Get card color and title
-        const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
-        const appTitle = card.querySelector('.app-card-title')?.textContent || 'Loading...';
+          // Get card color and title
+          const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
+          const appTitle = card.querySelector('.app-card-title')?.textContent || 'Loading...';
 
-        // Save for return animation
-        sessionStorage.setItem('vgtools-last-app', appId);
-        sessionStorage.setItem('vgtools-last-color', accentColor.trim());
-        sessionStorage.setItem('vgtools-last-icon', appTitle);
+          // Save for return animation
+          sessionStorage.setItem('vgtools-last-app', appId);
+          sessionStorage.setItem('vgtools-last-color', accentColor.trim());
+          sessionStorage.setItem('vgtools-last-icon', appTitle);
 
-        // Get click position
-        const rect = card.getBoundingClientRect();
-        const x = rect.left + rect.width / 2;
-        const y = rect.top + rect.height / 2;
+          // Get click position
+          const rect = card.getBoundingClientRect();
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
 
-        // Create transition overlay
-        const overlay = document.createElement('div');
-        overlay.className = 'page-transition-overlay';
+          // Theme-aware open transition
+          const theme = this.currentVisualTheme || localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+          const themedOverlay = document.createElement('div');
+          themedOverlay.className = `app-open-theme-overlay ${theme === 'comicbook' ? 'comic' : 'glass'}`;
+          themedOverlay.style.setProperty('--open-x', `${x}px`);
+          themedOverlay.style.setProperty('--open-y', `${y}px`);
+          document.body.appendChild(themedOverlay);
 
-        const circle = document.createElement('div');
-        circle.className = 'page-transition-circle';
-        circle.style.cssText = `left: ${x}px; top: ${y}px; --transition-color: ${accentColor};`;
+          requestAnimationFrame(() => {
+            themedOverlay.classList.add('animate');
+          });
 
-        const iconSpan = document.createElement('span');
-        iconSpan.className = 'page-transition-icon';
-        iconSpan.textContent = appTitle;
+          setTimeout(() => {
+            window.location.href = href;
+          }, theme === 'comicbook' ? 840 : 900);
+        } catch (err) {
+          window.location.href = href;
+        }
+      },
 
-        overlay.appendChild(circle);
-        document.body.appendChild(overlay);
-        document.body.appendChild(iconSpan);
+      animateCardsEntrance(baseDelay = 0) {
+        if (!this.el.appCards || this.el.appCards.length === 0) return;
 
-        // Trigger animations
-        requestAnimationFrame(() => {
-          circle.classList.add('animate');
-          iconSpan.classList.add('animate');
+        // Respect reduced motion preference.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          this.el.appCards.forEach((card) => {
+            card.style.animation = 'none';
+            card.style.opacity = '1';
+          });
+          return;
+        }
+
+        this.el.appCards.forEach((card, i) => {
+          const delay = Math.min(baseDelay + i * 90, baseDelay + 1400);
+          card.style.animation = 'none';
+          card.style.opacity = '0';
+          card.style.animationDelay = card.classList.contains('app-card-new')
+            ? `${delay}ms, 0ms`
+            : `${delay}ms`;
         });
 
-        // Navigate after animation
-        setTimeout(() => {
-          window.location.href = href;
-        }, 800);
+        // Force reflow to restart CSS animations cleanly.
+        void this.el.appGrid.offsetHeight;
+
+        this.el.appCards.forEach((card) => {
+          card.style.removeProperty('animation');
+          card.style.removeProperty('opacity');
+        });
       },
 
       handleSearch() {
@@ -2628,15 +3066,20 @@
 
       getAppImagePaths(theme) {
         const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
-        const mode = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
         return this.TOOL_IDS.reduce((paths, toolId) => {
-          paths[toolId] = `Theme/${normalizedTheme}/${toolId}_${normalizedTheme}_${mode}.png`;
+          paths[toolId] = `Theme/${normalizedTheme}/${toolId}_${normalizedTheme}.png`;
           return paths;
         }, {});
       },
 
+      getPatternForTheme(theme) {
+        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        return `Theme/${normalizedTheme}/pattern_${normalizedTheme}.jpg`;
+      },
+
       setVisualTheme(theme, save = true) {
         const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const previousTheme = this.currentVisualTheme;
         this.currentVisualTheme = normalizedTheme;
         if (save) {
           localStorage.setItem('vgtools-visual-theme', normalizedTheme);
@@ -2644,7 +3087,52 @@
         if (this.el.visualThemeSelect && this.el.visualThemeSelect.value !== normalizedTheme) {
           this.el.visualThemeSelect.value = normalizedTheme;
         }
+        if (previousTheme && previousTheme !== normalizedTheme) {
+          this.playVisualThemeTransition(normalizedTheme, () => this.applyVisualTheme());
+          return;
+        }
         this.applyVisualTheme();
+      },
+
+      playVisualThemeTransition(theme, onSwitch) {
+        const currentTheme = document.documentElement.dataset.visualTheme || 'comicbook';
+        const patternMorph = document.createElement('div');
+        patternMorph.className = 'theme-pattern-morph';
+        patternMorph.style.setProperty('--pattern-current', `url('${this.getPatternForTheme(currentTheme)}')`);
+        patternMorph.style.setProperty('--pattern-target', `url('${this.getPatternForTheme(theme)}')`);
+        document.body.appendChild(patternMorph);
+
+        const overlay = document.createElement('div');
+        overlay.className = `theme-transition-overlay ${theme === 'comicbook' ? 'comic' : 'glass'}`;
+        if (theme === 'comicbook') {
+          const bursts = ['POW!', 'BAM!', 'WHAM!', 'BOOM!'];
+          overlay.setAttribute('data-burst-text', bursts[Math.floor(Math.random() * bursts.length)]);
+        }
+
+        document.body.classList.add('theme-switching-out');
+
+        requestAnimationFrame(() => {
+          patternMorph.classList.add('animate');
+        });
+
+        setTimeout(() => {
+          if (typeof onSwitch === 'function') onSwitch();
+
+          document.body.classList.remove('theme-switching-out');
+          document.body.classList.add(theme === 'comicbook' ? 'theme-switching-in-comic' : 'theme-switching-in-glass');
+          this.animateCardsEntrance(120);
+
+          document.body.appendChild(overlay);
+          requestAnimationFrame(() => {
+            overlay.classList.add('phase-in');
+          });
+        }, 620);
+
+        setTimeout(() => {
+          document.body.classList.remove('theme-switching-in-comic', 'theme-switching-in-glass');
+          patternMorph.remove();
+          overlay.remove();
+        }, theme === 'comicbook' ? 2440 : 2340);
       },
 
       applyVisualTheme() {

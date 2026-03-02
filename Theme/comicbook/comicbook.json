@@ -1,0 +1,73 @@
+{
+  "theme_name": "Comicbook",
+  "version": "1.0",
+  "philosophy": "Graphic modernism with high-contrast poster energy. Flat, declarative, bold. Ink and print logic.",
+  "design_intent": "Maximize clarity through hard contrast, solid fills, and geometric authority.",
+
+  "color_system": {
+    "mode": "limited_primary_palette",
+    "temperature_bias": "warm_neutral_base",
+    "core_palette": {
+      "pure_black": "#000000",
+      "primary_red": "#E10600",
+      "primary_yellow": "#FFD400",
+      "background_beige": "#F2E6C9",
+      "accent_white": "#FFFFFF"
+    },
+    "allowed_expansion": "minimal",
+    "true_black_required": true,
+    "gradient_usage": false
+  },
+
+  "lighting_model": {
+    "lighting": "none_flat_graphic",
+    "shadow_type": "hard_block_or_none",
+    "bloom": false,
+    "rim_light": false,
+    "volumetric_effects": false
+  },
+
+  "material_language": {
+    "material_type": "ink_on_paper",
+    "surface_texture": "optional_subtle_print_grain",
+    "reflection": "none",
+    "translucency": false
+  },
+
+  "rendering_rules": {
+    "fill_type": "solid_flat",
+    "outline_usage": "strong_black_outlines_or_shape_contrast",
+    "form_separation": "color_block_contrast",
+    "anti_aliasing_feel": "crisp_edges",
+    "shadow_blur": false
+  },
+
+  "geometry_behavior": {
+    "preserve_original_layout": true,
+    "proportion_lock": true,
+    "corner_radius": "sharp_or_minimal_rounding",
+    "perspective": "graphic_isometric_or_flat",
+    "distortion": "none"
+  },
+
+  "iconography": {
+    "stroke_weight": "bold",
+    "fill": "solid",
+    "symbol_clarity": "maximum",
+    "contrast": "graphic_high"
+  },
+
+  "background_rules": {
+    "background_type": "flat_solid",
+    "gradient_allowed": false,
+    "atmosphere": false
+  },
+
+  "emotional_signature": [
+    "industrial_energy",
+    "modernist_clarity",
+    "graphic_confidence",
+    "print_poster_power",
+    "bold_expression"
+  ]
+}

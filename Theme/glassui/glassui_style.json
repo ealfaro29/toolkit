@@ -1,0 +1,109 @@
+{
+  "style_name": "Luminous Neo-Futurist Blue Volumetric",
+  "version": "1.0",
+  "purpose": "Transform flat high-contrast poster graphics into cool-spectrum volumetric digital illustrations while preserving original composition.",
+  "core_principle": "Preserve geometry. Replace flat print logic with luminous atmospheric rendering.",
+
+  "palette": {
+    "color_mode": "cool_spectrum_only",
+    "forbidden_colors": ["pure_black", "warm_yellow", "orange", "earth_tones"],
+    "primary_dark": "#1A2E6E",
+    "primary_mid": "#2F4FD8",
+    "accent_indigo": "#5A6CFF",
+    "accent_cyan": "#8FD3FF",
+    "highlight": "#E6F4FF",
+    "shadow_bias": "ultramarine",
+    "background_gradient": {
+      "type": "radial_soft",
+      "center": "#DCEBFF",
+      "edge": "#2A3F9E"
+    }
+  },
+
+  "contrast_strategy": {
+    "true_black_allowed": false,
+    "separation_method": "luminance_and_glow",
+    "shadow_style": "soft_gradient_only",
+    "max_contrast_ratio": "medium",
+    "no_hard_drop_shadows": true
+  },
+
+  "surface_rendering": {
+    "fill_type": "multi-stop_gradients",
+    "edge_treatment": "subtle_rim_light",
+    "material_simulation": "semi_gloss_polymer",
+    "texture_realism": false,
+    "micro_texture": "none",
+    "plane_shading": "directional_soft"
+  },
+
+  "lighting_model": {
+    "primary_light": "diffused_cool_top_left",
+    "secondary_light": "ambient_volumetric_fill",
+    "bloom_intensity": 0.35,
+    "specular_sharpness": "low",
+    "shadow_hardness": "very_soft"
+  },
+
+  "atmosphere": {
+    "volumetric_haze": true,
+    "haze_intensity": 0.25,
+    "particle_layer": {
+      "enabled": true,
+      "density": "light",
+      "size_variation": "small_to_medium",
+      "blur": "soft"
+    },
+    "depth_falloff": "mist_gradient"
+  },
+
+  "linework": {
+    "hard_outlines": false,
+    "edge_definition": "value_shift_and_glow",
+    "icon_style": "clean_minimal_no_stroke"
+  },
+
+  "geometry_rules": {
+    "preserve_original_layout": true,
+    "preserve_proportions": true,
+    "corner_style": "slightly_rounded",
+    "perspective": "subtle_isometric_enhancement",
+    "no_exaggerated_distortion": true
+  },
+
+  "symbol_rendering": {
+    "style": "flat_forms_with_gradient_volume",
+    "stroke_usage": "minimal_or_none",
+    "contrast_against_background": "soft_luminous"
+  },
+
+  "background_rules": {
+    "flat_background": false,
+    "use_gradient": true,
+    "add_depth_particles": true,
+    "avoid_visual_clutter": true
+  },
+
+  "emotional_tone": {
+    "keywords": [
+      "calm_intelligence",
+      "digital_lab",
+      "speculative_design",
+      "curated_futurism",
+      "clean_precision"
+    ]
+  },
+
+  "conversion_pipeline": [
+    "Preserve composition and object placement exactly.",
+    "Replace black regions with deep cobalt/ultramarine.",
+    "Replace warm primaries with indigo/cyan equivalents.",
+    "Convert flat fills into smooth multi-stop gradients.",
+    "Add subtle rim lighting to edges.",
+    "Introduce volumetric haze layer.",
+    "Add light bokeh particle layer.",
+    "Remove heavy outlines.",
+    "Ensure no pure blacks remain.",
+    "Balance luminance for soft glow separation."
+  ]
+}
