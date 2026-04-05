@@ -36,7 +36,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="shared/styles.css" />
   <style>
     /* Hub-Specific Styles */
@@ -46,6 +46,14 @@
 
     html[data-visual-theme="glassui"] {
       --hub-pattern-image: url('Theme/glassui/pattern_glassui.jpg');
+    }
+
+    html[data-visual-theme="minimal"] {
+      --hub-pattern-image: none;
+    }
+
+    html[data-visual-theme="emoji"] {
+      --hub-pattern-image: none;
     }
 
     body::before,
@@ -352,6 +360,125 @@
       100% {
         opacity: 0;
         transform: translateX(34%) skewX(-6deg);
+      }
+    }
+
+    .app-open-theme-overlay.minimal {
+      background:
+        radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%),
+          rgba(255, 255, 255, 0.96) 0%,
+          rgba(255, 255, 255, 0.82) 16%,
+          rgba(255, 255, 255, 0.36) 34%,
+          rgba(255, 255, 255, 0) 62%);
+    }
+
+    html[data-theme="dark"] .app-open-theme-overlay.minimal {
+      background:
+        radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%),
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0.08) 18%,
+          rgba(255, 255, 255, 0.03) 38%,
+          rgba(255, 255, 255, 0) 64%),
+        radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%),
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.24) 58%,
+          rgba(0, 0, 0, 0.7) 100%);
+    }
+
+    .app-open-theme-overlay.minimal.animate {
+      animation: minimalAppOpen 560ms ease-out forwards;
+    }
+
+    @keyframes minimalAppOpen {
+      0% {
+        opacity: 0;
+        transform: scale(0.985);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .app-open-theme-overlay.emoji {
+      background:
+        radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%),
+          rgba(255, 255, 255, 0.92) 0%,
+          rgba(255, 214, 107, 0.78) 16%,
+          rgba(255, 146, 83, 0.38) 36%,
+          rgba(255, 146, 83, 0) 62%),
+        linear-gradient(135deg, rgba(255, 248, 238, 0.68) 0%, rgba(255, 224, 244, 0.38) 100%);
+      backdrop-filter: blur(6px) saturate(118%);
+      -webkit-backdrop-filter: blur(6px) saturate(118%);
+    }
+
+    html[data-theme="dark"] .app-open-theme-overlay.emoji {
+      background:
+        radial-gradient(circle at var(--open-x, 50%) var(--open-y, 50%),
+          rgba(255, 214, 107, 0.28) 0%,
+          rgba(255, 135, 181, 0.22) 18%,
+          rgba(125, 211, 252, 0.12) 36%,
+          rgba(125, 211, 252, 0) 62%),
+        linear-gradient(135deg, rgba(30, 18, 43, 0.74) 0%, rgba(18, 20, 41, 0.56) 100%);
+    }
+
+    .app-open-theme-overlay.emoji::after {
+      content: attr(data-emoji-burst);
+      position: absolute;
+      inset: 12%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: clamp(34px, 6vw, 86px);
+      line-height: 1.35;
+      letter-spacing: 12px;
+      opacity: 0;
+      transform: scale(0.78) rotate(-5deg);
+      filter: saturate(1.12);
+      text-shadow: 0 12px 28px rgba(255, 123, 84, 0.2);
+    }
+
+    .app-open-theme-overlay.emoji.animate {
+      animation: emojiAppOpen 780ms cubic-bezier(0.2, 0.82, 0.25, 1) forwards;
+    }
+
+    .app-open-theme-overlay.emoji.animate::after {
+      animation: emojiBurstReveal 720ms ease-out forwards;
+    }
+
+    @keyframes emojiAppOpen {
+      0% {
+        opacity: 0;
+        transform: scale(0.94);
+      }
+
+      35% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.04);
+      }
+    }
+
+    @keyframes emojiBurstReveal {
+      0% {
+        opacity: 0;
+        transform: scale(0.72) rotate(-8deg);
+      }
+
+      35% {
+        opacity: 1;
+        transform: scale(1.02) rotate(-2deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.08) rotate(1deg);
       }
     }
 
@@ -797,6 +924,642 @@
       color: rgba(255, 255, 255, 0.86) !important;
     }
 
+    html[data-theme="light"][data-visual-theme="minimal"] {
+      --accent-color: #111111;
+      --accent-yellow: #111111;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] {
+      --accent-color: #f5f5f7;
+      --accent-yellow: #f5f5f7;
+    }
+
+    html[data-visual-theme="minimal"] body::before,
+    html[data-visual-theme="minimal"] .welcome-overlay {
+      background-image: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] body {
+      background: #f5f5f7 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] body {
+      background: #000000 !important;
+    }
+
+    html[data-visual-theme="minimal"] header.panel {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-radius: 28px !important;
+      box-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] header.panel {
+      background: #ffffff !important;
+      border: 1px solid rgba(17, 17, 17, 0.08) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] header.panel {
+      background: #0b0b0f !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-visual-theme="minimal"] header.panel h1,
+    html[data-visual-theme="minimal"] header.panel .sub,
+    html[data-visual-theme="minimal"] .search-input,
+    html[data-visual-theme="minimal"] .visual-theme-select,
+    html[data-visual-theme="minimal"] #theme-toggle {
+      text-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] header.panel h1,
+    html[data-theme="light"][data-visual-theme="minimal"] header.panel .sub,
+    html[data-theme="light"][data-visual-theme="minimal"] .search-input,
+    html[data-theme="light"][data-visual-theme="minimal"] .visual-theme-select,
+    html[data-theme="light"][data-visual-theme="minimal"] #theme-toggle {
+      color: #111111 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] header.panel h1,
+    html[data-theme="dark"][data-visual-theme="minimal"] header.panel .sub,
+    html[data-theme="dark"][data-visual-theme="minimal"] .search-input,
+    html[data-theme="dark"][data-visual-theme="minimal"] .visual-theme-select,
+    html[data-theme="dark"][data-visual-theme="minimal"] #theme-toggle {
+      color: #f5f5f7 !important;
+    }
+
+    html[data-visual-theme="minimal"] .search-input,
+    html[data-visual-theme="minimal"] .visual-theme-select,
+    html[data-visual-theme="minimal"] #theme-toggle {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border-radius: 18px !important;
+      box-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .search-input,
+    html[data-theme="light"][data-visual-theme="minimal"] .visual-theme-select,
+    html[data-theme="light"][data-visual-theme="minimal"] #theme-toggle {
+      background: #ffffff !important;
+      border: 1px solid rgba(17, 17, 17, 0.08) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .search-input,
+    html[data-theme="dark"][data-visual-theme="minimal"] .visual-theme-select,
+    html[data-theme="dark"][data-visual-theme="minimal"] #theme-toggle {
+      background: #101014 !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-visual-theme="minimal"] .search-input:focus,
+    html[data-visual-theme="minimal"] .visual-theme-select:focus {
+      box-shadow: none !important;
+      width: 280px !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .search-input:focus,
+    html[data-theme="light"][data-visual-theme="minimal"] .visual-theme-select:focus {
+      border-color: rgba(17, 17, 17, 0.2) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .search-input:focus,
+    html[data-theme="dark"][data-visual-theme="minimal"] .visual-theme-select:focus {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card {
+      justify-content: stretch !important;
+      color: var(--ink) !important;
+      border-radius: 28px !important;
+      box-shadow: none !important;
+      transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.22s ease !important;
+      overflow: hidden;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .app-card {
+      background: #ffffff !important;
+      border: 1px solid rgba(17, 17, 17, 0.08) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .app-card {
+      background: #0b0b0f !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card::before,
+    html[data-visual-theme="minimal"] .app-card::after {
+      display: none !important;
+      content: none !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card:hover {
+      transform: translateY(-2px) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .app-card:hover {
+      border-color: rgba(17, 17, 17, 0.16) !important;
+      background: #fcfcfd !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .app-card:hover {
+      border-color: rgba(255, 255, 255, 0.16) !important;
+      background: #111116 !important;
+    }
+
+    html[data-visual-theme="minimal"] .card-glass-content {
+      min-height: 100%;
+      padding: 24px 24px 72px !important;
+      gap: 14px !important;
+      border: none !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      justify-content: flex-start;
+    }
+
+    html[data-visual-theme="minimal"] .app-card-title {
+      font-size: 24px !important;
+      line-height: 1.1 !important;
+      letter-spacing: -0.03em !important;
+      font-weight: 600 !important;
+      margin-top: 0 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .app-card-title {
+      color: #111111 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .app-card-title {
+      color: #f5f5f7 !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card-description {
+      font-size: 13px !important;
+      line-height: 1.55 !important;
+      text-shadow: none !important;
+      -webkit-line-clamp: 4 !important;
+      line-clamp: 4 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .app-card-description {
+      color: #6b7280 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .app-card-description {
+      color: #a1a1aa !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card-tags {
+      display: none !important;
+    }
+
+    html[data-visual-theme="minimal"] .card-share-btn {
+      opacity: 1 !important;
+      transform: none !important;
+      width: 32px !important;
+      height: 32px !important;
+      top: auto !important;
+      bottom: 16px !important;
+      right: 16px !important;
+      border-radius: 999px !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .card-share-btn {
+      background: #ffffff !important;
+      border: 1px solid rgba(17, 17, 17, 0.08) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .card-share-btn {
+      background: #0b0b0f !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .card-share-btn svg {
+      stroke: #111111 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .card-share-btn svg {
+      stroke: #f5f5f7 !important;
+    }
+
+    html[data-visual-theme="minimal"] .new-badge-overlay {
+      border-radius: 999px !important;
+      box-shadow: none !important;
+      animation: none !important;
+      letter-spacing: 0 !important;
+      text-transform: none !important;
+      padding: 5px 10px !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .new-badge-overlay {
+      background: #111111 !important;
+      color: #ffffff !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .new-badge-overlay {
+      background: #ffffff !important;
+      color: #111111 !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card-new {
+      animation: cardEntrance 0.5s ease forwards !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .app-card-new {
+      border-color: rgba(17, 17, 17, 0.16) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .app-card-new {
+      border-color: rgba(255, 255, 255, 0.16) !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card-new::after {
+      display: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] {
+      --accent-color: #ff6b4a;
+      --accent-yellow: #ffd166;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] {
+      --accent-color: #ff8fb3;
+      --accent-yellow: #7dd3fc;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] body {
+      background:
+        radial-gradient(circle at top left, rgba(255, 211, 164, 0.34) 0%, rgba(255, 211, 164, 0) 34%),
+        radial-gradient(circle at bottom right, rgba(255, 190, 231, 0.28) 0%, rgba(255, 190, 231, 0) 36%),
+        #fff7f1 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] body {
+      background:
+        radial-gradient(circle at top left, rgba(255, 190, 98, 0.12) 0%, rgba(255, 190, 98, 0) 34%),
+        radial-gradient(circle at bottom right, rgba(255, 143, 188, 0.12) 0%, rgba(255, 143, 188, 0) 36%),
+        #130d19 !important;
+    }
+
+    html[data-visual-theme="emoji"] body::before {
+      content: var(--hub-emoji-wallpaper, "");
+      background: none !important;
+      display: block;
+      inset: -5%;
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: clamp(22px, 2vw, 34px);
+      line-height: 1.65;
+      letter-spacing: 12px;
+      word-spacing: 10px;
+      white-space: normal;
+      text-align: center;
+      opacity: 0.22;
+      transform: rotate(-8deg) scale(1.08);
+      overflow: hidden;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] body::before {
+      opacity: 0.16;
+      filter: saturate(1.08);
+    }
+
+    html[data-visual-theme="emoji"] header.panel {
+      border-radius: 30px !important;
+      overflow: hidden;
+      backdrop-filter: blur(18px) saturate(118%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(118%) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] header.panel {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 247, 240, 0.68) 100%) !important;
+      border: 1px solid rgba(255, 165, 108, 0.34) !important;
+      box-shadow: 0 10px 26px rgba(255, 162, 120, 0.14) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] header.panel {
+      background: linear-gradient(135deg, rgba(34, 24, 45, 0.82) 0%, rgba(20, 18, 39, 0.76) 100%) !important;
+      border: 1px solid rgba(255, 143, 188, 0.22) !important;
+      box-shadow: 0 12px 28px rgba(12, 10, 24, 0.32) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] header.panel h1,
+    html[data-theme="light"][data-visual-theme="emoji"] header.panel .sub,
+    html[data-theme="light"][data-visual-theme="emoji"] .search-input,
+    html[data-theme="light"][data-visual-theme="emoji"] .visual-theme-select,
+    html[data-theme="light"][data-visual-theme="emoji"] #theme-toggle {
+      color: #2d1b10 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] header.panel h1,
+    html[data-theme="dark"][data-visual-theme="emoji"] header.panel .sub,
+    html[data-theme="dark"][data-visual-theme="emoji"] .search-input,
+    html[data-theme="dark"][data-visual-theme="emoji"] .visual-theme-select,
+    html[data-theme="dark"][data-visual-theme="emoji"] #theme-toggle {
+      color: #fff6fb !important;
+    }
+
+    html[data-visual-theme="emoji"] .search-input,
+    html[data-visual-theme="emoji"] .visual-theme-select,
+    html[data-visual-theme="emoji"] #theme-toggle {
+      border-radius: 999px !important;
+      box-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .search-input,
+    html[data-theme="light"][data-visual-theme="emoji"] .visual-theme-select,
+    html[data-theme="light"][data-visual-theme="emoji"] #theme-toggle {
+      background: rgba(255, 255, 255, 0.82) !important;
+      border: 1px solid rgba(255, 165, 108, 0.3) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .search-input,
+    html[data-theme="dark"][data-visual-theme="emoji"] .visual-theme-select,
+    html[data-theme="dark"][data-visual-theme="emoji"] #theme-toggle {
+      background: rgba(35, 28, 50, 0.82) !important;
+      border: 1px solid rgba(255, 143, 188, 0.22) !important;
+    }
+
+    .app-card-sticker {
+      display: none;
+    }
+
+    html[data-visual-theme="emoji"] .app-card {
+      aspect-ratio: 1 / 1.28 !important;
+      border-radius: 0 !important;
+      overflow: hidden;
+      transform: rotate(var(--emoji-card-tilt, 0deg));
+      transform-origin: center center;
+      transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .app-card {
+      background: linear-gradient(180deg, rgba(255, 243, 159, 0.98) 0%, rgba(255, 234, 122, 0.96) 100%) !important;
+      border: 2px solid rgba(198, 156, 36, 0.18) !important;
+      box-shadow: 0 14px 28px rgba(195, 155, 61, 0.22) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card {
+      background: linear-gradient(180deg, rgba(255, 224, 119, 0.96) 0%, rgba(255, 196, 85, 0.92) 100%) !important;
+      border: 2px solid rgba(255, 221, 133, 0.2) !important;
+      box-shadow: 0 16px 34px rgba(10, 10, 22, 0.34), 0 0 0 1px rgba(255, 213, 128, 0.12) inset !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card::before {
+      content: '';
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 26%),
+        radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 24%),
+        radial-gradient(circle at 80% 78%, rgba(186, 146, 35, 0.08) 0%, rgba(186, 146, 35, 0) 26%) !important;
+      mix-blend-mode: normal !important;
+      opacity: 0.7 !important;
+      filter: none !important;
+      transform: none !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card::before {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 24%),
+        radial-gradient(circle at 22% 18%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 22%),
+        radial-gradient(circle at 80% 78%, rgba(168, 124, 25, 0.08) 0%, rgba(168, 124, 25, 0) 24%) !important;
+      opacity: 0.52 !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card:hover {
+      transform: translateY(-8px) rotate(var(--emoji-card-hover-tilt, 0deg)) !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card:hover::before {
+      opacity: 0.82 !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card.keyboard-selected {
+      outline: 4px solid #ffd166;
+      outline-offset: 4px;
+    }
+
+    html[data-visual-theme="emoji"] .card-glass-content {
+      position: relative;
+      min-height: 100%;
+      padding: 24px 18px 28px !important;
+      justify-content: flex-start;
+      gap: 10px;
+      border-radius: 0 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: none !important;
+      background: transparent !important;
+    }
+
+    html[data-visual-theme="emoji"] .card-glass-content::before {
+      content: '';
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      width: 68px;
+      height: 18px;
+      border-radius: 6px;
+      transform: translateX(-50%) rotate(-5deg);
+      opacity: 0.72;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .card-glass-content::before {
+      background: rgba(255, 255, 255, 0.52);
+      box-shadow: 0 2px 8px rgba(122, 90, 21, 0.08);
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .card-glass-content::before {
+      background: rgba(255, 248, 214, 0.28);
+      box-shadow: 0 2px 8px rgba(10, 10, 22, 0.12);
+    }
+
+    html[data-visual-theme="emoji"] .card-glass-content::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 54px;
+      height: 54px;
+      clip-path: polygon(100% 0, 0 100%, 100% 100%);
+      background: linear-gradient(135deg,
+          rgba(255, 247, 205, 0.98) 0%,
+          rgba(248, 215, 112, 0.98) 58%,
+          rgba(227, 182, 63, 1) 100%);
+      pointer-events: none;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .card-glass-content::after {
+      box-shadow: -5px -5px 8px rgba(184, 140, 36, 0.12);
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .card-glass-content::after {
+      background: linear-gradient(135deg,
+          rgba(255, 238, 176, 0.98) 0%,
+          rgba(235, 188, 78, 0.98) 58%,
+          rgba(208, 154, 39, 1) 100%);
+      box-shadow: -5px -5px 8px rgba(122, 74, 0, 0.14);
+    }
+
+    html[data-visual-theme="emoji"] .app-card-sticker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
+      width: 68px;
+      height: 68px;
+      margin: 6px 0 4px 6px;
+      border-radius: 26px 18px 28px 16px;
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: 40px;
+      line-height: 1;
+      transform: rotate(var(--emoji-sticker-tilt, -6deg));
+      box-shadow: 0 10px 18px rgba(120, 85, 18, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .app-card-sticker {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 250, 233, 0.82) 100%);
+      box-shadow: 0 10px 18px rgba(120, 85, 18, 0.18);
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card-sticker {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 244, 214, 0.18) 100%);
+      box-shadow: 0 10px 18px rgba(10, 10, 22, 0.18);
+    }
+
+    html[data-visual-theme="emoji"] .app-card-title {
+      font-family: "Permanent Marker", "Bangers", cursive !important;
+      font-size: 23px !important;
+      line-height: 1.05 !important;
+      letter-spacing: 0.01em !important;
+      text-transform: none !important;
+      max-width: none;
+      padding-right: 44px;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .app-card-title {
+      color: #5b3100 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card-title {
+      color: #4b2300 !important;
+      text-shadow: none !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card-description {
+      font-family: "Patrick Hand", "Comic Sans MS", cursive !important;
+      font-size: 14px !important;
+      line-height: 1.28 !important;
+      margin-top: 2px !important;
+      max-width: none;
+      padding-right: 12px;
+      -webkit-line-clamp: 6 !important;
+      line-clamp: 6 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .app-card-description {
+      color: rgba(91, 49, 0, 0.82) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card-description {
+      color: rgba(75, 35, 0, 0.84) !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card-tags {
+      margin-top: auto;
+      padding-top: 6px;
+      max-width: calc(100% - 24px);
+    }
+
+    html[data-visual-theme="emoji"] .app-card-tag {
+      font-family: "Patrick Hand", "Comic Sans MS", cursive !important;
+      font-size: 13px !important;
+      letter-spacing: 0.04em !important;
+      border-radius: 14px 18px 14px 18px !important;
+      transform: rotate(-2deg);
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .app-card-tag {
+      background: rgba(255, 252, 235, 0.9) !important;
+      border: 1px dashed rgba(161, 113, 17, 0.34) !important;
+      color: #6b3c00 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card-tag {
+      background: rgba(255, 246, 214, 0.86) !important;
+      border: 1px dashed rgba(143, 90, 0, 0.28) !important;
+      color: #5a2f00 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .app-card-tag.accent {
+      background: rgba(255, 255, 255, 0.92) !important;
+      border-color: rgba(198, 138, 18, 0.38) !important;
+      color: #5b3100 !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card-tag.accent {
+      background: rgba(255, 255, 255, 0.9) !important;
+      border-color: rgba(161, 113, 17, 0.34) !important;
+      color: #5a2f00 !important;
+    }
+
+    html[data-visual-theme="emoji"] .card-share-btn {
+      opacity: 1 !important;
+      transform: none !important;
+      width: 34px !important;
+      height: 34px !important;
+      top: 14px !important;
+      right: 14px !important;
+      border-radius: 999px !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card-new::after {
+      display: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .card-share-btn {
+      background: rgba(255, 255, 255, 0.78) !important;
+      border: 1px solid rgba(198, 156, 36, 0.22) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .card-share-btn {
+      background: rgba(255, 248, 214, 0.74) !important;
+      border: 1px solid rgba(161, 113, 17, 0.22) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .card-share-btn svg,
+    html[data-theme="dark"][data-visual-theme="emoji"] .card-share-btn svg {
+      stroke: #6b3c00 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="emoji"] .new-badge-overlay {
+      background: #fff9dd !important;
+      border: 1px dashed rgba(161, 113, 17, 0.34) !important;
+      box-shadow: 0 8px 18px rgba(195, 155, 61, 0.18) !important;
+      color: #6b3c00 !important;
+      transform: rotate(-6deg);
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .new-badge-overlay {
+      background: #fff2be !important;
+      border: 1px dashed rgba(161, 113, 17, 0.34) !important;
+      box-shadow: 0 8px 18px rgba(10, 10, 22, 0.16) !important;
+      color: #5a2f00 !important;
+      transform: rotate(-6deg);
+    }
+
     /* NEW Card Special Styling */
     @keyframes newCardGlow {
 
@@ -974,6 +1737,62 @@
       justify-content: center;
     }
 
+    .page-transition-overlay.glass-return {
+      background: linear-gradient(120deg,
+          rgba(190, 205, 255, 0.00) 10%,
+          rgba(188, 166, 255, 0.18) 34%,
+          rgba(255, 255, 255, 0.28) 50%,
+          rgba(164, 182, 255, 0.18) 64%,
+          rgba(190, 205, 255, 0.00) 90%);
+      backdrop-filter: blur(10px) saturate(110%);
+      -webkit-backdrop-filter: blur(10px) saturate(110%);
+      animation: glassReturnFade 760ms ease-out forwards;
+    }
+
+    @keyframes glassReturnFade {
+      0% {
+        opacity: 0.85;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .page-transition-overlay.minimal-return {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      animation: glassReturnFade 620ms ease-out forwards;
+    }
+
+    html[data-theme="dark"] .page-transition-overlay.minimal-return {
+      background: rgba(0, 0, 0, 0.64);
+    }
+
+    .page-transition-overlay.emoji-return {
+      background:
+        linear-gradient(135deg, rgba(255, 245, 235, 0.74) 0%, rgba(255, 223, 247, 0.48) 100%);
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      animation: emojiReturnFade 760ms ease-out forwards;
+    }
+
+    html[data-theme="dark"] .page-transition-overlay.emoji-return {
+      background:
+        linear-gradient(135deg, rgba(31, 18, 42, 0.74) 0%, rgba(19, 22, 44, 0.58) 100%);
+    }
+
+    @keyframes emojiReturnFade {
+      0% {
+        opacity: 0.88;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
     .page-transition-circle {
       width: 0;
       height: 0;
@@ -982,6 +1801,55 @@
       transform: translate(-50%, -50%);
       position: absolute;
       opacity: 0;
+    }
+
+    .page-transition-circle.glass-return-circle {
+      background:
+        radial-gradient(circle,
+          rgba(241, 247, 255, 0.92) 0%,
+          rgba(191, 211, 255, 0.62) 36%,
+          rgba(138, 164, 255, 0.34) 58%,
+          rgba(102, 126, 234, 0.12) 74%,
+          rgba(102, 126, 234, 0) 100%);
+      box-shadow: 0 0 56px rgba(160, 186, 255, 0.22);
+    }
+
+    .page-transition-circle.minimal-return-circle {
+      background:
+        radial-gradient(circle,
+          rgba(255, 255, 255, 0.98) 0%,
+          rgba(255, 255, 255, 0.82) 26%,
+          rgba(255, 255, 255, 0.22) 56%,
+          rgba(255, 255, 255, 0) 100%);
+      box-shadow: none;
+    }
+
+    html[data-theme="dark"] .page-transition-circle.minimal-return-circle {
+      background:
+        radial-gradient(circle,
+          rgba(255, 255, 255, 0.14) 0%,
+          rgba(255, 255, 255, 0.08) 28%,
+          rgba(255, 255, 255, 0.02) 58%,
+          rgba(255, 255, 255, 0) 100%);
+    }
+
+    .page-transition-circle.emoji-return-circle {
+      background:
+        radial-gradient(circle,
+          rgba(255, 255, 255, 0.98) 0%,
+          rgba(255, 217, 110, 0.76) 24%,
+          rgba(255, 144, 110, 0.44) 54%,
+          rgba(255, 144, 110, 0) 100%);
+      box-shadow: 0 0 68px rgba(255, 172, 97, 0.24);
+    }
+
+    html[data-theme="dark"] .page-transition-circle.emoji-return-circle {
+      background:
+        radial-gradient(circle,
+          rgba(255, 217, 110, 0.22) 0%,
+          rgba(255, 143, 188, 0.18) 24%,
+          rgba(125, 211, 252, 0.1) 52%,
+          rgba(125, 211, 252, 0) 100%);
     }
 
     .page-transition-circle.animate {
@@ -1064,6 +1932,27 @@
       opacity: 1;
       transform: translate(-50%, -50%) scale(1);
       animation: iconFadeOut 0.5s ease-out 0.1s forwards;
+    }
+
+    .page-transition-icon.glass-return-icon {
+      color: #f3f7ff;
+      text-shadow: 0 4px 18px rgba(102, 126, 234, 0.28);
+    }
+
+    .page-transition-icon.minimal-return-icon {
+      color: #111111;
+      text-shadow: none;
+      font-size: 36px;
+    }
+
+    html[data-theme="dark"] .page-transition-icon.minimal-return-icon {
+      color: #f5f5f7;
+    }
+
+    .page-transition-icon.emoji-return-icon {
+      font-size: clamp(34px, 4vw, 58px);
+      letter-spacing: 12px;
+      text-shadow: 0 10px 26px rgba(255, 128, 90, 0.25);
     }
 
     @keyframes iconFadeOut {
@@ -1707,6 +2596,22 @@
       }
     }
 
+    body.theme-switching-in-minimal .container {
+      animation: minimalUiReveal 520ms ease-out both;
+    }
+
+    @keyframes minimalUiReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .theme-transition-overlay.comic {
       background:
         radial-gradient(circle at 50% 50%, rgba(247, 207, 39, 0.72) 0%, rgba(231, 47, 47, 0.48) 38%, rgba(0, 0, 0, 0) 72%),
@@ -1804,6 +2709,105 @@
       100% {
         opacity: 0;
         transform: translateX(32%) skewX(-6deg);
+      }
+    }
+
+    .theme-transition-overlay.minimal {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.76) 18%, rgba(255, 255, 255, 0.16) 46%, rgba(255, 255, 255, 0) 72%);
+    }
+
+    html[data-theme="dark"] .theme-transition-overlay.minimal {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0.02) 44%, rgba(255, 255, 255, 0) 72%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.42) 100%);
+    }
+
+    .theme-transition-overlay.minimal.phase-in {
+      animation: minimalThemeFade 980ms ease-out forwards;
+    }
+
+    @keyframes minimalThemeFade {
+      0% {
+        opacity: 0;
+      }
+
+      25% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .theme-transition-overlay.emoji {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 222, 126, 0.66) 18%, rgba(255, 140, 110, 0.24) 44%, rgba(255, 140, 110, 0) 72%),
+        linear-gradient(135deg, rgba(255, 248, 238, 0.66) 0%, rgba(255, 224, 244, 0.42) 100%);
+      backdrop-filter: blur(6px) saturate(118%);
+      -webkit-backdrop-filter: blur(6px) saturate(118%);
+    }
+
+    html[data-theme="dark"] .theme-transition-overlay.emoji {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 217, 110, 0.18) 0%, rgba(255, 143, 188, 0.15) 20%, rgba(125, 211, 252, 0.09) 46%, rgba(125, 211, 252, 0) 72%),
+        linear-gradient(180deg, rgba(28, 18, 42, 0.62) 0%, rgba(14, 18, 36, 0.76) 100%);
+    }
+
+    .theme-transition-overlay.emoji::after {
+      content: attr(data-emoji-burst);
+      position: absolute;
+      inset: 10%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: clamp(28px, 4.8vw, 68px);
+      line-height: 1.5;
+      letter-spacing: 10px;
+      opacity: 0;
+      transform: scale(0.82) rotate(-4deg);
+      filter: saturate(1.12);
+    }
+
+    .theme-transition-overlay.emoji.phase-in {
+      animation: emojiThemeFade 1260ms ease-out forwards;
+    }
+
+    .theme-transition-overlay.emoji.phase-in::after {
+      animation: emojiThemeBurst 980ms ease-out forwards;
+    }
+
+    @keyframes emojiThemeFade {
+      0% {
+        opacity: 0;
+      }
+
+      22% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes emojiThemeBurst {
+      0% {
+        opacity: 0;
+        transform: scale(0.75) rotate(-7deg);
+      }
+
+      28% {
+        opacity: 1;
+        transform: scale(1.02) rotate(-2deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.08) rotate(1deg);
       }
     }
 
@@ -2103,7 +3107,7 @@
   <!-- Welcome Overlay - Shows only once -->
   <div id="welcome-overlay" class="welcome-overlay">
     <div class="welcome-content">
-      <div class="welcome-badge">✨ New Experience</div>
+      <div class="welcome-badge">New Experience</div>
       <h1 class="welcome-title">
         Welcome to the new
         <span>vgtools.pro</span>
@@ -2130,8 +3134,14 @@
       </div>
       <div class="theme-switcher">
         <select id="visual-theme-select" class="visual-theme-select" aria-label="Visual theme selector">
-          <option value="comicbook">Comicbook</option>
-          <option value="glassui">Glass UI</option>
+          <optgroup label="Visual">
+            <option value="comicbook">Comicbook</option>
+            <option value="glassui">Glass UI</option>
+          </optgroup>
+          <optgroup label="Basic">
+            <option value="minimal">Minimal</option>
+            <option value="emoji">Emoji</option>
+          </optgroup>
         </select>
         <button id="theme-toggle" title="Change theme"></button>
       </div>
@@ -2291,7 +3301,7 @@
         <span class="footer-divider">•</span>
         <span class="footer-app-count">16 apps</span>
         <span class="footer-divider">•</span>
-        <span class="footer-hint">⌨️ Use arrow keys to navigate</span>
+        <span class="footer-hint">Use arrow keys to navigate</span>
       </div>
       <div class="footer-right">
         <button id="feedback-open-btn" class="minimal-btn">
@@ -2312,8 +3322,33 @@
     const App = {
       el: {},
       THEMES: ['light', 'dark', 'system'],
-      THEME_ICONS: { light: '☀️', dark: '🌔', system: '⚙️' },
-      VISUAL_THEMES: ['comicbook', 'glassui'],
+      THEME_ICONS: { light: 'L', dark: 'D', system: 'A' },
+      THEME_LABELS: { light: 'Light', dark: 'Dark', system: 'Auto' },
+      VISUAL_THEMES: ['comicbook', 'glassui', 'minimal', 'emoji'],
+      VISUAL_THEME_META: {
+        comicbook: { group: 'visual', usesArtwork: true, usesPattern: true, transition: 'comic' },
+        glassui: { group: 'visual', usesArtwork: true, usesPattern: true, transition: 'glass' },
+        minimal: { group: 'basic', usesArtwork: false, usesPattern: false, transition: 'minimal' },
+        emoji: { group: 'basic', usesArtwork: false, usesPattern: false, transition: 'emoji' },
+      },
+      EMOJI_THEME_SYMBOLS: {
+        brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
+        moodboards: ['🖼️', '🎨', '📌', '✨'],
+        blobs: ['🫧', '💧', '🌀', '🎨'],
+        jigsaws: ['🧩', '✂️', '🖼️', '🧠'],
+        iconfactory: ['✳️', '🔷', '🛠️', '📦'],
+        qrcodes: ['🔳', '📱', '🔗', '📡'],
+        colors: ['🎨', '🌈', '🧪', '🖌️'],
+        notes: ['📝', '📌', '🗂️', '💡'],
+        locator: ['📍', '🗺️', '🌍', '🧭'],
+        signatures: ['✍️', '🖋️', '📄', '✔️'],
+        svgrecolor: ['🎨', '🔁', '🧬', '🖌️'],
+        any2svg: ['🪄', '📄', '🖼️', '➡️'],
+        bgremover: ['🖼️', '✂️', '💇', '🫥'],
+        wordclouds: ['☁️', '🔤', '📚', '💬'],
+        sankey: ['📊', '↗️', '🔀', '💧'],
+        mockups: ['📱', '💻', '🖥️', '✨'],
+      },
       TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
       DRAG_STATE: { dragged: null, over: null },
 
@@ -2437,11 +3472,20 @@
           // Get card color and title
           const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
           const appTitle = card.querySelector('.app-card-title')?.textContent || 'Loading...';
+          const theme = this.currentVisualTheme || localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+          const transitionVariant = this.getVisualTransitionVariant(theme);
 
           // Save for return animation
           sessionStorage.setItem('vgtools-last-app', appId);
           sessionStorage.setItem('vgtools-last-color', accentColor.trim());
-          sessionStorage.setItem('vgtools-last-icon', appTitle);
+          sessionStorage.setItem(
+            'vgtools-last-icon',
+            transitionVariant === 'minimal'
+              ? ''
+              : transitionVariant === 'emoji'
+                ? (card.dataset.emojiBurst || this.getEmojiBurstForTool(appId))
+                : appTitle
+          );
 
           // Get click position
           const rect = card.getBoundingClientRect();
@@ -2449,11 +3493,13 @@
           const y = rect.top + rect.height / 2;
 
           // Theme-aware open transition
-          const theme = this.currentVisualTheme || localStorage.getItem('vgtools-visual-theme') || 'comicbook';
           const themedOverlay = document.createElement('div');
-          themedOverlay.className = `app-open-theme-overlay ${theme === 'comicbook' ? 'comic' : 'glass'}`;
+          themedOverlay.className = `app-open-theme-overlay ${transitionVariant}`;
           themedOverlay.style.setProperty('--open-x', `${x}px`);
           themedOverlay.style.setProperty('--open-y', `${y}px`);
+          if (transitionVariant === 'emoji') {
+            themedOverlay.setAttribute('data-emoji-burst', card.dataset.emojiBurst || this.getEmojiBurstForTool(appId));
+          }
           document.body.appendChild(themedOverlay);
 
           requestAnimationFrame(() => {
@@ -2462,7 +3508,7 @@
 
           setTimeout(() => {
             window.location.href = href;
-          }, theme === 'comicbook' ? 840 : 900);
+          }, transitionVariant === 'comic' ? 840 : transitionVariant === 'glass' ? 900 : transitionVariant === 'emoji' ? 780 : 560);
         } catch (err) {
           window.location.href = href;
         }
@@ -2595,6 +3641,10 @@
         const lastAppId = sessionStorage.getItem('vgtools-last-app');
         const lastAppColor = sessionStorage.getItem('vgtools-last-color');
         const lastAppIcon = sessionStorage.getItem('vgtools-last-icon');
+        const currentVisualTheme = document.documentElement.dataset.visualTheme
+          || this.currentVisualTheme
+          || localStorage.getItem('vgtools-visual-theme')
+          || 'comicbook';
 
         if (returning) {
           sessionStorage.removeItem('vgtools-returning');
@@ -2604,25 +3654,49 @@
 
           // Create return transition overlay
           const overlay = document.createElement('div');
-          overlay.className = 'page-transition-overlay';
+          const returnVariant = currentVisualTheme === 'glassui'
+            ? 'glass-return'
+            : currentVisualTheme === 'minimal'
+              ? 'minimal-return'
+              : currentVisualTheme === 'emoji'
+                ? 'emoji-return'
+              : '';
+          overlay.className = `page-transition-overlay ${returnVariant}`.trim();
 
           const circle = document.createElement('div');
-          circle.className = 'page-transition-circle return-animate';
-          circle.style.cssText = `left: 50%; top: 50%; --transition-color: ${lastAppColor || '#4f46e5'};`;
-
-          const iconSpan = document.createElement('span');
-          iconSpan.className = 'page-transition-icon return-icon-animate';
-          iconSpan.textContent = lastAppIcon || '🏠';
+          const returnCircleVariant = currentVisualTheme === 'glassui'
+            ? 'glass-return-circle'
+            : currentVisualTheme === 'minimal'
+              ? 'minimal-return-circle'
+              : currentVisualTheme === 'emoji'
+                ? 'emoji-return-circle'
+              : '';
+          circle.className = `page-transition-circle return-animate ${returnCircleVariant}`.trim();
+          circle.style.cssText = `left: 50%; top: 50%; --transition-color: ${currentVisualTheme === 'glassui' ? 'rgba(188, 205, 255, 0.88)' : currentVisualTheme === 'minimal' ? 'rgba(255, 255, 255, 0.96)' : currentVisualTheme === 'emoji' ? 'rgba(255, 195, 102, 0.92)' : (lastAppColor || '#4f46e5')};`;
 
           overlay.appendChild(circle);
           document.body.appendChild(overlay);
-          document.body.appendChild(iconSpan);
+          const iconLabel = currentVisualTheme === 'minimal' ? '' : (lastAppIcon || 'Home');
+          let iconSpan = null;
+          if (iconLabel) {
+            iconSpan = document.createElement('span');
+            const returnIconVariant = currentVisualTheme === 'glassui'
+              ? 'glass-return-icon'
+              : currentVisualTheme === 'minimal'
+                ? 'minimal-return-icon'
+                : currentVisualTheme === 'emoji'
+                  ? 'emoji-return-icon'
+                : '';
+            iconSpan.className = `page-transition-icon return-icon-animate ${returnIconVariant}`.trim();
+            iconSpan.textContent = iconLabel;
+            document.body.appendChild(iconSpan);
+          }
 
           // Remove after animation
           setTimeout(() => {
             overlay.remove();
-            iconSpan.remove();
-          }, 800);
+            if (iconSpan) iconSpan.remove();
+          }, currentVisualTheme === 'emoji' ? 860 : 800);
         }
       },
 
@@ -2649,21 +3723,24 @@
           mockups: ['Canvas', 'Mockups', '3D'],
         };
 
-        this.el.appCards.forEach(card => {
+        const emojiCardTiltVariants = [-1.1, 0.95, -0.7, 1.2];
+        const emojiHoverTiltVariants = [-0.25, 0.2, -0.1, 0.3];
+        const emojiStickerTiltVariants = ['-8deg', '7deg', '-6deg', '6deg'];
+
+        this.el.appCards.forEach((card, cardIndex) => {
           const id = card.dataset.id;
           const imgPath = appImagePaths[id];
           const tech = appTech[id] || [];
           const isNew = card.dataset.new === 'true';
-
+          card.dataset.emojiBurst = this.getEmojiBurstForTool(id);
+          card.style.setProperty('--card-emoji-pattern', JSON.stringify(this.getEmojiPatternForTool(id)));
+          card.style.setProperty('--emoji-card-tilt', `${emojiCardTiltVariants[cardIndex % emojiCardTiltVariants.length]}deg`);
+          card.style.setProperty('--emoji-card-hover-tilt', `${emojiHoverTiltVariants[cardIndex % emojiHoverTiltVariants.length]}deg`);
+          card.style.setProperty('--emoji-sticker-tilt', emojiStickerTiltVariants[cardIndex % emojiStickerTiltVariants.length]);
           if (imgPath) {
             card.style.setProperty('--card-bg-image', `url('${imgPath}')`);
-          }
-
-          // Save the original icon emoji for page transitions
-          const iconEl = card.querySelector('.app-card-icon');
-          const iconEmoji = iconEl ? iconEl.textContent : '';
-          if (iconEl) {
-            card.dataset.icon = iconEmoji;
+          } else {
+            card.style.removeProperty('--card-bg-image');
           }
 
           // Get existing elements TEXT before clearing
@@ -2676,11 +3753,16 @@
           const glassContent = document.createElement('div');
           glassContent.className = 'card-glass-content';
 
-          // Create title element with emoji
+          const emojiSticker = document.createElement('div');
+          emojiSticker.className = 'app-card-sticker';
+          emojiSticker.textContent = this.getEmojiStickerForTool(id);
+          glassContent.appendChild(emojiSticker);
+
+          // Create title element
           if (titleText) {
             const newTitle = document.createElement('h2');
             newTitle.className = 'app-card-title';
-            newTitle.textContent = iconEmoji ? `${iconEmoji} ${titleText}` : titleText;
+            newTitle.textContent = titleText;
             glassContent.appendChild(newTitle);
           }
 
@@ -2721,7 +3803,7 @@
             e.stopPropagation();
             const appUrl = new URL(card.getAttribute('href'), window.location.origin).href;
             navigator.clipboard.writeText(appUrl).then(() => {
-              this.showToast('📋 Link copied to clipboard!');
+              this.showToast('Link copied to clipboard!');
             });
           });
           card.appendChild(shareBtn);
@@ -3064,8 +4146,45 @@
         this.setVisualTheme(savedVisualTheme, false);
       },
 
+      getVisualThemeMeta(theme) {
+        return this.VISUAL_THEME_META[theme] || this.VISUAL_THEME_META.comicbook;
+      },
+
+      getVisualTransitionVariant(theme) {
+        return this.getVisualThemeMeta(theme).transition || 'comic';
+      },
+
+      getEmojiThemeSymbols(toolId) {
+        return this.EMOJI_THEME_SYMBOLS[toolId] || ['🎉', '✨', '🌈', '🫧'];
+      },
+
+      getEmojiStickerForTool(toolId) {
+        return this.getEmojiThemeSymbols(toolId)[0] || '✨';
+      },
+
+      buildEmojiPattern(symbols, repeatCount = 48) {
+        return Array.from({ length: repeatCount }, (_, index) => symbols[index % symbols.length]).join('  ');
+      },
+
+      getEmojiPatternForTool(toolId) {
+        return this.buildEmojiPattern(this.getEmojiThemeSymbols(toolId), 54);
+      },
+
+      getEmojiBurstForTool(toolId) {
+        return this.getEmojiThemeSymbols(toolId).join('  ');
+      },
+
+      getHubEmojiWallpaper() {
+        const allSymbols = [...new Set(this.TOOL_IDS.flatMap((toolId) => this.getEmojiThemeSymbols(toolId)))];
+        return this.buildEmojiPattern(allSymbols, 120);
+      },
+
       getAppImagePaths(theme) {
         const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const themeMeta = this.getVisualThemeMeta(normalizedTheme);
+        if (!themeMeta.usesArtwork) {
+          return {};
+        }
         return this.TOOL_IDS.reduce((paths, toolId) => {
           paths[toolId] = `Theme/${normalizedTheme}/${toolId}_${normalizedTheme}.png`;
           return paths;
@@ -3074,6 +4193,10 @@
 
       getPatternForTheme(theme) {
         const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const themeMeta = this.getVisualThemeMeta(normalizedTheme);
+        if (!themeMeta.usesPattern) {
+          return 'none';
+        }
         return `Theme/${normalizedTheme}/pattern_${normalizedTheme}.jpg`;
       },
 
@@ -3096,17 +4219,22 @@
 
       playVisualThemeTransition(theme, onSwitch) {
         const currentTheme = document.documentElement.dataset.visualTheme || 'comicbook';
+        const transitionVariant = this.getVisualTransitionVariant(theme);
+        const currentPattern = this.getPatternForTheme(currentTheme);
+        const targetPattern = this.getPatternForTheme(theme);
         const patternMorph = document.createElement('div');
         patternMorph.className = 'theme-pattern-morph';
-        patternMorph.style.setProperty('--pattern-current', `url('${this.getPatternForTheme(currentTheme)}')`);
-        patternMorph.style.setProperty('--pattern-target', `url('${this.getPatternForTheme(theme)}')`);
+        patternMorph.style.setProperty('--pattern-current', currentPattern === 'none' ? 'none' : `url('${currentPattern}')`);
+        patternMorph.style.setProperty('--pattern-target', targetPattern === 'none' ? 'none' : `url('${targetPattern}')`);
         document.body.appendChild(patternMorph);
 
         const overlay = document.createElement('div');
-        overlay.className = `theme-transition-overlay ${theme === 'comicbook' ? 'comic' : 'glass'}`;
-        if (theme === 'comicbook') {
+        overlay.className = `theme-transition-overlay ${transitionVariant}`;
+        if (transitionVariant === 'comic') {
           const bursts = ['POW!', 'BAM!', 'WHAM!', 'BOOM!'];
           overlay.setAttribute('data-burst-text', bursts[Math.floor(Math.random() * bursts.length)]);
+        } else if (transitionVariant === 'emoji') {
+          overlay.setAttribute('data-emoji-burst', this.buildEmojiPattern(['🎉', '✨', '🌈', '🫧', '🎨', '📱'], 24));
         }
 
         document.body.classList.add('theme-switching-out');
@@ -3119,7 +4247,7 @@
           if (typeof onSwitch === 'function') onSwitch();
 
           document.body.classList.remove('theme-switching-out');
-          document.body.classList.add(theme === 'comicbook' ? 'theme-switching-in-comic' : 'theme-switching-in-glass');
+          document.body.classList.add(`theme-switching-in-${transitionVariant}`);
           this.animateCardsEntrance(120);
 
           document.body.appendChild(overlay);
@@ -3129,20 +4257,31 @@
         }, 620);
 
         setTimeout(() => {
-          document.body.classList.remove('theme-switching-in-comic', 'theme-switching-in-glass');
+          document.body.classList.remove('theme-switching-in-comic', 'theme-switching-in-glass', 'theme-switching-in-minimal');
+          document.body.classList.remove('theme-switching-in-emoji');
           patternMorph.remove();
           overlay.remove();
-        }, theme === 'comicbook' ? 2440 : 2340);
+        }, transitionVariant === 'comic' ? 2440 : transitionVariant === 'glass' ? 2340 : transitionVariant === 'emoji' ? 1960 : 1260);
       },
 
       applyVisualTheme() {
         document.documentElement.dataset.visualTheme = this.currentVisualTheme;
+        document.documentElement.dataset.visualThemeGroup = this.getVisualThemeMeta(this.currentVisualTheme).group;
+        if (this.currentVisualTheme === 'emoji') {
+          document.documentElement.style.setProperty('--hub-emoji-wallpaper', JSON.stringify(this.getHubEmojiWallpaper()));
+        } else {
+          document.documentElement.style.removeProperty('--hub-emoji-wallpaper');
+        }
         const appImagePaths = this.getAppImagePaths(this.currentVisualTheme);
         this.el.appCards.forEach(card => {
           const id = card.dataset.id;
           const imgPath = appImagePaths[id];
+          card.dataset.emojiBurst = this.getEmojiBurstForTool(id);
+          card.style.setProperty('--card-emoji-pattern', JSON.stringify(this.getEmojiPatternForTool(id)));
           if (imgPath) {
             card.style.setProperty('--card-bg-image', `url('${imgPath}')`);
+          } else {
+            card.style.removeProperty('--card-bg-image');
           }
         });
       },
@@ -3152,6 +4291,8 @@
           localStorage.setItem('creative-toolkit-theme', theme);
         }
         this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+        this.el.themeToggle.title = `Color theme: ${this.THEME_LABELS[theme] || theme}`;
+        this.el.themeToggle.setAttribute('aria-label', `Color theme: ${this.THEME_LABELS[theme] || theme}`);
         this.applyTheme(theme);
       },
 

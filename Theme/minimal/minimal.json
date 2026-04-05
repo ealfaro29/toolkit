@@ -1,0 +1,23 @@
+{
+  "theme_name": "Minimal",
+  "group": "Basic",
+  "version": "1.0",
+  "philosophy": "Quiet, reductionist, and utility-first. Remove decorative artwork and let hierarchy, spacing, and monochrome contrast carry the interface.",
+  "design_intent": "Deliver a super simple Apple-inspired white/black environment where typography and spacing replace splash and card imagery.",
+  "visual_rules": {
+    "artwork_usage": "none",
+    "pattern_usage": "none",
+    "surface_style": "flat_monochrome",
+    "accent_mode": "typography_only",
+    "border_style": "subtle_hairline",
+    "shadow_usage": "minimal_or_none"
+  },
+  "palette": {
+    "light_background": "#F5F5F7",
+    "light_surface": "#FFFFFF",
+    "light_text": "#111111",
+    "dark_background": "#000000",
+    "dark_surface": "#0B0B0F",
+    "dark_text": "#F5F5F7"
+  }
+}

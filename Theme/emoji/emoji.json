@@ -1,0 +1,23 @@
+{
+  "theme_name": "Emoji",
+  "group": "Basic",
+  "version": "1.0",
+  "philosophy": "Playful, loud, and unmistakably app-specific. Replace illustrations with dense emoji wallpapers that instantly communicate what each tool does.",
+  "design_intent": "Deliver a visual theme as expressive as comicbook or glassui, but using repeated emoji patterns instead of splash and card images.",
+  "visual_rules": {
+    "artwork_usage": "none",
+    "pattern_usage": "emoji_wallpaper",
+    "surface_style": "soft_glass_panels",
+    "accent_mode": "emoji_and_color",
+    "border_style": "rounded_soft_outline",
+    "shadow_usage": "playful_but_light"
+  },
+  "palette": {
+    "light_background": "#FFF7F1",
+    "light_surface": "#FFFFFF",
+    "light_accent": "#FF6B4A",
+    "dark_background": "#130D19",
+    "dark_surface": "#22182D",
+    "dark_accent": "#FF8FB3"
+  }
+}

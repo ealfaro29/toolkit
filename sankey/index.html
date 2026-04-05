@@ -1266,7 +1266,9 @@
                 const preview = this.el.splashPreview;
                 if (!preview) return;
 
-                preview.innerHTML = '<img src="Comicbook.png" alt="Sankey Diagram Preview">';
+                const themeAsset = document.documentElement.dataset.visualThemeAsset
+                    || (localStorage.getItem('vgtools-visual-theme') === 'glassui' ? 'glass.png' : 'Comicbook.png');
+                preview.innerHTML = `<img src="${themeAsset}" alt="Sankey Diagram Preview">`;
             },
 
             showToast(message) {

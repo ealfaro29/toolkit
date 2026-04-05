@@ -75,7 +75,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: url('Comicbook.png') center / cover no-repeat;
+            background: var(--tool-theme-local-image, url('Comicbook.png')) center / cover no-repeat;
             opacity: 0.15;
             /* Reduced for better legibility */
             z-index: -1;
