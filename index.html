@@ -8,7 +8,7 @@
 
   <!-- SEO Meta Tags -->
   <meta name="description"
-    content="A universe of 15 creative mini-apps for designers. Generate QR codes, remove backgrounds with AI, create moodboards, and more. 100% client-side, your data never leaves your browser." />
+    content="A universe of 16 creative mini-apps for designers. Generate QR codes, remove backgrounds with AI, create moodboards, and more. 100% client-side, your data never leaves your browser." />
   <meta name="keywords"
     content="design tools, QR generator, background remover, moodboard, color palette, SVG tools, icon factory, creative toolkit" />
   <meta name="author" content="VGTools Pro" />
@@ -1547,6 +1547,179 @@
       transform: rotate(-6deg);
     }
 
+    /* ---- TERMINAL THEME HUB ---- */
+    html[data-visual-theme="terminal"] {
+      --hub-pattern-image: none;
+      --accent-color: #00ff41;
+      --accent-yellow: #00ff41;
+    }
+
+    html[data-visual-theme="terminal"] body {
+      background: #060a06 !important;
+    }
+
+    html[data-visual-theme="terminal"] body::before,
+    html[data-visual-theme="terminal"] .welcome-overlay {
+      background-image: none !important;
+    }
+
+    html[data-visual-theme="terminal"] header.panel {
+      background: rgba(6, 10, 6, 0.92) !important;
+      border: 1px solid rgba(0, 255, 65, 0.25) !important;
+      border-radius: 0 !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      box-shadow: 0 0 20px rgba(0, 255, 65, 0.08) !important;
+    }
+
+    html[data-visual-theme="terminal"] header.panel h1,
+    html[data-visual-theme="terminal"] header.panel .sub,
+    html[data-visual-theme="terminal"] .search-input,
+    html[data-visual-theme="terminal"] #theme-toggle,
+    html[data-visual-theme="terminal"] #theme-picker-btn {
+      color: #00ff41 !important;
+      font-family: "JetBrains Mono", ui-monospace, monospace !important;
+      text-shadow: 0 0 8px rgba(0, 255, 65, 0.4) !important;
+    }
+
+    html[data-visual-theme="terminal"] .search-input,
+    html[data-visual-theme="terminal"] #theme-toggle,
+    html[data-visual-theme="terminal"] #theme-picker-btn {
+      background: rgba(0, 255, 65, 0.06) !important;
+      border: 1px solid rgba(0, 255, 65, 0.25) !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .search-input::placeholder {
+      color: rgba(0, 255, 65, 0.45) !important;
+    }
+
+    html[data-visual-theme="terminal"] .search-input:focus {
+      border-color: rgba(0, 255, 65, 0.6) !important;
+      box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.12) !important;
+      width: 280px !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card {
+      aspect-ratio: 1 / 1 !important;
+      background: #060a06 !important;
+      border: 1.5px solid rgba(0, 255, 65, 0.35) !important;
+      border-radius: 0 !important;
+      box-shadow: 0 0 12px rgba(0, 255, 65, 0.07), inset 0 0 20px rgba(0, 0, 0, 0.5) !important;
+      color: #00ff41 !important;
+      font-family: "JetBrains Mono", ui-monospace, monospace !important;
+      justify-content: flex-end !important;
+      transition: border-color 0.2s, box-shadow 0.2s !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card::before {
+      display: none !important;
+      content: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card::after {
+      content: '● ● ●';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 26px;
+      background: rgba(0, 255, 65, 0.1);
+      border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 10px;
+      color: rgba(0, 255, 65, 0.45);
+      letter-spacing: 3px;
+      font-family: ui-monospace, monospace;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    html[data-visual-theme="terminal"] .app-card:hover {
+      border-color: rgba(0, 255, 65, 0.75) !important;
+      box-shadow: 0 0 22px rgba(0, 255, 65, 0.18), inset 0 0 20px rgba(0, 0, 0, 0.5) !important;
+      transform: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.keyboard-selected {
+      outline: 2px solid #00ff41 !important;
+      outline-offset: 2px !important;
+    }
+
+    html[data-visual-theme="terminal"] .terminal-ascii {
+      position: absolute;
+      top: 34px;
+      left: 0; right: 0;
+      padding: 6px 10px;
+      margin: 0;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 9px;
+      line-height: 1.35;
+      color: rgba(0, 255, 65, 0.8);
+      text-shadow: 0 0 6px rgba(0, 255, 65, 0.5);
+      white-space: pre;
+      overflow: hidden;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    html[data-visual-theme="terminal"] .app-card-title {
+      color: #00ff41 !important;
+      font-family: "JetBrains Mono", ui-monospace, monospace !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-shadow: 0 0 8px rgba(0, 255, 65, 0.5) !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      position: relative;
+      z-index: 3;
+    }
+
+    html[data-visual-theme="terminal"] .app-card-description {
+      color: rgba(0, 255, 65, 0.55) !important;
+      font-family: "JetBrains Mono", ui-monospace, monospace !important;
+      font-size: 9px !important;
+      line-height: 1.4 !important;
+      text-shadow: none !important;
+      position: relative;
+      z-index: 3;
+      -webkit-line-clamp: 3 !important;
+      line-clamp: 3 !important;
+    }
+
+    html[data-visual-theme="terminal"] .card-glass-content {
+      background: transparent !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      border: none !important;
+      border-radius: 0 !important;
+      padding: 8px 10px 10px !important;
+      justify-content: flex-end;
+      min-height: 100%;
+    }
+
+    html[data-visual-theme="terminal"] .app-card-tags {
+      display: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .card-share-btn {
+      display: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .new-badge-overlay {
+      background: #060a06 !important;
+      border: 1px solid #00ff41 !important;
+      color: #00ff41 !important;
+      border-radius: 0 !important;
+      box-shadow: 0 0 8px rgba(0, 255, 65, 0.3) !important;
+      animation: none !important;
+      letter-spacing: 0.1em !important;
+      text-shadow: 0 0 6px rgba(0, 255, 65, 0.4) !important;
+    }
+
     /* NEW Card Special Styling */
     @keyframes newCardGlow {
 
@@ -3075,281 +3248,10 @@
       z-index: 1;
     }
 
-    /* ======================================================
-       NEW THEMES
-       ====================================================== */
 
-    /* --- Terminal --- */
-    html[data-visual-theme="terminal"] {
-      --accent-color: #00ff41; --accent-color-tint: rgba(0,255,65,0.12); --accent-yellow: #00ff41;
-    }
-    html[data-visual-theme="terminal"] body {
-      background: #0a0e0a !important;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
-    }
-    html[data-visual-theme="terminal"] body::before,
-    html[data-visual-theme="terminal"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="terminal"] header.panel {
-      background: #0f140f !important; border: 1px solid #00ff41 !important;
-      border-radius: 4px !important; box-shadow: 0 0 16px rgba(0,255,65,0.12) !important;
-      backdrop-filter: none !important;
-    }
-    html[data-visual-theme="terminal"] header.panel h1 {
-      color: #00ff41 !important; font-family: ui-monospace, monospace !important;
-      text-shadow: 0 0 10px rgba(0,255,65,0.55) !important;
-    }
-    html[data-visual-theme="terminal"] header.panel .sub { color: rgba(0,255,65,0.5) !important; font-family: ui-monospace, monospace !important; }
-    html[data-visual-theme="terminal"] .search-input,
-    html[data-visual-theme="terminal"] #theme-toggle,
-    html[data-visual-theme="terminal"] #theme-picker-btn {
-      background: #0f140f !important; border: 1px solid #00ff41 !important;
-      color: #00ff41 !important; border-radius: 2px !important; font-family: ui-monospace, monospace !important;
-    }
-    html[data-visual-theme="terminal"] .search-input::placeholder { color: rgba(0,255,65,0.35) !important; }
-    html[data-visual-theme="terminal"] .card-glass-content {
-      background: rgba(10,14,10,0.93) !important; border-top: 1px solid #00ff41 !important;
-    }
-    html[data-visual-theme="terminal"] .app-card-title {
-      color: #00ff41 !important; font-family: ui-monospace, monospace !important;
-      text-shadow: 0 0 6px rgba(0,255,65,0.4) !important; font-size: 13px !important;
-    }
-    html[data-visual-theme="terminal"] .app-card-description {
-      color: rgba(0,255,65,0.6) !important; font-family: ui-monospace, monospace !important; font-size: 11px !important;
-    }
-    html[data-visual-theme="terminal"] .app-card {
-      border: 1px solid rgba(0,255,65,0.25) !important; box-shadow: 0 0 8px rgba(0,255,65,0.06) !important;
-    }
-    html[data-visual-theme="terminal"] .app-card:hover {
-      border-color: #00ff41 !important; box-shadow: 0 0 18px rgba(0,255,65,0.2) !important;
-    }
-
-    /* --- Brutalist --- */
-    html[data-visual-theme="brutalist"] { --accent-color: #111111; --accent-color-tint: rgba(17,17,17,0.1); --accent-yellow: #FFE600; }
-    html[data-theme="dark"][data-visual-theme="brutalist"] { --accent-color: #FFE600; --accent-color-tint: rgba(255,230,0,0.1); }
-    html[data-visual-theme="brutalist"] body { background: #f0f0f0 !important; }
-    html[data-theme="dark"][data-visual-theme="brutalist"] body { background: #1a1a1a !important; }
-    html[data-visual-theme="brutalist"] body::before,
-    html[data-visual-theme="brutalist"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="brutalist"] header.panel {
-      background: #ffffff !important; border: 4px solid #111 !important;
-      border-radius: 0 !important; box-shadow: 6px 6px 0 #111 !important; backdrop-filter: none !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] header.panel {
-      background: #111 !important; border-color: #FFE600 !important; box-shadow: 6px 6px 0 #FFE600 !important;
-    }
-    html[data-visual-theme="brutalist"] header.panel h1 {
-      color: #111 !important; text-transform: uppercase !important; letter-spacing: -0.02em !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] header.panel h1 { color: #FFE600 !important; }
-    html[data-visual-theme="brutalist"] header.panel .sub { color: #555 !important; }
-    html[data-theme="dark"][data-visual-theme="brutalist"] header.panel .sub { color: #aaa !important; }
-    html[data-visual-theme="brutalist"] .search-input,
-    html[data-visual-theme="brutalist"] #theme-toggle,
-    html[data-visual-theme="brutalist"] #theme-picker-btn {
-      background: #fff !important; border: 3px solid #111 !important;
-      border-radius: 0 !important; box-shadow: 3px 3px 0 #111 !important; color: #111 !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] .search-input,
-    html[data-theme="dark"][data-visual-theme="brutalist"] #theme-toggle,
-    html[data-theme="dark"][data-visual-theme="brutalist"] #theme-picker-btn {
-      background: #222 !important; border-color: #FFE600 !important;
-      box-shadow: 3px 3px 0 #FFE600 !important; color: #FFE600 !important;
-    }
-    html[data-visual-theme="brutalist"] .card-glass-content {
-      background: #ffffff !important; border-top: 4px solid #111 !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] .card-glass-content {
-      background: #1a1a1a !important; border-top-color: #FFE600 !important;
-    }
-    html[data-visual-theme="brutalist"] .app-card-title {
-      color: #111 !important; text-transform: uppercase !important; font-size: 13px !important; letter-spacing: 0.03em !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] .app-card-title { color: #FFE600 !important; }
-    html[data-visual-theme="brutalist"] .app-card {
-      border: 3px solid #111 !important; border-radius: 0 !important; box-shadow: 5px 5px 0 #111 !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] .app-card {
-      border-color: #FFE600 !important; box-shadow: 5px 5px 0 #FFE600 !important;
-    }
-    html[data-visual-theme="brutalist"] .app-card:hover {
-      transform: translate(-2px,-2px) !important; box-shadow: 7px 7px 0 #111 !important;
-    }
-    html[data-theme="dark"][data-visual-theme="brutalist"] .app-card:hover { box-shadow: 7px 7px 0 #FFE600 !important; }
-
-    /* --- Neon --- */
-    html[data-visual-theme="neon"] { --accent-color: #00f5ff; --accent-color-tint: rgba(0,245,255,0.12); --accent-yellow: #ff00d4; }
-    html[data-visual-theme="neon"] body { background: #060010 !important; }
-    html[data-visual-theme="neon"] body::before,
-    html[data-visual-theme="neon"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="neon"] header.panel {
-      background: rgba(6,0,16,0.88) !important; border: 1px solid rgba(0,245,255,0.35) !important;
-      border-radius: 14px !important; box-shadow: 0 0 24px rgba(0,245,255,0.1), inset 0 0 30px rgba(0,245,255,0.03) !important;
-      backdrop-filter: blur(14px) !important;
-    }
-    html[data-visual-theme="neon"] header.panel h1 {
-      color: #00f5ff !important; text-shadow: 0 0 14px rgba(0,245,255,0.7) !important;
-    }
-    html[data-visual-theme="neon"] header.panel .sub { color: rgba(0,245,255,0.5) !important; }
-    html[data-visual-theme="neon"] .search-input,
-    html[data-visual-theme="neon"] #theme-toggle,
-    html[data-visual-theme="neon"] #theme-picker-btn {
-      background: rgba(6,0,16,0.7) !important; border: 1px solid rgba(0,245,255,0.3) !important;
-      color: #00f5ff !important; border-radius: 8px !important;
-    }
-    html[data-visual-theme="neon"] .card-glass-content {
-      background: rgba(6,0,16,0.85) !important; border-top: 1px solid rgba(0,245,255,0.28) !important;
-    }
-    html[data-visual-theme="neon"] .app-card-title { color: #00f5ff !important; text-shadow: 0 0 8px rgba(0,245,255,0.5) !important; }
-    html[data-visual-theme="neon"] .app-card-description { color: rgba(255,255,255,0.6) !important; }
-    html[data-visual-theme="neon"] .app-card {
-      border: 1px solid rgba(0,245,255,0.18) !important; box-shadow: 0 0 10px rgba(0,245,255,0.08) !important;
-    }
-    html[data-visual-theme="neon"] .app-card:hover {
-      border-color: rgba(0,245,255,0.6) !important;
-      box-shadow: 0 0 20px rgba(0,245,255,0.25), 0 0 40px rgba(255,0,212,0.08) !important;
-    }
-
-    /* --- Pastel --- */
-    html[data-visual-theme="pastel"] { --accent-color: #c084fc; --accent-color-tint: rgba(192,132,252,0.12); --accent-yellow: #fbbf24; }
-    html[data-visual-theme="pastel"] body { background: #fdf4ff !important; }
-    html[data-theme="dark"][data-visual-theme="pastel"] body { background: #1e1224 !important; }
-    html[data-visual-theme="pastel"] body::before,
-    html[data-visual-theme="pastel"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="pastel"] header.panel {
-      background: rgba(255,255,255,0.88) !important; border: 1px solid rgba(192,132,252,0.22) !important;
-      border-radius: 20px !important; box-shadow: 0 4px 20px rgba(192,132,252,0.1) !important;
-      backdrop-filter: blur(10px) !important;
-    }
-    html[data-theme="dark"][data-visual-theme="pastel"] header.panel {
-      background: rgba(30,18,36,0.88) !important; border-color: rgba(192,132,252,0.18) !important;
-    }
-    html[data-visual-theme="pastel"] header.panel h1 { color: #7c3aed !important; }
-    html[data-theme="dark"][data-visual-theme="pastel"] header.panel h1 { color: #c084fc !important; }
-    html[data-visual-theme="pastel"] header.panel .sub { color: #a78bfa !important; }
-    html[data-visual-theme="pastel"] .search-input,
-    html[data-visual-theme="pastel"] #theme-toggle,
-    html[data-visual-theme="pastel"] #theme-picker-btn {
-      background: rgba(255,255,255,0.88) !important; border: 1px solid rgba(192,132,252,0.28) !important;
-      border-radius: 14px !important; color: #7c3aed !important;
-    }
-    html[data-theme="dark"][data-visual-theme="pastel"] .search-input,
-    html[data-theme="dark"][data-visual-theme="pastel"] #theme-toggle,
-    html[data-theme="dark"][data-visual-theme="pastel"] #theme-picker-btn {
-      background: rgba(30,18,36,0.7) !important; color: #c084fc !important;
-    }
-    html[data-visual-theme="pastel"] .card-glass-content {
-      background: rgba(255,255,255,0.9) !important; border-top: 1px solid rgba(192,132,252,0.18) !important;
-    }
-    html[data-theme="dark"][data-visual-theme="pastel"] .card-glass-content { background: rgba(30,18,36,0.88) !important; }
-    html[data-visual-theme="pastel"] .app-card-title { color: #7c3aed !important; }
-    html[data-theme="dark"][data-visual-theme="pastel"] .app-card-title { color: #c084fc !important; }
-    html[data-visual-theme="pastel"] .app-card-description { color: #9333ea !important; opacity: 0.72; }
-    html[data-visual-theme="pastel"] .app-card { border: 1px solid rgba(192,132,252,0.18) !important; box-shadow: 0 4px 16px rgba(192,132,252,0.08) !important; }
-    html[data-visual-theme="pastel"] .app-card:hover { border-color: rgba(192,132,252,0.5) !important; box-shadow: 0 8px 24px rgba(192,132,252,0.18) !important; }
-
-    /* --- Newspaper --- */
-    html[data-visual-theme="newspaper"] { --accent-color: #1a1a1a; --accent-color-tint: rgba(26,26,26,0.08); --accent-yellow: #1a1a1a; }
-    html[data-theme="dark"][data-visual-theme="newspaper"] { --accent-color: #f0e6d3; --accent-yellow: #f0e6d3; }
-    html[data-visual-theme="newspaper"] body { background: #f5efe6 !important; }
-    html[data-theme="dark"][data-visual-theme="newspaper"] body { background: #1a1610 !important; }
-    html[data-visual-theme="newspaper"] body::before,
-    html[data-visual-theme="newspaper"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="newspaper"] header.panel {
-      background: #ede5d8 !important; border: none !important;
-      border-top: 3px double #1a1a1a !important; border-bottom: 3px double #1a1a1a !important;
-      border-radius: 0 !important; box-shadow: none !important; backdrop-filter: none !important;
-    }
-    html[data-theme="dark"][data-visual-theme="newspaper"] header.panel {
-      background: #201c14 !important; border-color: #c8b99a !important;
-    }
-    html[data-visual-theme="newspaper"] header.panel h1 {
-      font-family: Georgia, serif !important; color: #1a1a1a !important;
-      font-style: italic !important; font-size: 22px !important;
-    }
-    html[data-theme="dark"][data-visual-theme="newspaper"] header.panel h1 { color: #f0e6d3 !important; }
-    html[data-visual-theme="newspaper"] header.panel .sub { font-family: Georgia, serif !important; color: #555 !important; font-style: italic !important; }
-    html[data-theme="dark"][data-visual-theme="newspaper"] header.panel .sub { color: #b0a090 !important; }
-    html[data-visual-theme="newspaper"] .search-input,
-    html[data-visual-theme="newspaper"] #theme-toggle,
-    html[data-visual-theme="newspaper"] #theme-picker-btn {
-      background: #ede5d8 !important; border: 1px solid #1a1a1a !important;
-      color: #1a1a1a !important; border-radius: 2px !important;
-    }
-    html[data-theme="dark"][data-visual-theme="newspaper"] .search-input,
-    html[data-theme="dark"][data-visual-theme="newspaper"] #theme-toggle,
-    html[data-theme="dark"][data-visual-theme="newspaper"] #theme-picker-btn {
-      background: #201c14 !important; border-color: #c8b99a !important; color: #f0e6d3 !important;
-    }
-    html[data-visual-theme="newspaper"] .card-glass-content {
-      background: #f5efe6 !important; border-top: 2px solid #1a1a1a !important;
-    }
-    html[data-theme="dark"][data-visual-theme="newspaper"] .card-glass-content {
-      background: #201c14 !important; border-top-color: #c8b99a !important;
-    }
-    html[data-visual-theme="newspaper"] .app-card-title {
-      color: #1a1a1a !important; font-family: Georgia, serif !important; font-style: italic !important;
-    }
-    html[data-theme="dark"][data-visual-theme="newspaper"] .app-card-title { color: #f0e6d3 !important; }
-    html[data-visual-theme="newspaper"] .app-card-description { font-family: Georgia, serif !important; color: #555 !important; font-size: 12px !important; }
-    html[data-visual-theme="newspaper"] .app-card { border: 1px solid #bbb5a8 !important; border-radius: 2px !important; box-shadow: none !important; }
-    html[data-visual-theme="newspaper"] .app-card:hover {
-      border-color: #1a1a1a !important; transform: none !important;
-      box-shadow: 2px 2px 0 rgba(0,0,0,0.15) !important;
-    }
-
-    /* --- Blueprint --- */
-    html[data-visual-theme="blueprint"] { --accent-color: #4db8ff; --accent-color-tint: rgba(77,184,255,0.12); --accent-yellow: #4db8ff; }
-    html[data-visual-theme="blueprint"] body {
-      background: #001f3f !important;
-      background-image: linear-gradient(rgba(77,184,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(77,184,255,0.07) 1px, transparent 1px) !important;
-      background-size: 24px 24px !important;
-    }
-    html[data-visual-theme="blueprint"] body::before,
-    html[data-visual-theme="blueprint"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="blueprint"] header.panel {
-      background: rgba(0,31,63,0.9) !important; border: 1px solid rgba(77,184,255,0.38) !important;
-      border-radius: 4px !important; box-shadow: 0 0 0 1px rgba(77,184,255,0.12), inset 0 0 20px rgba(77,184,255,0.04) !important;
-      backdrop-filter: blur(8px) !important;
-    }
-    html[data-visual-theme="blueprint"] header.panel h1 {
-      color: #4db8ff !important; text-transform: uppercase !important; letter-spacing: 0.08em !important; font-size: 16px !important;
-    }
-    html[data-visual-theme="blueprint"] header.panel .sub { color: rgba(77,184,255,0.55) !important; }
-    html[data-visual-theme="blueprint"] .search-input,
-    html[data-visual-theme="blueprint"] #theme-toggle,
-    html[data-visual-theme="blueprint"] #theme-picker-btn {
-      background: rgba(0,31,63,0.8) !important; border: 1px solid rgba(77,184,255,0.35) !important;
-      color: #4db8ff !important; border-radius: 2px !important;
-    }
-    html[data-visual-theme="blueprint"] .card-glass-content {
-      background: rgba(0,31,63,0.9) !important; border-top: 1px solid rgba(77,184,255,0.28) !important;
-    }
-    html[data-visual-theme="blueprint"] .app-card-title {
-      color: #4db8ff !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; font-size: 12px !important;
-    }
-    html[data-visual-theme="blueprint"] .app-card-description { color: rgba(77,184,255,0.6) !important; }
-    html[data-visual-theme="blueprint"] .app-card { border: 1px solid rgba(77,184,255,0.22) !important; border-radius: 2px !important; box-shadow: 0 0 8px rgba(77,184,255,0.07) !important; }
-    html[data-visual-theme="blueprint"] .app-card:hover { border-color: rgba(77,184,255,0.6) !important; box-shadow: 0 0 18px rgba(77,184,255,0.2) !important; }
-
-    /* --- Custom (inherits minimal layout, user controls define appearance) --- */
-    html[data-visual-theme="custom"] body { font-family: var(--font-family-sans) !important; }
-    html[data-visual-theme="custom"] body::before,
-    html[data-visual-theme="custom"] .welcome-overlay { background-image: none !important; }
-    html[data-visual-theme="custom"] header.panel {
-      backdrop-filter: none !important; border-radius: 20px !important; box-shadow: none !important;
-    }
-    html[data-theme="light"][data-visual-theme="custom"] header.panel { background: #ffffff !important; border: 1px solid rgba(0,0,0,0.08) !important; }
-    html[data-theme="dark"][data-visual-theme="custom"] header.panel { background: #0b0b0f !important; border: 1px solid rgba(255,255,255,0.08) !important; }
-    html[data-visual-theme="custom"] .search-input,
-    html[data-visual-theme="custom"] #theme-toggle,
-    html[data-visual-theme="custom"] #theme-picker-btn { border-radius: 18px !important; box-shadow: none !important; }
-    html[data-theme="light"][data-visual-theme="custom"] body { background: #f5f5f7 !important; }
-    html[data-theme="dark"][data-visual-theme="custom"] body { background: #000000 !important; }
-    /* custom-bg override applies on top */
-    html[data-visual-theme="custom"][data-custom-bg] body { background: var(--custom-hub-bg) !important; }
 
     /* ======================================================
-       THEME PICKER — POPOVER
+       THEME PICKER — FULLSCREEN MODAL
        ====================================================== */
     #theme-picker-btn {
       height: 36px;
@@ -3379,391 +3281,235 @@
     }
     #theme-picker-btn .tp-btn-label { line-height: 1; }
 
-    /* Backdrop — transparent, just catches outside clicks */
+    /* Fullscreen backdrop */
     .tp-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 2000;
-      display: none;
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s ease;
     }
-    .tp-overlay.open { display: block; }
+    .tp-overlay.open { opacity: 1; pointer-events: auto; }
 
-    /* Floating panel — positioned by JS below the button */
-    .tp-panel {
-      position: fixed;
-      width: 308px;
-      max-height: min(82vh, 680px);
-      background: var(--surface-alt);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.06);
+    /* Centered modal */
+    .tp-modal {
+      width: 100%; max-width: 540px;
+      background: var(--surface);
       border: 1px solid var(--border-color);
-      overflow-x: hidden;
-      overflow-y: auto;
-      transform-origin: top right;
-      animation: tpPopIn 0.18s cubic-bezier(0.34, 1.4, 0.64, 1) both;
-    }
-    html[data-theme="dark"] .tp-panel {
-      box-shadow: 0 8px 32px rgba(0,0,0,0.48), 0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.07);
-    }
-    @keyframes tpPopIn {
-      from { opacity: 0; transform: scale(0.88) translateY(-6px); }
-      to   { opacity: 1; transform: scale(1)    translateY(0); }
-    }
-
-    .tp-section-label {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-    }
-
-    /* 2×2 visual grid */
-    .tp-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 12px 12px 4px;
-    }
-
-    .tp-card {
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 20px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.12);
       overflow: hidden;
-      background: none;
-      cursor: pointer;
-      padding: 0;
+      transform: scale(0.94) translateY(10px);
+      transition: transform 0.24s cubic-bezier(0.34,1.4,0.64,1);
+    }
+    html[data-theme="dark"] .tp-modal {
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .tp-overlay.open .tp-modal { transform: scale(1) translateY(0); }
+
+    /* Modal header */
+    .tp-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 24px 18px;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky; top: 0;
+      background: var(--surface); z-index: 1;
+    }
+    .tp-modal-title {
+      font-size: 17px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em;
+    }
+    .tp-modal-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface-alt); border: 1px solid var(--border-color);
+      color: var(--muted); font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s; line-height: 1;
+      font-family: var(--font-family-sans);
+    }
+    .tp-modal-close:hover { background: var(--surface-hover, var(--surface-alt)); color: var(--ink); }
+
+    /* Recently used section */
+    .tp-recents { padding: 16px 24px 0; display: none; }
+    .tp-recents.has-recents { display: block; }
+    .tp-group-label {
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px;
+    }
+    .tp-recents-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .tp-recent-chip {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      padding: 6px 10px; border-radius: 10px;
+      border: 1.5px solid var(--border-color);
+      background: var(--surface-alt); cursor: pointer;
+      transition: border-color 0.15s, transform 0.12s;
+      font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap;
+    }
+    .tp-recent-chip:hover { border-color: var(--accent-color); transform: translateY(-1px); }
+    .tp-recent-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+    /* 2-column theme grid (4+1 themes: 2×2 + full-width terminal row) */
+    .tp-theme-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 14px; padding: 20px 24px;
+    }
+    .tp-card-terminal-wide {
+      grid-column: span 2;
+    }
+    .tp-card-terminal-wide .tp-preview {
+      aspect-ratio: unset;
+      height: 90px;
+    }
+
+    /* Cards (div[role=button]) */
+    .tp-card {
+      position: relative; border-radius: 14px; overflow: hidden;
+      border: 2px solid var(--border-color);
+      cursor: pointer; background: none;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.16s;
       text-align: left;
-      position: relative;
-      transition: border-color 0.18s, box-shadow 0.18s, transform 0.14s;
     }
     .tp-card:hover {
-      transform: translateY(-2px);
       border-color: var(--accent-color);
-      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+      transform: translateY(-3px);
     }
     .tp-card.tp-active {
       border-color: var(--accent-color);
-      box-shadow: 0 0 0 1px var(--accent-color);
+      box-shadow: 0 0 0 1px var(--accent-color), 0 4px 20px rgba(0,0,0,0.1);
     }
-    /* Checkmark badge on active card */
-    .tp-card.tp-active::after {
+    /* Checkmark top-left on active */
+    .tp-card.tp-active::before {
       content: '';
-      position: absolute;
-      top: 6px; right: 6px;
-      width: 18px; height: 18px;
-      background: var(--accent-color) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat;
-      border-radius: 50%;
+      position: absolute; top: 8px; left: 8px; z-index: 10;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent-color) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
 
+    /* Preview area — aspect-ratio 3/2 */
     .tp-preview {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background-size: cover;
-      background-position: center;
-      position: relative;
-      overflow: hidden;
+      width: 100%; aspect-ratio: 3/2;
+      background-size: cover; background-position: center;
+      position: relative; overflow: hidden;
     }
+
+    /* Favorite button */
+    .tp-fav-btn {
+      position: absolute; top: 8px; right: 8px; z-index: 10;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(0,0,0,0.35); backdrop-filter: blur(4px);
+      border: none; cursor: pointer; color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s, color 0.15s, background 0.15s, transform 0.15s;
+    }
+    .tp-card:hover .tp-fav-btn { opacity: 1; }
+    .tp-fav-btn.tp-fav-active { opacity: 1; color: #f7cf27; background: rgba(0,0,0,0.5); }
+    .tp-fav-btn:hover { transform: scale(1.15); }
+    .tp-fav-btn svg { width: 14px; height: 14px; }
+
+    /* Card info bar */
+    .tp-card-info {
+      padding: 10px 12px 11px; background: var(--surface);
+      border-top: 1px solid var(--border-color);
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .tp-card-name { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: 0.01em; }
+    .tp-card-tagline { font-size: 10px; font-weight: 400; color: var(--muted); }
+
+    /* ---- THEME PREVIEWS ---- */
 
     /* Comicbook — halftone pattern + POW */
-    .tp-preview-comic {
-      background-image: url('Theme/comicbook/pattern_comicbook.jpg');
-      background-color: #F7CF27;
-    }
+    .tp-preview-comic { background-image: url('Theme/comicbook/pattern_comicbook.jpg'); background-color: #F7CF27; }
     .tp-preview-comic::after {
-      content: 'POW!';
-      position: absolute;
-      bottom: 4px; left: 7px;
-      font-family: "Bangers", Impact, sans-serif;
-      font-size: 18px;
-      color: #F7CF27;
-      -webkit-text-stroke: 1.5px #111;
-      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+      content: 'POW!'; position: absolute; bottom: 6px; left: 10px;
+      font-family: "Bangers", Impact, sans-serif; font-size: 22px;
+      color: #F7CF27; -webkit-text-stroke: 1.5px #111;
       transform: rotate(-4deg);
+      transition: transform 0.2s;
       pointer-events: none;
     }
+    .tp-card:hover .tp-preview-comic::after { transform: rotate(-6deg) scale(1.12); }
 
-    /* Glass UI — dark photo + shimmer */
-    .tp-preview-glass {
-      background-image: url('Theme/glassui/pattern_glassui.jpg');
-      background-color: #0d1826;
-    }
+    /* Glass UI — dark photo + shimmer sweep */
+    .tp-preview-glass { background-image: url('Theme/glassui/pattern_glassui.jpg'); background-color: #0d1826; }
     .tp-preview-glass::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg,
-        rgba(255,255,255,0.0) 30%,
-        rgba(255,255,255,0.18) 50%,
-        rgba(100,160,255,0.06) 70%);
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.12) 50%, transparent 80%);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
     }
+    .tp-card:hover .tp-preview-glass::after { transform: translateX(100%); }
 
-    /* Emoji — warm gradient + emoji row */
+    /* Emoji — warm gradient + emoji text */
     .tp-preview-emoji {
       background: linear-gradient(135deg, #fff8ee 0%, #fde8f8 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      letter-spacing: 3px;
-      padding: 6px;
-      overflow: hidden;
-      flex-wrap: wrap;
-      gap: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; letter-spacing: 3px; padding: 8px; flex-wrap: wrap; gap: 3px;
     }
-    html[data-theme="dark"] .tp-preview-emoji {
-      background: linear-gradient(135deg, #1e1226 0%, #13132b 100%);
+    html[data-theme="dark"] .tp-preview-emoji { background: linear-gradient(135deg, #1e1226 0%, #13132b 100%); }
+    .tp-card:hover .tp-preview-emoji { animation: emojiWiggle 0.6s ease; }
+    @keyframes emojiWiggle {
+      0%,100% { letter-spacing: 3px; }
+      50%     { letter-spacing: 7px; }
     }
 
-    /* Minimal — clean white + "Aa" typographic preview */
-    .tp-preview-minimal {
-      background: #f5f5f7;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 8px 10px;
-      gap: 4px;
-    }
-    html[data-theme="dark"] .tp-preview-minimal {
-      background: #111;
-    }
+    /* Minimal — clean background + Aa typographic */
+    .tp-preview-minimal { background: #f5f5f7; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; padding: 10px 12px; gap: 5px; }
+    html[data-theme="dark"] .tp-preview-minimal { background: #111; }
     .tp-preview-minimal::before {
-      content: 'Aa';
-      font-family: ui-sans-serif, system-ui, sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: #111;
-      letter-spacing: -0.5px;
-      line-height: 1;
-      margin-bottom: auto;
-      align-self: center;
+      content: 'Aa'; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 26px; font-weight: 700;
+      color: #111; letter-spacing: -0.5px; line-height: 1; margin-bottom: auto; align-self: center;
+      transition: font-size 0.2s, letter-spacing 0.2s;
     }
     html[data-theme="dark"] .tp-preview-minimal::before { color: #f5f5f7; }
+    .tp-card:hover .tp-preview-minimal::before { font-size: 32px; letter-spacing: -1px; }
     .tp-preview-minimal::after {
-      content: '';
-      display: block;
-      width: 60%;
-      height: 2px;
-      background: rgba(0,0,0,0.1);
-      border-radius: 1px;
+      content: ''; display: block; width: 40%; height: 2px; background: rgba(0,0,0,0.1); border-radius: 1px;
+      transition: width 0.25s;
     }
     html[data-theme="dark"] .tp-preview-minimal::after { background: rgba(255,255,255,0.1); }
+    .tp-card:hover .tp-preview-minimal::after { width: 70%; }
 
-    .tp-card-label {
-      padding: 6px 9px 7px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--ink);
-      background: var(--surface);
-      letter-spacing: 0.01em;
-    }
-
-    /* ---- Divider ---- */
-    .tp-divider {
-      height: 1px;
-      background: var(--border-color);
-      margin: 8px 12px 0;
-    }
-
-    /* ---- Customize section ---- */
-    .tp-customize {
-      overflow: hidden;
-    }
-
-    .tp-customize-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      background: none;
-      border: none;
-      width: 100%;
-      cursor: pointer;
-      text-align: left;
-      font-family: var(--font-family-sans);
-    }
-    .tp-customize-toggle:hover .tp-customize-label { color: var(--accent-color); }
-    .tp-customize-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      transition: color 0.15s;
-    }
-    .tp-customize-chevron {
-      color: var(--muted);
-      transition: transform 0.25s ease;
-      flex-shrink: 0;
-    }
-    .tp-customize-chevron.open { transform: rotate(180deg); }
-
-    .tp-customize-body {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-    .tp-customize-body.open { max-height: 200px; }
-
-    .tp-customize-inner {
-      padding: 0 14px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .tp-ctrl-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .tp-ctrl-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--muted);
-      width: 72px;
-      flex-shrink: 0;
-    }
-
-    .tp-accent-input {
-      width: 32px; height: 32px;
-      border-radius: 7px;
-      border: 1px solid var(--border-color);
-      padding: 2px;
-      cursor: pointer;
-      background: none;
-      flex-shrink: 0;
-    }
-    .tp-accent-input::-webkit-color-swatch-wrapper { padding: 0; }
-    .tp-accent-input::-webkit-color-swatch { border-radius: 5px; border: none; }
-
-    .tp-swatches {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .tp-swatch {
-      width: 24px; height: 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color 0.12s, transform 0.12s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-    }
-    .tp-swatch:hover { transform: scale(1.15); }
-    .tp-swatch.tp-swatch-active {
-      border-color: var(--ink);
-      box-shadow: 0 0 0 1px var(--ink);
-    }
-
-    .tp-font-select {
-      flex: 1;
-      height: 30px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-      color: var(--ink);
-      font-size: 12px;
-      font-family: var(--font-family-sans);
-      padding: 0 8px;
-      cursor: pointer;
-    }
-
-    /* Custom bg override — already handled per-theme above */
-
-    /* ---- New theme previews ---- */
+    /* Terminal — terminal window mock */
     .tp-preview-terminal {
-      background: #0a0e0a;
-      display: flex; flex-direction: column; justify-content: center;
-      padding: 8px 10px; gap: 4px;
+      background: #060a06;
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start;
+      padding: 0; overflow: hidden; position: relative;
     }
     .tp-preview-terminal::before {
-      content: '> VGTools_';
-      font-family: ui-monospace, monospace; font-size: 11px;
-      color: #00ff41; text-shadow: 0 0 6px rgba(0,255,65,0.6);
+      content: '● ● ●';
+      display: block; width: 100%; padding: 5px 8px;
+      background: rgba(0, 255, 65, 0.1);
+      border-bottom: 1px solid rgba(0, 255, 65, 0.22);
+      font-size: 9px; letter-spacing: 3px;
+      color: rgba(0, 255, 65, 0.45);
+      font-family: ui-monospace, monospace;
+      flex-shrink: 0;
     }
     .tp-preview-terminal::after {
-      content: '▮▮▮ ▮▮ ▮▮▮▮';
-      font-family: ui-monospace, monospace; font-size: 8px;
-      color: rgba(0,255,65,0.28);
+      content: '> VGTools_';
+      display: block; padding: 10px 10px 4px;
+      font-family: ui-monospace, monospace; font-size: 13px;
+      color: #00ff41; text-shadow: 0 0 8px rgba(0, 255, 65, 0.7);
+    }
+    .tp-card:hover .tp-preview-terminal::after {
+      animation: termCursorBlink 0.7s step-end infinite;
+    }
+    @keyframes termCursorBlink {
+      0%, 100% { border-right: 2px solid #00ff41; }
+      50%       { border-right: 2px solid transparent; }
     }
 
-    .tp-preview-brutalist {
-      background: #ffffff; display: flex; flex-direction: column;
-      justify-content: flex-end; padding: 0; overflow: hidden;
-    }
-    html[data-theme="dark"] .tp-preview-brutalist { background: #1a1a1a; }
-    .tp-preview-brutalist::before {
-      content: 'BRUT'; font-size: 26px; font-weight: 900;
-      color: #111; padding: 6px 8px; letter-spacing: -2px; line-height: 1;
-    }
-    html[data-theme="dark"] .tp-preview-brutalist::before { color: #FFE600; }
-    .tp-preview-brutalist::after {
-      content: ''; display: block; height: 7px; background: #111;
-    }
-    html[data-theme="dark"] .tp-preview-brutalist::after { background: #FFE600; }
+    /* ---- Per-theme modal overrides ---- */
 
-    .tp-preview-neon {
-      background: #060010;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .tp-preview-neon::before {
-      content: 'VG';
-      font-size: 28px; font-weight: 900; letter-spacing: 6px;
-      color: #00f5ff; text-shadow: 0 0 10px #00f5ff, 0 0 28px rgba(0,245,255,0.45);
-    }
-
-    .tp-preview-pastel {
-      background: linear-gradient(135deg, #fdf4ff 0%, #f0fdf4 50%, #fff7ed 100%);
-      display: flex; align-items: center; justify-content: center; gap: 4px;
-    }
-    html[data-theme="dark"] .tp-preview-pastel { background: linear-gradient(135deg, #1e1224 0%, #12241e 50%, #241e12 100%); }
-    .tp-preview-pastel::before { content: '🌸'; font-size: 22px; }
-    .tp-preview-pastel::after  { content: '🫧'; font-size: 22px; }
-
-    .tp-preview-newspaper {
-      background: #f5efe6; display: flex; flex-direction: column;
-      justify-content: space-between; padding: 6px 8px;
-    }
-    html[data-theme="dark"] .tp-preview-newspaper { background: #1a1610; }
-    .tp-preview-newspaper::before {
-      content: 'VG DAILY'; font-family: Georgia, serif; font-size: 12px;
-      font-weight: 700; font-style: italic; color: #1a1a1a;
-      border-bottom: 2px double #1a1a1a; padding-bottom: 3px;
-    }
-    html[data-theme="dark"] .tp-preview-newspaper::before { color: #f0e6d3; border-color: #f0e6d3; }
-    .tp-preview-newspaper::after {
-      content: ''; display: block; height: 2px;
-      background: repeating-linear-gradient(90deg,#1a1a1a 0 6px,transparent 6px 10px);
-      opacity: 0.25;
-    }
-
-    .tp-preview-blueprint {
-      background: #001f3f;
-      background-image: linear-gradient(rgba(77,184,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(77,184,255,0.1) 1px, transparent 1px);
-      background-size: 10px 10px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .tp-preview-blueprint::before {
-      content: '⊕'; font-size: 28px; color: #4db8ff;
-      text-shadow: 0 0 10px rgba(77,184,255,0.65);
-    }
-
-    .tp-preview-custom {
-      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);
-      display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px;
-    }
-    .tp-preview-custom::before {
-      content: '';
-      width: 18px; height: 18px; border-radius: 50%;
-      background: var(--custom-preview-dot, var(--accent-color));
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-    .tp-preview-custom::after {
-      content: 'Custom';
-      font-size: 12px; font-weight: 600; color: var(--ink);
+    /* ---- Responsive ---- */
+    @media (max-width: 440px) {
+      .tp-theme-grid { grid-template-columns: 1fr; }
+      .tp-modal { border-radius: 14px 14px 0 0; }
+      .tp-overlay { align-items: flex-end; padding: 0; }
     }
   </style>
   <script>
@@ -4001,19 +3747,13 @@
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: 'L', dark: 'D', system: 'A' },
       THEME_LABELS: { light: 'Light', dark: 'Dark', system: 'Auto' },
-      VISUAL_THEMES: ['comicbook', 'glassui', 'minimal', 'emoji', 'terminal', 'brutalist', 'neon', 'pastel', 'newspaper', 'blueprint', 'custom'],
+      VISUAL_THEMES: ['comicbook', 'glassui', 'minimal', 'emoji', 'terminal'],
       VISUAL_THEME_META: {
         comicbook: { group: 'visual',  usesArtwork: true,  usesPattern: true,  transition: 'comic'   },
         glassui:   { group: 'visual',  usesArtwork: true,  usesPattern: true,  transition: 'glass'   },
         minimal:   { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
         emoji:     { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'emoji'   },
-        terminal:  { group: 'style',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
-        brutalist: { group: 'style',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
-        neon:      { group: 'style',   usesArtwork: false, usesPattern: false, transition: 'glass'   },
-        pastel:    { group: 'style',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
-        newspaper: { group: 'style',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
-        blueprint: { group: 'style',   usesArtwork: false, usesPattern: false, transition: 'glass'   },
-        custom:    { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
+        terminal:  { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
       },
       EMOJI_THEME_SYMBOLS: {
         brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
@@ -4034,6 +3774,24 @@
         mockups: ['📱', '💻', '🖥️', '✨'],
       },
       TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
+      TERMINAL_ASCII_ART: {
+        brickbuilder: '_           _      _\n| |__ _ _ __| | __ | |\n|_|/_,`|/ _` |/ /__|_|',
+        moodboards:   '|V|  ___  ___  _\n| \\/| _ \\/ _ \\| |\n|_/ |___/\\___/|_|',
+        blobs:        ' _    _     _\n| |__| |___| |__\n|_.__/|___||____|',
+        jigsaws:      ' _  _  __ __\n| || |/ /|  \\\n| || |\\_ \\|__/',
+        iconfactory:  '|~|  _  _ |\n| |/ / (_||\n|_|\\_ \\__||',
+        qrcodes:      ' ___  ____\n| _ \\/ ___|\n|  _/ /___\n|_| \\____|',
+        colors:       ' ___ _\n/ __| |_\n| (__|  _|\n\\___|_|',
+        notes:        '|\\ | ___ _\n| \\|/ _ \\ |\n|   \\___/_|',
+        locator:      '| _  _  _\n| | || |/ /\n|_|\\___/_/',
+        signatures:   ' _\n/ _|_  _\n\\__| || |\n   |_|/_/',
+        svgrecolor:   '/_\\ ___ _\n/ __/ _ \\\n\\__\\___/|_|',
+        any2svg:      '/-\\ _  _\\|\n|_||_ |/ /\n   |_|/_/',
+        bgremover:    '|~\\ ___ _ _\n| _) _ \\ V /\n|_||___|_|',
+        wordclouds:   '\\/\\/ _  _ _\n \\/  // / /\n     \\__/_/',
+        sankey:       '/ _| _  _ _ _\n\\ \\/ _|| | / /\n \\__\\__|_|/_/',
+        mockups:      '|V|  _  _|  _\n| \\/| |/ / | |\n|_/  |/ /  |_|',
+      },
       DRAG_STATE: { dragged: null, over: null },
 
       konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
@@ -4058,11 +3816,7 @@
         this.el.themePickerBtn = document.getElementById('theme-picker-btn');
         this.el.tpBtnLabel = document.getElementById('tp-btn-label');
         this.el.themePickerOverlay = document.getElementById('theme-picker-overlay');
-        this.el.tpCustomizeBody = document.getElementById('tp-customize-body');
-        this.el.tpAccentColor = document.getElementById('tp-accent-color');
-        this.el.tpAccentSwatches = document.getElementById('tp-accent-swatches');
-        this.el.tpBgSwatches = document.getElementById('tp-bg-swatches');
-        this.el.tpFontSelect = document.getElementById('tp-font-select');
+        this.el.tpCloseBtn = document.getElementById('tp-close-btn');
         this.el.appGrid = document.getElementById('app-grid');
         this.el.appCards = Array.from(this.el.appGrid.children);
         this.el.searchInput = document.getElementById('search-input');
@@ -4097,48 +3851,30 @@
             : this.openThemePicker();
         });
         this.el.themePickerOverlay.addEventListener('click', () => this.closeThemePicker());
-        // Prevent panel clicks from bubbling to backdrop
-        this.el.themePickerOverlay.querySelector('.tp-panel').addEventListener('click', e => e.stopPropagation());
+        // Prevent modal clicks from bubbling to backdrop
+        this.el.themePickerOverlay.querySelector('.tp-modal').addEventListener('click', e => e.stopPropagation());
 
-        // Visual theme cards
+        // Close button
+        if (this.el.tpCloseBtn) {
+          this.el.tpCloseBtn.addEventListener('click', () => this.closeThemePicker());
+        }
+
+        // Escape key closes picker
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.el.themePickerOverlay.classList.contains('open')) {
+            this.closeThemePicker();
+          }
+        });
+
+        // Visual theme cards (div[role=button])
         this.el.themePickerOverlay.querySelectorAll('.tp-card[data-theme]').forEach(card => {
-          card.addEventListener('click', () => this.setVisualTheme(card.dataset.theme));
+          card.addEventListener('click', () => { this.setVisualTheme(card.dataset.theme); this.closeThemePicker(); });
+          card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setVisualTheme(card.dataset.theme); this.closeThemePicker(); }
+          });
         });
 
-        // Accent color picker
-        this.el.tpAccentColor.addEventListener('input', (e) => {
-          localStorage.setItem('vgtools-custom-accent', e.target.value);
-          this.syncAccentSwatches(e.target.value);
-          this.applyCustomSettings();
-        });
 
-        // Accent presets
-        this.el.tpAccentSwatches.addEventListener('click', (e) => {
-          const swatch = e.target.closest('.tp-swatch');
-          if (!swatch) return;
-          const color = swatch.dataset.color;
-          this.el.tpAccentColor.value = color;
-          localStorage.setItem('vgtools-custom-accent', color);
-          this.syncAccentSwatches(color);
-          this.applyCustomSettings();
-        });
-
-        // Background swatches
-        this.el.tpBgSwatches.addEventListener('click', (e) => {
-          const swatch = e.target.closest('.tp-swatch');
-          if (!swatch) return;
-          localStorage.setItem('vgtools-custom-bg', swatch.dataset.bgIndex);
-          this.el.tpBgSwatches.querySelectorAll('.tp-swatch').forEach(s =>
-            s.classList.toggle('tp-swatch-active', s === swatch)
-          );
-          this.applyCustomSettings();
-        });
-
-        // Font select
-        this.el.tpFontSelect.addEventListener('change', (e) => {
-          localStorage.setItem('vgtools-custom-font', e.target.value);
-          this.applyCustomSettings();
-        });
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
           if (localStorage.getItem('creative-toolkit-theme') === 'system') {
             this.applyTheme('system');
@@ -4416,7 +4152,11 @@
                 ? 'emoji-return-circle'
               : '';
           circle.className = `page-transition-circle return-animate ${returnCircleVariant}`.trim();
-          circle.style.cssText = `left: 50%; top: 50%; --transition-color: ${currentVisualTheme === 'glassui' ? 'rgba(188, 205, 255, 0.88)' : currentVisualTheme === 'minimal' ? 'rgba(255, 255, 255, 0.96)' : currentVisualTheme === 'emoji' ? 'rgba(255, 195, 102, 0.92)' : (lastAppColor || '#4f46e5')};`;
+          const returnColor = currentVisualTheme === 'glassui' ? 'rgba(188, 205, 255, 0.88)'
+            : currentVisualTheme === 'minimal' ? 'rgba(255, 255, 255, 0.96)'
+            : currentVisualTheme === 'emoji' ? 'rgba(255, 195, 102, 0.92)'
+            : (lastAppColor || '#4f46e5');
+          circle.style.cssText = `left: 50%; top: 50%; --transition-color: ${returnColor};`;
 
           overlay.appendChild(circle);
           document.body.appendChild(overlay);
@@ -4957,43 +4697,13 @@
         { label: 'Indigo', bg: 'linear-gradient(135deg,#1a0533 0%,#2d1b69 100%)',                 swatch: '#2d1b69' },
         { label: 'Ocean',  bg: 'linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)',     swatch: '#2c5364' },
       ],
-      VISUAL_THEME_LABELS: { comicbook: 'Comicbook', glassui: 'Glass UI', emoji: 'Emoji', minimal: 'Minimal', terminal: 'Terminal', brutalist: 'Brutalist', neon: 'Neon', pastel: 'Pastel', newspaper: 'Newspaper', blueprint: 'Blueprint', custom: 'Custom' },
+      VISUAL_THEME_LABELS: { comicbook: 'Comicbook', glassui: 'Glass UI', emoji: 'Emoji', minimal: 'Minimal', terminal: 'Terminal' },
 
       initThemePicker() {
-        // Build accent presets
-        this.ACCENT_PRESETS.forEach(color => {
-          const s = document.createElement('button');
-          s.type = 'button';
-          s.className = 'tp-swatch';
-          s.dataset.color = color;
-          s.title = color;
-          s.style.background = color;
-          this.el.tpAccentSwatches.appendChild(s);
-        });
-        // Build bg swatches
-        this.BG_PRESETS.forEach((preset, i) => {
-          const s = document.createElement('button');
-          s.type = 'button';
-          s.className = 'tp-swatch';
-          s.dataset.bgIndex = i;
-          s.title = preset.label;
-          s.style.background = preset.swatch;
-          this.el.tpBgSwatches.appendChild(s);
-        });
         this.syncThemePicker();
       },
 
       openThemePicker() {
-        // Position panel below-left of button
-        const btn = this.el.themePickerBtn;
-        const rect = btn.getBoundingClientRect();
-        const panel = this.el.themePickerOverlay.querySelector('.tp-panel');
-        const panelW = 308;
-        let left = rect.right - panelW;
-        let top = rect.bottom + 6;
-        left = Math.max(8, Math.min(left, window.innerWidth - panelW - 8));
-        panel.style.left = `${left}px`;
-        panel.style.top = `${top}px`;
         this.el.themePickerOverlay.classList.add('open');
         this.syncThemePicker();
       },
@@ -5016,33 +4726,10 @@
           card.classList.toggle('tp-active', card.dataset.theme === this.currentVisualTheme);
         });
 
-        // Show/hide custom controls
-        const isCustom = this.currentVisualTheme === 'custom';
-        if (this.el.tpCustomizeBody) {
-          this.el.tpCustomizeBody.classList.toggle('open', isCustom);
-        }
-
         // Button label + dot
         if (this.el.tpBtnLabel) {
           this.el.tpBtnLabel.textContent = this.VISUAL_THEME_LABELS[this.currentVisualTheme] || 'Theme';
         }
-
-        // Sync accent controls
-        const accent = localStorage.getItem('vgtools-custom-accent') || '#E72F2F';
-        this.el.tpAccentColor.value = accent;
-        this.syncAccentSwatches(accent);
-
-        // Sync bg swatch
-        const bgIdx = parseInt(localStorage.getItem('vgtools-custom-bg') || '0', 10);
-        this.el.tpBgSwatches.querySelectorAll('.tp-swatch').forEach((s, i) => {
-          s.classList.toggle('tp-swatch-active', i === bgIdx);
-        });
-
-        // Sync font
-        this.el.tpFontSelect.value = localStorage.getItem('vgtools-custom-font') || 'system';
-
-        // Update custom preview dot color
-        document.documentElement.style.setProperty('--custom-preview-dot', accent);
       },
 
       applyCustomSettings() {
@@ -5189,6 +4876,19 @@
             card.style.setProperty('--card-bg-image', `url('${imgPath}')`);
           } else {
             card.style.removeProperty('--card-bg-image');
+          }
+          if (this.currentVisualTheme === 'terminal') {
+            const ascii = this.TERMINAL_ASCII_ART[id] || ('[ ' + id + ' ]');
+            let pre = card.querySelector('.terminal-ascii');
+            if (!pre) {
+              pre = document.createElement('pre');
+              pre.className = 'terminal-ascii';
+              card.appendChild(pre);
+            }
+            pre.textContent = ascii;
+          } else {
+            const pre = card.querySelector('.terminal-ascii');
+            if (pre) pre.remove();
           }
         });
       },
@@ -5479,94 +5179,64 @@
 
   <!-- Theme Picker Popover -->
   <div id="theme-picker-overlay" class="tp-overlay">
-    <div class="tp-panel" role="dialog" aria-label="Select a theme">
+    <div class="tp-modal" role="dialog" aria-label="Select a theme" aria-modal="true">
 
-      <!-- Visual section -->
-      <div class="tp-section-label" style="padding:10px 12px 6px;">Visual</div>
-      <div class="tp-grid">
-        <button class="tp-card" data-theme="comicbook">
+      <!-- Header -->
+      <div class="tp-modal-header">
+        <span class="tp-modal-title">Choose your theme</span>
+        <button class="tp-modal-close" id="tp-close-btn" aria-label="Close">&times;</button>
+      </div>
+
+      <!-- Main theme grid — 3 columns -->
+      <div class="tp-theme-grid">
+
+        <!-- Comicbook -->
+        <div class="tp-card" role="button" tabindex="0" data-theme="comicbook">
           <div class="tp-preview tp-preview-comic"></div>
-          <div class="tp-card-label">Comicbook</div>
-        </button>
-        <button class="tp-card" data-theme="glassui">
-          <div class="tp-preview tp-preview-glass"></div>
-          <div class="tp-card-label">Glass UI</div>
-        </button>
-      </div>
-
-      <!-- Style section -->
-      <div class="tp-section-label" style="padding:10px 12px 6px;">Style</div>
-      <div class="tp-grid">
-        <button class="tp-card" data-theme="neon">
-          <div class="tp-preview tp-preview-neon"></div>
-          <div class="tp-card-label">Neon</div>
-        </button>
-        <button class="tp-card" data-theme="pastel">
-          <div class="tp-preview tp-preview-pastel"></div>
-          <div class="tp-card-label">Pastel</div>
-        </button>
-        <button class="tp-card" data-theme="terminal">
-          <div class="tp-preview tp-preview-terminal"></div>
-          <div class="tp-card-label">Terminal</div>
-        </button>
-        <button class="tp-card" data-theme="brutalist">
-          <div class="tp-preview tp-preview-brutalist"></div>
-          <div class="tp-card-label">Brutalist</div>
-        </button>
-        <button class="tp-card" data-theme="newspaper">
-          <div class="tp-preview tp-preview-newspaper"></div>
-          <div class="tp-card-label">Newspaper</div>
-        </button>
-        <button class="tp-card" data-theme="blueprint">
-          <div class="tp-preview tp-preview-blueprint"></div>
-          <div class="tp-card-label">Blueprint</div>
-        </button>
-      </div>
-
-      <!-- Clean section -->
-      <div class="tp-section-label" style="padding:10px 12px 6px;">Clean</div>
-      <div class="tp-grid">
-        <button class="tp-card" data-theme="emoji">
-          <div class="tp-preview tp-preview-emoji" aria-hidden="true">🎨✨🌈🫧📱💡✂️🎉</div>
-          <div class="tp-card-label">Emoji</div>
-        </button>
-        <button class="tp-card" data-theme="minimal">
-          <div class="tp-preview tp-preview-minimal"></div>
-          <div class="tp-card-label">Minimal</div>
-        </button>
-      </div>
-
-      <!-- Custom — its own theme with controls -->
-      <div class="tp-divider"></div>
-      <button class="tp-card" data-theme="custom" id="tp-custom-card" style="margin:8px 12px 0;width:calc(100% - 24px);border-radius:10px;">
-        <div class="tp-preview tp-preview-custom" style="aspect-ratio:unset;height:44px;"></div>
-      </button>
-
-      <!-- Custom controls — visible only when custom theme is active -->
-      <div class="tp-customize-body" id="tp-customize-body">
-        <div class="tp-customize-inner">
-          <div class="tp-ctrl-row">
-            <span class="tp-ctrl-label">Accent</span>
-            <input type="color" id="tp-accent-color" class="tp-accent-input" value="#E72F2F">
-            <div class="tp-swatches" id="tp-accent-swatches"></div>
-          </div>
-          <div class="tp-ctrl-row">
-            <span class="tp-ctrl-label">Background</span>
-            <div class="tp-swatches" id="tp-bg-swatches"></div>
-          </div>
-          <div class="tp-ctrl-row">
-            <span class="tp-ctrl-label">Font</span>
-            <select id="tp-font-select" class="tp-font-select">
-              <option value="system">System (Inter)</option>
-              <option value="serif">Serif (Georgia)</option>
-              <option value="mono">Monospace</option>
-              <option value="rounded">Rounded (Nunito)</option>
-            </select>
+          <div class="tp-card-info">
+            <span class="tp-card-name">Comicbook</span>
+            <span class="tp-card-tagline">Bold graphic energy</span>
           </div>
         </div>
+
+        <!-- Glass UI -->
+        <div class="tp-card" role="button" tabindex="0" data-theme="glassui">
+          <div class="tp-preview tp-preview-glass"></div>
+          <div class="tp-card-info">
+            <span class="tp-card-name">Glass UI</span>
+            <span class="tp-card-tagline">Luminous &amp; futuristic</span>
+          </div>
+        </div>
+
+        <!-- Emoji -->
+        <div class="tp-card" role="button" tabindex="0" data-theme="emoji">
+          <div class="tp-preview tp-preview-emoji" aria-hidden="true">🎨✨🌈🫧📱💡✂️🎉</div>
+          <div class="tp-card-info">
+            <span class="tp-card-name">Emoji</span>
+            <span class="tp-card-tagline">Playful &amp; expressive</span>
+          </div>
+        </div>
+
+        <!-- Minimal -->
+        <div class="tp-card" role="button" tabindex="0" data-theme="minimal">
+          <div class="tp-preview tp-preview-minimal"></div>
+          <div class="tp-card-info">
+            <span class="tp-card-name">Minimal</span>
+            <span class="tp-card-tagline">Clean &amp; quiet</span>
+          </div>
+        </div>
+
+        <!-- Terminal -->
+        <div class="tp-card tp-card-terminal-wide" role="button" tabindex="0" data-theme="terminal">
+          <div class="tp-preview tp-preview-terminal"></div>
+          <div class="tp-card-info">
+            <span class="tp-card-name">Terminal</span>
+            <span class="tp-card-tagline">Hacker green glow</span>
+          </div>
+        </div>
+
       </div>
 
-      <div style="height:10px;"></div>
     </div>
   </div>
 

@@ -19,15 +19,9 @@
   const THEMES = {
     comicbook: { assetFile: 'Comicbook.png', usesArtwork: true, usesPattern: true, transition: 'comic', group: 'visual' },
     glassui: { assetFile: 'glass.png', usesArtwork: true, usesPattern: true, transition: 'glass', group: 'visual' },
-    minimal: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal', group: 'basic' },
-    emoji: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'emoji', group: 'basic' },
-    terminal: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal', group: 'style' },
-    brutalist: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal', group: 'style' },
-    neon: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'glass', group: 'style' },
-    pastel: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal', group: 'style' },
-    newspaper: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal', group: 'style' },
-    blueprint: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'glass', group: 'style' },
-    custom: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal', group: 'basic' },
+    minimal:  { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal',  group: 'basic' },
+    emoji:    { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'emoji',    group: 'basic' },
+    terminal: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal',  group: 'basic' },
   };
 
   const CUSTOM_THEME_ACCENT_KEY = 'vgtools-custom-accent';
@@ -491,6 +485,14 @@ html[data-theme="dark"] .theme-return-overlay.emoji {
       fontLink.id = 'vgtools-emoji-fonts';
       fontLink.rel = 'stylesheet';
       fontLink.href = 'https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Permanent+Marker&display=swap';
+      document.head.appendChild(fontLink);
+    }
+
+    if (theme === 'terminal' && !document.getElementById('vgtools-terminal-font')) {
+      const fontLink = document.createElement('link');
+      fontLink.id = 'vgtools-terminal-font';
+      fontLink.rel = 'stylesheet';
+      fontLink.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap';
       document.head.appendChild(fontLink);
     }
 
@@ -1496,28 +1498,38 @@ html[data-theme="dark"][data-visual-theme="glassui"] textarea:focus {
       return;
     }
 
+
     if (theme === 'terminal') {
       styleEl.textContent = `
 html[data-visual-theme="terminal"] {
   --accent-color: #00ff41 !important;
-  --accent-color-tint: rgba(0, 255, 65, 0.12) !important;
-  --accent-yellow: #00ff41 !important;
+  --accent-color-tint: rgba(0,255,65,0.10) !important;
 }
-
-html[data-visual-theme="terminal"] body::before,
+html[data-visual-theme="terminal"] body {
+  background: #060a06 !important;
+  color: #00ff41 !important;
+  font-family: "JetBrains Mono", ui-monospace, "Courier New", monospace !important;
+}
+html[data-visual-theme="terminal"] body::before {
+  content: "" !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  pointer-events: none !important;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.07) 0px, rgba(0,0,0,0.07) 1px,
+    transparent 1px, transparent 3px
+  ) !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
 html[data-visual-theme="terminal"] header.panel::before,
 html[data-visual-theme="terminal"] .wiki-header::before {
   content: none !important;
   background-image: none !important;
   opacity: 0 !important;
 }
-
-html[data-visual-theme="terminal"] body {
-  background: #0a0e0a !important;
-  color: #d1ffd9 !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace !important;
-}
-
 html[data-visual-theme="terminal"] .panel,
 html[data-visual-theme="terminal"] header.panel,
 html[data-visual-theme="terminal"] aside.panel,
@@ -1526,39 +1538,31 @@ html[data-visual-theme="terminal"] .splash-content,
 html[data-visual-theme="terminal"] .wiki-modal-content,
 html[data-visual-theme="terminal"] .modal-content,
 html[data-visual-theme="terminal"] .dialog-content.panel {
-  background: rgba(6, 12, 6, 0.96) !important;
-  border: 1px solid rgba(0, 255, 65, 0.4) !important;
-  border-radius: 4px !important;
-  box-shadow: 0 0 16px rgba(0, 255, 65, 0.18) !important;
-  color: #d1ffd9 !important;
+  background: #0a0e0a !important;
+  border: 1px solid rgba(0,255,65,0.4) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 12px rgba(0,255,65,0.12) !important;
+  color: #00ff41 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
 }
-
-html[data-visual-theme="terminal"] header.panel {
-  background: rgba(4, 10, 4, 0.98) !important;
-  border-color: rgba(0, 255, 65, 0.6) !important;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.35) !important;
-}
-
-html[data-visual-theme="terminal"] header.panel h1,
-html[data-visual-theme="terminal"] .splash-info h2,
-html[data-visual-theme="terminal"] .wiki-header h3,
-html[data-visual-theme="terminal"] .modal-header h2 {
+html[data-visual-theme="terminal"] h1,
+html[data-visual-theme="terminal"] h2,
+html[data-visual-theme="terminal"] h3,
+html[data-visual-theme="terminal"] header.panel h1 {
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
   color: #00ff41 !important;
-  text-shadow: 0 0 14px rgba(0, 255, 65, 0.65) !important;
-  letter-spacing: 0.05em !important;
+  text-shadow: 0 0 8px rgba(0,255,65,0.55) !important;
 }
-
-html[data-visual-theme="terminal"] .sub,
-html[data-visual-theme="terminal"] label,
 html[data-visual-theme="terminal"] p,
+html[data-visual-theme="terminal"] label,
+html[data-visual-theme="terminal"] .sub,
 html[data-visual-theme="terminal"] .description,
-html[data-visual-theme="terminal"] .wiki-body,
-html[data-visual-theme="terminal"] .modal-body {
-  color: rgba(0, 255, 65, 0.75) !important;
+html[data-visual-theme="terminal"] header.panel .sub {
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  color: rgba(0,255,65,0.75) !important;
 }
-
 html[data-visual-theme="terminal"] .control-group,
 html[data-visual-theme="terminal"] .panel-section,
 html[data-visual-theme="terminal"] .group,
@@ -1571,1117 +1575,89 @@ html[data-visual-theme="terminal"] .zoom-controls,
 html[data-visual-theme="terminal"] .level-card,
 html[data-visual-theme="terminal"] .panel-section-preview,
 html[data-visual-theme="terminal"] .toast {
-  background: rgba(0, 255, 65, 0.04) !important;
-  border: 1px solid rgba(0, 255, 65, 0.2) !important;
-  border-radius: 6px !important;
-  box-shadow: 0 0 14px rgba(0, 255, 65, 0.12) !important;
+  background: transparent !important;
+  border: 1px solid rgba(0,255,65,0.18) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
-
-html[data-visual-theme="terminal"] button,
-html[data-visual-theme="terminal"] .btn,
 html[data-visual-theme="terminal"] input,
 html[data-visual-theme="terminal"] select,
-html[data-visual-theme="terminal"] textarea,
+html[data-visual-theme="terminal"] textarea {
+  background: #060a06 !important;
+  color: #00ff41 !important;
+  border: 1px solid rgba(0,255,65,0.35) !important;
+  border-radius: 0 !important;
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  box-shadow: none !important;
+  caret-color: #00ff41 !important;
+}
+html[data-visual-theme="terminal"] input::placeholder,
+html[data-visual-theme="terminal"] textarea::placeholder {
+  color: rgba(0,255,65,0.3) !important;
+}
+html[data-visual-theme="terminal"] input:focus,
+html[data-visual-theme="terminal"] select:focus,
+html[data-visual-theme="terminal"] textarea:focus {
+  border-color: #00ff41 !important;
+  box-shadow: 0 0 0 2px rgba(0,255,65,0.15), 0 0 8px rgba(0,255,65,0.2) !important;
+  outline: none !important;
+}
+html[data-visual-theme="terminal"] input[type="range"] {
+  background: transparent !important;
+  accent-color: #00ff41 !important;
+  border: none !important;
+}
+html[data-visual-theme="terminal"] button,
+html[data-visual-theme="terminal"] .btn,
 html[data-visual-theme="terminal"] .back-to-home,
 html[data-visual-theme="terminal"] #wiki-open-btn,
 html[data-visual-theme="terminal"] #theme-toggle,
 html[data-visual-theme="terminal"] #splash-close-btn,
 html[data-visual-theme="terminal"] #wiki-close-btn,
 html[data-visual-theme="terminal"] .modal-close-btn {
-  background: rgba(6, 12, 6, 0.9) !important;
-  border: 1px solid rgba(0, 255, 65, 0.5) !important;
+  background: #0a0e0a !important;
   color: #00ff41 !important;
-  border-radius: 4px !important;
-  box-shadow: 0 0 12px rgba(0, 255, 65, 0.2) !important;
+  border: 1px solid rgba(0,255,65,0.45) !important;
+  border-radius: 0 !important;
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  box-shadow: 0 0 6px rgba(0,255,65,0.12) !important;
+  backdrop-filter: none !important;
+  text-shadow: 0 0 5px rgba(0,255,65,0.35) !important;
 }
-
-html[data-visual-theme="terminal"] input::placeholder,
-html[data-visual-theme="terminal"] textarea::placeholder {
-  color: rgba(0, 255, 65, 0.45) !important;
-}
-
-html[data-visual-theme="terminal"] input:focus,
-html[data-visual-theme="terminal"] select:focus,
-html[data-visual-theme="terminal"] textarea:focus {
+html[data-visual-theme="terminal"] button:hover,
+html[data-visual-theme="terminal"] .btn:hover,
+html[data-visual-theme="terminal"] .back-to-home:hover {
+  background: rgba(0,255,65,0.08) !important;
   border-color: #00ff41 !important;
-  box-shadow: 0 0 0 2px rgba(0, 255, 65, 0.25) !important;
+  box-shadow: 0 0 12px rgba(0,255,65,0.3) !important;
 }
-
+html[data-visual-theme="terminal"] .btn {
+  background: rgba(0,255,65,0.1) !important;
+  border-color: #00ff41 !important;
+}
 html[data-visual-theme="terminal"] .version-badge,
 html[data-visual-theme="terminal"] .badge {
-  background: rgba(6, 12, 6, 0.92) !important;
-  border: 1px solid rgba(0, 255, 65, 0.35) !important;
+  background: #0a0e0a !important;
+  border: 1px solid rgba(0,255,65,0.3) !important;
   color: #00ff41 !important;
-  border-radius: 999px !important;
-}
-`;
-      return;
-    }
-
-    if (theme === 'brutalist') {
-      styleEl.textContent = `
-html[data-theme="light"][data-visual-theme="brutalist"] {
-  --accent-color: #111111 !important;
-  --accent-color-tint: rgba(17, 17, 17, 0.1) !important;
-  --accent-yellow: #FFE600 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] {
-  --accent-color: #FFE600 !important;
-  --accent-color-tint: rgba(255, 230, 0, 0.12) !important;
-  --accent-yellow: #FFE600 !important;
-}
-
-html[data-visual-theme="brutalist"] body::before,
-html[data-visual-theme="brutalist"] header.panel::before,
-html[data-visual-theme="brutalist"] .wiki-header::before {
-  content: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-html[data-theme="light"][data-visual-theme="brutalist"] body {
-  background: #f0f0f0 !important;
-  color: #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] body {
-  background: #1a1a1a !important;
-  color: #FFE600 !important;
-}
-
-html[data-visual-theme="brutalist"] .panel,
-html[data-visual-theme="brutalist"] header.panel,
-html[data-visual-theme="brutalist"] aside.panel,
-html[data-visual-theme="brutalist"] main.panel,
-html[data-visual-theme="brutalist"] .splash-content,
-html[data-visual-theme="brutalist"] .wiki-modal-content,
-html[data-visual-theme="brutalist"] .modal-content,
-html[data-visual-theme="brutalist"] .dialog-content.panel {
   border-radius: 0 !important;
-  border: 4px solid !important;
-  box-shadow: 6px 6px 0 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-html[data-theme="light"][data-visual-theme="brutalist"] .panel,
-html[data-theme="light"][data-visual-theme="brutalist"] header.panel,
-html[data-theme="light"][data-visual-theme="brutalist"] aside.panel,
-html[data-theme="light"][data-visual-theme="brutalist"] main.panel,
-html[data-theme="light"][data-visual-theme="brutalist"] .splash-content,
-html[data-theme="light"][data-visual-theme="brutalist"] .wiki-modal-content,
-html[data-theme="light"][data-visual-theme="brutalist"] .modal-content,
-html[data-theme="light"][data-visual-theme="brutalist"] .dialog-content.panel {
-  background: #f0f0f0 !important;
-  border-color: #111111 !important;
-  box-shadow: 6px 6px 0 #111111 !important;
-  color: #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] .panel,
-html[data-theme="dark"][data-visual-theme="brutalist"] header.panel,
-html[data-theme="dark"][data-visual-theme="brutalist"] aside.panel,
-html[data-theme="dark"][data-visual-theme="brutalist"] main.panel,
-html[data-theme="dark"][data-visual-theme="brutalist"] .splash-content,
-html[data-theme="dark"][data-visual-theme="brutalist"] .wiki-modal-content,
-html[data-theme="dark"][data-visual-theme="brutalist"] .modal-content,
-html[data-theme="dark"][data-visual-theme="brutalist"] .dialog-content.panel {
-  background: #1a1a1a !important;
-  border-color: #FFE600 !important;
-  box-shadow: 6px 6px 0 #FFE600 !important;
-  color: #FFE600 !important;
-}
-
-html[data-visual-theme="brutalist"] header.panel h1,
-html[data-visual-theme="brutalist"] .splash-info h2,
-html[data-visual-theme="brutalist"] .wiki-header h3,
-html[data-visual-theme="brutalist"] .modal-header h2 {
-  text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
-}
-
-html[data-theme="light"][data-visual-theme="brutalist"] header.panel h1,
-html[data-theme="light"][data-visual-theme="brutalist"] .sub,
-html[data-theme="light"][data-visual-theme="brutalist"] label,
-html[data-theme="light"][data-visual-theme="brutalist"] p,
-html[data-theme="light"][data-visual-theme="brutalist"] .description,
-html[data-theme="light"][data-visual-theme="brutalist"] .wiki-body,
-html[data-theme="light"][data-visual-theme="brutalist"] .modal-body {
-  color: #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] header.panel h1,
-html[data-theme="dark"][data-visual-theme="brutalist"] .sub,
-html[data-theme="dark"][data-visual-theme="brutalist"] label,
-html[data-theme="dark"][data-visual-theme="brutalist"] p,
-html[data-theme="dark"][data-visual-theme="brutalist"] .description,
-html[data-theme="dark"][data-visual-theme="brutalist"] .wiki-body,
-html[data-theme="dark"][data-visual-theme="brutalist"] .modal-body {
-  color: #FFE600 !important;
-}
-
-html[data-visual-theme="brutalist"] .control-group,
-html[data-visual-theme="brutalist"] .panel-section,
-html[data-visual-theme="brutalist"] .group,
-html[data-visual-theme="brutalist"] .box,
-html[data-visual-theme="brutalist"] .settings-group,
-html[data-visual-theme="brutalist"] fieldset,
-html[data-visual-theme="brutalist"] .dock,
-html[data-visual-theme="brutalist"] .properties-panel,
-html[data-visual-theme="brutalist"] .zoom-controls,
-html[data-visual-theme="brutalist"] .level-card,
-html[data-visual-theme="brutalist"] .panel-section-preview,
-html[data-visual-theme="brutalist"] .toast {
-  border-radius: 0 !important;
-  border: 3px solid !important;
-  box-shadow: 4px 4px 0 !important;
-  background: transparent !important;
-}
-
-html[data-theme="light"][data-visual-theme="brutalist"] .control-group,
-html[data-theme="light"][data-visual-theme="brutalist"] .panel-section,
-html[data-theme="light"][data-visual-theme="brutalist"] .group,
-html[data-theme="light"][data-visual-theme="brutalist"] .box,
-html[data-theme="light"][data-visual-theme="brutalist"] .settings-group,
-html[data-theme="light"][data-visual-theme="brutalist"] fieldset,
-html[data-theme="light"][data-visual-theme="brutalist"] .dock,
-html[data-theme="light"][data-visual-theme="brutalist"] .properties-panel,
-html[data-theme="light"][data-visual-theme="brutalist"] .zoom-controls,
-html[data-theme="light"][data-visual-theme="brutalist"] .level-card,
-html[data-theme="light"][data-visual-theme="brutalist"] .panel-section-preview,
-html[data-theme="light"][data-visual-theme="brutalist"] .toast {
-  border-color: #111111 !important;
-  box-shadow: 4px 4px 0 #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] .control-group,
-html[data-theme="dark"][data-visual-theme="brutalist"] .panel-section,
-html[data-theme="dark"][data-visual-theme="brutalist"] .group,
-html[data-theme="dark"][data-visual-theme="brutalist"] .box,
-html[data-theme="dark"][data-visual-theme="brutalist"] .settings-group,
-html[data-theme="dark"][data-visual-theme="brutalist"] fieldset,
-html[data-theme="dark"][data-visual-theme="brutalist"] .dock,
-html[data-theme="dark"][data-visual-theme="brutalist"] .properties-panel,
-html[data-theme="dark"][data-visual-theme="brutalist"] .zoom-controls,
-html[data-theme="dark"][data-visual-theme="brutalist"] .level-card,
-html[data-theme="dark"][data-visual-theme="brutalist"] .panel-section-preview,
-html[data-theme="dark"][data-visual-theme="brutalist"] .toast {
-  border-color: #FFE600 !important;
-  box-shadow: 4px 4px 0 #FFE600 !important;
-}
-
-html[data-visual-theme="brutalist"] button,
-html[data-visual-theme="brutalist"] .btn,
-html[data-visual-theme="brutalist"] input,
-html[data-visual-theme="brutalist"] select,
-html[data-visual-theme="brutalist"] textarea,
-html[data-visual-theme="brutalist"] .back-to-home,
-html[data-visual-theme="brutalist"] #wiki-open-btn,
-html[data-visual-theme="brutalist"] #theme-toggle,
-html[data-visual-theme="brutalist"] #splash-close-btn,
-html[data-visual-theme="brutalist"] #wiki-close-btn,
-html[data-visual-theme="brutalist"] .modal-close-btn {
-  border-radius: 0 !important;
-  border: 3px solid !important;
-  box-shadow: 4px 4px 0 !important;
-  text-transform: uppercase !important;
-}
-
-html[data-theme="light"][data-visual-theme="brutalist"] button,
-html[data-theme="light"][data-visual-theme="brutalist"] .btn,
-html[data-theme="light"][data-visual-theme="brutalist"] input,
-html[data-theme="light"][data-visual-theme="brutalist"] select,
-html[data-theme="light"][data-visual-theme="brutalist"] textarea,
-html[data-theme="light"][data-visual-theme="brutalist"] .back-to-home,
-html[data-theme="light"][data-visual-theme="brutalist"] #wiki-open-btn,
-html[data-theme="light"][data-visual-theme="brutalist"] #theme-toggle,
-html[data-theme="light"][data-visual-theme="brutalist"] #splash-close-btn,
-html[data-theme="light"][data-visual-theme="brutalist"] #wiki-close-btn,
-html[data-theme="light"][data-visual-theme="brutalist"] .modal-close-btn {
-  background: #ffffff !important;
-  border-color: #111111 !important;
-  color: #111111 !important;
-  box-shadow: 4px 4px 0 #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] button,
-html[data-theme="dark"][data-visual-theme="brutalist"] .btn,
-html[data-theme="dark"][data-visual-theme="brutalist"] input,
-html[data-theme="dark"][data-visual-theme="brutalist"] select,
-html[data-theme="dark"][data-visual-theme="brutalist"] textarea,
-html[data-theme="dark"][data-visual-theme="brutalist"] .back-to-home,
-html[data-theme="dark"][data-visual-theme="brutalist"] #wiki-open-btn,
-html[data-theme="dark"][data-visual-theme="brutalist"] #theme-toggle,
-html[data-theme="dark"][data-visual-theme="brutalist"] #splash-close-btn,
-html[data-theme="dark"][data-visual-theme="brutalist"] #wiki-close-btn,
-html[data-theme="dark"][data-visual-theme="brutalist"] .modal-close-btn {
-  background: #111111 !important;
-  border-color: #FFE600 !important;
-  color: #FFE600 !important;
-  box-shadow: 4px 4px 0 #FFE600 !important;
-}
-
-html[data-visual-theme="brutalist"] input:focus,
-html[data-visual-theme="brutalist"] select:focus,
-html[data-visual-theme="brutalist"] textarea:focus {
-  outline: none !important;
-  box-shadow: 0 0 0 3px rgba(255, 230, 0, 0.25) !important;
-}
-
-html[data-visual-theme="brutalist"] .version-badge,
-html[data-visual-theme="brutalist"] .badge {
-  border-radius: 0 !important;
-  border: 3px solid !important;
-  box-shadow: 3px 3px 0 !important;
-}
-
-html[data-theme="light"][data-visual-theme="brutalist"] .version-badge,
-html[data-theme="light"][data-visual-theme="brutalist"] .badge {
-  background: #ffffff !important;
-  border-color: #111111 !important;
-  color: #111111 !important;
-  box-shadow: 3px 3px 0 #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="brutalist"] .version-badge,
-html[data-theme="dark"][data-visual-theme="brutalist"] .badge {
-  background: #111111 !important;
-  border-color: #FFE600 !important;
-  color: #FFE600 !important;
-  box-shadow: 3px 3px 0 #FFE600 !important;
-}
-`;
-      return;
-    }
-
-    if (theme === 'neon') {
-      styleEl.textContent = `
-html[data-visual-theme="neon"] {
-  --accent-color: #00f5ff !important;
-  --accent-color-tint: rgba(0, 245, 255, 0.12) !important;
-  --accent-yellow: #ff00d4 !important;
-}
-
-html[data-visual-theme="neon"] body::before,
-html[data-visual-theme="neon"] header.panel::before,
-html[data-visual-theme="neon"] .wiki-header::before {
-  content: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-html[data-visual-theme="neon"] body {
-  background: #060010 !important;
-  color: #e5e7eb !important;
-}
-
-html[data-visual-theme="neon"] .panel,
-html[data-visual-theme="neon"] header.panel,
-html[data-visual-theme="neon"] aside.panel,
-html[data-visual-theme="neon"] main.panel,
-html[data-visual-theme="neon"] .splash-content,
-html[data-visual-theme="neon"] .wiki-modal-content,
-html[data-visual-theme="neon"] .modal-content,
-html[data-visual-theme="neon"] .dialog-content.panel {
-  background: rgba(6, 0, 16, 0.88) !important;
-  border: 1px solid rgba(0, 245, 255, 0.35) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 0 24px rgba(0, 245, 255, 0.1), inset 0 0 30px rgba(0, 245, 255, 0.03) !important;
-  color: #e5e7eb !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-}
-
-html[data-visual-theme="neon"] header.panel h1,
-html[data-visual-theme="neon"] .splash-info h2,
-html[data-visual-theme="neon"] .wiki-header h3,
-html[data-visual-theme="neon"] .modal-header h2 {
-  color: #00f5ff !important;
-  text-shadow: 0 0 14px rgba(0, 245, 255, 0.7) !important;
-}
-
-html[data-visual-theme="neon"] .sub,
-html[data-visual-theme="neon"] label,
-html[data-visual-theme="neon"] p,
-html[data-visual-theme="neon"] .description,
-html[data-visual-theme="neon"] .wiki-body,
-html[data-visual-theme="neon"] .modal-body {
-  color: rgba(255, 255, 255, 0.7) !important;
-}
-
-html[data-visual-theme="neon"] .control-group,
-html[data-visual-theme="neon"] .panel-section,
-html[data-visual-theme="neon"] .group,
-html[data-visual-theme="neon"] .box,
-html[data-visual-theme="neon"] .settings-group,
-html[data-visual-theme="neon"] fieldset,
-html[data-visual-theme="neon"] .dock,
-html[data-visual-theme="neon"] .properties-panel,
-html[data-visual-theme="neon"] .zoom-controls,
-html[data-visual-theme="neon"] .level-card,
-html[data-visual-theme="neon"] .panel-section-preview,
-html[data-visual-theme="neon"] .toast {
-  background: rgba(6, 0, 16, 0.7) !important;
-  border: 1px solid rgba(0, 245, 255, 0.18) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 0 16px rgba(0, 245, 255, 0.08) !important;
-}
-
-html[data-visual-theme="neon"] button,
-html[data-visual-theme="neon"] .btn,
-html[data-visual-theme="neon"] input,
-html[data-visual-theme="neon"] select,
-html[data-visual-theme="neon"] textarea,
-html[data-visual-theme="neon"] .back-to-home,
-html[data-visual-theme="neon"] #wiki-open-btn,
-html[data-visual-theme="neon"] #theme-toggle,
-html[data-visual-theme="neon"] #splash-close-btn,
-html[data-visual-theme="neon"] #wiki-close-btn,
-html[data-visual-theme="neon"] .modal-close-btn {
-  background: rgba(6, 0, 16, 0.7) !important;
-  border: 1px solid rgba(0, 245, 255, 0.3) !important;
-  color: #00f5ff !important;
-  border-radius: 8px !important;
-  box-shadow: 0 0 14px rgba(0, 245, 255, 0.2) !important;
-}
-
-html[data-visual-theme="neon"] input:focus,
-html[data-visual-theme="neon"] select:focus,
-html[data-visual-theme="neon"] textarea:focus {
-  border-color: #00f5ff !important;
-  box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.25) !important;
-}
-
-html[data-visual-theme="neon"] .version-badge,
-html[data-visual-theme="neon"] .badge {
-  background: rgba(6, 0, 16, 0.72) !important;
-  border: 1px solid rgba(0, 245, 255, 0.25) !important;
-  color: #00f5ff !important;
-  border-radius: 999px !important;
-}
-`;
-      return;
-    }
-
-    if (theme === 'pastel') {
-      styleEl.textContent = `
-html[data-visual-theme="pastel"] {
-  --accent-color: #c084fc !important;
-  --accent-color-tint: rgba(192, 132, 252, 0.12) !important;
-  --accent-yellow: #fbbf24 !important;
-}
-
-html[data-visual-theme="pastel"] body::before,
-html[data-visual-theme="pastel"] header.panel::before,
-html[data-visual-theme="pastel"] .wiki-header::before {
-  content: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-html[data-theme="light"][data-visual-theme="pastel"] body {
-  background: #fdf4ff !important;
-  color: #4c1d95 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] body {
-  background: #1e1224 !important;
-  color: #f3e8ff !important;
-}
-
-html[data-visual-theme="pastel"] .panel,
-html[data-visual-theme="pastel"] header.panel,
-html[data-visual-theme="pastel"] aside.panel,
-html[data-visual-theme="pastel"] main.panel,
-html[data-visual-theme="pastel"] .splash-content,
-html[data-visual-theme="pastel"] .wiki-modal-content,
-html[data-visual-theme="pastel"] .modal-content,
-html[data-visual-theme="pastel"] .dialog-content.panel {
-  border-radius: 20px !important;
-  box-shadow: 0 4px 20px rgba(192, 132, 252, 0.12) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
-}
-
-html[data-theme="light"][data-visual-theme="pastel"] .panel,
-html[data-theme="light"][data-visual-theme="pastel"] header.panel,
-html[data-theme="light"][data-visual-theme="pastel"] aside.panel,
-html[data-theme="light"][data-visual-theme="pastel"] main.panel,
-html[data-theme="light"][data-visual-theme="pastel"] .splash-content,
-html[data-theme="light"][data-visual-theme="pastel"] .wiki-modal-content,
-html[data-theme="light"][data-visual-theme="pastel"] .modal-content,
-html[data-theme="light"][data-visual-theme="pastel"] .dialog-content.panel {
-  background: rgba(255, 255, 255, 0.88) !important;
-  border: 1px solid rgba(192, 132, 252, 0.22) !important;
-  color: #4c1d95 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] .panel,
-html[data-theme="dark"][data-visual-theme="pastel"] header.panel,
-html[data-theme="dark"][data-visual-theme="pastel"] aside.panel,
-html[data-theme="dark"][data-visual-theme="pastel"] main.panel,
-html[data-theme="dark"][data-visual-theme="pastel"] .splash-content,
-html[data-theme="dark"][data-visual-theme="pastel"] .wiki-modal-content,
-html[data-theme="dark"][data-visual-theme="pastel"] .modal-content,
-html[data-theme="dark"][data-visual-theme="pastel"] .dialog-content.panel {
-  background: rgba(30, 18, 36, 0.88) !important;
-  border: 1px solid rgba(192, 132, 252, 0.18) !important;
-  color: #f3e8ff !important;
-}
-
-html[data-visual-theme="pastel"] header.panel h1,
-html[data-visual-theme="pastel"] .splash-info h2,
-html[data-visual-theme="pastel"] .wiki-header h3,
-html[data-visual-theme="pastel"] .modal-header h2 {
-  color: #7c3aed !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] header.panel h1,
-html[data-theme="dark"][data-visual-theme="pastel"] .splash-info h2,
-html[data-theme="dark"][data-visual-theme="pastel"] .wiki-header h3,
-html[data-theme="dark"][data-visual-theme="pastel"] .modal-header h2 {
-  color: #c084fc !important;
-}
-
-html[data-visual-theme="pastel"] .sub,
-html[data-visual-theme="pastel"] label,
-html[data-visual-theme="pastel"] p,
-html[data-visual-theme="pastel"] .description,
-html[data-visual-theme="pastel"] .wiki-body,
-html[data-visual-theme="pastel"] .modal-body {
-  color: #7c3aed !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] .sub,
-html[data-theme="dark"][data-visual-theme="pastel"] label,
-html[data-theme="dark"][data-visual-theme="pastel"] p,
-html[data-theme="dark"][data-visual-theme="pastel"] .description,
-html[data-theme="dark"][data-visual-theme="pastel"] .wiki-body,
-html[data-theme="dark"][data-visual-theme="pastel"] .modal-body {
-  color: #e9d5ff !important;
-}
-
-html[data-visual-theme="pastel"] .control-group,
-html[data-visual-theme="pastel"] .panel-section,
-html[data-visual-theme="pastel"] .group,
-html[data-visual-theme="pastel"] .box,
-html[data-visual-theme="pastel"] .settings-group,
-html[data-visual-theme="pastel"] fieldset,
-html[data-visual-theme="pastel"] .dock,
-html[data-visual-theme="pastel"] .properties-panel,
-html[data-visual-theme="pastel"] .zoom-controls,
-html[data-visual-theme="pastel"] .level-card,
-html[data-visual-theme="pastel"] .panel-section-preview,
-html[data-visual-theme="pastel"] .toast {
-  border-radius: 18px !important;
-  border: 1px solid rgba(192, 132, 252, 0.2) !important;
-  background: rgba(255, 255, 255, 0.72) !important;
-  box-shadow: 0 4px 16px rgba(192, 132, 252, 0.08) !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] .control-group,
-html[data-theme="dark"][data-visual-theme="pastel"] .panel-section,
-html[data-theme="dark"][data-visual-theme="pastel"] .group,
-html[data-theme="dark"][data-visual-theme="pastel"] .box,
-html[data-theme="dark"][data-visual-theme="pastel"] .settings-group,
-html[data-theme="dark"][data-visual-theme="pastel"] fieldset,
-html[data-theme="dark"][data-visual-theme="pastel"] .dock,
-html[data-theme="dark"][data-visual-theme="pastel"] .properties-panel,
-html[data-theme="dark"][data-visual-theme="pastel"] .zoom-controls,
-html[data-theme="dark"][data-visual-theme="pastel"] .level-card,
-html[data-theme="dark"][data-visual-theme="pastel"] .panel-section-preview,
-html[data-theme="dark"][data-visual-theme="pastel"] .toast {
-  background: rgba(30, 18, 36, 0.75) !important;
-  border-color: rgba(192, 132, 252, 0.18) !important;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2) !important;
-}
-
-html[data-visual-theme="pastel"] button,
-html[data-visual-theme="pastel"] .btn,
-html[data-visual-theme="pastel"] input,
-html[data-visual-theme="pastel"] select,
-html[data-visual-theme="pastel"] textarea,
-html[data-visual-theme="pastel"] .back-to-home,
-html[data-visual-theme="pastel"] #wiki-open-btn,
-html[data-visual-theme="pastel"] #theme-toggle,
-html[data-visual-theme="pastel"] #splash-close-btn,
-html[data-visual-theme="pastel"] #wiki-close-btn,
-html[data-visual-theme="pastel"] .modal-close-btn {
-  background: rgba(255, 255, 255, 0.88) !important;
-  border: 1px solid rgba(192, 132, 252, 0.28) !important;
-  color: #7c3aed !important;
-  border-radius: 14px !important;
-  box-shadow: 0 4px 16px rgba(192, 132, 252, 0.1) !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] button,
-html[data-theme="dark"][data-visual-theme="pastel"] .btn,
-html[data-theme="dark"][data-visual-theme="pastel"] input,
-html[data-theme="dark"][data-visual-theme="pastel"] select,
-html[data-theme="dark"][data-visual-theme="pastel"] textarea,
-html[data-theme="dark"][data-visual-theme="pastel"] .back-to-home,
-html[data-theme="dark"][data-visual-theme="pastel"] #wiki-open-btn,
-html[data-theme="dark"][data-visual-theme="pastel"] #theme-toggle,
-html[data-theme="dark"][data-visual-theme="pastel"] #splash-close-btn,
-html[data-theme="dark"][data-visual-theme="pastel"] #wiki-close-btn,
-html[data-theme="dark"][data-visual-theme="pastel"] .modal-close-btn {
-  background: rgba(30, 18, 36, 0.72) !important;
-  border: 1px solid rgba(192, 132, 252, 0.2) !important;
-  color: #c084fc !important;
-}
-
-html[data-visual-theme="pastel"] input:focus,
-html[data-visual-theme="pastel"] select:focus,
-html[data-visual-theme="pastel"] textarea:focus {
-  border-color: #c084fc !important;
-  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.2) !important;
-}
-
-html[data-visual-theme="pastel"] .version-badge,
-html[data-visual-theme="pastel"] .badge {
-  border-radius: 999px !important;
-  background: rgba(255, 255, 255, 0.86) !important;
-  border: 1px solid rgba(192, 132, 252, 0.24) !important;
-  color: #7c3aed !important;
-}
-
-html[data-theme="dark"][data-visual-theme="pastel"] .version-badge,
-html[data-theme="dark"][data-visual-theme="pastel"] .badge {
-  background: rgba(30, 18, 36, 0.8) !important;
-  border-color: rgba(192, 132, 252, 0.2) !important;
-  color: #c084fc !important;
-}
-`;
-      return;
-    }
-
-    if (theme === 'newspaper') {
-      styleEl.textContent = `
-html[data-visual-theme="newspaper"] {
-  --accent-color: #1a1a1a !important;
-  --accent-color-tint: rgba(26, 26, 26, 0.08) !important;
-  --accent-yellow: #1a1a1a !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] {
-  --accent-color: #f0e6d3 !important;
-  --accent-yellow: #f0e6d3 !important;
-}
-
-html[data-visual-theme="newspaper"] body::before,
-html[data-visual-theme="newspaper"] header.panel::before,
-html[data-visual-theme="newspaper"] .wiki-header::before {
-  content: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-html[data-visual-theme="newspaper"] body {
-  font-family: Georgia, "Times New Roman", serif !important;
-}
-
-html[data-theme="light"][data-visual-theme="newspaper"] body {
-  background: #f5efe6 !important;
-  color: #1a1a1a !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] body {
-  background: #1a1610 !important;
-  color: #f0e6d3 !important;
-}
-
-html[data-visual-theme="newspaper"] .panel,
-html[data-visual-theme="newspaper"] header.panel,
-html[data-visual-theme="newspaper"] aside.panel,
-html[data-visual-theme="newspaper"] main.panel,
-html[data-visual-theme="newspaper"] .splash-content,
-html[data-visual-theme="newspaper"] .wiki-modal-content,
-html[data-visual-theme="newspaper"] .modal-content,
-html[data-visual-theme="newspaper"] .dialog-content.panel {
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-html[data-theme="light"][data-visual-theme="newspaper"] .panel,
-html[data-theme="light"][data-visual-theme="newspaper"] header.panel,
-html[data-theme="light"][data-visual-theme="newspaper"] aside.panel,
-html[data-theme="light"][data-visual-theme="newspaper"] main.panel,
-html[data-theme="light"][data-visual-theme="newspaper"] .splash-content,
-html[data-theme="light"][data-visual-theme="newspaper"] .wiki-modal-content,
-html[data-theme="light"][data-visual-theme="newspaper"] .modal-content,
-html[data-theme="light"][data-visual-theme="newspaper"] .dialog-content.panel {
-  background: #f5efe6 !important;
-  border: 2px solid #1a1a1a !important;
-  color: #1a1a1a !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] .panel,
-html[data-theme="dark"][data-visual-theme="newspaper"] header.panel,
-html[data-theme="dark"][data-visual-theme="newspaper"] aside.panel,
-html[data-theme="dark"][data-visual-theme="newspaper"] main.panel,
-html[data-theme="dark"][data-visual-theme="newspaper"] .splash-content,
-html[data-theme="dark"][data-visual-theme="newspaper"] .wiki-modal-content,
-html[data-theme="dark"][data-visual-theme="newspaper"] .modal-content,
-html[data-theme="dark"][data-visual-theme="newspaper"] .dialog-content.panel {
-  background: #201c14 !important;
-  border: 2px solid #c8b99a !important;
-  color: #f0e6d3 !important;
-}
-
-html[data-visual-theme="newspaper"] header.panel {
-  border-top: 3px double #1a1a1a !important;
-  border-bottom: 3px double #1a1a1a !important;
-  border-left: none !important;
-  border-right: none !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] header.panel {
-  border-top-color: #c8b99a !important;
-  border-bottom-color: #c8b99a !important;
-}
-
-html[data-visual-theme="newspaper"] header.panel h1,
-html[data-visual-theme="newspaper"] .splash-info h2,
-html[data-visual-theme="newspaper"] .wiki-header h3,
-html[data-visual-theme="newspaper"] .modal-header h2 {
-  font-family: Georgia, "Times New Roman", serif !important;
-  font-style: italic !important;
-}
-
-html[data-visual-theme="newspaper"] .sub,
-html[data-visual-theme="newspaper"] label,
-html[data-visual-theme="newspaper"] p,
-html[data-visual-theme="newspaper"] .description,
-html[data-visual-theme="newspaper"] .wiki-body,
-html[data-visual-theme="newspaper"] .modal-body {
-  font-family: Georgia, "Times New Roman", serif !important;
-}
-
-html[data-visual-theme="newspaper"] .control-group,
-html[data-visual-theme="newspaper"] .panel-section,
-html[data-visual-theme="newspaper"] .group,
-html[data-visual-theme="newspaper"] .box,
-html[data-visual-theme="newspaper"] .settings-group,
-html[data-visual-theme="newspaper"] fieldset,
-html[data-visual-theme="newspaper"] .dock,
-html[data-visual-theme="newspaper"] .properties-panel,
-html[data-visual-theme="newspaper"] .zoom-controls,
-html[data-visual-theme="newspaper"] .level-card,
-html[data-visual-theme="newspaper"] .panel-section-preview,
-html[data-visual-theme="newspaper"] .toast {
-  background: transparent !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-html[data-theme="light"][data-visual-theme="newspaper"] .control-group,
-html[data-theme="light"][data-visual-theme="newspaper"] .panel-section,
-html[data-theme="light"][data-visual-theme="newspaper"] .group,
-html[data-theme="light"][data-visual-theme="newspaper"] .box,
-html[data-theme="light"][data-visual-theme="newspaper"] .settings-group,
-html[data-theme="light"][data-visual-theme="newspaper"] fieldset,
-html[data-theme="light"][data-visual-theme="newspaper"] .dock,
-html[data-theme="light"][data-visual-theme="newspaper"] .properties-panel,
-html[data-theme="light"][data-visual-theme="newspaper"] .zoom-controls,
-html[data-theme="light"][data-visual-theme="newspaper"] .level-card,
-html[data-theme="light"][data-visual-theme="newspaper"] .panel-section-preview,
-html[data-theme="light"][data-visual-theme="newspaper"] .toast {
-  border: 1px solid #1a1a1a !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] .control-group,
-html[data-theme="dark"][data-visual-theme="newspaper"] .panel-section,
-html[data-theme="dark"][data-visual-theme="newspaper"] .group,
-html[data-theme="dark"][data-visual-theme="newspaper"] .box,
-html[data-theme="dark"][data-visual-theme="newspaper"] .settings-group,
-html[data-theme="dark"][data-visual-theme="newspaper"] fieldset,
-html[data-theme="dark"][data-visual-theme="newspaper"] .dock,
-html[data-theme="dark"][data-visual-theme="newspaper"] .properties-panel,
-html[data-theme="dark"][data-visual-theme="newspaper"] .zoom-controls,
-html[data-theme="dark"][data-visual-theme="newspaper"] .level-card,
-html[data-theme="dark"][data-visual-theme="newspaper"] .panel-section-preview,
-html[data-theme="dark"][data-visual-theme="newspaper"] .toast {
-  border: 1px solid #c8b99a !important;
-}
-
-html[data-visual-theme="newspaper"] button,
-html[data-visual-theme="newspaper"] .btn,
-html[data-visual-theme="newspaper"] input,
-html[data-visual-theme="newspaper"] select,
-html[data-visual-theme="newspaper"] textarea,
-html[data-visual-theme="newspaper"] .back-to-home,
-html[data-visual-theme="newspaper"] #wiki-open-btn,
-html[data-visual-theme="newspaper"] #theme-toggle,
-html[data-visual-theme="newspaper"] #splash-close-btn,
-html[data-visual-theme="newspaper"] #wiki-close-btn,
-html[data-visual-theme="newspaper"] .modal-close-btn {
-  border-radius: 2px !important;
-  box-shadow: none !important;
-  font-family: Georgia, "Times New Roman", serif !important;
-}
-
-html[data-theme="light"][data-visual-theme="newspaper"] button,
-html[data-theme="light"][data-visual-theme="newspaper"] .btn,
-html[data-theme="light"][data-visual-theme="newspaper"] input,
-html[data-theme="light"][data-visual-theme="newspaper"] select,
-html[data-theme="light"][data-visual-theme="newspaper"] textarea,
-html[data-theme="light"][data-visual-theme="newspaper"] .back-to-home,
-html[data-theme="light"][data-visual-theme="newspaper"] #wiki-open-btn,
-html[data-theme="light"][data-visual-theme="newspaper"] #theme-toggle,
-html[data-theme="light"][data-visual-theme="newspaper"] #splash-close-btn,
-html[data-theme="light"][data-visual-theme="newspaper"] #wiki-close-btn,
-html[data-theme="light"][data-visual-theme="newspaper"] .modal-close-btn {
-  background: #ede5d8 !important;
-  border: 1px solid #1a1a1a !important;
-  color: #1a1a1a !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] button,
-html[data-theme="dark"][data-visual-theme="newspaper"] .btn,
-html[data-theme="dark"][data-visual-theme="newspaper"] input,
-html[data-theme="dark"][data-visual-theme="newspaper"] select,
-html[data-theme="dark"][data-visual-theme="newspaper"] textarea,
-html[data-theme="dark"][data-visual-theme="newspaper"] .back-to-home,
-html[data-theme="dark"][data-visual-theme="newspaper"] #wiki-open-btn,
-html[data-theme="dark"][data-visual-theme="newspaper"] #theme-toggle,
-html[data-theme="dark"][data-visual-theme="newspaper"] #splash-close-btn,
-html[data-theme="dark"][data-visual-theme="newspaper"] #wiki-close-btn,
-html[data-theme="dark"][data-visual-theme="newspaper"] .modal-close-btn {
-  background: #201c14 !important;
-  border: 1px solid #c8b99a !important;
-  color: #f0e6d3 !important;
-}
-
-html[data-visual-theme="newspaper"] input:focus,
-html[data-visual-theme="newspaper"] select:focus,
-html[data-visual-theme="newspaper"] textarea:focus {
-  border-color: #1a1a1a !important;
-  box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.2) !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] input:focus,
-html[data-theme="dark"][data-visual-theme="newspaper"] select:focus,
-html[data-theme="dark"][data-visual-theme="newspaper"] textarea:focus {
-  border-color: #f0e6d3 !important;
-  box-shadow: 0 0 0 2px rgba(240, 230, 211, 0.2) !important;
-}
-
-html[data-visual-theme="newspaper"] .version-badge,
-html[data-visual-theme="newspaper"] .badge {
-  border-radius: 2px !important;
-  box-shadow: none !important;
-  font-family: Georgia, "Times New Roman", serif !important;
-}
-
-html[data-theme="light"][data-visual-theme="newspaper"] .version-badge,
-html[data-theme="light"][data-visual-theme="newspaper"] .badge {
-  background: #ede5d8 !important;
-  border: 1px solid #1a1a1a !important;
-  color: #1a1a1a !important;
-}
-
-html[data-theme="dark"][data-visual-theme="newspaper"] .version-badge,
-html[data-theme="dark"][data-visual-theme="newspaper"] .badge {
-  background: #201c14 !important;
-  border: 1px solid #c8b99a !important;
-  color: #f0e6d3 !important;
-}
-`;
-      return;
-    }
-
-    if (theme === 'blueprint') {
-      styleEl.textContent = `
-html[data-visual-theme="blueprint"] {
-  --accent-color: #4db8ff !important;
-  --accent-color-tint: rgba(77, 184, 255, 0.12) !important;
-  --accent-yellow: #4db8ff !important;
-}
-
-html[data-visual-theme="blueprint"] body::before,
-html[data-visual-theme="blueprint"] header.panel::before,
-html[data-visual-theme="blueprint"] .wiki-header::before {
-  content: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-html[data-visual-theme="blueprint"] body {
-  background: #001f3f !important;
-  background-image: linear-gradient(rgba(77, 184, 255, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(77, 184, 255, 0.07) 1px, transparent 1px) !important;
-  background-size: 24px 24px !important;
-  color: #c7e6ff !important;
-}
-
-html[data-visual-theme="blueprint"] .panel,
-html[data-visual-theme="blueprint"] header.panel,
-html[data-visual-theme="blueprint"] aside.panel,
-html[data-visual-theme="blueprint"] main.panel,
-html[data-visual-theme="blueprint"] .splash-content,
-html[data-visual-theme="blueprint"] .wiki-modal-content,
-html[data-visual-theme="blueprint"] .modal-content,
-html[data-visual-theme="blueprint"] .dialog-content.panel {
-  background: rgba(0, 31, 63, 0.9) !important;
-  border: 1px solid rgba(77, 184, 255, 0.38) !important;
-  border-radius: 4px !important;
-  box-shadow: 0 0 0 1px rgba(77, 184, 255, 0.12), inset 0 0 20px rgba(77, 184, 255, 0.04) !important;
-  color: #c7e6ff !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-
-html[data-visual-theme="blueprint"] header.panel h1,
-html[data-visual-theme="blueprint"] .splash-info h2,
-html[data-visual-theme="blueprint"] .wiki-header h3,
-html[data-visual-theme="blueprint"] .modal-header h2 {
-  color: #4db8ff !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-}
-
-html[data-visual-theme="blueprint"] .sub,
-html[data-visual-theme="blueprint"] label,
-html[data-visual-theme="blueprint"] p,
-html[data-visual-theme="blueprint"] .description,
-html[data-visual-theme="blueprint"] .wiki-body,
-html[data-visual-theme="blueprint"] .modal-body {
-  color: rgba(77, 184, 255, 0.7) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
-}
-
-html[data-visual-theme="blueprint"] .control-group,
-html[data-visual-theme="blueprint"] .panel-section,
-html[data-visual-theme="blueprint"] .group,
-html[data-visual-theme="blueprint"] .box,
-html[data-visual-theme="blueprint"] .settings-group,
-html[data-visual-theme="blueprint"] fieldset,
-html[data-visual-theme="blueprint"] .dock,
-html[data-visual-theme="blueprint"] .properties-panel,
-html[data-visual-theme="blueprint"] .zoom-controls,
-html[data-visual-theme="blueprint"] .level-card,
-html[data-visual-theme="blueprint"] .panel-section-preview,
-html[data-visual-theme="blueprint"] .toast {
-  background: rgba(0, 31, 63, 0.8) !important;
-  border: 1px solid rgba(77, 184, 255, 0.3) !important;
-  border-radius: 4px !important;
-  box-shadow: 0 0 10px rgba(77, 184, 255, 0.08) !important;
-}
-
-html[data-visual-theme="blueprint"] button,
-html[data-visual-theme="blueprint"] .btn,
-html[data-visual-theme="blueprint"] input,
-html[data-visual-theme="blueprint"] select,
-html[data-visual-theme="blueprint"] textarea,
-html[data-visual-theme="blueprint"] .back-to-home,
-html[data-visual-theme="blueprint"] #wiki-open-btn,
-html[data-visual-theme="blueprint"] #theme-toggle,
-html[data-visual-theme="blueprint"] #splash-close-btn,
-html[data-visual-theme="blueprint"] #wiki-close-btn,
-html[data-visual-theme="blueprint"] .modal-close-btn {
-  background: rgba(0, 31, 63, 0.8) !important;
-  border: 1px solid rgba(77, 184, 255, 0.35) !important;
-  color: #4db8ff !important;
-  border-radius: 2px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-}
-
-html[data-visual-theme="blueprint"] input:focus,
-html[data-visual-theme="blueprint"] select:focus,
-html[data-visual-theme="blueprint"] textarea:focus {
-  border-color: #4db8ff !important;
-  box-shadow: 0 0 0 3px rgba(77, 184, 255, 0.25) !important;
-}
-
-html[data-visual-theme="blueprint"] .version-badge,
-html[data-visual-theme="blueprint"] .badge {
-  background: rgba(0, 31, 63, 0.9) !important;
-  border: 1px solid rgba(77, 184, 255, 0.3) !important;
-  color: #4db8ff !important;
-  border-radius: 2px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-}
-`;
-      return;
-    }
-
-    if (theme === 'custom') {
-      styleEl.textContent = `
-html[data-visual-theme="custom"] body::before,
-html[data-visual-theme="custom"] header.panel::before,
-html[data-visual-theme="custom"] .wiki-header::before {
-  content: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-
-html[data-visual-theme="custom"] body {
-  font-family: var(--font-family-sans) !important;
-}
-
-html[data-theme="light"][data-visual-theme="custom"] body {
-  background: #f5f5f7 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="custom"] body {
-  background: #000000 !important;
-}
-
-html[data-visual-theme="custom"][data-custom-bg] body {
-  background: var(--custom-hub-bg) !important;
-}
-
-html[data-visual-theme="custom"] .panel,
-html[data-visual-theme="custom"] header.panel,
-html[data-visual-theme="custom"] aside.panel,
-html[data-visual-theme="custom"] main.panel,
-html[data-visual-theme="custom"] .splash-content,
-html[data-visual-theme="custom"] .wiki-modal-content,
-html[data-visual-theme="custom"] .modal-content,
-html[data-visual-theme="custom"] .dialog-content.panel {
-  border-radius: 20px !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-html[data-theme="light"][data-visual-theme="custom"] .panel,
-html[data-theme="light"][data-visual-theme="custom"] header.panel,
-html[data-theme="light"][data-visual-theme="custom"] aside.panel,
-html[data-theme="light"][data-visual-theme="custom"] main.panel,
-html[data-theme="light"][data-visual-theme="custom"] .splash-content,
-html[data-theme="light"][data-visual-theme="custom"] .wiki-modal-content,
-html[data-theme="light"][data-visual-theme="custom"] .modal-content,
-html[data-theme="light"][data-visual-theme="custom"] .dialog-content.panel {
-  background: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  color: #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="custom"] .panel,
-html[data-theme="dark"][data-visual-theme="custom"] header.panel,
-html[data-theme="dark"][data-visual-theme="custom"] aside.panel,
-html[data-theme="dark"][data-visual-theme="custom"] main.panel,
-html[data-theme="dark"][data-visual-theme="custom"] .splash-content,
-html[data-theme="dark"][data-visual-theme="custom"] .wiki-modal-content,
-html[data-theme="dark"][data-visual-theme="custom"] .modal-content,
-html[data-theme="dark"][data-visual-theme="custom"] .dialog-content.panel {
-  background: #0b0b0f !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #f5f5f7 !important;
-}
-
-html[data-theme="light"][data-visual-theme="custom"] header.panel h1,
-html[data-theme="light"][data-visual-theme="custom"] .sub,
-html[data-theme="light"][data-visual-theme="custom"] label,
-html[data-theme="light"][data-visual-theme="custom"] p,
-html[data-theme="light"][data-visual-theme="custom"] .description,
-html[data-theme="light"][data-visual-theme="custom"] .wiki-body,
-html[data-theme="light"][data-visual-theme="custom"] .modal-body {
-  color: #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="custom"] header.panel h1,
-html[data-theme="dark"][data-visual-theme="custom"] .sub,
-html[data-theme="dark"][data-visual-theme="custom"] label,
-html[data-theme="dark"][data-visual-theme="custom"] p,
-html[data-theme="dark"][data-visual-theme="custom"] .description,
-html[data-theme="dark"][data-visual-theme="custom"] .wiki-body,
-html[data-theme="dark"][data-visual-theme="custom"] .modal-body {
-  color: #f5f5f7 !important;
-}
-
-html[data-visual-theme="custom"] .control-group,
-html[data-visual-theme="custom"] .panel-section,
-html[data-visual-theme="custom"] .group,
-html[data-visual-theme="custom"] .box,
-html[data-visual-theme="custom"] .settings-group,
-html[data-visual-theme="custom"] fieldset,
-html[data-visual-theme="custom"] .dock,
-html[data-visual-theme="custom"] .properties-panel,
-html[data-visual-theme="custom"] .zoom-controls,
-html[data-visual-theme="custom"] .level-card,
-html[data-visual-theme="custom"] .panel-section-preview,
-html[data-visual-theme="custom"] .toast {
-  background: transparent !important;
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+}
+html[data-visual-theme="terminal"] .splash-image { display: none !important; }
+html[data-visual-theme="terminal"] .splash-info {
+  padding: 0 !important;
   border: none !important;
-  border-radius: 20px !important;
-  box-shadow: none !important;
-}
-
-html[data-visual-theme="custom"] button,
-html[data-visual-theme="custom"] .btn,
-html[data-visual-theme="custom"] input,
-html[data-visual-theme="custom"] select,
-html[data-visual-theme="custom"] textarea,
-html[data-visual-theme="custom"] .back-to-home,
-html[data-visual-theme="custom"] #wiki-open-btn,
-html[data-visual-theme="custom"] #theme-toggle,
-html[data-visual-theme="custom"] #splash-close-btn,
-html[data-visual-theme="custom"] #wiki-close-btn,
-html[data-visual-theme="custom"] .modal-close-btn {
-  border-radius: 999px !important;
-  box-shadow: none !important;
-}
-
-html[data-theme="light"][data-visual-theme="custom"] button,
-html[data-theme="light"][data-visual-theme="custom"] .btn,
-html[data-theme="light"][data-visual-theme="custom"] input,
-html[data-theme="light"][data-visual-theme="custom"] select,
-html[data-theme="light"][data-visual-theme="custom"] textarea,
-html[data-theme="light"][data-visual-theme="custom"] .back-to-home,
-html[data-theme="light"][data-visual-theme="custom"] #wiki-open-btn,
-html[data-theme="light"][data-visual-theme="custom"] #theme-toggle,
-html[data-theme="light"][data-visual-theme="custom"] #splash-close-btn,
-html[data-theme="light"][data-visual-theme="custom"] #wiki-close-btn,
-html[data-theme="light"][data-visual-theme="custom"] .modal-close-btn {
-  background: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  color: #111111 !important;
-}
-
-html[data-theme="dark"][data-visual-theme="custom"] button,
-html[data-theme="dark"][data-visual-theme="custom"] .btn,
-html[data-theme="dark"][data-visual-theme="custom"] input,
-html[data-theme="dark"][data-visual-theme="custom"] select,
-html[data-theme="dark"][data-visual-theme="custom"] textarea,
-html[data-theme="dark"][data-visual-theme="custom"] .back-to-home,
-html[data-theme="dark"][data-visual-theme="custom"] #wiki-open-btn,
-html[data-theme="dark"][data-visual-theme="custom"] #theme-toggle,
-html[data-theme="dark"][data-visual-theme="custom"] #splash-close-btn,
-html[data-theme="dark"][data-visual-theme="custom"] #wiki-close-btn,
-html[data-theme="dark"][data-visual-theme="custom"] .modal-close-btn {
-  background: #101014 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: #f5f5f7 !important;
-}
-
-html[data-visual-theme="custom"] .btn {
-  background: var(--accent-color) !important;
-  color: #ffffff !important;
-  border-color: transparent !important;
-  box-shadow: 0 10px 20px var(--accent-color-tint) !important;
-}
-
-html[data-visual-theme="custom"] input:focus,
-html[data-visual-theme="custom"] select:focus,
-html[data-visual-theme="custom"] textarea:focus {
-  border-color: var(--accent-color) !important;
-  box-shadow: 0 0 0 3px var(--accent-color-tint) !important;
-}
-
-html[data-visual-theme="custom"] .version-badge,
-html[data-visual-theme="custom"] .badge {
-  border-radius: 999px !important;
   background: transparent !important;
-  border: 1px solid var(--accent-color-tint) !important;
-  color: var(--accent-color) !important;
 }
+html[data-visual-theme="terminal"] .wiki-header {
+  background: #0a0e0a !important;
+  background-image: none !important;
+  border-bottom: 1px solid rgba(0,255,65,0.25) !important;
+  color: #00ff41 !important;
+}
+html[data-visual-theme="terminal"] ::-webkit-scrollbar { background: #060a06; width: 6px; }
+html[data-visual-theme="terminal"] ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.3); border-radius: 0; }
+html[data-visual-theme="terminal"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,65,0.55); }
 `;
       return;
     }
@@ -2699,7 +1675,7 @@ html[data-visual-theme="comicbook"] .dialog-content.panel {
   background: #fff3d7 !important;
   border: 4px solid #111111 !important;
   border-radius: 0 !important;
-  box-shadow: 8px 8px 0 #111111 !important;
+  box-shadow: 6px 6px 0 #111111 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -2711,7 +1687,7 @@ html[data-visual-theme="comicbook"] main.panel {
   background: #fffdf3 !important;
   border: 4px solid #111111 !important;
   border-radius: 0 !important;
-  box-shadow: 8px 8px 0 #111111 !important;
+  box-shadow: 6px 6px 0 #111111 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -2965,7 +1941,7 @@ html[data-theme="dark"][data-visual-theme="comicbook"] textarea {
   const applyToolThemeImages = (root, state) => {
     if (!root || !root.querySelectorAll) return;
 
-    if (state.theme !== 'comicbook' || !state.toolThemeImage) {
+    if (!state.toolThemeImage) {
       root.querySelectorAll('.splash-image img').forEach((img) => {
         const currentSrc = img.getAttribute('src') || '';
         if (/Comicbook(?:_(?:light|dark))?\.png|glass(?:_(?:light|dark))?\.png/i.test(currentSrc)) {

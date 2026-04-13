@@ -649,7 +649,7 @@
             margin-top: auto;
         }
     </style>
-    <script src="../shared/visual-theme.js?v=8"></script>
+    <script src="../shared/visual-theme.js?v=10"></script>
 </head>
 
 <body>
@@ -1266,9 +1266,8 @@
                 const preview = this.el.splashPreview;
                 if (!preview) return;
 
-                const themeAsset = document.documentElement.dataset.visualThemeAsset
-                    || (localStorage.getItem('vgtools-visual-theme') === 'glassui' ? 'glass.png' : 'Comicbook.png');
-                preview.innerHTML = `<img src="${themeAsset}" alt="Sankey Diagram Preview">`;
+                const themeAsset = document.documentElement.dataset.visualThemeAsset || null;
+                preview.innerHTML = themeAsset ? `<img src="${themeAsset}" alt="Sankey Diagram Preview">` : '';
             },
 
             showToast(message) {
