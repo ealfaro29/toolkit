@@ -1653,13 +1653,13 @@
       position: absolute;
       top: 34px;
       left: 0; right: 0;
-      padding: 6px 10px;
+      padding: 8px 12px;
       margin: 0;
       font-family: "JetBrains Mono", ui-monospace, monospace;
-      font-size: 9px;
-      line-height: 1.35;
-      color: rgba(0, 255, 65, 0.8);
-      text-shadow: 0 0 6px rgba(0, 255, 65, 0.5);
+      font-size: 11px;
+      line-height: 1.6;
+      color: #00ff41;
+      text-shadow: 0 0 8px rgba(0, 255, 65, 0.55);
       white-space: pre;
       overflow: hidden;
       z-index: 3;
@@ -2971,6 +2971,72 @@
       }
     }
 
+    /* ---- Terminal transitions ---- */
+    .app-open-theme-overlay.terminal {
+      background: radial-gradient(
+        circle at var(--open-x, 50%) var(--open-y, 50%),
+        rgba(0, 255, 65, 0.12) 0%,
+        rgba(6, 10, 6, 0.96) 28%,
+        #060a06 100%
+      );
+      background-size: 100% 100%;
+    }
+    .app-open-theme-overlay.terminal.animate {
+      animation: terminalAppOpen 600ms ease-out forwards;
+    }
+    @keyframes terminalAppOpen {
+      0%   { opacity: 0; }
+      12%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    body.theme-switching-in-terminal .container {
+      animation: terminalUiReveal 560ms ease-out both;
+    }
+    @keyframes terminalUiReveal {
+      0%   { opacity: 0; transform: translateY(6px); filter: brightness(0.4) saturate(0); }
+      60%  { filter: brightness(1) saturate(0.6); }
+      100% { opacity: 1; transform: translateY(0); filter: brightness(1) saturate(1); }
+    }
+
+    .theme-transition-overlay.terminal {
+      background: #060a06;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent 0, transparent 2px,
+        rgba(0, 255, 65, 0.04) 2px, rgba(0, 255, 65, 0.04) 4px
+      );
+    }
+    .theme-transition-overlay.terminal::after {
+      content: '> BOOTING TERMINAL...';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: ui-monospace, "JetBrains Mono", monospace;
+      font-size: clamp(13px, 1.8vw, 22px);
+      color: #00ff41;
+      text-shadow: 0 0 14px rgba(0, 255, 65, 0.65);
+      opacity: 0; letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+    .theme-transition-overlay.terminal.phase-in {
+      animation: terminalThemeBoot 1160ms ease-out forwards;
+    }
+    .theme-transition-overlay.terminal.phase-in::after {
+      animation: terminalBootText 1040ms ease-out forwards;
+    }
+    @keyframes terminalThemeBoot {
+      0%  { opacity: 0; }
+      10% { opacity: 0.97; }
+      82% { opacity: 0.97; }
+      100%{ opacity: 0; }
+    }
+    @keyframes terminalBootText {
+      0%  { opacity: 0; }
+      18% { opacity: 1; }
+      76% { opacity: 1; }
+      100%{ opacity: 0; }
+    }
+
     /* === WELCOME OVERLAY === */
     .welcome-overlay {
       position: fixed;
@@ -3356,10 +3422,8 @@
     }
     .tp-card-terminal-wide {
       grid-column: span 2;
-    }
-    .tp-card-terminal-wide .tp-preview {
-      aspect-ratio: unset;
-      height: 90px;
+      justify-self: center;
+      width: calc(50% - 7px); /* same visual size as one column in 2-col 14px-gap grid */
     }
 
     /* Cards (div[role=button]) */
@@ -3753,7 +3817,7 @@
         glassui:   { group: 'visual',  usesArtwork: true,  usesPattern: true,  transition: 'glass'   },
         minimal:   { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
         emoji:     { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'emoji'   },
-        terminal:  { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
+        terminal:  { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'terminal' },
       },
       EMOJI_THEME_SYMBOLS: {
         brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
@@ -3775,22 +3839,22 @@
       },
       TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
       TERMINAL_ASCII_ART: {
-        brickbuilder: '_           _      _\n| |__ _ _ __| | __ | |\n|_|/_,`|/ _` |/ /__|_|',
-        moodboards:   '|V|  ___  ___  _\n| \\/| _ \\/ _ \\| |\n|_/ |___/\\___/|_|',
-        blobs:        ' _    _     _\n| |__| |___| |__\n|_.__/|___||____|',
-        jigsaws:      ' _  _  __ __\n| || |/ /|  \\\n| || |\\_ \\|__/',
-        iconfactory:  '|~|  _  _ |\n| |/ / (_||\n|_|\\_ \\__||',
-        qrcodes:      ' ___  ____\n| _ \\/ ___|\n|  _/ /___\n|_| \\____|',
-        colors:       ' ___ _\n/ __| |_\n| (__|  _|\n\\___|_|',
-        notes:        '|\\ | ___ _\n| \\|/ _ \\ |\n|   \\___/_|',
-        locator:      '| _  _  _\n| | || |/ /\n|_|\\___/_/',
-        signatures:   ' _\n/ _|_  _\n\\__| || |\n   |_|/_/',
-        svgrecolor:   '/_\\ ___ _\n/ __/ _ \\\n\\__\\___/|_|',
-        any2svg:      '/-\\ _  _\\|\n|_||_ |/ /\n   |_|/_/',
-        bgremover:    '|~\\ ___ _ _\n| _) _ \\ V /\n|_||___|_|',
-        wordclouds:   '\\/\\/ _  _ _\n \\/  // / /\n     \\__/_/',
-        sankey:       '/ _| _  _ _ _\n\\ \\/ _|| | / /\n \\__\\__|_|/_/',
-        mockups:      '|V|  _  _|  _\n| \\/| |/ / | |\n|_/  |/ /  |_|',
+        brickbuilder: '$ brick-builder\n> 2D block editor\n> [initialized]',
+        moodboards:   '$ moodboards\n> visual canvas\n> [initialized]',
+        blobs:        '$ blob-studio\n> SVG blob shapes\n> [initialized]',
+        jigsaws:      '$ jigsaw-gen\n> puzzle grids\n> [initialized]',
+        iconfactory:  '$ icon-factory\n> icon builder\n> [initialized]',
+        qrcodes:      '$ qr-codes\n> QR generator\n> [initialized]',
+        colors:       '$ color-mixer\n> palette gen\n> [initialized]',
+        notes:        '$ notepad\n> notes + kanban\n> [initialized]',
+        locator:      '$ locator\n> geocoding map\n> [initialized]',
+        signatures:   '$ sig-to-svg\n> vectorizer\n> [initialized]',
+        svgrecolor:   '$ svg-recolor\n> hue replace\n> [initialized]',
+        any2svg:      '$ any2svg\n> file converter\n> [initialized]',
+        bgremover:    '$ bg-remover\n> erase bg layer\n> [initialized]',
+        wordclouds:   '$ word-cloud\n> text visuals\n> [initialized]',
+        sankey:       '$ sankey\n> flow diagrams\n> [initialized]',
+        mockups:      '$ mockups\n> device frames\n> [initialized]',
       },
       DRAG_STATE: { dragged: null, over: null },
 
@@ -3988,7 +4052,7 @@
 
           setTimeout(() => {
             window.location.href = href;
-          }, transitionVariant === 'comic' ? 840 : transitionVariant === 'glass' ? 900 : transitionVariant === 'emoji' ? 780 : 560);
+          }, transitionVariant === 'comic' ? 840 : transitionVariant === 'glass' ? 900 : transitionVariant === 'emoji' ? 780 : transitionVariant === 'terminal' ? 560 : 560);
         } catch (err) {
           window.location.href = href;
         }
@@ -4852,10 +4916,10 @@
 
         setTimeout(() => {
           document.body.classList.remove('theme-switching-in-comic', 'theme-switching-in-glass', 'theme-switching-in-minimal');
-          document.body.classList.remove('theme-switching-in-emoji');
+          document.body.classList.remove('theme-switching-in-emoji', 'theme-switching-in-terminal');
           patternMorph.remove();
           overlay.remove();
-        }, transitionVariant === 'comic' ? 2440 : transitionVariant === 'glass' ? 2340 : transitionVariant === 'emoji' ? 1960 : 1260);
+        }, transitionVariant === 'comic' ? 2440 : transitionVariant === 'glass' ? 2340 : transitionVariant === 'emoji' ? 1960 : transitionVariant === 'terminal' ? 1260 : 1260);
       },
 
       applyVisualTheme() {
