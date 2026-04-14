@@ -3838,32 +3838,49 @@
         mockups: ['📱', '💻', '🖥️', '✨'],
       },
       TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
-      // Miniwi block-element font — 4 chars per glyph, covers a–r (18 glyphs)
-      // Glyph order: a=0 … r=17. 'j' has descender in row 4 (offset 36).
-      MINIWI_FONT: [
-        '▄▖▄ ▄▖▄ ▄▖▄▖▄▖▖▖▄▖ ▖▖▖▖ ▖  ▖▖ ▖▄▖▄▖▄▖▄▖▄▖▄▖▖▖▖▖▖  ▖▖▖▖▖▄▖▗ ▄▖▄▖▖▖▄▖▄▖▄▖▄▖▄▖',
-        '▌▌▙▘▌ ▌▌▙▖▙▖▌ ▙▌▐  ▌▙▘▌ ▛▖▞▌▛▖▌▌▌▙▌▌▌▙▘▚ ▐ ▌▌▌▌▌▞▖▌▚▘▌▌▗▘▜ ▄▌▄▌▙▌▙▖▙▖ ▌▙▌▙▌',
-        '▛▌▙▘▙▖▙▘▙▖▌ ▙▌▌▌▟▖▙▌▌▌▙▖▌▝ ▌▌▝▌▙▌▌ █▌▌▌▄▌▐ ▙▌▚▘▛ ▝▌▌▌▐ ▙▖▟▖▙▖▄▌ ▌▄▌▙▌ ▌▙▌▄▌',
-        '                                    ▘                                      ',
-      ],
-      // Short labels using only a–r (covered by the 75-char font rows)
+      // Miniwi bitmap font — per-glyph data parsed from miniwi.flf (github.com/xero/figlet-fonts)
+      // Each entry: 4 row strings, variable width (most=2, M/W=4, N=3)
+      // Row 4 non-empty = descender (only Q among caps)
+      MINIWI_GLYPHS: {
+        'A':['▄▖','▌▌','▛▌','  '], 'B':['▄ ','▙▘','▙▘','  '],
+        'C':['▄▖','▌ ','▙▖','  '], 'D':['▄ ','▌▌','▙▘','  '],
+        'E':['▄▖','▙▖','▙▖','  '], 'F':['▄▖','▙▖','▌ ','  '],
+        'G':['▄▖','▌ ','▙▌','  '], 'H':['▖▖','▙▌','▌▌','  '],
+        'I':['▄▖','▐ ','▟▖','  '], 'J':[' ▖',' ▌','▙▌','  '],
+        'K':['▖▖','▙▘','▌▌','  '], 'L':['▖ ','▌ ','▙▖','  '],
+        'M':['▖  ▖','▛▖▞▌','▌▝ ▌','    '],
+        'N':['▖ ▖','▛▖▌','▌▝▌','   '],
+        'O':['▄▖','▌▌','▙▌','  '], 'P':['▄▖','▙▌','▌ ','  '],
+        'Q':['▄▖','▌▌','█▌',' ▘'], 'R':['▄▖','▙▘','▌▌','  '],
+        'S':['▄▖','▚ ','▄▌','  '], 'T':['▄▖','▐ ','▐ ','  '],
+        'U':['▖▖','▌▌','▙▌','  '], 'V':['▖▖','▌▌','▚▘','  '],
+        'W':['▖  ▖','▌▞▖▌','▛ ▝▌','    '],
+        'X':['▖▖','▚▘','▌▌','  '], 'Y':['▖▖','▌▌','▐ ','  '],
+        'Z':['▄▖','▗▘','▙▖','  '],
+        '0':['▄▖','▛▌','█▌','  '], '1':['▗ ','▜ ','▟▖','  '],
+        '2':['▄▖','▄▌','▙▖','  '], '3':['▄▖','▄▌','▄▌','  '],
+        '4':['▖▖','▙▌',' ▌','  '], '5':['▄▖','▙▖','▄▌','  '],
+        '6':['▄▖','▙▖','▙▌','  '], '7':['▄▖',' ▌',' ▌','  '],
+        '8':['▄▖','▙▌','▙▌','  '], '9':['▄▖','▙▌','▄▌','  '],
+        ' ':['  ','  ','  ','  '],
+      },
       TERMINAL_LABELS: {
-        brickbuilder: 'brick',
-        moodboards:   'mood',
-        blobs:        'blob',
-        jigsaws:      'jig',
-        iconfactory:  'icon',
-        qrcodes:      'qr',
-        colors:       'color',
-        notes:        'memo',
-        locator:      'geo',
-        signatures:   'ink',
-        svgrecolor:   'recolor',
-        any2svg:      'forge',
-        bgremover:    'clip',
-        wordclouds:   'fog',
-        sankey:       'link',
-        mockups:      'mock',
+        brickbuilder: 'BRK',
+        moodboards:   'MOD',
+        blobs:        'BLB',
+        jigsaws:      'JIG',
+        iconfactory:  'ICO',
+        qrcodes:      'QRC',
+        colors:       'HUE',
+        notes:        'NTE',
+        locator:      'GEO',
+        signatures:   'SIG',
+        svgrecolor:   'CLR',
+        any2svg:      'SVG',
+        bgremover:    'BKG',
+        wordclouds:   'WRD',
+        sankey:       'SKY',
+        mockups:      'MCK',
       },
       DRAG_STATE: { dragged: null, over: null },
 
@@ -4715,26 +4732,18 @@
       },
 
       renderMiniwi(text) {
-        const font = this.MINIWI_FONT;
-        const w = 4;
-        const lower = text.toLowerCase();
-        const lines = ['', '', '', ''];
+        const G = this.MINIWI_GLYPHS;
+        const rows = ['', '', '', ''];
         let first = true;
-        for (const ch of lower) {
-          let idx = -1;
-          if (ch >= 'a' && ch <= 'z') idx = ch.charCodeAt(0) - 97;
-          else if (ch >= '1' && ch <= '9') idx = 26 + (ch.charCodeAt(0) - 49);
-          else if (ch === ' ') { for (let i = 0; i < 4; i++) lines[i] += '  '; first = false; continue; }
-          if (idx < 0) continue;
-          if (!first) { for (let i = 0; i < 4; i++) lines[i] += ' '; } // 1-col gap
+        for (const ch of text.toUpperCase()) {
+          const g = G[ch] || G[' '];
+          const w = g[0].length;
+          if (!first) { for (let i = 0; i < 4; i++) rows[i] += ' '; }
           first = false;
-          const start = idx * w;
-          for (let i = 0; i < 4; i++) {
-            lines[i] += (font[i] || '').padEnd(start + w, ' ').slice(start, start + w);
-          }
+          for (let i = 0; i < 4; i++) rows[i] += (g[i] || '').padEnd(w, ' ');
         }
-        const hasDescender = lines[3].trimEnd().length > 0;
-        return lines.slice(0, hasDescender ? 4 : 3).map(l => l.trimEnd()).join('\n');
+        const hasDescender = rows[3].trimEnd().length > 0;
+        return rows.slice(0, hasDescender ? 4 : 3).map(r => r.trimEnd()).join('\n');
       },
 
       getEmojiThemeSymbols(toolId) {
