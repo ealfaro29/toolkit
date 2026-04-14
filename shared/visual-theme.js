@@ -22,6 +22,7 @@
     minimal:  { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal',  group: 'basic' },
     emoji:    { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'emoji',    group: 'basic' },
     terminal: { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal',  group: 'basic' },
+    noir:     { assetFile: null, usesArtwork: false, usesPattern: false, transition: 'minimal',  group: 'basic' },
   };
 
   const CUSTOM_THEME_ACCENT_KEY = 'vgtools-custom-accent';
@@ -1658,6 +1659,141 @@ html[data-visual-theme="terminal"] .wiki-header {
 html[data-visual-theme="terminal"] ::-webkit-scrollbar { background: #060a06; width: 6px; }
 html[data-visual-theme="terminal"] ::-webkit-scrollbar-thumb { background: rgba(0,255,65,0.3); border-radius: 0; }
 html[data-visual-theme="terminal"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,65,0.55); }
+`;
+      return;
+    }
+
+    if (theme === 'noir') {
+      styleEl.textContent = `
+html[data-visual-theme="noir"] {
+  --accent-color: #0a0a0a;
+  --ink: #0a0a0a;
+  --surface: #f0ece6;
+  --surface-alt: #e8e4de;
+  --border-color: #0a0a0a;
+  --muted: rgba(10,10,10,0.55);
+}
+html[data-theme="dark"][data-visual-theme="noir"] {
+  --accent-color: #f0ece6;
+  --ink: #f0ece6;
+  --surface: #0c0c0c;
+  --surface-alt: #181818;
+  --border-color: #f0ece6;
+  --muted: rgba(240,236,230,0.55);
+}
+html[data-visual-theme="noir"] body {
+  font-family: Georgia, "Times New Roman", serif !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+/* Film grain */
+html[data-visual-theme="noir"] body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.06; mix-blend-mode: multiply;
+}
+html[data-theme="dark"][data-visual-theme="noir"] body::before { mix-blend-mode: screen; opacity: 0.08; }
+html[data-visual-theme="noir"] .panel,
+html[data-visual-theme="noir"] header.panel,
+html[data-visual-theme="noir"] aside.panel,
+html[data-visual-theme="noir"] main.panel {
+  background: var(--surface) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  box-shadow: 4px 4px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] h1,
+html[data-visual-theme="noir"] h2,
+html[data-visual-theme="noir"] h3 {
+  font-family: Georgia, "Times New Roman", serif !important;
+  letter-spacing: -0.03em !important;
+  color: var(--ink) !important;
+}
+html[data-visual-theme="noir"] p,
+html[data-visual-theme="noir"] label,
+html[data-visual-theme="noir"] .sub {
+  font-family: Georgia, "Times New Roman", serif !important;
+  color: var(--muted) !important;
+}
+html[data-visual-theme="noir"] button,
+html[data-visual-theme="noir"] .btn {
+  font-family: Georgia, "Times New Roman", serif !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  box-shadow: 3px 3px 0 var(--border-color) !important;
+  transition: transform 0.12s, box-shadow 0.12s !important;
+}
+html[data-visual-theme="noir"] button:hover,
+html[data-visual-theme="noir"] .btn:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] button:active,
+html[data-visual-theme="noir"] .btn:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 1px 1px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] input,
+html[data-visual-theme="noir"] select,
+html[data-visual-theme="noir"] textarea {
+  font-family: Georgia, "Times New Roman", serif !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+html[data-visual-theme="noir"] input:focus,
+html[data-visual-theme="noir"] textarea:focus,
+html[data-visual-theme="noir"] select:focus {
+  outline: none !important;
+  box-shadow: 3px 3px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] .control-group,
+html[data-visual-theme="noir"] .panel-section,
+html[data-visual-theme="noir"] .group,
+html[data-visual-theme="noir"] .box,
+html[data-visual-theme="noir"] .settings-group,
+html[data-visual-theme="noir"] fieldset {
+  border: 2px solid var(--border-color) !important;
+  border-radius: 0 !important;
+  background: var(--surface-alt) !important;
+}
+html[data-visual-theme="noir"] .version-badge,
+html[data-visual-theme="noir"] .badge {
+  font-family: Georgia, serif !important;
+  background: var(--ink) !important;
+  color: var(--surface) !important;
+  border-radius: 0 !important;
+  box-shadow: 2px 2px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] .back-to-home,
+html[data-visual-theme="noir"] #wiki-open-btn,
+html[data-visual-theme="noir"] #theme-toggle,
+html[data-visual-theme="noir"] #splash-close-btn,
+html[data-visual-theme="noir"] #wiki-close-btn,
+html[data-visual-theme="noir"] .modal-close-btn {
+  border-radius: 0 !important;
+  box-shadow: 3px 3px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] .splash-image { display: none !important; }
+html[data-visual-theme="noir"] .wiki-modal-content,
+html[data-visual-theme="noir"] .modal-content {
+  border-radius: 0 !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 6px 6px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] .toast {
+  border-radius: 0 !important;
+  border: 2px solid var(--border-color) !important;
+  box-shadow: 3px 3px 0 var(--border-color) !important;
+}
+html[data-visual-theme="noir"] ::-webkit-scrollbar { background: var(--surface); width: 6px; }
+html[data-visual-theme="noir"] ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 0; }
 `;
       return;
     }
