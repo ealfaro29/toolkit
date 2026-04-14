@@ -2012,6 +2012,62 @@
           rgba(125, 211, 252, 0) 100%);
     }
 
+    /* Terminal return — full black cover with scanlines + flicker */
+    .page-transition-overlay.terminal-return {
+      background: #060a06;
+      background-image: repeating-linear-gradient(
+        0deg,
+        rgba(0,255,65,0.03) 0px, rgba(0,255,65,0.03) 1px,
+        transparent 1px, transparent 4px
+      );
+    }
+    /* Green glow bar sweeps down on ::before, "HOME" prompt on ::after */
+    .page-transition-overlay.terminal-return::before {
+      content: '';
+      position: absolute; left: 0; right: 0;
+      top: -6px; height: 6px;
+      background: linear-gradient(to bottom, transparent, rgba(0,255,65,0.65), transparent);
+      animation: termReturnScan 0.3s ease-in forwards;
+    }
+    .page-transition-overlay.terminal-return::after {
+      content: '> cd ~/home';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: ui-monospace, monospace;
+      font-size: clamp(13px, 1.6vw, 18px);
+      color: #00ff41;
+      letter-spacing: 0.12em;
+      animation: termReturnText 0.72s ease-out forwards;
+      white-space: nowrap;
+    }
+    @keyframes termReturnScan {
+      from { top: -6px; opacity: 1; }
+      to   { top: calc(100% + 6px); opacity: 0.4; }
+    }
+    @keyframes termReturnText {
+      0%   { opacity: 0; }
+      20%  { opacity: 1; }
+      75%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    /* The circle is used as the CRT flicker flash — override it to be transparent */
+    .page-transition-circle.terminal-return-circle {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    /* Flicker the whole overlay on entry */
+    .page-transition-circle.terminal-return-circle.return-animate {
+      animation: termReturnFlicker 0.72s steps(1) forwards;
+    }
+    @keyframes termReturnFlicker {
+      0%   { opacity: 1; }
+      15%  { opacity: 0.3; }
+      22%  { opacity: 1; }
+      30%  { opacity: 0.5; }
+      38%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
     .page-transition-circle.animate {
       animation: circleExpand 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
@@ -4293,6 +4349,8 @@
               ? 'minimal-return'
               : currentVisualTheme === 'emoji'
                 ? 'emoji-return'
+              : currentVisualTheme === 'terminal'
+                ? 'terminal-return'
               : '';
           overlay.className = `page-transition-overlay ${returnVariant}`.trim();
 
@@ -4303,11 +4361,14 @@
               ? 'minimal-return-circle'
               : currentVisualTheme === 'emoji'
                 ? 'emoji-return-circle'
+              : currentVisualTheme === 'terminal'
+                ? 'terminal-return-circle'
               : '';
           circle.className = `page-transition-circle return-animate ${returnCircleVariant}`.trim();
           const returnColor = currentVisualTheme === 'glassui' ? 'rgba(188, 205, 255, 0.88)'
             : currentVisualTheme === 'minimal' ? 'rgba(255, 255, 255, 0.96)'
             : currentVisualTheme === 'emoji' ? 'rgba(255, 195, 102, 0.92)'
+            : currentVisualTheme === 'terminal' ? '#060a06'
             : (lastAppColor || '#4f46e5');
           circle.style.cssText = `left: 50%; top: 50%; --transition-color: ${returnColor};`;
 
@@ -4316,7 +4377,7 @@
           // Circle is now in the DOM at 300vmax — reveal body so the first visible
           // frame is covered by the circle, not raw hub content.
           delete document.documentElement.dataset.hubReturning;
-          const iconLabel = currentVisualTheme === 'minimal' ? '' : (lastAppIcon || 'Home');
+          const iconLabel = (currentVisualTheme === 'minimal' || currentVisualTheme === 'terminal') ? '' : (lastAppIcon || 'Home');
           let iconSpan = null;
           if (iconLabel) {
             iconSpan = document.createElement('span');
@@ -4336,7 +4397,7 @@
           setTimeout(() => {
             overlay.remove();
             if (iconSpan) iconSpan.remove();
-          }, currentVisualTheme === 'emoji' ? 860 : 800);
+          }, currentVisualTheme === 'emoji' ? 860 : currentVisualTheme === 'terminal' ? 720 : 800);
         }
       },
 
