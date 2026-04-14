@@ -3838,23 +3838,32 @@
         mockups: ['📱', '💻', '🖥️', '✨'],
       },
       TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
-      TERMINAL_ASCII_ART: {
-        brickbuilder: '$ brick-builder\n> 2D block editor\n> [initialized]',
-        moodboards:   '$ moodboards\n> visual canvas\n> [initialized]',
-        blobs:        '$ blob-studio\n> SVG blob shapes\n> [initialized]',
-        jigsaws:      '$ jigsaw-gen\n> puzzle grids\n> [initialized]',
-        iconfactory:  '$ icon-factory\n> icon builder\n> [initialized]',
-        qrcodes:      '$ qr-codes\n> QR generator\n> [initialized]',
-        colors:       '$ color-mixer\n> palette gen\n> [initialized]',
-        notes:        '$ notepad\n> notes + kanban\n> [initialized]',
-        locator:      '$ locator\n> geocoding map\n> [initialized]',
-        signatures:   '$ sig-to-svg\n> vectorizer\n> [initialized]',
-        svgrecolor:   '$ svg-recolor\n> hue replace\n> [initialized]',
-        any2svg:      '$ any2svg\n> file converter\n> [initialized]',
-        bgremover:    '$ bg-remover\n> erase bg layer\n> [initialized]',
-        wordclouds:   '$ word-cloud\n> text visuals\n> [initialized]',
-        sankey:       '$ sankey\n> flow diagrams\n> [initialized]',
-        mockups:      '$ mockups\n> device frames\n> [initialized]',
+      // Miniwi block-element font — 4 chars per glyph, covers a–r (18 glyphs)
+      // Glyph order: a=0 … r=17. 'j' has descender in row 4 (offset 36).
+      MINIWI_FONT: [
+        '▄▖▄ ▄▖▄ ▄▖▄▖▄▖▖▖▄▖ ▖▖▖▖ ▖  ▖▖ ▖▄▖▄▖▄▖▄▖▄▖▄▖▖▖▖▖▖  ▖▖▖▖▖▄▖▗ ▄▖▄▖▖▖▄▖▄▖▄▖▄▖▄▖',
+        '▌▌▙▘▌ ▌▌▙▖▙▖▌ ▙▌▐  ▌▙▘▌ ▛▖▞▌▛▖▌▌▌▙▌▌▌▙▘▚ ▐ ▌▌▌▌▌▞▖▌▚▘▌▌▗▘▜ ▄▌▄▌▙▌▙▖▙▖ ▌▙▌▙▌',
+        '▛▌▙▘▙▖▙▘▙▖▌ ▙▌▌▌▟▖▙▌▌▌▙▖▌▝ ▌▌▝▌▙▌▌ █▌▌▌▄▌▐ ▙▌▚▘▛ ▝▌▌▌▐ ▙▖▟▖▙▖▄▌ ▌▄▌▙▌ ▌▙▌▄▌',
+        '                                    ▘                                      ',
+      ],
+      // Short labels using only a–r (covered by the 75-char font rows)
+      TERMINAL_LABELS: {
+        brickbuilder: 'brick',
+        moodboards:   'mood',
+        blobs:        'blob',
+        jigsaws:      'jig',
+        iconfactory:  'icon',
+        qrcodes:      'qr',
+        colors:       'color',
+        notes:        'memo',
+        locator:      'geo',
+        signatures:   'ink',
+        svgrecolor:   'recolor',
+        any2svg:      'forge',
+        bgremover:    'clip',
+        wordclouds:   'fog',
+        sankey:       'link',
+        mockups:      'mock',
       },
       DRAG_STATE: { dragged: null, over: null },
 
@@ -4705,6 +4714,26 @@
         return this.getVisualThemeMeta(theme).transition || 'comic';
       },
 
+      renderMiniwi(text) {
+        const font = this.MINIWI_FONT;
+        const w = 4;
+        const lower = text.toLowerCase();
+        const lines = ['', '', '', ''];
+        for (const ch of lower) {
+          let idx = -1;
+          if (ch >= 'a' && ch <= 'z') idx = ch.charCodeAt(0) - 97;
+          else if (ch >= '1' && ch <= '9') idx = 26 + (ch.charCodeAt(0) - 49);
+          else if (ch === ' ') { for (let i = 0; i < 4; i++) lines[i] += '    '; continue; }
+          if (idx < 0) continue;
+          const start = idx * w;
+          for (let i = 0; i < 4; i++) {
+            lines[i] += (font[i] || '').padEnd(start + w, ' ').slice(start, start + w);
+          }
+        }
+        const hasDescender = lines[3].trimEnd().length > 0;
+        return lines.slice(0, hasDescender ? 4 : 3).map(l => l.trimEnd()).join('\n');
+      },
+
       getEmojiThemeSymbols(toolId) {
         return this.EMOJI_THEME_SYMBOLS[toolId] || ['🎉', '✨', '🌈', '🫧'];
       },
@@ -4930,6 +4959,12 @@
         } else {
           document.documentElement.style.removeProperty('--hub-emoji-wallpaper');
         }
+        if (this.currentVisualTheme === 'terminal' && !document.getElementById('vgtools-terminal-font')) {
+          const fl = document.createElement('link');
+          fl.id = 'vgtools-terminal-font'; fl.rel = 'stylesheet';
+          fl.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap';
+          document.head.appendChild(fl);
+        }
         const appImagePaths = this.getAppImagePaths(this.currentVisualTheme);
         this.el.appCards.forEach(card => {
           const id = card.dataset.id;
@@ -4942,7 +4977,8 @@
             card.style.removeProperty('--card-bg-image');
           }
           if (this.currentVisualTheme === 'terminal') {
-            const ascii = this.TERMINAL_ASCII_ART[id] || ('[ ' + id + ' ]');
+            const label = this.TERMINAL_LABELS[id] || id.slice(0, 6);
+            const ascii = this.renderMiniwi(label);
             let pre = card.querySelector('.terminal-ascii');
             if (!pre) {
               pre = document.createElement('pre');
