@@ -1656,10 +1656,10 @@
       padding: 8px 10px;
       margin: 0;
       font-family: ui-monospace, "Courier New", monospace;
-      font-size: 15px;
+      font-size: 18px;
       line-height: 1;
       color: #00ff41;
-      text-shadow: 0 0 8px rgba(0, 255, 65, 0.55);
+      text-shadow: none;
       white-space: pre;
       overflow: hidden;
       z-index: 3;
@@ -4719,12 +4719,15 @@
         const w = 4;
         const lower = text.toLowerCase();
         const lines = ['', '', '', ''];
+        let first = true;
         for (const ch of lower) {
           let idx = -1;
           if (ch >= 'a' && ch <= 'z') idx = ch.charCodeAt(0) - 97;
           else if (ch >= '1' && ch <= '9') idx = 26 + (ch.charCodeAt(0) - 49);
-          else if (ch === ' ') { for (let i = 0; i < 4; i++) lines[i] += '    '; continue; }
+          else if (ch === ' ') { for (let i = 0; i < 4; i++) lines[i] += '  '; first = false; continue; }
           if (idx < 0) continue;
+          if (!first) { for (let i = 0; i < 4; i++) lines[i] += ' '; } // 1-col gap
+          first = false;
           const start = idx * w;
           for (let i = 0; i < 4; i++) {
             lines[i] += (font[i] || '').padEnd(start + w, ' ').slice(start, start + w);
