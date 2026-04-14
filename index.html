@@ -2972,69 +2972,130 @@
     }
 
     /* ---- Terminal transitions ---- */
+
+    /* 1. Hub → App open: CRT flicker then wipe to black */
     .app-open-theme-overlay.terminal {
-      background: radial-gradient(
-        circle at var(--open-x, 50%) var(--open-y, 50%),
-        rgba(0, 255, 65, 0.12) 0%,
-        rgba(6, 10, 6, 0.96) 28%,
-        #060a06 100%
-      );
-      background-size: 100% 100%;
-    }
-    .app-open-theme-overlay.terminal.animate {
-      animation: terminalAppOpen 600ms ease-out forwards;
-    }
-    @keyframes terminalAppOpen {
-      0%   { opacity: 0; }
-      12%  { opacity: 1; }
-      100% { opacity: 1; }
-    }
-
-    body.theme-switching-in-terminal .container {
-      animation: terminalUiReveal 560ms ease-out both;
-    }
-    @keyframes terminalUiReveal {
-      0%   { opacity: 0; transform: translateY(6px); filter: brightness(0.4) saturate(0); }
-      60%  { filter: brightness(1) saturate(0.6); }
-      100% { opacity: 1; transform: translateY(0); filter: brightness(1) saturate(1); }
-    }
-
-    .theme-transition-overlay.terminal {
       background: #060a06;
       background-image: repeating-linear-gradient(
         0deg,
-        transparent 0, transparent 2px,
-        rgba(0, 255, 65, 0.04) 2px, rgba(0, 255, 65, 0.04) 4px
+        rgba(0,255,65,0.03) 0px, rgba(0,255,65,0.03) 1px,
+        transparent 1px, transparent 4px
       );
     }
-    .theme-transition-overlay.terminal::after {
-      content: '> BOOTING TERMINAL...';
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: ui-monospace, "JetBrains Mono", monospace;
-      font-size: clamp(13px, 1.8vw, 22px);
+    .app-open-theme-overlay.terminal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(0,255,65,0.08) 0%, transparent 8%,
+        transparent 92%, rgba(0,255,65,0.04) 100%);
+      animation: termScanBar 0.18s linear infinite;
+      pointer-events: none;
+    }
+    .app-open-theme-overlay.terminal::after {
+      content: attr(data-terminal-cmd);
+      position: absolute;
+      bottom: 28%; left: 50%;
+      transform: translateX(-50%);
+      font-family: ui-monospace, monospace;
+      font-size: clamp(12px, 1.6vw, 18px);
       color: #00ff41;
-      text-shadow: 0 0 14px rgba(0, 255, 65, 0.65);
-      opacity: 0; letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
+      opacity: 0;
       white-space: nowrap;
     }
+    .app-open-theme-overlay.terminal.animate {
+      animation: termAppOpen 580ms steps(1, end) forwards;
+    }
+    .app-open-theme-overlay.terminal.animate::after {
+      animation: termCmdReveal 580ms ease-out forwards;
+    }
+    @keyframes termAppOpen {
+      0%   { opacity: 0; }
+      8%   { opacity: 0.9; }
+      14%  { opacity: 0.3; }
+      20%  { opacity: 1; }
+      26%  { opacity: 0.5; }
+      32%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+    @keyframes termCmdReveal {
+      0%   { opacity: 0; }
+      35%  { opacity: 0; }
+      50%  { opacity: 1; }
+      88%  { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes termScanBar {
+      from { background-position: 0 0; }
+      to   { background-position: 0 4px; }
+    }
+
+    /* 2. Theme-switch overlay: scan wipe + boot text */
+    .theme-transition-overlay.terminal {
+      background: #060a06;
+      overflow: hidden;
+    }
+    /* Horizontal green scan line sweeps top→bottom */
+    .theme-transition-overlay.terminal::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: -6px; height: 6px;
+      background: linear-gradient(to bottom, transparent, rgba(0,255,65,0.7), transparent);
+      opacity: 0;
+    }
+    .theme-transition-overlay.terminal::after {
+      content: attr(data-terminal-boot);
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: ui-monospace, monospace;
+      font-size: clamp(13px, 1.8vw, 20px);
+      color: #00ff41;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+      opacity: 0;
+      border-right: 2px solid #00ff41;
+    }
     .theme-transition-overlay.terminal.phase-in {
-      animation: terminalThemeBoot 1160ms ease-out forwards;
+      animation: termThemeBoot 1260ms ease-in-out forwards;
+    }
+    .theme-transition-overlay.terminal.phase-in::before {
+      animation: termScanLine 640ms ease-in forwards;
     }
     .theme-transition-overlay.terminal.phase-in::after {
-      animation: terminalBootText 1040ms ease-out forwards;
+      animation: termBootText 1100ms ease-out forwards;
     }
-    @keyframes terminalThemeBoot {
-      0%  { opacity: 0; }
-      10% { opacity: 0.97; }
-      82% { opacity: 0.97; }
-      100%{ opacity: 0; }
+    @keyframes termThemeBoot {
+      0%   { opacity: 0; }
+      8%   { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { opacity: 0; }
     }
-    @keyframes terminalBootText {
-      0%  { opacity: 0; }
-      18% { opacity: 1; }
-      76% { opacity: 1; }
-      100%{ opacity: 0; }
+    @keyframes termScanLine {
+      0%   { opacity: 1; top: -6px; }
+      100% { opacity: 0.4; top: calc(100% + 6px); }
+    }
+    @keyframes termBootText {
+      0%   { opacity: 0; }
+      20%  { opacity: 0; }
+      30%  { opacity: 1; }
+      75%  { opacity: 1; }
+      90%  { opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* 3. Card reveal after theme switch */
+    body.theme-switching-in-terminal .container {
+      animation: termUiReveal 600ms ease-out both;
+    }
+    @keyframes termUiReveal {
+      0%   { opacity: 0; filter: brightness(2) saturate(0) contrast(4); }
+      6%   { opacity: 0.6; filter: brightness(1.4) saturate(0.2); }
+      12%  { opacity: 0.2; }
+      18%  { opacity: 1; filter: brightness(1.1) saturate(0.6); }
+      100% { opacity: 1; filter: brightness(1) saturate(1); }
     }
 
     /* === WELCOME OVERLAY === */
@@ -4063,6 +4124,8 @@
           themedOverlay.style.setProperty('--open-y', `${y}px`);
           if (transitionVariant === 'emoji') {
             themedOverlay.setAttribute('data-emoji-burst', card.dataset.emojiBurst || this.getEmojiBurstForTool(appId));
+          } else if (transitionVariant === 'terminal') {
+            themedOverlay.setAttribute('data-terminal-cmd', `> run ./${appId}`);
           }
           // Solid blanket sits BEHIND the decorative overlay (z-index 209999 vs 210000).
           // When the overlay fades to transparent, the blanket is revealed instead of the hub.
@@ -4934,6 +4997,9 @@
           overlay.setAttribute('data-burst-text', bursts[Math.floor(Math.random() * bursts.length)]);
         } else if (transitionVariant === 'emoji') {
           overlay.setAttribute('data-emoji-burst', this.buildEmojiPattern(['🎉', '✨', '🌈', '🫧', '🎨', '📱'], 24));
+        } else if (transitionVariant === 'terminal') {
+          const cmds = ['> LOADING TERMINAL...', '> APPLYING THEME...', '> INIT VGTOOLS...', '> BOOTING...'];
+          overlay.setAttribute('data-terminal-boot', cmds[Math.floor(Math.random() * cmds.length)]);
         }
 
         document.body.classList.add('theme-switching-out');
