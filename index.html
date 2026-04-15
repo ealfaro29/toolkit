@@ -1087,36 +1087,29 @@
     }
 
     html[data-visual-theme="minimal"] .app-card-title {
-      font-size: 24px !important;
-      line-height: 1.1 !important;
-      letter-spacing: -0.03em !important;
-      font-weight: 600 !important;
+      font-size: 32px !important;
+      line-height: 1.05 !important;
+      letter-spacing: -0.04em !important;
+      font-weight: 700 !important;
       margin-top: 0 !important;
       text-shadow: none !important;
+      background-clip: text !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
     }
 
     html[data-theme="light"][data-visual-theme="minimal"] .app-card-title {
-      color: #111111 !important;
+      background-image: linear-gradient(160deg, #111111 0%, #555555 100%) !important;
+      color: transparent !important;
     }
 
     html[data-theme="dark"][data-visual-theme="minimal"] .app-card-title {
-      color: #f5f5f7 !important;
+      background-image: linear-gradient(160deg, #f5f5f7 0%, #888888 100%) !important;
+      color: transparent !important;
     }
 
     html[data-visual-theme="minimal"] .app-card-description {
-      font-size: 13px !important;
-      line-height: 1.55 !important;
-      text-shadow: none !important;
-      -webkit-line-clamp: 4 !important;
-      line-clamp: 4 !important;
-    }
-
-    html[data-theme="light"][data-visual-theme="minimal"] .app-card-description {
-      color: #6b7280 !important;
-    }
-
-    html[data-theme="dark"][data-visual-theme="minimal"] .app-card-description {
-      color: #a1a1aa !important;
+      display: none !important;
     }
 
     html[data-visual-theme="minimal"] .app-card-tags {
@@ -1720,6 +1713,91 @@
       text-shadow: 0 0 6px rgba(0, 255, 65, 0.4) !important;
     }
 
+    /* ---- TERMINAL LIGHT MODE ---- */
+    html[data-theme="light"][data-visual-theme="terminal"] {
+      --accent-color: #0a5c1a;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] body {
+      background: #f2f8f2 !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] header.panel {
+      background: rgba(242, 248, 242, 0.95) !important;
+      border-color: rgba(10, 92, 26, 0.2) !important;
+      box-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] header.panel h1,
+    html[data-theme="light"][data-visual-theme="terminal"] header.panel .sub,
+    html[data-theme="light"][data-visual-theme="terminal"] .search-input,
+    html[data-theme="light"][data-visual-theme="terminal"] #theme-toggle,
+    html[data-theme="light"][data-visual-theme="terminal"] #theme-picker-btn {
+      color: #0a5c1a !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .search-input,
+    html[data-theme="light"][data-visual-theme="terminal"] #theme-toggle,
+    html[data-theme="light"][data-visual-theme="terminal"] #theme-picker-btn {
+      background: rgba(10, 92, 26, 0.05) !important;
+      border-color: rgba(10, 92, 26, 0.22) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .search-input::placeholder {
+      color: rgba(10, 92, 26, 0.4) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .search-input:focus {
+      border-color: rgba(10, 92, 26, 0.55) !important;
+      box-shadow: 0 0 0 3px rgba(10, 92, 26, 0.1) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .app-card {
+      background: #ffffff !important;
+      border-color: rgba(10, 92, 26, 0.22) !important;
+      box-shadow: 0 0 10px rgba(10, 92, 26, 0.05), inset 0 0 20px rgba(242, 248, 242, 0.6) !important;
+      color: #0a5c1a !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .app-card::after {
+      background: rgba(10, 92, 26, 0.07) !important;
+      border-bottom-color: rgba(10, 92, 26, 0.15) !important;
+      color: rgba(10, 92, 26, 0.35) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .app-card:hover {
+      border-color: rgba(10, 92, 26, 0.6) !important;
+      box-shadow: 0 0 18px rgba(10, 92, 26, 0.1) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .terminal-ascii {
+      color: #0a5c1a !important;
+      text-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .app-card-title {
+      color: #0a5c1a !important;
+      text-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .app-card-description {
+      color: rgba(10, 92, 26, 0.55) !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="terminal"] .new-badge-overlay {
+      background: #ffffff !important;
+      border-color: #0a5c1a !important;
+      color: #0a5c1a !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+
+    /* Noir-only card elements — hidden by default so they don't leak into other themes */
+    .noir-card-kicker,
+    .noir-card-footer {
+      display: none;
+    }
+
     /* ---- NOIR THEME HUB ---- */
     html[data-visual-theme="noir"] {
       --hub-pattern-image: none;
@@ -1833,22 +1911,67 @@
     /* App cards */
     html[data-visual-theme="noir"] .app-card {
       border-radius: 0 !important;
-      box-shadow: 5px 5px 0 #0a0a0a !important;
       overflow: hidden;
-      transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+      aspect-ratio: 1 / 1.08 !important;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease !important;
+      isolation: isolate;
     }
     html[data-theme="light"][data-visual-theme="noir"] .app-card {
-      background: #ffffff !important;
-      border: 2px solid #0a0a0a !important;
+      background: #f7f1e7 !important;
+      color: #0a0a0a !important;
+      border: 1.5px solid #0a0a0a !important;
+      box-shadow: 5px 5px 0 #0a0a0a !important;
     }
     html[data-theme="dark"][data-visual-theme="noir"] .app-card {
-      background: #181818 !important;
-      border: 2px solid #f0ece6 !important;
+      background: #111111 !important;
+      color: #f0ece6 !important;
+      border: 1.5px solid #f0ece6 !important;
       box-shadow: 5px 5px 0 #f0ece6 !important;
     }
-    html[data-visual-theme="noir"] .app-card::before,
+    html[data-visual-theme="noir"] .app-card::before {
+      display: block !important;
+      content: '' !important;
+      position: absolute;
+      inset: 0 0 48% 0;
+      background-image:
+        linear-gradient(180deg, rgba(25, 23, 21, 0.04) 0%, rgba(25, 23, 21, 0) 44%, rgba(25, 23, 21, 0.18) 100%),
+        var(--card-bg-image, none) !important;
+      background-position: center, center !important;
+      background-size: cover, cover !important;
+      background-repeat: no-repeat, no-repeat !important;
+      opacity: 1 !important;
+      mix-blend-mode: normal !important;
+      filter: grayscale(1) contrast(1.18) sepia(0.28) saturate(0.42) brightness(0.95) !important;
+      transform-origin: center !important;
+      border-bottom: 1.5px solid currentColor;
+    }
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card::before {
+      filter: grayscale(1) contrast(1.14) sepia(0.22) saturate(0.36) brightness(0.82) !important;
+    }
     html[data-visual-theme="noir"] .app-card::after {
-      display: none !important; content: none !important;
+      content: attr(data-noir-stamp);
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      z-index: 2;
+      padding: 5px 9px 4px;
+      font-family: "Courier New", ui-monospace, monospace !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.18em !important;
+      text-transform: uppercase !important;
+    }
+    html[data-theme="light"][data-visual-theme="noir"] .app-card::after {
+      background: rgba(247, 241, 231, 0.95) !important;
+      color: #0a0a0a !important;
+      border: 1px solid #0a0a0a !important;
+      box-shadow: 2px 2px 0 rgba(10, 10, 10, 0.18) !important;
+    }
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card::after {
+      background: rgba(17, 17, 17, 0.94) !important;
+      color: #f0ece6 !important;
+      border: 1px solid #f0ece6 !important;
+      box-shadow: 2px 2px 0 rgba(240, 236, 230, 0.16) !important;
     }
     html[data-visual-theme="noir"] .app-card:hover {
       transform: translate(-2px, -2px) !important;
@@ -1861,50 +1984,115 @@
     }
 
     html[data-visual-theme="noir"] .card-glass-content {
+      position: relative;
+      min-height: 100%;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start;
+      gap: 10px;
+      padding: calc(52% + 18px) 18px 16px !important;
+      color: inherit !important;
       background: transparent !important;
       backdrop-filter: none !important;
       border: none !important;
       border-radius: 0 !important;
-      padding: 20px 20px 64px !important;
-      justify-content: flex-start;
-      min-height: 100%;
+    }
+
+    html[data-visual-theme="noir"] .card-glass-content::before,
+    html[data-visual-theme="noir"] .card-glass-content::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    html[data-visual-theme="noir"] .noir-card-kicker {
+      display: block;
+      padding: 6px 0 5px;
+      border-top: 1px solid currentColor;
+      border-bottom: 1px solid currentColor;
+      font-family: "Courier New", ui-monospace, monospace !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.18em !important;
+      text-transform: uppercase !important;
+      opacity: 0.82;
+    }
+
+    html[data-visual-theme="noir"] .noir-card-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1 1 auto;
+      min-height: 0;
     }
 
     html[data-visual-theme="noir"] .app-card-title {
       font-family: Georgia, "Times New Roman", serif !important;
-      font-size: 22px !important;
+      font-size: 21px !important;
       font-weight: 700 !important;
-      letter-spacing: -0.03em !important;
-      line-height: 1.05 !important;
+      letter-spacing: -0.025em !important;
+      line-height: 0.98 !important;
+      text-transform: uppercase !important;
       text-shadow: none !important;
+      margin: 0 !important;
+      min-height: 2em !important;
+      max-width: calc(100% - 2px) !important;
+      overflow-wrap: anywhere !important;
+      text-wrap: balance;
     }
     html[data-theme="light"][data-visual-theme="noir"] .app-card-title { color: #0a0a0a !important; }
     html[data-theme="dark"][data-visual-theme="noir"] .app-card-title  { color: #f0ece6 !important; }
 
-    html[data-visual-theme="noir"] .app-card-description {
-      font-family: Georgia, "Times New Roman", serif !important;
-      font-size: 13px !important;
-      line-height: 1.55 !important;
-      text-shadow: none !important;
+    html[data-visual-theme="noir"] .card-glass-content[data-noir-density="compact"] .app-card-title {
+      font-size: 18px !important;
+      line-height: 0.96 !important;
+      letter-spacing: -0.015em !important;
     }
-    html[data-theme="light"][data-visual-theme="noir"] .app-card-description { color: rgba(10,10,10,0.6) !important; }
-    html[data-theme="dark"][data-visual-theme="noir"] .app-card-description  { color: rgba(240,236,230,0.6) !important; }
 
-    html[data-visual-theme="noir"] .app-card-tags { display: none !important; }
+    html[data-visual-theme="noir"] .app-card-description {
+      display: none !important;
+    }
 
-    html[data-visual-theme="noir"] .card-share-btn {
+    html[data-visual-theme="noir"] .app-card-tags {
+      display: none !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card-tag {
+      padding: 0 !important;
+      background: none !important;
+      border: none !important;
       border-radius: 0 !important;
       backdrop-filter: none !important;
-      bottom: 16px !important; right: 16px !important;
+      -webkit-backdrop-filter: none !important;
+      font-family: "Courier New", ui-monospace, monospace !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.14em !important;
+      text-transform: uppercase !important;
+    }
+    html[data-theme="light"][data-visual-theme="noir"] .app-card-tag { color: rgba(10, 10, 10, 0.66) !important; }
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card-tag  { color: rgba(240, 236, 230, 0.68) !important; }
+    html[data-theme="light"][data-visual-theme="noir"] .app-card-tag.accent { color: #0a0a0a !important; }
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card-tag.accent  { color: #f0ece6 !important; }
+
+    html[data-visual-theme="noir"] .card-share-btn {
+      opacity: 1 !important;
+      transform: none !important;
+      top: 14px !important;
+      bottom: auto !important;
+      right: 14px !important;
+      z-index: 11 !important;
+      border-radius: 0 !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
     }
     html[data-theme="light"][data-visual-theme="noir"] .card-share-btn {
-      background: #ffffff !important;
-      border: 2px solid #0a0a0a !important;
+      background: #f7f1e7 !important;
+      border: 1.5px solid #0a0a0a !important;
       box-shadow: 2px 2px 0 #0a0a0a !important;
     }
     html[data-theme="dark"][data-visual-theme="noir"] .card-share-btn {
-      background: #181818 !important;
-      border: 2px solid #f0ece6 !important;
+      background: #111111 !important;
+      border: 1.5px solid #f0ece6 !important;
       box-shadow: 2px 2px 0 #f0ece6 !important;
     }
     html[data-theme="light"][data-visual-theme="noir"] .card-share-btn svg { stroke: #0a0a0a !important; }
@@ -1913,7 +2101,10 @@
     html[data-visual-theme="noir"] .new-badge-overlay {
       border-radius: 0 !important;
       animation: none !important;
-      letter-spacing: 0.08em !important;
+      letter-spacing: 0.14em !important;
+      font-family: "Courier New", ui-monospace, monospace !important;
+      top: 52px !important;
+      left: 14px !important;
     }
     html[data-theme="light"][data-visual-theme="noir"] .new-badge-overlay {
       background: #0a0a0a !important;
@@ -1929,6 +2120,38 @@
     html[data-visual-theme="noir"] .app-card.keyboard-selected {
       outline: 3px solid currentColor !important;
       outline-offset: 3px !important;
+    }
+
+    html[data-visual-theme="noir"] .noir-card-footer {
+      display: flex;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 8px;
+      min-height: 22px;
+    }
+
+    html[data-theme="light"][data-visual-theme="noir"] .noir-card-footer {
+      border-top: 1px solid rgba(10, 10, 10, 0.14) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="noir"] .noir-card-footer {
+      border-top: 1px solid rgba(240, 236, 230, 0.14) !important;
+    }
+
+    html[data-visual-theme="noir"] .noir-card-folio {
+      display: block;
+      min-width: 0;
+      max-width: 100%;
+      font-family: "Courier New", ui-monospace, monospace !important;
+      font-size: 9px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.1em !important;
+      text-transform: uppercase !important;
+      line-height: 1.2 !important;
+      opacity: 0.68;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* NEW Card Special Styling */
@@ -3989,6 +4212,81 @@
 
     /* ---- Per-theme modal overrides ---- */
 
+    /* Terminal: dark green-tinted modal */
+    html[data-visual-theme="terminal"] .tp-modal {
+      background: #0a0e0a;
+      border-color: rgba(0, 255, 65, 0.25);
+    }
+    html[data-visual-theme="terminal"] .tp-modal-header {
+      background: #0a0e0a;
+      border-bottom-color: rgba(0, 255, 65, 0.18);
+    }
+    html[data-visual-theme="terminal"] .tp-modal-title { color: #00ff41; }
+    html[data-visual-theme="terminal"] .tp-modal-close {
+      background: rgba(0, 255, 65, 0.08); border-color: rgba(0, 255, 65, 0.22); color: #00ff41;
+    }
+    html[data-visual-theme="terminal"] .tp-card {
+      border-color: rgba(0, 255, 65, 0.2);
+    }
+    html[data-visual-theme="terminal"] .tp-card:hover {
+      border-color: #00ff41;
+      box-shadow: 0 0 16px rgba(0, 255, 65, 0.2);
+    }
+    html[data-visual-theme="terminal"] .tp-card-info {
+      background: #0a0e0a; border-top-color: rgba(0, 255, 65, 0.15);
+    }
+    html[data-visual-theme="terminal"] .tp-card-name { color: #00ff41; }
+    html[data-visual-theme="terminal"] .tp-card-tagline { color: rgba(0, 255, 65, 0.5); }
+    html[data-visual-theme="terminal"] .tp-recents { border-bottom: 1px solid rgba(0, 255, 65, 0.1); padding-bottom: 12px; }
+    html[data-visual-theme="terminal"] .tp-group-label { color: rgba(0, 255, 65, 0.45); }
+    html[data-visual-theme="terminal"] .tp-recent-chip {
+      background: rgba(0, 255, 65, 0.07); border-color: rgba(0, 255, 65, 0.2); color: #00ff41;
+    }
+
+    /* Noir: cream/charcoal modal */
+    html[data-visual-theme="noir"] .tp-modal {
+      background: #f0ece6;
+      border-color: rgba(10,10,10,0.18);
+      box-shadow: 6px 6px 0 rgba(10,10,10,0.15), 0 24px 80px rgba(0,0,0,0.3);
+    }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-modal {
+      background: #181818;
+      border-color: rgba(240,236,230,0.12);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.4), 0 24px 80px rgba(0,0,0,0.6);
+    }
+    html[data-visual-theme="noir"] .tp-modal-header {
+      background: #f0ece6; border-bottom-color: rgba(10,10,10,0.1);
+    }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-modal-header {
+      background: #181818; border-bottom-color: rgba(240,236,230,0.1);
+    }
+    html[data-visual-theme="noir"] .tp-modal-title { color: #0a0a0a; font-family: Georgia, serif; }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-modal-title { color: #f0ece6; }
+    html[data-visual-theme="noir"] .tp-modal-close {
+      background: rgba(10,10,10,0.06); border-color: rgba(10,10,10,0.15); color: #3a3a3a;
+    }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-modal-close {
+      background: rgba(240,236,230,0.08); border-color: rgba(240,236,230,0.15); color: #b0a898;
+    }
+    html[data-visual-theme="noir"] .tp-card { border-color: rgba(10,10,10,0.18); border-radius: 0; }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-card { border-color: rgba(240,236,230,0.15); }
+    html[data-visual-theme="noir"] .tp-card:hover {
+      border-color: #0a0a0a; box-shadow: 5px 5px 0 rgba(10,10,10,0.2);
+      transform: translate(-2px, -2px);
+    }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-card:hover {
+      border-color: #f0ece6; box-shadow: 5px 5px 0 rgba(240,236,230,0.15);
+    }
+    html[data-visual-theme="noir"] .tp-card-info { background: #f0ece6; border-top-color: rgba(10,10,10,0.1); }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-card-info { background: #181818; border-top-color: rgba(240,236,230,0.1); }
+    html[data-visual-theme="noir"] .tp-card-name { color: #0a0a0a; font-family: Georgia, serif; }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-card-name { color: #f0ece6; }
+    html[data-visual-theme="noir"] .tp-card-tagline { color: #6a6a6a; }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-card-tagline { color: #888; }
+    html[data-visual-theme="noir"] .tp-group-label { color: #8a8078; }
+    html[data-visual-theme="noir"] .tp-recent-chip { background: rgba(10,10,10,0.04); border-color: rgba(10,10,10,0.15); color: #0a0a0a; border-radius: 0; }
+    html[data-theme="dark"][data-visual-theme="noir"] .tp-recent-chip { background: rgba(240,236,230,0.06); border-color: rgba(240,236,230,0.15); color: #f0ece6; }
+
     /* ---- Responsive ---- */
     @media (max-width: 600px) {
       .tp-theme-grid { grid-template-columns: repeat(2, 1fr); }
@@ -4241,7 +4539,7 @@
         minimal:   { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
         emoji:     { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'emoji'   },
         terminal:  { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'terminal' },
-        noir:      { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'noir'    },
+        noir:      { group: 'basic',   usesArtwork: true,  usesPattern: false, transition: 'noir'    },
       },
       EMOJI_THEME_SYMBOLS: {
         brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
@@ -4306,6 +4604,24 @@
         sankey:       'SKY',
         mockups:      'MCK',
       },
+      NOIR_CARD_META: {
+        brickbuilder: { stamp: 'BUILD',  kicker: 'Constructed Forms',      deck: 'Build modular scenes fast.',         folio: 'VGTOOLS PRESS / NO. 01' },
+        moodboards:   { stamp: 'MOOD',   kicker: 'Cuttings And Clippings', deck: 'Compose boards from visual scraps.', folio: 'VGTOOLS PRESS / NO. 02' },
+        blobs:        { stamp: 'INK',    kicker: 'Liquid Studies',         deck: 'Generate organic vector shapes.',    folio: 'VGTOOLS PRESS / NO. 03' },
+        jigsaws:      { stamp: 'PUZZLE', kicker: 'Piece By Piece',         deck: 'Turn images into playable puzzles.', folio: 'VGTOOLS PRESS / NO. 04' },
+        iconfactory:  { stamp: 'ICONS',  kicker: 'Symbols Desk',           deck: 'Craft crisp icon systems.',          folio: 'VGTOOLS PRESS / NO. 05' },
+        qrcodes:      { stamp: 'SCAN',   kicker: 'Machine Read',           deck: 'Publish offline scannable codes.',   folio: 'VGTOOLS PRESS / NO. 06' },
+        colors:       { stamp: 'INK',    kicker: 'Print Registry',         deck: 'Organize palettes and swatches.',    folio: 'VGTOOLS PRESS / NO. 07' },
+        notes:        { stamp: 'NOTES',  kicker: 'Field Notes',            deck: 'Capture notes and sort tasks.',      folio: 'VGTOOLS PRESS / NO. 08' },
+        locator:      { stamp: 'MAPS',   kicker: 'Wayfinding',             deck: 'Map places and export routes.',      folio: 'VGTOOLS PRESS / NO. 09' },
+        signatures:   { stamp: 'SIGN',   kicker: 'By Hand',                deck: 'Trace signatures into SVG.',         folio: 'VGTOOLS PRESS / NO. 10' },
+        svgrecolor:   { stamp: 'HUE',    kicker: 'Pigment Shift',          deck: 'Shift hues across SVG groups.',      folio: 'VGTOOLS PRESS / NO. 11' },
+        any2svg:      { stamp: 'TRACE',  kicker: 'Vector Bureau',          deck: 'Convert many files into SVG.',       folio: 'VGTOOLS PRESS / NO. 12' },
+        bgremover:    { stamp: 'CUT',    kicker: 'Cutout Desk',            deck: 'Cut subjects from backgrounds.',     folio: 'VGTOOLS PRESS / NO. 13' },
+        wordclouds:   { stamp: 'WORDS',  kicker: 'Type Storm',             deck: 'Turn text into compositions.',       folio: 'VGTOOLS PRESS / NO. 14' },
+        sankey:       { stamp: 'DATA',   kicker: 'Flow Ledger',            deck: 'Draw flows with weighted paths.',    folio: 'VGTOOLS PRESS / NO. 15' },
+        mockups:      { stamp: 'PRESS',  kicker: 'Proof Sheet',            deck: 'Stage work on real devices.',        folio: 'VGTOOLS PRESS / NO. 16' },
+      },
       DRAG_STATE: { dragged: null, over: null },
 
       konamiCode: ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'],
@@ -4331,6 +4647,8 @@
         this.el.tpBtnLabel = document.getElementById('tp-btn-label');
         this.el.themePickerOverlay = document.getElementById('theme-picker-overlay');
         this.el.tpCloseBtn = document.getElementById('tp-close-btn');
+        this.el.tpRecents = document.getElementById('tp-recents');
+        this.el.tpRecentsRow = document.getElementById('tp-recents-row');
         this.el.appGrid = document.getElementById('app-grid');
         this.el.appCards = Array.from(this.el.appGrid.children);
         this.el.searchInput = document.getElementById('search-input');
@@ -4385,6 +4703,14 @@
           card.addEventListener('click', () => { this.setVisualTheme(card.dataset.theme); this.closeThemePicker(); });
           card.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setVisualTheme(card.dataset.theme); this.closeThemePicker(); }
+          });
+        });
+
+        // Favorite buttons — stopPropagation so card click doesn't also fire
+        this.el.themePickerOverlay.querySelectorAll('.tp-fav-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleFavorite(btn.dataset.theme);
           });
         });
 
@@ -4744,8 +5070,12 @@
           const id = card.dataset.id;
           const imgPath = appImagePaths[id];
           const tech = appTech[id] || [];
+          const noirMeta = this.getNoirCardMeta(id);
+          const isNoirTheme = this.currentVisualTheme === 'noir';
+          const isEmojiTheme = this.currentVisualTheme === 'emoji';
           const isNew = card.dataset.new === 'true';
           card.dataset.emojiBurst = this.getEmojiBurstForTool(id);
+          card.dataset.noirStamp = noirMeta.stamp;
           card.style.setProperty('--card-emoji-pattern', JSON.stringify(this.getEmojiPatternForTool(id)));
           card.style.setProperty('--emoji-card-tilt', `${emojiCardTiltVariants[cardIndex % emojiCardTiltVariants.length]}deg`);
           card.style.setProperty('--emoji-card-hover-tilt', `${emojiHoverTiltVariants[cardIndex % emojiHoverTiltVariants.length]}deg`);
@@ -4761,22 +5091,41 @@
           const descEl = card.querySelector('.app-card-description');
           const titleText = titleEl ? titleEl.textContent : '';
           const descText = descEl ? descEl.textContent : '';
+          const noirCompact = titleText.length >= 15 || titleText.trim().split(/\s+/).length >= 3;
 
           // Create glass content wrapper
           const glassContent = document.createElement('div');
           glassContent.className = 'card-glass-content';
+          if (isNoirTheme) {
+            glassContent.classList.add('noir-card-content');
+          }
+          glassContent.dataset.noirDensity = noirCompact ? 'compact' : 'default';
 
-          const emojiSticker = document.createElement('div');
-          emojiSticker.className = 'app-card-sticker';
-          emojiSticker.textContent = this.getEmojiStickerForTool(id);
-          glassContent.appendChild(emojiSticker);
+          if (isNoirTheme) {
+            const kicker = document.createElement('div');
+            kicker.className = 'noir-card-kicker';
+            kicker.textContent = noirMeta.kicker;
+            glassContent.appendChild(kicker);
+          }
+
+          if (isEmojiTheme) {
+            const emojiSticker = document.createElement('div');
+            emojiSticker.className = 'app-card-sticker';
+            emojiSticker.textContent = this.getEmojiStickerForTool(id);
+            glassContent.appendChild(emojiSticker);
+          }
+
+          const copyWrap = document.createElement('div');
+          if (isNoirTheme) {
+            copyWrap.className = 'noir-card-copy';
+          }
 
           // Create title element
           if (titleText) {
             const newTitle = document.createElement('h2');
             newTitle.className = 'app-card-title';
             newTitle.textContent = titleText;
-            glassContent.appendChild(newTitle);
+            copyWrap.appendChild(newTitle);
           }
 
           // Create description element
@@ -4784,8 +5133,10 @@
             const newDesc = document.createElement('p');
             newDesc.className = 'app-card-description';
             newDesc.textContent = descText;
-            glassContent.appendChild(newDesc);
+            copyWrap.appendChild(newDesc);
           }
+
+          glassContent.appendChild(copyWrap);
 
           // Add tech tags
           if (tech.length > 0) {
@@ -4798,6 +5149,16 @@
               tagsDiv.appendChild(tag);
             });
             glassContent.appendChild(tagsDiv);
+          }
+
+          if (isNoirTheme) {
+            const footer = document.createElement('div');
+            footer.className = 'noir-card-footer';
+            const folio = document.createElement('span');
+            folio.className = 'noir-card-folio';
+            folio.textContent = noirMeta.folio;
+            footer.appendChild(folio);
+            glassContent.appendChild(footer);
           }
 
           // Clear card and add glass content
@@ -5207,6 +5568,15 @@
         return this.buildEmojiPattern(allSymbols, 120);
       },
 
+      getNoirCardMeta(toolId) {
+        return this.NOIR_CARD_META[toolId] || {
+          stamp: 'ARCHIVE',
+          kicker: 'VGTools Archive',
+          deck: 'A local tool for visual work.',
+          folio: 'VGTOOLS PRESS / SPECIAL',
+        };
+      },
+
       getAppImagePaths(theme) {
         const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
         const themeMeta = this.getVisualThemeMeta(normalizedTheme);
@@ -5238,10 +5608,89 @@
         { label: 'Indigo', bg: 'linear-gradient(135deg,#1a0533 0%,#2d1b69 100%)',                 swatch: '#2d1b69' },
         { label: 'Ocean',  bg: 'linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)',     swatch: '#2c5364' },
       ],
-      VISUAL_THEME_LABELS: { comicbook: 'Comicbook', glassui: 'Glass UI', emoji: 'Emoji', minimal: 'Minimal', terminal: 'Terminal' },
+      VISUAL_THEME_LABELS: { comicbook: 'Comicbook', glassui: 'Glass UI', emoji: 'Emoji', minimal: 'Minimal', terminal: 'Terminal', noir: 'Noir' },
+
+      THEME_COLORS: {
+        comicbook: '#f7cf27',
+        glassui:   '#4a9eff',
+        emoji:     '#ff6b4a',
+        minimal:   '#6b7280',
+        terminal:  '#00ff41',
+        noir:      '#0a0a0a',
+      },
+
+      // ---- Recents & Favorites ----
+
+      getRecentThemes() {
+        try { return JSON.parse(localStorage.getItem('vgtools-recent-themes') || '[]'); }
+        catch { return []; }
+      },
+
+      addToRecents(theme) {
+        let recents = this.getRecentThemes().filter(t => t !== theme);
+        recents.unshift(theme);
+        if (recents.length > 4) recents = recents.slice(0, 4);
+        localStorage.setItem('vgtools-recent-themes', JSON.stringify(recents));
+      },
+
+      getFavorites() {
+        try { return JSON.parse(localStorage.getItem('vgtools-favorite-themes') || '[]'); }
+        catch { return []; }
+      },
+
+      toggleFavorite(theme) {
+        let favs = this.getFavorites();
+        const idx = favs.indexOf(theme);
+        if (idx === -1) favs.push(theme);
+        else favs.splice(idx, 1);
+        localStorage.setItem('vgtools-favorite-themes', JSON.stringify(favs));
+        this.syncFavButtons();
+      },
+
+      renderRecents() {
+        if (!this.el.tpRecents || !this.el.tpRecentsRow) return;
+        const recents = this.getRecentThemes().filter(t => this.VISUAL_THEMES.includes(t));
+        this.el.tpRecentsRow.innerHTML = '';
+        if (recents.length === 0) {
+          this.el.tpRecents.classList.remove('has-recents');
+          return;
+        }
+        this.el.tpRecents.classList.add('has-recents');
+        recents.forEach(theme => {
+          const chip = document.createElement('div');
+          chip.className = 'tp-recent-chip';
+          chip.setAttribute('role', 'button');
+          chip.setAttribute('tabindex', '0');
+          const dot = document.createElement('span');
+          dot.className = 'tp-recent-dot';
+          const color = this.THEME_COLORS[theme];
+          if (color) dot.style.background = color;
+          const label = document.createElement('span');
+          label.textContent = this.VISUAL_THEME_LABELS[theme] || theme;
+          chip.appendChild(dot);
+          chip.appendChild(label);
+          chip.addEventListener('click', () => { this.setVisualTheme(theme); this.closeThemePicker(); });
+          chip.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setVisualTheme(theme); this.closeThemePicker(); }
+          });
+          this.el.tpRecentsRow.appendChild(chip);
+        });
+      },
+
+      syncFavButtons() {
+        if (!this.el.themePickerOverlay) return;
+        const favs = this.getFavorites();
+        this.el.themePickerOverlay.querySelectorAll('.tp-fav-btn').forEach(btn => {
+          btn.classList.toggle('tp-fav-active', favs.includes(btn.dataset.theme));
+        });
+      },
+
+      // ---- End Recents & Favorites ----
 
       initThemePicker() {
         this.syncThemePicker();
+        this.renderRecents();
+        this.syncFavButtons();
       },
 
       openThemePicker() {
@@ -5271,6 +5720,9 @@
         if (this.el.tpBtnLabel) {
           this.el.tpBtnLabel.textContent = this.VISUAL_THEME_LABELS[this.currentVisualTheme] || 'Theme';
         }
+
+        this.renderRecents();
+        this.syncFavButtons();
       },
 
       applyCustomSettings() {
@@ -5339,6 +5791,7 @@
         this.currentVisualTheme = normalizedTheme;
         if (save) {
           localStorage.setItem('vgtools-visual-theme', normalizedTheme);
+          this.addToRecents(normalizedTheme);
         }
         this.syncThemePicker();
         if (previousTheme && previousTheme !== normalizedTheme) {
@@ -5739,12 +6192,21 @@
         <button class="tp-modal-close" id="tp-close-btn" aria-label="Close">&times;</button>
       </div>
 
+      <!-- Recently used section (hidden until populated) -->
+      <div class="tp-recents" id="tp-recents">
+        <div class="tp-group-label">Recently used</div>
+        <div class="tp-recents-row" id="tp-recents-row"></div>
+      </div>
+
       <!-- Main theme grid — 3 columns -->
       <div class="tp-theme-grid">
 
         <!-- Comicbook -->
         <div class="tp-card" role="button" tabindex="0" data-theme="comicbook">
           <div class="tp-preview tp-preview-comic"></div>
+          <button class="tp-fav-btn" data-theme="comicbook" aria-label="Favorite Comicbook" tabindex="-1">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
+          </button>
           <div class="tp-card-info">
             <span class="tp-card-name">Comicbook</span>
             <span class="tp-card-tagline">Bold graphic energy</span>
@@ -5754,6 +6216,9 @@
         <!-- Glass UI -->
         <div class="tp-card" role="button" tabindex="0" data-theme="glassui">
           <div class="tp-preview tp-preview-glass"></div>
+          <button class="tp-fav-btn" data-theme="glassui" aria-label="Favorite Glass UI" tabindex="-1">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
+          </button>
           <div class="tp-card-info">
             <span class="tp-card-name">Glass UI</span>
             <span class="tp-card-tagline">Luminous &amp; futuristic</span>
@@ -5763,6 +6228,9 @@
         <!-- Emoji -->
         <div class="tp-card" role="button" tabindex="0" data-theme="emoji">
           <div class="tp-preview tp-preview-emoji" aria-hidden="true">🎨✨🌈🫧📱💡✂️🎉</div>
+          <button class="tp-fav-btn" data-theme="emoji" aria-label="Favorite Emoji" tabindex="-1">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
+          </button>
           <div class="tp-card-info">
             <span class="tp-card-name">Emoji</span>
             <span class="tp-card-tagline">Playful &amp; expressive</span>
@@ -5772,6 +6240,9 @@
         <!-- Minimal -->
         <div class="tp-card" role="button" tabindex="0" data-theme="minimal">
           <div class="tp-preview tp-preview-minimal"></div>
+          <button class="tp-fav-btn" data-theme="minimal" aria-label="Favorite Minimal" tabindex="-1">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
+          </button>
           <div class="tp-card-info">
             <span class="tp-card-name">Minimal</span>
             <span class="tp-card-tagline">Clean &amp; quiet</span>
@@ -5781,6 +6252,9 @@
         <!-- Terminal -->
         <div class="tp-card" role="button" tabindex="0" data-theme="terminal">
           <div class="tp-preview tp-preview-terminal"></div>
+          <button class="tp-fav-btn" data-theme="terminal" aria-label="Favorite Terminal" tabindex="-1">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
+          </button>
           <div class="tp-card-info">
             <span class="tp-card-name">Terminal</span>
             <span class="tp-card-tagline">Hacker green glow</span>
@@ -5790,6 +6264,9 @@
         <!-- Noir -->
         <div class="tp-card" role="button" tabindex="0" data-theme="noir">
           <div class="tp-preview tp-preview-noir"></div>
+          <button class="tp-fav-btn" data-theme="noir" aria-label="Favorite Noir" tabindex="-1">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
+          </button>
           <div class="tp-card-info">
             <span class="tp-card-name">Noir</span>
             <span class="tp-card-tagline">High contrast &amp; gritty</span>
