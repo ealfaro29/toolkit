@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Noir Asset Tool</title>
+  <style>
+    :root {
+      --paper: #f3ebdd;
+      --paper-deep: #e5d8c6;
+      --ink: #181411;
+      --ink-soft: rgba(24, 20, 17, 0.72);
+      --rule: rgba(24, 20, 17, 0.18);
+      --shadow: 6px 6px 0 rgba(24, 20, 17, 0.22);
+      --shadow-tight: 4px 4px 0 rgba(24, 20, 17, 0.18);
+      --font-serif: Georgia, "Times New Roman", serif;
+      --font-sans: "Segoe UI", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent 28%),
+        linear-gradient(180deg, #f7f1e8 0%, #ebe1d2 100%);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      padding: 24px;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(0, 0, 0, 0.05) 0.65px, transparent 0.65px);
+      background-size: 8px 8px;
+      opacity: 0.22;
+      mix-blend-mode: multiply;
+    }
+
+    .shell {
+      position: relative;
+      max-width: 1600px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 18px;
+    }
+
+    .masthead,
+    .panel {
+      background: rgba(243, 235, 221, 0.96);
+      border: 2px solid var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .masthead {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 22px;
+      align-items: end;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 4vw, 52px);
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .brand p,
+    .meta,
+    .meta a {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 360px minmax(320px, 420px) minmax(520px, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      font-family: var(--font-serif);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 17px;
+    }
+
+    .section {
+      border-top: 1px solid var(--rule);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label,
+    .mini-label {
+      font-family: var(--font-serif);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      width: 100%;
+      border: 2px solid var(--ink);
+      background: #fcf8f1;
+      color: var(--ink);
+      padding: 11px 12px;
+      font: 14px/1.3 var(--font-sans);
+      box-shadow: var(--shadow-tight);
+    }
+
+    button {
+      cursor: pointer;
+      font-family: var(--font-serif);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: linear-gradient(180deg, #fefbf5 0%, #f0e5d6 100%);
+    }
+
+    button:hover {
+      transform: translate(-1px, -1px);
+    }
+
+    button:active {
+      transform: translate(1px, 1px);
+      box-shadow: 2px 2px 0 rgba(24, 20, 17, 0.18);
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .btn-row.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .status {
+      padding: 10px 12px;
+      border: 1px solid var(--rule);
+      background: rgba(255, 255, 255, 0.46);
+      color: var(--ink-soft);
+      font-size: 13px;
+      min-height: 42px;
+    }
+
+    .status.error {
+      color: #6b1d15;
+      border-color: rgba(107, 29, 21, 0.25);
+      background: rgba(184, 79, 64, 0.08);
+    }
+
+    .status.ok {
+      color: #234f28;
+      border-color: rgba(35, 79, 40, 0.25);
+      background: rgba(68, 122, 75, 0.08);
+    }
+
+    .saved-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .saved-chip {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid var(--rule);
+      background: rgba(255, 255, 255, 0.44);
+      font-size: 12px;
+    }
+
+    .saved-chip.active {
+      border-color: var(--ink);
+      background: rgba(24, 20, 17, 0.06);
+    }
+
+    .saved-chip strong {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .saved-chip span {
+      color: var(--ink-soft);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      overflow: auto;
+      padding-right: 4px;
+      min-height: 220px;
+      max-height: calc(100vh - 330px);
+    }
+
+    .result-card {
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0.44);
+      box-shadow: var(--shadow-tight);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .result-card.active {
+      border-color: var(--ink);
+    }
+
+    .result-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      filter: grayscale(0.18);
+    }
+
+    .result-meta {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .result-meta strong {
+      color: var(--ink);
+      font-family: var(--font-serif);
+      font-size: 13px;
+      letter-spacing: 0.03em;
+    }
+
+    .preview-wrap {
+      display: grid;
+      gap: 14px;
+      min-height: 0;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .preview-target {
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .canvas-frame {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.16)),
+        var(--paper);
+      border: 2px solid var(--ink);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .canvas-frame::before {
+      content: "Drag to pan / wheel to zoom";
+      position: absolute;
+      right: 16px;
+      top: 10px;
+      color: var(--ink-soft);
+      font-size: 12px;
+    }
+
+    canvas {
+      width: min(100%, 780px);
+      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      background: #f1e7d7;
+      border: 1px solid rgba(24, 20, 17, 0.16);
+      cursor: grab;
+    }
+
+    canvas.dragging {
+      cursor: grabbing;
+    }
+
+    .range-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 14px;
+    }
+
+    .range-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .range-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .range-head span:last-child {
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-family: var(--font-sans);
+    }
+
+    input[type="range"] {
+      padding: 0;
+      box-shadow: none;
+      background: transparent;
+      border: none;
+    }
+
+    .source-meta {
+      display: grid;
+      gap: 6px;
+      padding: 12px;
+      border: 1px solid var(--rule);
+      background: rgba(255, 255, 255, 0.42);
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+
+    .source-meta strong {
+      color: var(--ink);
+    }
+
+    .source-meta a {
+      color: var(--ink);
+      text-decoration-color: rgba(24, 20, 17, 0.35);
+    }
+
+    .empty {
+      border: 1px dashed rgba(24, 20, 17, 0.28);
+      background: rgba(255, 255, 255, 0.3);
+      color: var(--ink-soft);
+      padding: 18px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .small-note {
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1280px) {
+      .layout {
+        grid-template-columns: 340px 1fr;
+      }
+
+      .results-panel {
+        order: 3;
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 860px) {
+      body {
+        padding: 14px;
+      }
+
+      .masthead {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .range-grid,
+      .btn-row,
+      .btn-row.three,
+      .saved-list,
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="brand">
+        <p>Temporary builder for VG Toolkit</p>
+        <h1>Noir Asset Tool</h1>
+      </div>
+      <div class="meta">
+        <p>Search free photos, convert them into photocopy / halftone artwork, and save them directly into <code>Theme/noir</code>.</p>
+        <p>API backend: <a id="docs-link" href="https://pixabay.com/api/docs/" target="_blank" rel="noreferrer">Pixabay docs</a></p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel">
+        <h2>Search</h2>
+
+        <div class="field">
+          <label for="api-key">Pixabay API key</label>
+          <input id="api-key" type="password" placeholder="Paste your free API key here">
+          <div class="small-note" id="key-note">You can also set <code>PIXABAY_API_KEY</code> before starting the server.</div>
+        </div>
+
+        <div class="field">
+          <label for="tool-select">Target mini app</label>
+          <select id="tool-select"></select>
+        </div>
+
+        <div class="btn-row">
+          <button id="use-hint-btn" type="button">Use hint</button>
+          <button id="refresh-status-btn" type="button">Refresh status</button>
+        </div>
+
+        <div class="field">
+          <label for="search-input">Search query</label>
+          <input id="search-input" type="text" placeholder="vintage map, newsroom desk, macro texture...">
+        </div>
+
+        <div class="field">
+          <label for="orientation-select">Orientation</label>
+          <select id="orientation-select">
+            <option value="horizontal">Horizontal</option>
+            <option value="all">All</option>
+            <option value="vertical">Vertical</option>
+          </select>
+        </div>
+
+        <div class="btn-row three">
+          <button id="prev-page-btn" type="button">Prev</button>
+          <button id="search-btn" type="button">Search</button>
+          <button id="next-page-btn" type="button">Next</button>
+        </div>
+
+        <div class="status" id="status-box">Ready.</div>
+
+        <div class="section">
+          <h3>Saved assets</h3>
+          <div class="saved-list" id="saved-list"></div>
+        </div>
+      </aside>
+
+      <section class="panel results-panel">
+        <div class="preview-header">
+          <div>
+            <h2>Results</h2>
+            <div class="small-note" id="results-summary">Search to load images.</div>
+          </div>
+        </div>
+        <div class="results-grid" id="results-grid">
+          <div class="empty">No results yet.</div>
+        </div>
+      </section>
+
+      <section class="panel preview-wrap">
+        <div class="preview-header">
+          <div>
+            <h2>Preview</h2>
+            <div class="preview-target" id="target-path">Theme/noir/brickbuilder_noir.png</div>
+          </div>
+        </div>
+
+        <div class="canvas-frame">
+          <canvas id="preview-canvas" width="720" height="720"></canvas>
+        </div>
+
+        <div class="btn-row three">
+          <button id="recenter-btn" type="button">Recenter</button>
+          <button id="download-btn" type="button">Download PNG</button>
+          <button id="save-btn" type="button">Save To Theme</button>
+        </div>
+
+        <div class="section">
+          <h3>Look controls</h3>
+          <div class="range-grid">
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Zoom</span><span id="zoom-value"></span></div>
+              <input id="zoom" type="range" min="1" max="3" step="0.01" value="1.18">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Exposure</span><span id="exposure-value"></span></div>
+              <input id="exposure" type="range" min="-1" max="1" step="0.01" value="0.06">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Contrast</span><span id="contrast-value"></span></div>
+              <input id="contrast" type="range" min="0.6" max="2.6" step="0.01" value="1.82">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Threshold</span><span id="threshold-value"></span></div>
+              <input id="threshold" type="range" min="0.1" max="0.95" step="0.01" value="0.56">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Softness</span><span id="softness-value"></span></div>
+              <input id="softness" type="range" min="0.01" max="0.35" step="0.01" value="0.11">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Halftone</span><span id="halftone-strength-value"></span></div>
+              <input id="halftone-strength" type="range" min="0" max="1" step="0.01" value="0.36">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Dot spacing</span><span id="dot-spacing-value"></span></div>
+              <input id="dot-spacing" type="range" min="4" max="20" step="1" value="8">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Dot scale</span><span id="dot-scale-value"></span></div>
+              <input id="dot-scale" type="range" min="0.2" max="1.4" step="0.01" value="0.9">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Grain</span><span id="grain-value"></span></div>
+              <input id="grain" type="range" min="0" max="1" step="0.01" value="0.16">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Paper tint</span><span id="paper-color-value"></span></div>
+              <input id="paper-color" type="color" value="#efe5d3">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Ink color</span><span id="ink-color-value"></span></div>
+              <input id="ink-color" type="color" value="#14100d">
+            </div>
+            <div class="range-field">
+              <div class="range-head"><span class="mini-label">Preset</span><span></span></div>
+              <button id="reset-look-btn" type="button">Reset look</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Selected source</h3>
+          <div class="source-meta" id="source-meta">
+            <div>No image selected.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const SEARCH_HINTS = {
+      brickbuilder: 'construction blocks blueprint vintage',
+      moodboards: 'magazine collage editorial desk',
+      blobs: 'ink in water macro monochrome',
+      jigsaws: 'puzzle pieces tabletop close up',
+      iconfactory: 'symbol sheet technical drawing',
+      qrcodes: 'barcode matrix print macro',
+      colors: 'ink swatches print test sheet',
+      notes: 'handwritten notebook paper close up',
+      locator: 'vintage map compass newspaper',
+      signatures: 'fountain pen signing paper',
+      svgrecolor: 'paint swatch chart studio table',
+      any2svg: 'drafting table tracing paper diagram',
+      bgremover: 'portrait profile studio lighting monochrome',
+      wordclouds: 'typography collage newspaper letters',
+      sankey: 'industrial flow diagram pipes',
+      mockups: 'device flatlay newspaper advertisement'
+    };
+
+    const DEFAULT_LOOK = {
+      zoom: 1.18,
+      exposure: 0.06,
+      contrast: 1.82,
+      threshold: 0.56,
+      softness: 0.11,
+      halftoneStrength: 0.36,
+      dotSpacing: 8,
+      dotScale: 0.9,
+      grain: 0.16,
+      paperColor: '#efe5d3',
+      inkColor: '#14100d'
+    };
+
+    const STATE = {
+      config: null,
+      currentToolId: 'brickbuilder',
+      currentPage: 1,
+      query: '',
+      orientation: 'horizontal',
+      selectedIndex: -1,
+      results: [],
+      selectedImage: null,
+      drag: null,
+      renderToken: 0,
+      panX: 0,
+      panY: 0,
+      ...DEFAULT_LOOK
+    };
+
+    const EL = {};
+
+    const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+    const lerp = (a, b, t) => a + ((b - a) * t);
+    const mixChannel = (a, b, t) => Math.round(lerp(a, b, t));
+    const smoothstep = (edge0, edge1, x) => {
+      const t = clamp((x - edge0) / Math.max(0.0001, edge1 - edge0), 0, 1);
+      return t * t * (3 - (2 * t));
+    };
+    const hashNoise = (x, y) => {
+      const n = Math.sin((x * 12.9898) + (y * 78.233)) * 43758.5453;
+      return n - Math.floor(n);
+    };
+    const hexToRgb = (hex) => {
+      const value = hex.replace('#', '').trim();
+      if (value.length !== 6) return { r: 0, g: 0, b: 0 };
+      return {
+        r: Number.parseInt(value.slice(0, 2), 16),
+        g: Number.parseInt(value.slice(2, 4), 16),
+        b: Number.parseInt(value.slice(4, 6), 16)
+      };
+    };
+    const $ = (id) => document.getElementById(id);
+
+    function setStatus(message, tone = '') {
+      EL.statusBox.textContent = message;
+      EL.statusBox.className = tone ? `status ${tone}` : 'status';
+    }
+
+    function formatNumber(value, digits = 2) {
+      return Number(value).toFixed(digits);
+    }
+
+    function syncPathLabel() {
+      EL.targetPath.textContent = `Theme/noir/${STATE.currentToolId}_noir.png`;
+    }
+
+    function updateValueLabels() {
+      $('zoom-value').textContent = `${formatNumber(STATE.zoom, 2)}x`;
+      $('exposure-value').textContent = formatNumber(STATE.exposure, 2);
+      $('contrast-value').textContent = formatNumber(STATE.contrast, 2);
+      $('threshold-value').textContent = formatNumber(STATE.threshold, 2);
+      $('softness-value').textContent = formatNumber(STATE.softness, 2);
+      $('halftone-strength-value').textContent = formatNumber(STATE.halftoneStrength, 2);
+      $('dot-spacing-value').textContent = `${STATE.dotSpacing}px`;
+      $('dot-scale-value').textContent = formatNumber(STATE.dotScale, 2);
+      $('grain-value').textContent = formatNumber(STATE.grain, 2);
+      $('paper-color-value').textContent = STATE.paperColor.toUpperCase();
+      $('ink-color-value').textContent = STATE.inkColor.toUpperCase();
+    }
+
+    function writeControlsFromState() {
+      $('zoom').value = STATE.zoom;
+      $('exposure').value = STATE.exposure;
+      $('contrast').value = STATE.contrast;
+      $('threshold').value = STATE.threshold;
+      $('softness').value = STATE.softness;
+      $('halftone-strength').value = STATE.halftoneStrength;
+      $('dot-spacing').value = STATE.dotSpacing;
+      $('dot-scale').value = STATE.dotScale;
+      $('grain').value = STATE.grain;
+      $('paper-color').value = STATE.paperColor;
+      $('ink-color').value = STATE.inkColor;
+      updateValueLabels();
+    }
+
+    function readControlsIntoState() {
+      STATE.zoom = Number.parseFloat($('zoom').value);
+      STATE.exposure = Number.parseFloat($('exposure').value);
+      STATE.contrast = Number.parseFloat($('contrast').value);
+      STATE.threshold = Number.parseFloat($('threshold').value);
+      STATE.softness = Number.parseFloat($('softness').value);
+      STATE.halftoneStrength = Number.parseFloat($('halftone-strength').value);
+      STATE.dotSpacing = Number.parseInt($('dot-spacing').value, 10);
+      STATE.dotScale = Number.parseFloat($('dot-scale').value);
+      STATE.grain = Number.parseFloat($('grain').value);
+      STATE.paperColor = $('paper-color').value;
+      STATE.inkColor = $('ink-color').value;
+      updateValueLabels();
+    }
+
+    function renderSavedList() {
+      const saved = STATE.config?.saved || {};
+      EL.savedList.innerHTML = '';
+      (STATE.config?.tools || []).forEach((tool) => {
+        const row = document.createElement('div');
+        row.className = `saved-chip${tool.id === STATE.currentToolId ? ' active' : ''}`;
+        row.innerHTML = `<strong>${tool.label}</strong><span>${saved[tool.id] ? 'Saved' : 'Open'}</span>`;
+        row.addEventListener('click', () => {
+          STATE.currentToolId = tool.id;
+          EL.toolSelect.value = tool.id;
+          syncPathLabel();
+          renderSavedList();
+        });
+        EL.savedList.appendChild(row);
+      });
+    }
+
+    function populateTools() {
+      EL.toolSelect.innerHTML = '';
+      (STATE.config?.tools || []).forEach((tool) => {
+        const option = document.createElement('option');
+        option.value = tool.id;
+        option.textContent = tool.label;
+        EL.toolSelect.appendChild(option);
+      });
+      EL.toolSelect.value = STATE.currentToolId;
+    }
+
+    function renderResults() {
+      EL.resultsGrid.innerHTML = '';
+      if (!STATE.results.length) {
+        EL.resultsGrid.innerHTML = '<div class="empty">No results yet.</div>';
+        return;
+      }
+
+      STATE.results.forEach((hit, index) => {
+        const card = document.createElement('article');
+        card.className = `result-card${index === STATE.selectedIndex ? ' active' : ''}`;
+        card.innerHTML = `
+          <img src="${hit.previewURL}" alt="${hit.tags}">
+          <div class="result-meta">
+            <strong>${hit.user || 'Unknown author'}</strong>
+            <div>${hit.tags || 'No tags'}</div>
+            <div>${hit.width} x ${hit.height}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => selectResult(index));
+        EL.resultsGrid.appendChild(card);
+      });
+    }
+
+    function renderSourceMeta() {
+      const hit = STATE.results[STATE.selectedIndex];
+      if (!hit) {
+        EL.sourceMeta.innerHTML = '<div>No image selected.</div>';
+        return;
+      }
+      EL.sourceMeta.innerHTML = `
+        <div><strong>Author:</strong> ${hit.user || 'Unknown'}</div>
+        <div><strong>Tags:</strong> ${hit.tags || 'No tags'}</div>
+        <div><strong>Size:</strong> ${hit.width} x ${hit.height}</div>
+        <div><strong>Source:</strong> <a href="${hit.pageURL}" target="_blank" rel="noreferrer">Open in Pixabay</a></div>
+      `;
+    }
+
+    function drawPlaceholder(message) {
+      const canvas = EL.previewCanvas;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#efe5d3';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'rgba(24, 20, 17, 0.75)';
+      ctx.font = '20px Georgia';
+      ctx.textAlign = 'center';
+      ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+    }
+
+    function scheduleRender() {
+      cancelAnimationFrame(STATE.renderToken);
+      STATE.renderToken = requestAnimationFrame(() => renderPreview());
+    }
+
+    function renderProcessed(canvas, size) {
+      if (!STATE.selectedImage) {
+        drawPlaceholder('Select an image');
+        return;
+      }
+
+      const paper = hexToRgb(STATE.paperColor);
+      const ink = hexToRgb(STATE.inkColor);
+      const img = STATE.selectedImage;
+      const working = document.createElement('canvas');
+      working.width = size;
+      working.height = size;
+      const wctx = working.getContext('2d', { willReadFrequently: true });
+
+      const scale = Math.max(size / img.width, size / img.height) * STATE.zoom;
+      const drawW = img.width * scale;
+      const drawH = img.height * scale;
+      const dx = ((size - drawW) / 2) + STATE.panX;
+      const dy = ((size - drawH) / 2) + STATE.panY;
+
+      wctx.fillStyle = '#ffffff';
+      wctx.fillRect(0, 0, size, size);
+      wctx.imageSmoothingEnabled = true;
+      wctx.imageSmoothingQuality = 'high';
+      wctx.drawImage(img, dx, dy, drawW, drawH);
+
+      const srcImage = wctx.getImageData(0, 0, size, size);
+      const src = srcImage.data;
+      const darknessMap = new Float32Array(size * size);
+      const outImage = new ImageData(size, size);
+      const out = outImage.data;
+      const exposureGain = Math.pow(2, STATE.exposure);
+      const thresholdMin = clamp(STATE.threshold - STATE.softness, 0, 1);
+      const thresholdMax = clamp(STATE.threshold + STATE.softness, 0, 1);
+
+      for (let y = 0; y < size; y += 1) {
+        for (let x = 0; x < size; x += 1) {
+          const pixelIndex = (y * size) + x;
+          const offset = pixelIndex * 4;
+          const r = src[offset];
+          const g = src[offset + 1];
+          const b = src[offset + 2];
+
+          let luminance = ((0.2126 * r) + (0.7152 * g) + (0.0722 * b)) / 255;
+          luminance = clamp(luminance * exposureGain, 0, 1);
+          luminance = clamp(((luminance - 0.5) * STATE.contrast) + 0.5, 0, 1);
+
+          const photocopy = 1 - smoothstep(thresholdMin, thresholdMax, luminance);
+          darknessMap[pixelIndex] = photocopy;
+
+          const grain = ((hashNoise(x, y) - 0.5) * STATE.grain * 0.18);
+          const paperLift = clamp(1 + grain, 0.8, 1.18);
+
+          const baseR = clamp(paper.r * paperLift, 0, 255);
+          const baseG = clamp(paper.g * paperLift, 0, 255);
+          const baseB = clamp(paper.b * paperLift, 0, 255);
+
+          out[offset] = mixChannel(baseR, ink.r, photocopy * 0.92);
+          out[offset + 1] = mixChannel(baseG, ink.g, photocopy * 0.92);
+          out[offset + 2] = mixChannel(baseB, ink.b, photocopy * 0.92);
+          out[offset + 3] = 255;
+        }
+      }
+
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+      ctx.clearRect(0, 0, size, size);
+      ctx.putImageData(outImage, 0, 0);
+
+      if (STATE.halftoneStrength > 0) {
+        const spacing = Math.max(4, STATE.dotSpacing);
+        ctx.save();
+        ctx.fillStyle = STATE.inkColor;
+        ctx.globalCompositeOperation = 'multiply';
+        for (let y = 0; y < size; y += spacing) {
+          for (let x = 0; x < size; x += spacing) {
+            const sx = Math.min(size - 1, x + Math.floor(spacing / 2));
+            const sy = Math.min(size - 1, y + Math.floor(spacing / 2));
+            const darkness = Math.pow(darknessMap[(sy * size) + sx], 1.1);
+            const radius = (spacing * 0.5 * STATE.dotScale) * darkness;
+            if (radius <= 0.15) continue;
+            ctx.globalAlpha = Math.min(1, STATE.halftoneStrength * (0.22 + (darkness * 0.96)));
+            ctx.beginPath();
+            ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+      }
+    }
+
+    function renderPreview() {
+      if (!STATE.selectedImage) {
+        drawPlaceholder('Select an image');
+        return;
+      }
+      renderProcessed(EL.previewCanvas, 720);
+    }
+
+    function createExportCanvas() {
+      const size = Number(STATE.config?.exportSize || 1024);
+      const canvas = document.createElement('canvas');
+      renderProcessed(canvas, size);
+      return canvas;
+    }
+
+    function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Could not load the selected image.'));
+        img.src = url;
+      });
+    }
+
+    async function selectResult(index) {
+      const hit = STATE.results[index];
+      if (!hit) return;
+      STATE.selectedIndex = index;
+      renderResults();
+      renderSourceMeta();
+      setStatus('Loading selected image...');
+      try {
+        const url = `/api/image?url=${encodeURIComponent(hit.largeImageURL || hit.webformatURL)}`;
+        STATE.selectedImage = await loadImage(url);
+        STATE.panX = 0;
+        STATE.panY = 0;
+        scheduleRender();
+        setStatus(`Selected image by ${hit.user || 'unknown author'}.`, 'ok');
+      } catch (error) {
+        STATE.selectedImage = null;
+        drawPlaceholder('Image could not be loaded');
+        setStatus(error.message, 'error');
+      }
+    }
+
+    function resetLook() {
+      Object.assign(STATE, DEFAULT_LOOK);
+      writeControlsFromState();
+      scheduleRender();
+    }
+
+    function recenterImage() {
+      STATE.panX = 0;
+      STATE.panY = 0;
+      STATE.zoom = DEFAULT_LOOK.zoom;
+      $('zoom').value = STATE.zoom;
+      updateValueLabels();
+      scheduleRender();
+    }
+
+    function downloadCurrent() {
+      if (!STATE.selectedImage) {
+        setStatus('Select an image before downloading.', 'error');
+        return;
+      }
+      const canvas = createExportCanvas();
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = `${STATE.currentToolId}_noir.png`;
+      link.click();
+      setStatus(`Downloaded ${STATE.currentToolId}_noir.png`, 'ok');
+    }
+
+    async function saveCurrent() {
+      if (!STATE.selectedImage) {
+        setStatus('Select an image before saving.', 'error');
+        return;
+      }
+      setStatus('Saving file to Theme/noir...');
+      try {
+        const canvas = createExportCanvas();
+        const response = await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            toolId: STATE.currentToolId,
+            dataUrl: canvas.toDataURL('image/png')
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.error || 'Save failed.');
+        }
+        if (STATE.config?.saved) {
+          STATE.config.saved[STATE.currentToolId] = true;
+        }
+        renderSavedList();
+        setStatus(`Saved ${payload.savedPath}`, 'ok');
+      } catch (error) {
+        setStatus(error.message, 'error');
+      }
+    }
+
+    function applyHint() {
+      EL.searchInput.value = SEARCH_HINTS[STATE.currentToolId] || '';
+      EL.searchInput.focus();
+    }
+
+    async function searchImages(page = 1) {
+      const query = EL.searchInput.value.trim();
+      const apiKey = EL.apiKey.value.trim();
+      if (!query) {
+        setStatus('Write a search query first.', 'error');
+        return;
+      }
+
+      STATE.query = query;
+      STATE.currentPage = page;
+      STATE.orientation = EL.orientationSelect.value;
+      localStorage.setItem('noir-asset-tool-key', apiKey);
+      localStorage.setItem('noir-asset-tool-query', query);
+      localStorage.setItem('noir-asset-tool-orientation', STATE.orientation);
+      localStorage.setItem('noir-asset-tool-tool', STATE.currentToolId);
+
+      setStatus(`Searching page ${page}...`);
+      EL.resultsSummary.textContent = 'Searching...';
+
+      try {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&page=${page}&orientation=${encodeURIComponent(STATE.orientation)}`, {
+          headers: apiKey ? { 'x-pixabay-key': apiKey } : {}
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Search failed.');
+        }
+        STATE.results = data.hits || [];
+        STATE.selectedIndex = -1;
+        STATE.selectedImage = null;
+        EL.resultsSummary.textContent = `${data.totalHits} total hits / page ${page}`;
+        renderResults();
+        renderSourceMeta();
+        drawPlaceholder('Select an image');
+        setStatus(`Loaded ${STATE.results.length} results.`, 'ok');
+      } catch (error) {
+        STATE.results = [];
+        STATE.selectedIndex = -1;
+        renderResults();
+        renderSourceMeta();
+        drawPlaceholder('Search failed');
+        EL.resultsSummary.textContent = 'Search failed.';
+        setStatus(error.message, 'error');
+      }
+    }
+
+    function bindRange(id) {
+      $(id).addEventListener('input', () => {
+        readControlsIntoState();
+        scheduleRender();
+      });
+    }
+
+    function attachCanvasInteractions() {
+      EL.previewCanvas.addEventListener('pointerdown', (event) => {
+        if (!STATE.selectedImage) return;
+        STATE.drag = {
+          x: event.clientX,
+          y: event.clientY,
+          panX: STATE.panX,
+          panY: STATE.panY
+        };
+        EL.previewCanvas.classList.add('dragging');
+        EL.previewCanvas.setPointerCapture(event.pointerId);
+      });
+
+      EL.previewCanvas.addEventListener('pointermove', (event) => {
+        if (!STATE.drag) return;
+        const rect = EL.previewCanvas.getBoundingClientRect();
+        const scale = EL.previewCanvas.width / rect.width;
+        STATE.panX = STATE.drag.panX + ((event.clientX - STATE.drag.x) * scale);
+        STATE.panY = STATE.drag.panY + ((event.clientY - STATE.drag.y) * scale);
+        scheduleRender();
+      });
+
+      const stopDrag = () => {
+        STATE.drag = null;
+        EL.previewCanvas.classList.remove('dragging');
+      };
+
+      EL.previewCanvas.addEventListener('pointerup', stopDrag);
+      EL.previewCanvas.addEventListener('pointercancel', stopDrag);
+      EL.previewCanvas.addEventListener('pointerleave', stopDrag);
+      EL.previewCanvas.addEventListener('wheel', (event) => {
+        if (!STATE.selectedImage) return;
+        event.preventDefault();
+        STATE.zoom = clamp(STATE.zoom + (event.deltaY > 0 ? -0.05 : 0.05), 1, 3);
+        $('zoom').value = STATE.zoom;
+        updateValueLabels();
+        scheduleRender();
+      }, { passive: false });
+    }
+
+    async function loadConfig() {
+      const response = await fetch('/api/config');
+      const config = await response.json();
+      STATE.config = config;
+      $('docs-link').href = config.apiDocs;
+      populateTools();
+      renderSavedList();
+      syncPathLabel();
+      $('key-note').innerHTML = config.hasEnvKey
+        ? 'Server started with <code>PIXABAY_API_KEY</code>. You can still paste a different key here.'
+        : 'No env key detected. Paste your free Pixabay key here or start the server with <code>PIXABAY_API_KEY</code>.';
+    }
+
+    function restoreState() {
+      const cachedKey = localStorage.getItem('noir-asset-tool-key') || '';
+      const cachedQuery = localStorage.getItem('noir-asset-tool-query') || '';
+      const cachedOrientation = localStorage.getItem('noir-asset-tool-orientation') || 'horizontal';
+      const cachedTool = localStorage.getItem('noir-asset-tool-tool') || STATE.currentToolId;
+      if (cachedKey) EL.apiKey.value = cachedKey;
+      if (cachedQuery) EL.searchInput.value = cachedQuery;
+      EL.orientationSelect.value = cachedOrientation;
+      if ((STATE.config?.tools || []).some((tool) => tool.id === cachedTool)) {
+        STATE.currentToolId = cachedTool;
+        EL.toolSelect.value = cachedTool;
+      }
+      syncPathLabel();
+      renderSavedList();
+    }
+
+    function bindUI() {
+      EL.toolSelect.addEventListener('change', () => {
+        STATE.currentToolId = EL.toolSelect.value;
+        localStorage.setItem('noir-asset-tool-tool', STATE.currentToolId);
+        syncPathLabel();
+        renderSavedList();
+      });
+
+      EL.useHintBtn.addEventListener('click', applyHint);
+      EL.refreshStatusBtn.addEventListener('click', async () => {
+        await loadConfig();
+        restoreState();
+        setStatus('Refreshed save status.', 'ok');
+      });
+      EL.searchBtn.addEventListener('click', () => searchImages(1));
+      EL.prevPageBtn.addEventListener('click', () => searchImages(Math.max(1, STATE.currentPage - 1)));
+      EL.nextPageBtn.addEventListener('click', () => searchImages(STATE.currentPage + 1));
+      EL.recenterBtn.addEventListener('click', recenterImage);
+      EL.downloadBtn.addEventListener('click', downloadCurrent);
+      EL.saveBtn.addEventListener('click', saveCurrent);
+      EL.resetLookBtn.addEventListener('click', resetLook);
+
+      EL.searchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          searchImages(1);
+        }
+      });
+
+      ['zoom', 'exposure', 'contrast', 'threshold', 'softness', 'halftone-strength', 'dot-spacing', 'dot-scale', 'grain', 'paper-color', 'ink-color']
+        .forEach(bindRange);
+
+      attachCanvasInteractions();
+    }
+
+    async function init() {
+      Object.assign(EL, {
+        apiKey: $('api-key'),
+        toolSelect: $('tool-select'),
+        searchInput: $('search-input'),
+        orientationSelect: $('orientation-select'),
+        useHintBtn: $('use-hint-btn'),
+        refreshStatusBtn: $('refresh-status-btn'),
+        searchBtn: $('search-btn'),
+        prevPageBtn: $('prev-page-btn'),
+        nextPageBtn: $('next-page-btn'),
+        statusBox: $('status-box'),
+        savedList: $('saved-list'),
+        resultsGrid: $('results-grid'),
+        resultsSummary: $('results-summary'),
+        previewCanvas: $('preview-canvas'),
+        targetPath: $('target-path'),
+        sourceMeta: $('source-meta'),
+        recenterBtn: $('recenter-btn'),
+        downloadBtn: $('download-btn'),
+        saveBtn: $('save-btn'),
+        resetLookBtn: $('reset-look-btn')
+      });
+
+      writeControlsFromState();
+      bindUI();
+      drawPlaceholder('Select an image');
+
+      try {
+        await loadConfig();
+        restoreState();
+        setStatus('Ready. Choose a tool, search an image, then save the processed PNG.', 'ok');
+      } catch (error) {
+        setStatus(`Could not load config: ${error.message}`, 'error');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
