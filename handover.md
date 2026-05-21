@@ -1,14 +1,14 @@
 # Handover: VGTools Pro Theme System — Continue Work
-**Date:** 2026-04-14  
-**Branch:** `temp/theme-work`  
+**Date:** 2026-04-14
+**Branch:** `temp/theme-work`
 **Last commit:** `db8f924` — feat: Noir theme
 
 ---
 
 ## Project Overview
 
-**Location:** `c:\Users\Esteban Alfaro\OneDrive - McKinsey & Company\Desktop\apps\HTML_apps\VG Toolkit\`  
-**Stack:** Pure HTML/CSS/JS multi-file SPA. No framework, no bundler.  
+**Location:** `c:\Users\Esteban Alfaro\OneDrive - McKinsey & Company\Desktop\apps\HTML_apps\VG Toolkit\`
+**Stack:** Pure HTML/CSS/JS multi-file SPA. No framework, no bundler.
 **Git remote:** `https://github.com/ealfaro29/toolkit.git`
 
 **Structure:**
@@ -134,16 +134,16 @@ Only `comicbook` and `glassui` use images:
 ---
 
 ## Miniwi Font (Terminal theme only)
-Source: `github.com/xero/figlet-fonts` → `miniwi.flf`  
+Source: `github.com/xero/figlet-fonts` → `miniwi.flf`
 Each glyph is a 4-row string array with variable width (A–Z mostly 2 chars, N=3, M/W=4).
 
-`MINIWI_GLYPHS` in index.html JS covers A–Z + 0–9 + space.  
+`MINIWI_GLYPHS` in index.html JS covers A–Z + 0–9 + space.
 `renderMiniwi(text)` uppercases text, looks up each char, joins rows with 1-space kerning gap, trims empty row 4 (descender) if unused.
 
-`TERMINAL_LABELS` maps tool IDs to 3-letter uppercase labels (all using A–Z covered by the font):  
+`TERMINAL_LABELS` maps tool IDs to 3-letter uppercase labels (all using A–Z covered by the font):
 `brickbuilder→BRK, moodboards→MOD, blobs→BLB, jigsaws→JIG, iconfactory→ICO, qrcodes→QRC, colors→HUE, notes→NTE, locator→GEO, signatures→SIG, svgrecolor→CLR, any2svg→SVG, bgremover→BKG, wordclouds→WRD, sankey→SKY, mockups→MCK`
 
-CSS for `.terminal-ascii`: `font-size: 18px; line-height: 1; font-family: ui-monospace; white-space: pre;`  
+CSS for `.terminal-ascii`: `font-size: 18px; line-height: 1; font-family: ui-monospace; white-space: pre;`
 **Critical:** `line-height: 1` — block chars break visually at any other value.
 
 ---
@@ -218,6 +218,6 @@ The user approved three themes to build next (in order of preference):
 ---
 
 ## Version Cache Busting
-Current version: **v=11**  
-All 16 mini-apps load: `<script src="../shared/visual-theme.js?v=11">`  
-When `visual-theme.js` changes: find-replace `v=11` → `v=12` across all mini-app `index.html` files.
+Current version: **v=14**
+All 16 mini-apps load: `<script src="../shared/visual-theme.js?v=14">`
+When `visual-theme.js` changes: bump the `v=` query string across all mini-app `index.html` files.
