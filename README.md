@@ -1,7 +1,7 @@
 # VGTools Pro - A Universe of Creative Mini-Apps
 
 <p align="center">
-  <img src="mockups/modal.png" alt="VGTools Pro Preview" width="600"/>
+  <img src="mockups/Comicbook.png" alt="VGTools Pro Preview" width="600"/>
 </p>
 
 **VGTools Pro** is a powerful, client-side collection of 15 mini-apps designed to streamline the daily tasks of creative professionals, such as presentation designers, visual artists, and developers. Born from the need for specific, fast, and secure solutions, this toolkit provides a suite of tools that run entirely in your browser, ensuring your data remains private and secure.

@@ -82,7 +82,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background: url('pattern.jpg') repeat;
+            background: var(--announcement-pattern-image, url('pattern.jpg')) repeat;
             background-size: 400px 400px;
             opacity: 0.4;
             z-index: -1;
@@ -146,6 +146,160 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
+        .card-image.assetless {
+            overflow: hidden;
+            border-radius: 32px;
+        }
+
+        .card-image.assetless img {
+            opacity: 0;
+        }
+
+        .card-image.assetless::before {
+            content: var(--announcement-emoji-wallpaper, "");
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+            font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+            font-size: clamp(30px, 4vw, 62px);
+            line-height: 1.5;
+            letter-spacing: 14px;
+            word-spacing: 10px;
+            white-space: normal;
+            text-align: center;
+            transform: rotate(-6deg) scale(1.06);
+        }
+
+        html[data-visual-theme="minimal"] .card-image.assetless {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 245, 247, 0.86) 100%);
+            border: 1px solid rgba(17, 17, 17, 0.08);
+        }
+
+        html[data-theme="dark"][data-visual-theme="minimal"] .card-image.assetless {
+            background: linear-gradient(145deg, rgba(16, 16, 20, 0.92) 0%, rgba(11, 11, 15, 0.9) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-visual-theme="emoji"] .card-image.assetless {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 240, 248, 0.82) 100%);
+            border: 1px solid rgba(255, 165, 108, 0.24);
+        }
+
+        html[data-theme="dark"][data-visual-theme="emoji"] .card-image.assetless {
+            background: linear-gradient(145deg, rgba(43, 29, 56, 0.92) 0%, rgba(24, 18, 44, 0.88) 100%);
+            border: 1px solid rgba(255, 143, 188, 0.18);
+        }
+
+        html[data-visual-theme="noir"] body {
+            background: #f0ece6;
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] body {
+            background: #0c0c0c;
+        }
+
+        html[data-visual-theme="noir"] body::before {
+            background-image:
+                linear-gradient(180deg, rgba(25, 23, 21, 0.03) 0%, rgba(25, 23, 21, 0.01) 100%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.12;
+            background-size: auto, 220px 220px;
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] body::before {
+            opacity: 0.16;
+        }
+
+        html[data-visual-theme="noir"] .announcement-card {
+            border-radius: 0;
+            padding: 18px;
+            gap: 22px;
+        }
+
+        html[data-visual-theme="noir"] .card-image {
+            overflow: hidden;
+            border: 2px solid #0a0a0a;
+            box-shadow: 6px 6px 0 #0a0a0a;
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] .card-image {
+            border-color: #f0ece6;
+            box-shadow: 6px 6px 0 #f0ece6;
+        }
+
+        html[data-visual-theme="noir"] .card-image img {
+            border-radius: 0;
+            opacity: 1;
+            box-shadow: none;
+            filter: grayscale(1) contrast(1.18) sepia(0.28) saturate(0.42) brightness(0.95);
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] .card-image img {
+            filter: grayscale(1) contrast(1.14) sepia(0.22) saturate(0.36) brightness(0.84);
+        }
+
+        html[data-visual-theme="noir"] .card-info h1 {
+            color: #0a0a0a;
+            background: none;
+            -webkit-text-fill-color: currentColor;
+            font-family: Georgia, "Times New Roman", serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] .card-info h1 {
+            color: #f0ece6;
+        }
+
+        html[data-visual-theme="noir"] .card-info .tagline {
+            font-family: "Courier New", ui-monospace, monospace;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        html[data-visual-theme="noir"] .card-info .description,
+        html[data-visual-theme="noir"] .feature-item,
+        html[data-visual-theme="noir"] .footer {
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        html[data-visual-theme="noir"] .features {
+            gap: 0;
+        }
+
+        html[data-visual-theme="noir"] .feature-item {
+            padding: 10px 0;
+            border-top: 1px solid rgba(10, 10, 10, 0.16);
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] .feature-item {
+            border-top-color: rgba(240, 236, 230, 0.16);
+        }
+
+        html[data-visual-theme="noir"] .feature-item:last-child {
+            border-bottom: 1px solid rgba(10, 10, 10, 0.16);
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] .feature-item:last-child {
+            border-bottom-color: rgba(240, 236, 230, 0.16);
+        }
+
+        html[data-visual-theme="noir"] .cta-button {
+            border-radius: 0;
+            background: #0a0a0a;
+            box-shadow: 4px 4px 0 rgba(10, 10, 10, 0.2);
+        }
+
+        html[data-theme="dark"][data-visual-theme="noir"] .cta-button {
+            background: #f0ece6;
+            color: #0a0a0a;
+            box-shadow: 4px 4px 0 rgba(240, 236, 230, 0.18);
+        }
+
         .card-info {
             flex: 1;
             display: flex;
@@ -195,8 +349,7 @@
         }
 
         .feature-item span.emoji {
-            font-size: 20px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            display: none;
         }
 
         .cta-button {
@@ -316,12 +469,49 @@
         function updateThemeIcon() {
             const btn = document.getElementById('theme-toggle');
             const theme = localStorage.getItem('vgtools-theme') || 'system';
-            btn.textContent = theme === 'dark' ? '☀️' : theme === 'light' ? '🌙' : '🔄';
+            const labels = { light: 'L', dark: 'D', system: 'A' };
+            const names = { light: 'Light', dark: 'Dark', system: 'Auto' };
+            btn.textContent = labels[theme] || 'A';
+            btn.title = `Color theme: ${names[theme] || theme}`;
+            btn.setAttribute('aria-label', `Color theme: ${names[theme] || theme}`);
+        }
+
+        function applyVisualTheme() {
+            const visualTheme = localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+            const preview = document.getElementById('announcement-image');
+            const previewWrap = preview ? preview.parentElement : null;
+            const themeMeta = {
+                comicbook: { usesArtwork: true, usesPattern: true },
+                glassui: { usesArtwork: true, usesPattern: true },
+                minimal: { usesArtwork: false, usesPattern: false },
+                emoji: { usesArtwork: false, usesPattern: false, wallpaper: '✳️  🔷  🛠️  📦  ✳️  🔷  🛠️  📦  ✳️  🔷  🛠️  📦' },
+                terminal: { usesArtwork: false, usesPattern: false },
+                noir: { usesArtwork: true, usesPattern: false }
+            }[visualTheme] || { usesArtwork: true, usesPattern: true };
+            const patternImage = `Theme/${visualTheme}/pattern_${visualTheme}.jpg`;
+            const previewImage = `Theme/${visualTheme}/iconfactory_${visualTheme}.png`;
+
+            document.documentElement.dataset.visualTheme = visualTheme;
+            document.documentElement.style.setProperty('--announcement-pattern-image', themeMeta.usesPattern ? `url('${patternImage}')` : 'none');
+            document.documentElement.style.setProperty('--announcement-emoji-wallpaper', JSON.stringify(themeMeta.wallpaper || ''));
+            if (previewWrap) {
+                previewWrap.classList.toggle('assetless', !themeMeta.usesArtwork);
+            }
+            if (preview && themeMeta.usesArtwork) {
+                preview.src = previewImage;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             updateThemeIcon();
+            applyVisualTheme();
             document.getElementById('theme-toggle').addEventListener('click', cycleTheme);
+        });
+
+        window.addEventListener('storage', (event) => {
+            if (!event.key || event.key === 'vgtools-visual-theme') {
+                applyVisualTheme();
+            }
         });
     </script>
 </head>
@@ -332,7 +522,7 @@
     <div class="announcement-card">
         <!-- Left side: Visual -->
         <div class="card-image">
-            <img src="iconfactory/modal.png" alt="vgtools.pro" draggable="false">
+            <img id="announcement-image" src="Theme/comicbook/iconfactory_comicbook.png" alt="vgtools.pro" draggable="false">
         </div>
 
         <!-- Right side: Info -->

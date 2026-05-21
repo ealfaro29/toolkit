@@ -78,7 +78,7 @@
 
     /* Wiki header background */
     .wiki-header {
-      background-image: url('modal.png');
+      background-image: url('Comicbook.png');
     }
 
     /* Progress bar for engine loading */
@@ -177,7 +177,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: url('modal.png') center / cover no-repeat;
+      background: url('Comicbook.png') center / cover no-repeat;
       opacity: 0.15;
       z-index: -1;
       pointer-events: none;
@@ -279,6 +279,7 @@
       margin-top: auto;
     }
   </style>
+  <script src="../shared/visual-theme.js?v=14"></script>
 </head>
 
 <body>
@@ -290,7 +291,7 @@
 
       <!-- Left side: Visual showcase -->
       <div class="splash-image">
-        <img src="modal.png" alt="Any2SVG" draggable="false">
+        <img src="Comicbook.png" alt="Any2SVG" draggable="false">
       </div>
 
       <!-- Right side: Info panel -->
@@ -680,20 +681,34 @@
       initVisitorCounter() {
         if (!this.el.visitorBadgeContainer) return;
 
-        const title = document.title; // "Any2SVG"
-        const pagePath = title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/--+/g, '-'); // "any2svg"
-        const fullPath = `ealfaro29.toolkit.${pagePath}`; // "ealfaro29.toolkit.any2svg"
+        const isLocalHost = /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname);
+        const cleanPath = window.location.pathname.replace(/index\.html$/i, '').replace(/\/+$/, '/');
+        const canonicalPath = isLocalHost
+          ? `https://vgtools.pro${cleanPath === '' ? '/' : cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`}`
+          : `${window.location.origin}${cleanPath === '' ? '/' : cleanPath.startsWith('/') ? cleanPath : `/${cleanPath}`}`;
 
         let accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim().substring(1);
         if (!accentColor || accentColor.length < 6) {
-          accentColor = 'A4C639'; // Fallback al color verde de esta app
+          accentColor = 'A4C639';
         }
 
-        const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}&labelColor=%23555555&countColor=%23${accentColor}`;
-        const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${fullPath}`;
+        const encodedPath = encodeURIComponent(canonicalPath);
+        const badgeUrl = `https://api.visitorbadge.io/api/visitors?path=${encodedPath}&label=Visitors&labelColor=%23555555&countColor=%23${accentColor}&style=flat`;
+        const linkUrl = `https://api.visitorbadge.io/api/visitors?path=${encodedPath}`;
+        const img = new Image();
+        img.alt = 'Visitor counter';
+        img.decoding = 'async';
+        img.loading = 'eager';
+        img.referrerPolicy = 'no-referrer';
 
         this.el.visitorBadgeContainer.href = linkUrl;
-        this.el.visitorBadgeContainer.innerHTML = `<img src="${badgeUrl}" alt="Visitor counter" />`;
+        this.el.visitorBadgeContainer.textContent = 'Visitors';
+        img.addEventListener('load', () => this.el.visitorBadgeContainer.replaceChildren(img));
+        img.addEventListener('error', () => {
+          this.el.visitorBadgeContainer.textContent = 'Visitors unavailable';
+          this.el.visitorBadgeContainer.removeAttribute('href');
+        });
+        img.src = badgeUrl;
       },
 
       showToast(message) {
