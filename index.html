@@ -4366,6 +4366,15 @@
           <p class="app-card-description">Design and build 2D brick structures with a simple drag-and-drop interface.
             Export your creations as high-quality SVG or PNG files.</p>
         </a>
+        <!-- SVG Recolor - NEW -->
+        <a href="svgrecolor/" class="app-card app-card-new"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
+          data-id="svgrecolor" data-new="true" draggable="true">
+
+          <h2 class="app-card-title">SVG Recolor</h2>
+          <p class="app-card-description">Powerful tool to analyze and recolor SVG files. Group colors by hue and shift
+            entire palettes with intuitive sliders.</p>
+        </a>
         <a href="moodboards/" class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="moodboards" draggable="true">
@@ -4446,6 +4455,15 @@
           <p class="app-card-description">Recolor SVG files using smart hue grouping and quick replacement controls.
             Great for branding variants and presentation-ready exports.</p>
         </a>
+        <!-- Handwriting OCR - Hidden -->
+        <!-- <a href="handwriting/" class="app-card"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
+          data-id="handwriting" draggable="true">
+
+          <h2 class="app-card-title">Handwriting OCR</h2>
+          <p class="app-card-description">Extract text from handwritten images using OCR technology. Perfect for
+            digitizing handwritten notes and documents.</p>
+        </a> -->
         <a href="any2svg/" class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="any2svg" draggable="true">
@@ -5045,6 +5063,7 @@
 
         const appTech = {
           brickbuilder: ['2D', 'SVG'],
+          svgrecolor: ['SVG', 'Hue-Shift'],
           moodboards: ['Canvas', 'PNG'],
           blobs: ['SVG', 'Bezier'],
           jigsaws: ['SVG', 'Vector'],
@@ -5054,7 +5073,7 @@
           notes: ['LocalStorage', 'MD'],
           locator: ['Leaflet', 'Maps'],
           signatures: ['Canvas', 'Trace'],
-          svgrecolor: ['SVG', 'Hue-Shift'],
+          // handwriting: ['OCR', 'Tesseract'],
           any2svg: ['In-Browser', 'PDF'],
           bgremover: ['AI', 'U2Net'],
           wordclouds: ['D3', 'Cloud'],
