@@ -3888,6 +3888,204 @@
       display: none;
     }
 
+    /* === THEME RELEASE SPLASH === */
+    .theme-splash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99998;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background-color: rgba(246, 247, 249, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms ease;
+    }
+
+    html[data-theme="dark"] .theme-splash-overlay {
+      background-color: rgba(10, 10, 10, 0.72);
+    }
+
+    .theme-splash-overlay.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .theme-splash-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .theme-splash-overlay.hidden {
+      display: none;
+    }
+
+    .theme-splash-content {
+      position: relative;
+      box-sizing: border-box;
+      width: min(560px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow-y: auto;
+      padding: 32px;
+      color: #1c1c1e;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(28, 28, 30, 0.16);
+      border-radius: 8px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+      transform: translateY(16px) scale(0.98);
+      transition: transform 320ms cubic-bezier(0.2, 0.82, 0.2, 1);
+    }
+
+    .theme-splash-overlay.is-visible .theme-splash-content {
+      transform: translateY(0) scale(1);
+    }
+
+    html[data-theme="dark"] .theme-splash-content {
+      color: #f5f5f7;
+      background: rgba(22, 22, 24, 0.94);
+      border-color: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+    }
+
+    .theme-splash-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      color: currentColor;
+      background: rgba(28, 28, 30, 0.06);
+      border: 1px solid rgba(28, 28, 30, 0.12);
+      border-radius: 6px;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    html[data-theme="dark"] .theme-splash-close {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .theme-splash-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 6px 9px;
+      color: #4b4b50;
+      background: rgba(28, 28, 30, 0.06);
+      border: 1px solid rgba(28, 28, 30, 0.1);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    html[data-theme="dark"] .theme-splash-kicker {
+      color: #c8c8ce;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .theme-splash-title {
+      margin: 0;
+      max-width: 460px;
+      padding-right: 40px;
+      font-family: inherit;
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 750;
+      line-height: 1.12;
+    }
+
+    .theme-splash-copy {
+      margin: 16px 0 0;
+      max-width: 480px;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .theme-splash-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 22px 0 24px;
+    }
+
+    .theme-splash-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 6px 9px;
+      border: 2px solid currentColor;
+      border-color: rgba(28, 28, 30, 0.14);
+      border-radius: 999px;
+      background: rgba(28, 28, 30, 0.04);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    html[data-theme="dark"] .theme-splash-chip {
+      border-color: rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .theme-splash-chip::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--chip-color, #e72f2f);
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.14);
+    }
+
+    .theme-splash-action {
+      min-height: 40px;
+      padding: 0 18px;
+      color: #fff;
+      background: #1c1c1e;
+      border: 1px solid #1c1c1e;
+      border-radius: 6px;
+      font-weight: 750;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    }
+
+    .theme-splash-action:hover {
+      background: #2c2c2e;
+    }
+
+    html[data-theme="dark"] .theme-splash-action {
+      color: #1c1c1e;
+      background: #f5f5f7;
+      border-color: #f5f5f7;
+    }
+
+    html[data-theme="dark"] .theme-splash-action:hover {
+      background: #ffffff;
+    }
+
+    @media (max-width: 640px) {
+      .theme-splash-content {
+        padding: 24px 18px;
+        box-shadow: 0 18px 54px rgba(0, 0, 0, 0.2);
+      }
+
+      .theme-splash-title {
+        padding-right: 38px;
+      }
+    }
+
     /* ----------------------------------------------------- */
     /*   iOS 26 LIQUID GLASS MIGRATION (Hub Version)       */
     /* ----------------------------------------------------- */
@@ -4332,6 +4530,25 @@
         <span class="welcome-dot"></span>
         <span class="welcome-dot"></span>
       </div>
+    </div>
+  </div>
+
+  <div id="theme-splash-overlay" class="theme-splash-overlay hidden" role="dialog" aria-modal="true"
+    aria-labelledby="theme-splash-title">
+    <div class="theme-splash-content">
+      <button id="theme-splash-close" class="theme-splash-close" type="button" aria-label="Close">&times;</button>
+      <div class="theme-splash-kicker">Theme update</div>
+      <h2 id="theme-splash-title" class="theme-splash-title">New themes are available</h2>
+      <p class="theme-splash-copy">Choose from Comicbook, Glass UI, Minimal, Emoji, Terminal, and Noir across the toolkit.</p>
+      <div class="theme-splash-strip" aria-hidden="true">
+        <span class="theme-splash-chip" style="--chip-color:#e72f2f">Comicbook</span>
+        <span class="theme-splash-chip" style="--chip-color:#7dd3fc">Glass UI</span>
+        <span class="theme-splash-chip" style="--chip-color:#111111">Minimal</span>
+        <span class="theme-splash-chip" style="--chip-color:#ff7ab6">Emoji</span>
+        <span class="theme-splash-chip" style="--chip-color:#00ff41">Terminal</span>
+        <span class="theme-splash-chip" style="--chip-color:#8a8078">Noir</span>
+      </div>
+      <button id="theme-splash-action" class="theme-splash-action" type="button">Explore themes</button>
     </div>
   </div>
 
@@ -6136,16 +6353,17 @@
 
       init() {
         const overlay = document.getElementById('welcome-overlay');
-        if (!overlay) return;
+        if (!overlay) return false;
 
         // Check if welcome was already shown
         if (this.wasShown()) {
           overlay.classList.add('hidden');
-          return;
+          return false;
         }
 
         // Show the overlay and schedule dismissal
         this.scheduleHide(overlay);
+        return true;
       },
 
       wasShown() {
@@ -6186,9 +6404,79 @@
       }
     };
 
+    const ThemeSplash = {
+      STORAGE_KEY: 'vgtools-theme-splash-v1',
+      SHOW_DELAY: 500,
+      WELCOME_DELAY: 3000,
+      bound: false,
+
+      init(delay = this.SHOW_DELAY) {
+        this.overlay = document.getElementById('theme-splash-overlay');
+        this.closeBtn = document.getElementById('theme-splash-close');
+        this.actionBtn = document.getElementById('theme-splash-action');
+        if (!this.overlay || this.wasShown()) return;
+        this.bind();
+        window.setTimeout(() => this.show(), delay);
+      },
+
+      wasShown() {
+        try {
+          return localStorage.getItem(this.STORAGE_KEY) === 'true';
+        } catch (e) {
+          return false;
+        }
+      },
+
+      markAsShown() {
+        try {
+          localStorage.setItem(this.STORAGE_KEY, 'true');
+        } catch (e) {
+          // localStorage not available
+        }
+      },
+
+      bind() {
+        if (this.bound) return;
+        this.bound = true;
+        this.closeBtn?.addEventListener('click', () => this.dismiss());
+        this.actionBtn?.addEventListener('click', () => this.dismiss(true));
+        this.overlay.addEventListener('click', (event) => {
+          if (event.target === this.overlay) this.dismiss();
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && this.isOpen()) this.dismiss();
+        });
+      },
+
+      show() {
+        if (!this.overlay || this.wasShown()) return;
+        this.overlay.classList.remove('hidden', 'fade-out');
+        requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
+      },
+
+      isOpen() {
+        return !!this.overlay && this.overlay.classList.contains('is-visible');
+      },
+
+      dismiss(openPicker = false) {
+        if (!this.overlay || this.overlay.classList.contains('hidden')) return;
+        this.markAsShown();
+        this.overlay.classList.remove('is-visible');
+        this.overlay.classList.add('fade-out');
+        window.setTimeout(() => {
+          this.overlay.classList.add('hidden');
+          this.overlay.classList.remove('fade-out');
+          if (openPicker && typeof App.openThemePicker === 'function') {
+            App.openThemePicker();
+          }
+        }, 280);
+      }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-      WelcomeOverlay.init();
+      const welcomeIsShowing = WelcomeOverlay.init();
       App.init();
+      ThemeSplash.init(welcomeIsShowing ? ThemeSplash.WELCOME_DELAY : ThemeSplash.SHOW_DELAY);
     });
   </script>
 
