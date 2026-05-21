@@ -2807,6 +2807,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
       padding: var(--space-4);
     }
@@ -2815,6 +2816,7 @@
     .footer-right {
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
@@ -4494,6 +4496,514 @@
       .tp-modal { border-radius: 14px 14px 0 0; }
       .tp-overlay { align-items: flex-end; padding: 0; }
     }
+    .app-card.app-card-banner {
+      --banner-art-width: min(42%, 540px);
+      grid-column: 1 / -1;
+      min-height: clamp(220px, 24vw, 280px);
+      aspect-ratio: auto !important;
+      justify-content: stretch !important;
+      background: var(--surface-alt) !important;
+    }
+
+    .app-card.app-card-banner.app-card-new {
+      animation: cardEntrance 0.5s ease forwards !important;
+      border-color: rgba(128, 128, 128, 0.22) !important;
+      box-shadow: var(--panel-shadow) !important;
+    }
+
+    .app-card.app-card-banner.app-card-new::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    .app-card.app-card-banner::before {
+      inset: 0 0 0 auto !important;
+      width: var(--banner-art-width);
+      border: 1px solid rgba(128, 128, 128, 0.22);
+      border-radius: 0;
+      background: var(--card-bg-image) center/cover no-repeat;
+      box-shadow: none;
+      opacity: 1 !important;
+      mix-blend-mode: normal !important;
+    }
+
+    .app-card.app-card-banner .card-glass-content {
+      width: calc(100% - var(--banner-art-width));
+      max-width: none;
+      min-height: 100%;
+      justify-content: center !important;
+      align-items: flex-start;
+      gap: 16px;
+      padding: clamp(22px, 4vw, 38px) clamp(20px, 4vw, 44px) !important;
+      background: transparent !important;
+      border-top: 0 !important;
+      box-sizing: border-box;
+    }
+
+    html[data-theme="light"] .app-card.app-card-banner .card-glass-content {
+      background: transparent !important;
+    }
+
+    .app-card.app-card-banner .app-card-banner-copy {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 11px;
+      max-width: 780px;
+      min-width: 0;
+    }
+
+    .app-card.app-card-banner .app-card-title {
+      margin: 0 !important;
+      max-width: 100%;
+      font-size: clamp(28px, 4.6vw, 46px) !important;
+      line-height: 1.05 !important;
+      letter-spacing: 0 !important;
+      overflow-wrap: anywhere;
+      text-wrap: balance;
+    }
+
+    .app-card.app-card-banner .app-card-description {
+      display: block !important;
+      max-width: 760px;
+      margin: 0 !important;
+      overflow: visible !important;
+      -webkit-line-clamp: unset !important;
+      line-clamp: unset !important;
+      -webkit-box-orient: initial !important;
+      font-size: clamp(13px, 1.45vw, 16px) !important;
+      line-height: 1.5 !important;
+      text-wrap: pretty;
+    }
+
+    .app-card.app-card-banner .app-card-tags {
+      display: flex !important;
+      margin-top: 0 !important;
+      gap: 10px;
+    }
+
+    .app-card-banner-label {
+      width: fit-content;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--card-accent-color, var(--accent-color));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .app-card-banner-shine {
+      position: absolute;
+      top: -40%;
+      bottom: -40%;
+      left: 0;
+      width: 28%;
+      z-index: 4;
+      pointer-events: none;
+      background: linear-gradient(105deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0) 24%,
+          rgba(255, 255, 255, 0.34) 48%,
+          rgba(255, 255, 255, 0.08) 56%,
+          transparent 78%);
+      mix-blend-mode: screen;
+      transform: translateX(-160%) skewX(-18deg);
+      animation: bannerShineSweep 5.8s ease-in-out infinite;
+    }
+
+    .app-card-banner-emoji {
+      display: none;
+    }
+
+    @keyframes bannerShineSweep {
+      0%, 58% {
+        transform: translateX(-160%) skewX(-18deg);
+      }
+
+      76%, 100% {
+        transform: translateX(520%) skewX(-18deg);
+      }
+    }
+
+    html[data-visual-theme="comicbook"] .app-card.app-card-banner {
+      background: #fff3d7 !important;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card.app-card-banner::before {
+      border: 0;
+      border-left: 4px solid #111;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-banner-label {
+      border: 3px solid #111;
+      border-radius: 0;
+      background: #F7CF27;
+      color: #111;
+      box-shadow: 3px 3px 0 #111;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card-banner-shine {
+      background: linear-gradient(105deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0) 22%,
+          rgba(247, 207, 39, 0.38) 42%,
+          rgba(255, 255, 255, 0.7) 50%,
+          rgba(247, 207, 39, 0.2) 58%,
+          transparent 78%);
+      mix-blend-mode: screen;
+    }
+
+    html[data-visual-theme="comicbook"] .app-card.app-card-banner .app-card-title {
+      font-size: clamp(30px, 5vw, 50px) !important;
+      line-height: 0.98 !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card.app-card-banner .app-card-title {
+      line-height: 1.12 !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card.app-card-banner {
+      --banner-emoji-width: min(34%, 300px);
+      aspect-ratio: auto !important;
+      min-height: 240px !important;
+      transform: none !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card.app-card-banner:hover {
+      transform: translateY(-4px) !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card.app-card-banner .card-glass-content {
+      width: calc(100% - var(--banner-emoji-width));
+      padding: clamp(22px, 4vw, 38px) clamp(20px, 4vw, 44px) !important;
+      justify-content: center !important;
+      gap: 16px !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card-banner-label {
+      background: #ff6b4a;
+      color: #fff7d6;
+      box-shadow: 0 3px 0 rgba(91, 49, 0, 0.18);
+    }
+
+    html[data-visual-theme="emoji"] .app-card-banner-emoji {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 50%;
+      right: clamp(22px, 4vw, 54px);
+      z-index: 3;
+      width: var(--banner-emoji-width);
+      height: calc(100% - 42px);
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: clamp(96px, 13vw, 178px);
+      line-height: 1;
+      transform: translateY(-50%) rotate(7deg);
+      pointer-events: none;
+      text-shadow: 0 14px 22px rgba(91, 49, 0, 0.16);
+    }
+
+    html[data-theme="dark"][data-visual-theme="emoji"] .app-card-banner-emoji {
+      text-shadow: 0 14px 22px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-visual-theme="minimal"] .app-card.app-card-banner .card-glass-content {
+      width: 100%;
+    }
+
+    html[data-theme="light"][data-visual-theme="minimal"] .app-card-banner-label {
+      background: #111;
+      color: #fff;
+    }
+
+    html[data-theme="dark"][data-visual-theme="minimal"] .app-card-banner-label {
+      background: #f5f5f7;
+      color: #0b0b0f;
+    }
+
+    html[data-visual-theme="minimal"] .app-card.app-card-banner .app-card-description {
+      display: block !important;
+      max-width: 760px;
+      color: var(--muted) !important;
+      -webkit-text-fill-color: currentColor !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card.app-card-banner .app-card-tags {
+      display: flex !important;
+    }
+
+    html[data-visual-theme="minimal"] .app-card.app-card-banner .app-card-tag {
+      display: inline-flex;
+      border-radius: 999px !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .app-card-banner-label {
+      background: rgba(143, 211, 255, 0.9);
+      color: #10205a;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .app-card-banner-label {
+      background: rgba(143, 211, 255, 0.22);
+      color: #e6f4ff;
+      border: 1px solid rgba(143, 211, 255, 0.38);
+    }
+
+    html[data-theme="light"][data-visual-theme="glassui"] .app-card.app-card-banner.app-card-new {
+      border-color: rgba(143, 211, 255, 0.35) !important;
+      box-shadow: 0 18px 42px rgba(97, 128, 255, 0.12) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="glassui"] .app-card.app-card-banner.app-card-new {
+      border-color: rgba(143, 211, 255, 0.26) !important;
+      box-shadow: 0 18px 42px rgba(31, 48, 130, 0.24) !important;
+    }
+
+    html[data-visual-theme="emoji"] .app-card.app-card-banner .app-card-sticker,
+    html[data-visual-theme="terminal"] .app-card.app-card-banner .terminal-ascii {
+      display: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner {
+      aspect-ratio: auto !important;
+      min-height: 240px !important;
+      transform: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner:hover {
+      transform: translateY(-4px) !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner::before {
+      display: none !important;
+      content: none !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner .card-glass-content {
+      background: transparent !important;
+      width: 100%;
+      padding: clamp(22px, 4vw, 38px) clamp(20px, 4vw, 44px) !important;
+      justify-content: center !important;
+      gap: 16px !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner .app-card-title {
+      font-size: clamp(20px, 3.2vw, 34px) !important;
+      line-height: 1.15 !important;
+      letter-spacing: 0.04em !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner .app-card-description {
+      display: block !important;
+      max-width: 760px;
+      overflow: visible !important;
+      -webkit-line-clamp: unset !important;
+      line-clamp: unset !important;
+      font-size: clamp(12px, 1.25vw, 15px) !important;
+      line-height: 1.55 !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card.app-card-banner .app-card-tags {
+      display: flex !important;
+    }
+
+    html[data-visual-theme="terminal"] .app-card-banner-label {
+      background: #00ff41;
+      color: #020502;
+      border-radius: 0;
+    }
+
+    html[data-visual-theme="terminal"] .app-card-banner-shine {
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(0, 255, 65, 0) 28%,
+          rgba(0, 255, 65, 0.28) 50%,
+          rgba(0, 255, 65, 0) 72%,
+          transparent 100%);
+      mix-blend-mode: normal;
+      opacity: 0.9;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner::before {
+      inset: 0 0 0 auto !important;
+      width: var(--banner-art-width);
+      border-radius: 0;
+      border: 0;
+      border-left: 1.5px solid currentColor;
+      box-shadow: none;
+      filter: grayscale(1) contrast(1.2) sepia(0.12) saturate(0.35) brightness(0.96) !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner {
+      aspect-ratio: auto !important;
+      min-height: 250px !important;
+      transform: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="noir"] .app-card.app-card-banner {
+      background: #f7f1e7 !important;
+      color: #0a0a0a !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card.app-card-banner {
+      background: #111111 !important;
+      color: #f0ece6 !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner:hover {
+      transform: translateY(-4px) !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .card-glass-content {
+      width: calc(100% - var(--banner-art-width));
+      padding: clamp(28px, 4vw, 42px) clamp(24px, 4vw, 44px) !important;
+      justify-content: center !important;
+      gap: 18px !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner::after {
+      content: none !important;
+      display: none !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .noir-card-copy {
+      max-width: 640px;
+      gap: 14px;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .app-card-title {
+      font-size: clamp(32px, 4.4vw, 52px) !important;
+      line-height: 0.96 !important;
+      letter-spacing: 0 !important;
+      min-height: 0 !important;
+      max-width: 100% !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .app-card-description {
+      display: block !important;
+      max-width: 620px;
+      overflow: visible !important;
+      -webkit-line-clamp: unset !important;
+      line-clamp: unset !important;
+      font-size: clamp(13px, 1.4vw, 16px) !important;
+      line-height: 1.55 !important;
+      font-family: var(--font-family-sans) !important;
+      text-shadow: none !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="noir"] .app-card.app-card-banner .app-card-description {
+      color: rgba(10, 10, 10, 0.72) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card.app-card-banner .app-card-description {
+      color: rgba(240, 236, 230, 0.76) !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .app-card-tags {
+      display: flex !important;
+      gap: 10px !important;
+      margin-top: 2px !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .app-card-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 18px;
+      padding: 0 !important;
+      letter-spacing: 0.16em !important;
+    }
+
+    html[data-theme="light"][data-visual-theme="noir"] .app-card.app-card-banner .app-card-tag {
+      color: rgba(10, 10, 10, 0.78) !important;
+    }
+
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card.app-card-banner .app-card-tag {
+      color: rgba(240, 236, 230, 0.74) !important;
+    }
+
+    html[data-visual-theme="noir"] .app-card-banner-label {
+      border-radius: 0;
+      border: 1.5px solid currentColor;
+      font-family: "Courier New", ui-monospace, monospace !important;
+      letter-spacing: 0.16em;
+      padding: 6px 10px 5px;
+      box-shadow: none;
+    }
+
+    html[data-theme="light"][data-visual-theme="noir"] .app-card-banner-label {
+      background: #0a0a0a;
+      color: #f7f1e7;
+      border-color: #0a0a0a;
+    }
+
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card-banner-label {
+      background: #f0ece6;
+      color: #0a0a0a;
+      border-color: #f0ece6;
+    }
+
+    html[data-visual-theme="noir"] .app-card-banner-shine {
+      background: linear-gradient(105deg,
+          transparent 0%,
+          rgba(240, 236, 230, 0) 22%,
+          rgba(240, 236, 230, 0.24) 48%,
+          rgba(240, 236, 230, 0.06) 58%,
+          transparent 78%);
+      mix-blend-mode: multiply;
+      opacity: 0.72;
+    }
+
+    html[data-theme="dark"][data-visual-theme="noir"] .app-card-banner-shine {
+      mix-blend-mode: screen;
+      opacity: 0.82;
+    }
+
+    html[data-visual-theme="noir"] .app-card.app-card-banner .card-share-btn {
+      display: none !important;
+    }
+
+    @media (max-width: 620px) {
+      .app-card.app-card-banner {
+        min-height: 420px;
+      }
+
+      .app-card.app-card-banner::before {
+        inset: 0 0 auto 0 !important;
+        width: auto;
+        height: 200px;
+      }
+
+      .app-card.app-card-banner .card-glass-content {
+        width: 100%;
+        min-height: 100%;
+        justify-content: flex-end !important;
+        padding: 230px 22px 22px !important;
+      }
+
+      html[data-visual-theme="emoji"] .app-card.app-card-banner .card-glass-content {
+        width: 100%;
+        padding: 190px 22px 22px !important;
+      }
+
+      html[data-visual-theme="emoji"] .app-card-banner-emoji {
+        top: 24px;
+        right: 0;
+        width: 100%;
+        height: 140px;
+        font-size: 108px;
+        transform: rotate(5deg);
+      }
+
+      .app-card.app-card-banner .app-card-title {
+        font-size: 30px !important;
+      }
+    }
   </style>
   <script>
     (function () {
@@ -4574,6 +5084,20 @@
 
     <main>
       <div class="app-grid" id="app-grid">
+        <a href="isocubes/" class="app-card app-card-new app-card-banner"
+          style="--card-accent-color: #2F7DE1; --card-icon-bg-color-transparent: rgba(47, 125, 225, 0.15);"
+          data-id="isocubes" data-new="true" data-new-until="2026-06-21T00:00:00" data-announcement="true"
+          data-label="New tool" draggable="true">
+
+          <h2 class="app-card-title">Iso Cube Builder</h2>
+          <p class="app-card-description">Build isometric voxel diagrams from width, height, and depth. Remove individual
+            cubes, tune separation, and export PowerPoint-friendly grouped SVGs.</p>
+          <div class="app-card-tags">
+            <span class="app-card-tag">SVG</span>
+            <span class="app-card-tag">Iso</span>
+            <span class="app-card-tag">3D Grid</span>
+          </div>
+        </a>
         <!-- Brick Builder - NEW -->
         <a href="brickbuilder/" class="app-card app-card-new"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
@@ -4733,11 +5257,19 @@
         <span class="footer-divider">•</span>
         <span class="footer-credit">by e. 2025</span>
         <span class="footer-divider">•</span>
-        <span class="footer-app-count">16 apps</span>
+        <span class="footer-app-count">17 apps</span>
         <span class="footer-divider">•</span>
         <span class="footer-hint">Use arrow keys to navigate</span>
       </div>
       <div class="footer-right">
+        <a class="minimal-btn" href="how-to.html" title="Open How To guide">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 7v14"></path>
+            <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+          </svg>
+          <span>How To</span>
+        </a>
         <button id="feedback-open-btn" class="minimal-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -4756,7 +5288,7 @@
     const App = {
       el: {},
       THEMES: ['light', 'dark', 'system'],
-      THEME_ICONS: { light: 'L', dark: 'D', system: 'A' },
+      THEME_ICONS: { light: '☀', dark: '☾', system: '⚙' },
       THEME_LABELS: { light: 'Light', dark: 'Dark', system: 'Auto' },
       VISUAL_THEMES: ['comicbook', 'glassui', 'minimal', 'emoji', 'terminal', 'noir'],
       VISUAL_THEME_META: {
@@ -4769,6 +5301,7 @@
       },
       EMOJI_THEME_SYMBOLS: {
         brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
+        isocubes: ['🧊', '◻️', '📦', '📐'],
         moodboards: ['🖼️', '🎨', '📌', '✨'],
         blobs: ['🫧', '💧', '🌀', '🎨'],
         jigsaws: ['🧩', '✂️', '🖼️', '🧠'],
@@ -4785,7 +5318,7 @@
         sankey: ['📊', '↗️', '🔀', '💧'],
         mockups: ['📱', '💻', '🖥️', '✨'],
       },
-      TOOL_IDS: ['brickbuilder', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
+      TOOL_IDS: ['brickbuilder', 'isocubes', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
       // Miniwi bitmap font — per-glyph data parsed from miniwi.flf (github.com/xero/figlet-fonts)
       // Each entry: 4 row strings, variable width (most=2, M/W=4, N=3)
       // Row 4 non-empty = descender (only Q among caps)
@@ -4814,6 +5347,7 @@
       },
       TERMINAL_LABELS: {
         brickbuilder: 'BRK',
+        isocubes:     'ISO',
         moodboards:   'MOD',
         blobs:        'BLB',
         jigsaws:      'JIG',
@@ -4832,6 +5366,7 @@
       },
       NOIR_CARD_META: {
         brickbuilder: { stamp: 'BUILD',  kicker: 'Constructed Forms',      deck: 'Build modular scenes fast.',         folio: 'VGTOOLS PRESS / NO. 01' },
+        isocubes:     { stamp: 'ISO',    kicker: 'Cubed Perspective',      deck: 'Compose isometric cube matrices.',   folio: 'VGTOOLS PRESS / NO. 17' },
         moodboards:   { stamp: 'MOOD',   kicker: 'Cuttings And Clippings', deck: 'Compose boards from visual scraps.', folio: 'VGTOOLS PRESS / NO. 02' },
         blobs:        { stamp: 'INK',    kicker: 'Liquid Studies',         deck: 'Generate organic vector shapes.',    folio: 'VGTOOLS PRESS / NO. 03' },
         jigsaws:      { stamp: 'PUZZLE', kicker: 'Piece By Piece',         deck: 'Turn images into playable puzzles.', folio: 'VGTOOLS PRESS / NO. 04' },
@@ -4879,6 +5414,7 @@
         this.el.appCards = Array.from(this.el.appGrid.children);
         this.el.searchInput = document.getElementById('search-input');
         this.currentVisualTheme = localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+        this.syncNewCardStates();
 
         // Initialize enhanced tooltips
         this.initTooltips();
@@ -5114,11 +5650,17 @@
 
       // === USAGE TRACKING ===
       sortByUsage() {
+        this.syncNewCardStates();
         const usage = JSON.parse(localStorage.getItem('vgtools-usage') || '{}');
         const cards = Array.from(this.el.appGrid.children);
 
         // Sort cards by usage count (descending), keeping NEW apps first
         cards.sort((a, b) => {
+          const aIsBanner = a.classList.contains('app-card-banner');
+          const bIsBanner = b.classList.contains('app-card-banner');
+          if (aIsBanner && !bIsBanner) return -1;
+          if (!aIsBanner && bIsBanner) return 1;
+
           const aIsNew = a.classList.contains('app-card-new');
           const bIsNew = b.classList.contains('app-card-new');
           if (aIsNew && !bIsNew) return -1;
@@ -5132,6 +5674,42 @@
         // Reappend in new order
         cards.forEach(card => this.el.appGrid.appendChild(card));
         this.el.appCards = cards;
+      },
+
+      syncNewCardStates(now = new Date()) {
+        if (!this.el.appCards) return;
+        this.el.appCards.forEach((card) => this.syncNewCardState(card, now));
+      },
+
+      syncNewCardState(card, now = new Date()) {
+        const active = this.isNewCardActive(card, now);
+        card.dataset.newActive = active ? 'true' : 'false';
+
+        if (active) {
+          card.classList.add('app-card-new');
+          if (card.dataset.announcement === 'true') {
+            card.classList.add('app-card-banner');
+          }
+        } else {
+          card.classList.remove('app-card-new');
+          if (card.dataset.announcement === 'true') {
+            card.classList.remove('app-card-banner');
+          }
+        }
+
+        return active;
+      },
+
+      isNewCardActive(card, now = new Date()) {
+        if (card.dataset.new !== 'true') return false;
+        const expiry = this.getNewCardExpiry(card);
+        return expiry ? now < expiry : true;
+      },
+
+      getNewCardExpiry(card) {
+        const raw = card.dataset.newUntil || '2026-01-01T00:00:00';
+        const expiry = new Date(raw);
+        return Number.isNaN(expiry.getTime()) ? null : expiry;
       },
 
       trackUsage(appId) {
@@ -5271,6 +5849,7 @@
 
         const appTech = {
           brickbuilder: ['2D', 'SVG'],
+          isocubes: ['SVG', 'Iso', '3D Grid'],
           svgrecolor: ['SVG', 'Hue-Shift'],
           moodboards: ['Canvas', 'PNG'],
           blobs: ['SVG', 'Bezier'],
@@ -5295,12 +5874,13 @@
 
         this.el.appCards.forEach((card, cardIndex) => {
           const id = card.dataset.id;
-          const imgPath = appImagePaths[id];
+          const isNew = this.syncNewCardState(card);
+          const imgPath = card.dataset.noArt === 'true' ? null : appImagePaths[id];
           const tech = appTech[id] || [];
           const noirMeta = this.getNoirCardMeta(id);
           const isNoirTheme = this.currentVisualTheme === 'noir';
           const isEmojiTheme = this.currentVisualTheme === 'emoji';
-          const isNew = card.dataset.new === 'true';
+          const isAnnouncementBanner = card.classList.contains('app-card-banner');
           card.dataset.emojiBurst = this.getEmojiBurstForTool(id);
           card.dataset.noirStamp = noirMeta.stamp;
           card.style.setProperty('--card-emoji-pattern', JSON.stringify(this.getEmojiPatternForTool(id)));
@@ -5328,14 +5908,14 @@
           }
           glassContent.dataset.noirDensity = noirCompact ? 'compact' : 'default';
 
-          if (isNoirTheme) {
+          if (isNoirTheme && !isAnnouncementBanner) {
             const kicker = document.createElement('div');
             kicker.className = 'noir-card-kicker';
             kicker.textContent = noirMeta.kicker;
             glassContent.appendChild(kicker);
           }
 
-          if (isEmojiTheme) {
+          if (isEmojiTheme && !isAnnouncementBanner) {
             const emojiSticker = document.createElement('div');
             emojiSticker.className = 'app-card-sticker';
             emojiSticker.textContent = this.getEmojiStickerForTool(id);
@@ -5345,6 +5925,16 @@
           const copyWrap = document.createElement('div');
           if (isNoirTheme) {
             copyWrap.className = 'noir-card-copy';
+          }
+          if (isAnnouncementBanner) {
+            copyWrap.classList.add('app-card-banner-copy');
+          }
+
+          if (isAnnouncementBanner) {
+            const bannerLabel = document.createElement('div');
+            bannerLabel.className = 'app-card-banner-label';
+            bannerLabel.textContent = card.dataset.label || 'New tool';
+            copyWrap.appendChild(bannerLabel);
           }
 
           // Create title element
@@ -5378,7 +5968,7 @@
             glassContent.appendChild(tagsDiv);
           }
 
-          if (isNoirTheme) {
+          if (isNoirTheme && !isAnnouncementBanner) {
             const footer = document.createElement('div');
             footer.className = 'noir-card-footer';
             const folio = document.createElement('span');
@@ -5391,6 +5981,21 @@
           // Clear card and add glass content
           card.innerHTML = '';
           card.appendChild(glassContent);
+
+          if (isAnnouncementBanner) {
+            const shine = document.createElement('span');
+            shine.className = 'app-card-banner-shine';
+            shine.setAttribute('aria-hidden', 'true');
+            card.appendChild(shine);
+
+            if (isEmojiTheme) {
+              const bannerEmoji = document.createElement('span');
+              bannerEmoji.className = 'app-card-banner-emoji';
+              bannerEmoji.setAttribute('aria-hidden', 'true');
+              bannerEmoji.textContent = this.getEmojiStickerForTool(id);
+              card.appendChild(bannerEmoji);
+            }
+          }
 
           // Add share button
           const shareBtn = document.createElement('button');
@@ -5409,18 +6014,11 @@
           });
           card.appendChild(shareBtn);
 
-          // Add NEW badge for new apps (only before January 1, 2026)
-          const newExpireDate = new Date('2026-01-01T00:00:00');
-          const isStillNew = isNew && (new Date() < newExpireDate);
-
-          if (isStillNew) {
+          if (isNew && !isAnnouncementBanner) {
             const badge = document.createElement('span');
             badge.className = 'new-badge-overlay';
             badge.textContent = 'NEW';
             card.appendChild(badge);
-          } else if (isNew) {
-            // After expiry date, remove the special styling
-            card.classList.remove('app-card-new');
           }
         });
       },
@@ -6097,10 +6695,11 @@
           fl.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap';
           document.head.appendChild(fl);
         }
+        this.initTooltips();
         const appImagePaths = this.getAppImagePaths(this.currentVisualTheme);
         this.el.appCards.forEach(card => {
           const id = card.dataset.id;
-          const imgPath = appImagePaths[id];
+          const imgPath = card.dataset.noArt === 'true' ? null : appImagePaths[id];
           card.dataset.emojiBurst = this.getEmojiBurstForTool(id);
           card.style.setProperty('--card-emoji-pattern', JSON.stringify(this.getEmojiPatternForTool(id)));
           if (imgPath) {

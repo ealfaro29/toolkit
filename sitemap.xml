@@ -7,10 +7,22 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Documentation -->
+  <url>
+    <loc>https://vgtools.pro/how-to.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
   
   <!-- Mini Apps -->
   <url>
     <loc>https://vgtools.pro/brickbuilder/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vgtools.pro/isocubes/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -43,6 +43,13 @@
       "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
     },
     {
+      "name": "Iso Cube Builder",
+      "short_name": "Iso Cubes",
+      "description": "Build isometric cube matrices",
+      "url": "/isocubes/",
+      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
+    },
+    {
       "name": "Background Remover",
       "short_name": "BG Remove",
       "description": "AI-powered background removal",

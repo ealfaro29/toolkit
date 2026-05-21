@@ -6,9 +6,9 @@
   const RETURN_STYLE_ID = 'vgtools-theme-return-transition-style';
   const COLOR_THEME_KEY = 'creative-toolkit-theme';
   const COLOR_THEME_LABELS = {
-    light: 'L',
-    dark: 'D',
-    system: 'A',
+    light: '☀',
+    dark: '☾',
+    system: '⚙',
   };
   const COLOR_THEME_NAMES = {
     light: 'Light',
@@ -50,6 +50,7 @@
   };
   const EMOJI_THEME_SYMBOLS = {
     brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
+    isocubes: ['🧊', '◻️', '📦', '📐'],
     moodboards: ['🖼️', '🎨', '📌', '✨'],
     blobs: ['🫧', '💧', '🌀', '🎨'],
     jigsaws: ['🧩', '✂️', '🖼️', '🧠'],

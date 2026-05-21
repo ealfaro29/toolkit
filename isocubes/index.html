@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iso Cube Builder</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <script>
+    (function () {
+      try {
+        let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        if (theme === 'system') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      } catch (e) { }
+    })();
+  </script>
+  <link rel="stylesheet" href="../shared/styles.css" />
+  <style>
+    body {
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 1500px;
+      grid-template-columns: 340px minmax(0, 1fr);
+      height: calc(100vh - 50px);
+    }
+
+    header.panel {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header.panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("../Theme/comicbook/isocubes_comicbook.png") center / cover no-repeat;
+      opacity: 0.16;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header-left,
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    .title-block {
+      min-width: 0;
+    }
+
+    .title-block h1,
+    .title-block .sub {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    aside.panel.controls {
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .control-group {
+      gap: 12px;
+    }
+
+    .control-group + .control-group {
+      padding-top: 18px;
+    }
+
+    .control-group-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .dimension-row {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr) 64px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dimension-row label {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .dimension-row .num-input {
+      width: 64px;
+    }
+
+    .preset-grid,
+    .action-grid,
+    .export-grid {
+      display: grid;
+      gap: 8px;
+    }
+
+    .preset-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .action-grid,
+    .export-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .compact-btn {
+      min-width: 0;
+      height: 36px;
+      padding: 0 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+
+    .segment-btn {
+      height: 36px;
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: 600 13px var(--font-family-sans);
+      transition: color var(--duration-standard) ease, background var(--duration-standard) ease;
+    }
+
+    .segment-btn.active {
+      color: var(--color-accent-text);
+      background: var(--accent-color);
+    }
+
+    .cube-workspace {
+      position: relative;
+      padding: 0;
+      overflow: hidden;
+      background-color: var(--surface-alt);
+      background-image:
+        linear-gradient(to right, rgba(128, 128, 128, 0.14) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(128, 128, 128, 0.14) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    #scene {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    .btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      gap: 8px;
+    }
+
+    .cube-face {
+      cursor: pointer;
+      vector-effect: non-scaling-stroke;
+      transition: filter 120ms ease, opacity 120ms ease;
+    }
+
+    .cube-face:hover {
+      filter: brightness(1.05) saturate(1.05);
+    }
+
+    .cube-face.selected {
+      filter: drop-shadow(0 5px 6px rgba(47, 125, 225, 0.35));
+    }
+
+    .toast {
+      z-index: 10000;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] header.panel .title-block h1,
+    html[data-visual-theme="noir"][data-theme="light"] .control-group-title,
+    html[data-visual-theme="noir"][data-theme="light"] .dimension-row label {
+      color: #191715 !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] header.panel .title-block .sub {
+      color: rgba(25, 23, 21, 0.68) !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] header.panel .title-block h1,
+    html[data-visual-theme="noir"][data-theme="dark"] .control-group-title,
+    html[data-visual-theme="noir"][data-theme="dark"] .dimension-row label {
+      color: #efe6da !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] header.panel .title-block .sub {
+      color: rgba(239, 230, 218, 0.72) !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] .container .btn.btn-secondary,
+    html[data-visual-theme="noir"][data-theme="light"] .container .back-to-home,
+    html[data-visual-theme="noir"][data-theme="light"] .container #theme-toggle,
+    html[data-visual-theme="noir"][data-theme="light"] .container .num-input {
+      background: #f4ede3 !important;
+      color: #191715 !important;
+      border-color: #191715 !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] .container .btn.btn-primary {
+      background: #191715 !important;
+      color: #f4ede3 !important;
+      border-color: #191715 !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] .container .btn.btn-secondary,
+    html[data-visual-theme="noir"][data-theme="dark"] .container .back-to-home,
+    html[data-visual-theme="noir"][data-theme="dark"] .container #theme-toggle,
+    html[data-visual-theme="noir"][data-theme="dark"] .container .num-input {
+      background: #0b0a09 !important;
+      color: #efe6da !important;
+      border-color: #efe6da !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] .container .btn.btn-primary {
+      background: #efe6da !important;
+      color: #0b0a09 !important;
+      border-color: #efe6da !important;
+    }
+
+    html[data-visual-theme="noir"] .container .btn span,
+    html[data-visual-theme="noir"] .container .btn svg {
+      color: inherit !important;
+      stroke: currentColor !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] main.panel.cube-workspace {
+      background-color: #e8ded1 !important;
+      background-image:
+        linear-gradient(to right, rgba(25, 23, 21, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(25, 23, 21, 0.12) 1px, transparent 1px) !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] main.panel.cube-workspace {
+      background-color: #161311 !important;
+      background-image:
+        linear-gradient(to right, rgba(239, 230, 218, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(239, 230, 218, 0.12) 1px, transparent 1px) !important;
+    }
+
+    html[data-visual-theme="noir"] .cube-face:hover {
+      filter: brightness(1.08) contrast(1.06);
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto;
+      }
+
+      .container {
+        height: auto;
+        min-height: calc(100vh - 50px);
+        grid-template-columns: 1fr;
+      }
+
+      aside.panel.controls {
+        position: relative;
+      }
+
+      .cube-workspace {
+        min-height: 540px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        padding: 14px;
+      }
+
+      .container {
+        height: auto;
+        gap: 14px;
+      }
+
+      header.panel {
+        height: auto;
+        min-height: 65px;
+        padding: 12px;
+      }
+
+      .title-block .sub {
+        display: none;
+      }
+
+      .dimension-row {
+        grid-template-columns: 72px minmax(0, 1fr) 58px;
+      }
+
+      .preset-grid,
+      .action-grid,
+      .export-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+  </style>
+  <script src="../shared/visual-theme.js?v=14"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header class="panel">
+      <div class="header-left">
+        <a href="../index.html" class="back-to-home" title="Back to home" aria-label="Back to home">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </a>
+        <div class="title-block">
+          <h1>Iso Cube Builder</h1>
+          <div class="sub">Parametric isometric cube blocks.</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" title="Change color mode" aria-label="Change color mode"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls" aria-label="Cube controls">
+      <section class="control-group">
+        <div class="control-group-title">Dimensions</div>
+        <div class="dimension-row">
+          <label for="width-range">Width</label>
+          <input id="width-range" data-dim="width" type="range" min="1" max="10" value="3" />
+          <input id="width-number" data-dim="width" class="num-input" type="number" min="1" max="10" value="3" />
+        </div>
+        <div class="dimension-row">
+          <label for="height-range">Height</label>
+          <input id="height-range" data-dim="height" type="range" min="1" max="10" value="3" />
+          <input id="height-number" data-dim="height" class="num-input" type="number" min="1" max="10" value="3" />
+        </div>
+        <div class="dimension-row">
+          <label for="depth-range">Depth</label>
+          <input id="depth-range" data-dim="depth" type="range" min="1" max="10" value="3" />
+          <input id="depth-number" data-dim="depth" class="num-input" type="number" min="1" max="10" value="3" />
+        </div>
+        <div class="dimension-row">
+          <label for="spacing-range">Separation</label>
+          <input id="spacing-range" type="range" min="0" max="24" value="9" />
+          <output id="spacing-value" class="num-input" for="spacing-range">9</output>
+        </div>
+        <div class="preset-grid" aria-label="Presets">
+          <button class="btn btn-secondary compact-btn" type="button" data-preset="3,3,3">3x3x3</button>
+          <button class="btn btn-secondary compact-btn" type="button" data-preset="2,3,5">2x3x5</button>
+          <button class="btn btn-secondary compact-btn" type="button" data-preset="5,2,4">5x2x4</button>
+        </div>
+      </section>
+
+      <section class="control-group">
+        <div class="control-group-title">Editing</div>
+        <div class="action-grid">
+          <button id="remove-cube" class="btn btn-primary compact-btn" type="button" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="m19 6-1 14H6L5 6"></path>
+              <path d="M10 11v5"></path>
+              <path d="M14 11v5"></path>
+            </svg>
+            <span>Remove cube</span>
+          </button>
+          <button id="undo" class="btn btn-secondary compact-btn" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 14 4 9l5-5"></path>
+              <path d="M4 9h10a6 6 0 0 1 0 12h-1"></path>
+            </svg>
+            <span>Undo</span>
+          </button>
+          <button id="redo" class="btn btn-secondary compact-btn" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m15 14 5-5-5-5"></path>
+              <path d="M20 9H10a6 6 0 0 0 0 12h1"></path>
+            </svg>
+            <span>Redo</span>
+          </button>
+          <button id="restore-all" class="btn btn-secondary compact-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+              <path d="M3 4v6h6"></path>
+            </svg>
+            <span>Restore</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="control-group">
+        <div class="control-group-title">Export</div>
+        <div class="export-grid">
+          <button id="export-svg" class="btn btn-secondary compact-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <path d="M7 10l5 5 5-5"></path>
+              <path d="M12 15V3"></path>
+            </svg>
+            <span>SVG</span>
+          </button>
+          <button id="export-png" class="btn btn-secondary compact-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <path d="M7 10l5 5 5-5"></path>
+              <path d="M12 15V3"></path>
+            </svg>
+            <span>PNG</span>
+          </button>
+        </div>
+      </section>
+
+    </aside>
+
+    <main class="panel cube-workspace" aria-label="Isometric cube workspace">
+      <svg id="scene" role="img" aria-label="Isometric cube model">
+        <g id="cubes"></g>
+      </svg>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <a id="visitor-badge" class="visitor-badge" href="#" target="_blank" title="Visitors"></a>
+  <script src="../shared/visitor-badge.js"></script>
+  <script>
+    const App = {
+      el: {},
+      STORAGE_KEY: 'vgtools-isocubes-state-v1',
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: 'L', dark: 'D', system: 'A' },
+      DIM_MIN: 1,
+      DIM_MAX: 10,
+      state: {
+        width: 3,
+        height: 3,
+        depth: 3,
+        spacing: 9,
+        removed: new Set(),
+        history: [],
+        future: []
+      },
+      bounds: { minX: -200, minY: -200, maxX: 200, maxY: 200 },
+      toastTimer: null,
+
+      init() {
+        this.cacheDOM();
+        this.initTheme();
+        this.loadState();
+        this.bindEvents();
+        this.syncControls();
+        this.render();
+      },
+
+      cacheDOM() {
+        [
+          'theme-toggle', 'width-range', 'width-number', 'height-range', 'height-number',
+          'depth-range', 'depth-number', 'spacing-range', 'spacing-value',
+          'remove-cube', 'restore-all', 'undo', 'redo',
+          'export-svg', 'export-png', 'scene', 'cubes', 'toast'
+        ].forEach((id) => {
+          this.el[id] = document.getElementById(id);
+        });
+      },
+
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') {
+            this.applyTheme('system');
+            this.render();
+          }
+        });
+      },
+
+      setTheme(theme, save = true) {
+        const safeTheme = this.THEMES.includes(theme) ? theme : 'system';
+        if (save) localStorage.setItem('creative-toolkit-theme', safeTheme);
+        this.el['theme-toggle'].textContent = this.THEME_ICONS[safeTheme];
+        this.applyTheme(safeTheme);
+        if (this.el.scene) this.render();
+      },
+
+      cycleTheme() {
+        const current = localStorage.getItem('creative-toolkit-theme') || 'system';
+        const index = this.THEMES.indexOf(current);
+        this.setTheme(this.THEMES[(index + 1) % this.THEMES.length]);
+      },
+
+      applyTheme(theme) {
+        const isDark = theme === 'system'
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      },
+
+      bindEvents() {
+        this.el['theme-toggle'].addEventListener('click', () => this.cycleTheme());
+
+        ['width', 'height', 'depth'].forEach((dim) => {
+          [this.el[`${dim}-range`], this.el[`${dim}-number`]].forEach((control) => {
+            control.addEventListener('input', (event) => {
+              this.setDimension(dim, event.target.value);
+            });
+          });
+        });
+
+        this.el['spacing-range'].addEventListener('input', (event) => {
+          this.state.spacing = this.clampNumber(event.target.value, 0, 24);
+          this.syncControls();
+          this.render();
+          this.saveState();
+        });
+
+        document.querySelectorAll('[data-preset]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const [width, height, depth] = button.dataset.preset.split(',').map(Number);
+            this.setPreset(width, height, depth);
+          });
+        });
+
+        this.el['remove-cube'].addEventListener('click', () => this.showToast('Click any cube to remove it'));
+        this.el['restore-all'].addEventListener('click', () => this.restoreAll());
+        this.el.undo.addEventListener('click', () => this.undo());
+        this.el.redo.addEventListener('click', () => this.redo());
+        this.el['export-svg'].addEventListener('click', () => this.exportSVG());
+        this.el['export-png'].addEventListener('click', () => this.exportPNG());
+
+        this.el.cubes.addEventListener('click', (event) => {
+          const face = event.target.closest('.cube-face');
+          if (!face) return;
+          event.stopPropagation();
+          this.handleCubeClick(face.dataset.key);
+        });
+
+        this.el.scene.addEventListener('click', (event) => {
+          if (event.target === this.el.scene) {
+            this.showToast('Click any cube to remove it');
+          }
+        });
+
+        window.addEventListener('keydown', (event) => this.handleKeyDown(event));
+        window.addEventListener('vgtools:visual-theme-applied', () => this.render());
+      },
+
+      setDimension(dim, rawValue) {
+        const next = this.clampNumber(rawValue, this.DIM_MIN, this.DIM_MAX);
+        if (this.state[dim] === next) {
+          this.syncControls();
+          return;
+        }
+        this.state[dim] = next;
+        this.pruneRemoved();
+        this.syncControls();
+        this.render();
+        this.saveState();
+      },
+
+      setPreset(width, height, depth) {
+        this.state.width = this.clampNumber(width, this.DIM_MIN, this.DIM_MAX);
+        this.state.height = this.clampNumber(height, this.DIM_MIN, this.DIM_MAX);
+        this.state.depth = this.clampNumber(depth, this.DIM_MIN, this.DIM_MAX);
+        this.state.removed = new Set();
+        this.state.history = [];
+        this.state.future = [];
+        this.syncControls();
+        this.render();
+        this.saveState();
+      },
+
+      handleCubeClick(key) {
+        if (!this.isKeyInBounds(key) || this.state.removed.has(key)) return;
+        this.pushHistory();
+        this.state.removed.add(key);
+        this.state.future = [];
+        this.render();
+        this.saveState();
+      },
+
+      restoreAll() {
+        if (this.state.removed.size === 0) return;
+        this.pushHistory();
+        this.state.removed = new Set();
+        this.state.future = [];
+        this.render();
+        this.saveState();
+      },
+
+      pushHistory() {
+        this.state.history.push({
+          removed: Array.from(this.state.removed)
+        });
+        if (this.state.history.length > 50) this.state.history.shift();
+      },
+
+      undo() {
+        if (this.state.history.length === 0) return;
+        this.state.future.push({
+          removed: Array.from(this.state.removed)
+        });
+        const previous = this.state.history.pop();
+        this.state.removed = new Set(previous.removed);
+        this.render();
+        this.saveState();
+      },
+
+      redo() {
+        if (this.state.future.length === 0) return;
+        this.state.history.push({
+          removed: Array.from(this.state.removed)
+        });
+        const next = this.state.future.pop();
+        this.state.removed = new Set(next.removed);
+        this.render();
+        this.saveState();
+      },
+
+      handleKeyDown(event) {
+        if (event.target.matches('input, textarea, select')) return;
+
+        if (event.key === 'Delete' || event.key === 'Backspace') {
+          event.preventDefault();
+          this.showToast('Click any cube to remove it');
+        } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+          event.preventDefault();
+          if (event.shiftKey) this.redo();
+          else this.undo();
+        } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
+          event.preventDefault();
+          this.redo();
+        }
+      },
+
+      render() {
+        const cells = this.getCells();
+        const faces = [];
+        this.resetBounds();
+
+        this.extendBoundsForModel();
+
+        this.sortCells(cells)
+          .forEach((cell) => {
+            const key = this.toKey(cell.x, cell.y, cell.z);
+            const polygons = this.getCubePolygons(cell.x, cell.y, cell.z);
+            const colors = this.getFaceColors(false);
+            const stroke = this.getCubeStrokeColor();
+            const strokeWidth = 0.9;
+
+            faces.push(this.faceMarkup(polygons.left, key, 'left', colors.left, stroke, strokeWidth, false));
+            faces.push(this.faceMarkup(polygons.right, key, 'right', colors.right, stroke, strokeWidth, false));
+            faces.push(this.faceMarkup(polygons.top, key, 'top', colors.top, stroke, strokeWidth, false));
+          });
+
+        this.el.cubes.innerHTML = faces.join('');
+        this.applyViewBox();
+        this.updateUI();
+      },
+
+      getCells() {
+        const cells = [];
+        for (let z = 0; z < this.state.height; z += 1) {
+          for (let y = 0; y < this.state.depth; y += 1) {
+            for (let x = 0; x < this.state.width; x += 1) {
+              const key = this.toKey(x, y, z);
+              if (!this.state.removed.has(key)) {
+                cells.push({ x, y, z });
+              }
+            }
+          }
+        }
+        return cells;
+      },
+
+      sortCells(cells) {
+        return cells.sort((a, b) => ((a.x + a.y) * 100 + a.z) - ((b.x + b.y) * 100 + b.z)
+          || a.y - b.y
+          || a.x - b.x);
+      },
+
+      faceMarkup(points, key, face, fill, stroke, strokeWidth, selected) {
+        points.forEach((point) => this.extendBounds(point));
+        const pointString = points.map((point) => `${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(' ');
+        const selectedClass = selected ? ' selected' : '';
+        return `<polygon class="cube-face face-${face}${selectedClass}" data-key="${key}" data-face="${face}" points="${pointString}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"></polygon>`;
+      },
+
+      applyViewBox() {
+        const margin = 88;
+        const minX = this.bounds.minX - margin;
+        const minY = this.bounds.minY - margin;
+        const width = Math.max(240, this.bounds.maxX - this.bounds.minX + margin * 2);
+        const height = Math.max(240, this.bounds.maxY - this.bounds.minY + margin * 2);
+        const centerX = minX + width / 2;
+        const centerY = minY + height / 2;
+        this.el.scene.setAttribute(
+          'viewBox',
+          `${(centerX - width / 2).toFixed(2)} ${(centerY - height / 2).toFixed(2)} ${width.toFixed(2)} ${height.toFixed(2)}`
+        );
+      },
+
+      resetBounds() {
+        this.bounds = {
+          minX: Number.POSITIVE_INFINITY,
+          minY: Number.POSITIVE_INFINITY,
+          maxX: Number.NEGATIVE_INFINITY,
+          maxY: Number.NEGATIVE_INFINITY
+        };
+      },
+
+      extendBoundsForModel() {
+        for (let z = 0; z < this.state.height; z += 1) {
+          for (let y = 0; y < this.state.depth; y += 1) {
+            for (let x = 0; x < this.state.width; x += 1) {
+              const polygons = this.getCubePolygons(x, y, z);
+              polygons.top.concat(polygons.left, polygons.right).forEach((point) => this.extendBounds(point));
+            }
+          }
+        }
+      },
+
+      extendBounds(point) {
+        this.bounds.minX = Math.min(this.bounds.minX, point.x);
+        this.bounds.minY = Math.min(this.bounds.minY, point.y);
+        this.bounds.maxX = Math.max(this.bounds.maxX, point.x);
+        this.bounds.maxY = Math.max(this.bounds.maxY, point.y);
+      },
+
+      getCubePolygons(x, y, z) {
+        const v = this.getVectors();
+        const o = this.cellOrigin(x, y, z);
+        const p000 = o;
+        const p100 = this.add(o, v.localX);
+        const p010 = this.add(o, v.localY);
+        const p110 = this.add(o, v.localX, v.localY);
+        const p001 = this.add(o, v.localZ);
+        const p101 = this.add(o, v.localX, v.localZ);
+        const p011 = this.add(o, v.localY, v.localZ);
+        const p111 = this.add(o, v.localX, v.localY, v.localZ);
+
+        return {
+          top: [p001, p101, p111, p011],
+          right: [p101, p111, p110, p100],
+          left: [p011, p111, p110, p010]
+        };
+      },
+
+      getVectors() {
+        const cubeW = 62;
+        const cubeD = 36;
+        const cubeH = 34;
+        const spacing = this.state.spacing;
+        return {
+          cellX: { x: cubeW / 2 + spacing * 0.72, y: cubeD / 2 + spacing * 0.42 },
+          cellY: { x: -cubeW / 2 - spacing * 0.72, y: cubeD / 2 + spacing * 0.42 },
+          cellZ: { x: 0, y: -cubeH - spacing * 0.82 },
+          localX: { x: cubeW / 2, y: cubeD / 2 },
+          localY: { x: -cubeW / 2, y: cubeD / 2 },
+          localZ: { x: 0, y: -cubeH }
+        };
+      },
+
+      cellOrigin(x, y, z) {
+        const v = this.getVectors();
+        return {
+          x: x * v.cellX.x + y * v.cellY.x + z * v.cellZ.x,
+          y: x * v.cellX.y + y * v.cellY.y + z * v.cellZ.y
+        };
+      },
+
+      add(...points) {
+        return points.reduce((sum, point) => ({
+          x: sum.x + point.x,
+          y: sum.y + point.y
+        }), { x: 0, y: 0 });
+      },
+
+      midpoint(a, b) {
+        return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      },
+
+      getFaceColors(selected) {
+        if (this.isNoirVisualTheme()) {
+          const colors = this.getNoirFaceColors();
+          if (!selected) return colors;
+
+          return {
+            top: this.mixHex(colors.top, '#FFFFFF', 0.18),
+            left: this.mixHex(colors.left, '#FFFFFF', 0.12),
+            right: this.mixHex(colors.right, '#FFFFFF', 0.1)
+          };
+        }
+
+        const base = this.getCubeBaseColor();
+        const colors = {
+          top: this.shadeHex(base, 24),
+          left: this.shadeHex(base, -4),
+          right: this.shadeHex(base, -22)
+        };
+        if (!selected) return colors;
+
+        return {
+          top: this.mixHex(colors.top, '#FFFFFF', 0.22),
+          left: this.mixHex(colors.left, '#FFFFFF', 0.16),
+          right: this.mixHex(colors.right, '#FFFFFF', 0.12)
+        };
+      },
+
+      getThemeAccentColor() {
+        const value = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim();
+        return this.normalizeHex(value, '#C9CED3');
+      },
+
+      getCubeBaseColor() {
+        return this.getThemeAccentColor();
+      },
+
+      getCubeStrokeColor() {
+        if (this.isNoirVisualTheme()) {
+          return this.isDarkMode() ? '#EFE6DA' : '#191715';
+        }
+        return this.shadeHex(this.getCubeBaseColor(), -38);
+      },
+
+      getNoirFaceColors() {
+        return this.isDarkMode()
+          ? { top: '#D8D0C6', left: '#B3AA9F', right: '#8E857B' }
+          : { top: '#B8AEA2', left: '#91877C', right: '#6D645A' };
+      },
+
+      isNoirVisualTheme() {
+        return document.documentElement.dataset.visualTheme === 'noir';
+      },
+
+      isDarkMode() {
+        return document.documentElement.dataset.theme === 'dark';
+      },
+
+      updateUI() {
+        this.el.undo.disabled = this.state.history.length === 0;
+        this.el.redo.disabled = this.state.future.length === 0;
+      },
+
+      syncControls() {
+        ['width', 'height', 'depth'].forEach((dim) => {
+          this.el[`${dim}-range`].value = this.state[dim];
+          this.el[`${dim}-number`].value = this.state[dim];
+        });
+        this.el['spacing-range'].value = this.state.spacing;
+        this.el['spacing-value'].value = this.state.spacing;
+        this.el['spacing-value'].textContent = this.state.spacing;
+      },
+
+      pruneRemoved() {
+        this.state.removed = new Set(Array.from(this.state.removed).filter((key) => this.isKeyInBounds(key)));
+      },
+
+      isKeyInBounds(key) {
+        const cell = this.fromKey(key);
+        return cell.x >= 0 && cell.x < this.state.width
+          && cell.y >= 0 && cell.y < this.state.depth
+          && cell.z >= 0 && cell.z < this.state.height;
+      },
+
+      toKey(x, y, z) {
+        return `${x},${y},${z}`;
+      },
+
+      fromKey(key) {
+        const [x, y, z] = String(key).split(',').map((part) => Number.parseInt(part, 10));
+        return { x, y, z };
+      },
+
+      clampNumber(value, min, max) {
+        const number = Number.parseInt(value, 10);
+        if (!Number.isFinite(number)) return min;
+        return Math.min(max, Math.max(min, number));
+      },
+
+      normalizeHex(value, fallback) {
+        const color = String(value || '').trim();
+        return /^#[0-9a-fA-F]{6}$/.test(color) ? color.toUpperCase() : fallback;
+      },
+
+      hexToRgb(hex) {
+        const safe = this.normalizeHex(hex, '#C9CED3').slice(1);
+        return {
+          r: Number.parseInt(safe.slice(0, 2), 16),
+          g: Number.parseInt(safe.slice(2, 4), 16),
+          b: Number.parseInt(safe.slice(4, 6), 16)
+        };
+      },
+
+      rgbToHex(r, g, b) {
+        return `#${[r, g, b].map((value) => {
+          const clamped = Math.max(0, Math.min(255, Math.round(value)));
+          return clamped.toString(16).padStart(2, '0');
+        }).join('')}`.toUpperCase();
+      },
+
+      shadeHex(hex, amount) {
+        const rgb = this.hexToRgb(hex);
+        const target = amount >= 0 ? 255 : 0;
+        const ratio = Math.abs(amount) / 100;
+        return this.rgbToHex(
+          rgb.r + (target - rgb.r) * ratio,
+          rgb.g + (target - rgb.g) * ratio,
+          rgb.b + (target - rgb.b) * ratio
+        );
+      },
+
+      mixHex(a, b, ratio) {
+        const first = this.hexToRgb(a);
+        const second = this.hexToRgb(b);
+        return this.rgbToHex(
+          first.r + (second.r - first.r) * ratio,
+          first.g + (second.g - first.g) * ratio,
+          first.b + (second.b - first.b) * ratio
+        );
+      },
+
+      getVisiblyDrawnCubeKeys(cells) {
+        if (!document.createElement) {
+          return new Set(cells.map((cell) => this.toKey(cell.x, cell.y, cell.z)));
+        }
+        const bounds = this.getBoundsForCells(cells);
+        const width = Math.max(1, bounds.maxX - bounds.minX + 8);
+        const height = Math.max(1, bounds.maxY - bounds.minY + 8);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext && canvas.getContext('2d', { willReadFrequently: true });
+        if (!ctx) return new Set(cells.map((cell) => this.toKey(cell.x, cell.y, cell.z)));
+
+        const scale = Math.max(1, Math.min(3, 1800 / Math.max(width, height)));
+        canvas.width = Math.ceil(width * scale);
+        canvas.height = Math.ceil(height * scale);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        cells.forEach((cell, index) => {
+          const colorId = index + 1;
+          const r = colorId & 255;
+          const g = (colorId >> 8) & 255;
+          const b = (colorId >> 16) & 255;
+          ctx.fillStyle = `rgb(${r},${g},${b})`;
+          const polygons = this.getCubePolygons(cell.x, cell.y, cell.z);
+          ['left', 'right', 'top'].forEach((face) => {
+            this.fillCanvasPolygon(ctx, polygons[face], bounds.minX, bounds.minY, scale);
+          });
+        });
+
+        const visible = new Set();
+        const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] === 0) continue;
+          const colorId = data[i] + (data[i + 1] << 8) + (data[i + 2] << 16);
+          if (colorId > 0 && colorId <= cells.length) {
+            const cell = cells[colorId - 1];
+            visible.add(this.toKey(cell.x, cell.y, cell.z));
+          }
+        }
+        return visible;
+      },
+
+      getBoundsForCells(cells) {
+        const bounds = {
+          minX: Number.POSITIVE_INFINITY,
+          minY: Number.POSITIVE_INFINITY,
+          maxX: Number.NEGATIVE_INFINITY,
+          maxY: Number.NEGATIVE_INFINITY
+        };
+        const extend = (point) => {
+          bounds.minX = Math.min(bounds.minX, point.x);
+          bounds.minY = Math.min(bounds.minY, point.y);
+          bounds.maxX = Math.max(bounds.maxX, point.x);
+          bounds.maxY = Math.max(bounds.maxY, point.y);
+        };
+        cells.forEach((cell) => {
+          const polygons = this.getCubePolygons(cell.x, cell.y, cell.z);
+          polygons.left.concat(polygons.right, polygons.top).forEach(extend);
+        });
+        return bounds;
+      },
+
+      fillCanvasPolygon(ctx, points, minX, minY, scale) {
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          const x = (point.x - minX + 4) * scale;
+          const y = (point.y - minY + 4) * scale;
+          if (index === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.closePath();
+        ctx.fill();
+      },
+
+      createExportSVGSource() {
+        const cells = this.sortCells(this.getCells());
+        if (cells.length === 0) return null;
+        const visibleKeys = this.getVisiblyDrawnCubeKeys(cells);
+        const exportCells = cells.filter((cell) => visibleKeys.has(this.toKey(cell.x, cell.y, cell.z)));
+        if (exportCells.length === 0) return null;
+
+        const bounds = {
+          minX: Number.POSITIVE_INFINITY,
+          minY: Number.POSITIVE_INFINITY,
+          maxX: Number.NEGATIVE_INFINITY,
+          maxY: Number.NEGATIVE_INFINITY
+        };
+        const cubeGroups = [];
+        const colors = this.getFaceColors(false);
+        const stroke = this.getCubeStrokeColor();
+        const strokeWidth = 0.9;
+
+        const extend = (point) => {
+          bounds.minX = Math.min(bounds.minX, point.x);
+          bounds.minY = Math.min(bounds.minY, point.y);
+          bounds.maxX = Math.max(bounds.maxX, point.x);
+          bounds.maxY = Math.max(bounds.maxY, point.y);
+        };
+
+        exportCells.forEach((cell) => {
+          const polygons = this.getCubePolygons(cell.x, cell.y, cell.z);
+          const faces = [
+            { points: polygons.left, fill: colors.left },
+            { points: polygons.right, fill: colors.right },
+            { points: polygons.top, fill: colors.top }
+          ];
+          faces.forEach((face) => {
+            face.points.forEach(extend);
+          });
+          cubeGroups.push({ faces });
+        });
+
+        const margin = 4;
+        const width = Math.ceil(bounds.maxX - bounds.minX + margin * 2);
+        const height = Math.ceil(bounds.maxY - bounds.minY + margin * 2);
+        const offsetX = margin - bounds.minX;
+        const offsetY = margin - bounds.minY;
+
+        const groups = cubeGroups.map((cube) => {
+          const polygons = cube.faces.map((face) => {
+            const points = face.points
+              .map((point) => `${(point.x + offsetX).toFixed(2)},${(point.y + offsetY).toFixed(2)}`)
+              .join(' ');
+            return `<polygon points="${points}" fill="${face.fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linejoin="round"/>`;
+          }).join('');
+          return `<g>${polygons}</g>`;
+        }).join('\n');
+
+        return {
+          source: `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n${groups}\n</svg>`,
+          width,
+          height
+        };
+      },
+
+      exportSVG() {
+        const exportFile = this.createExportSVGSource();
+        if (!exportFile) {
+          this.showToast('Nothing to export');
+          return;
+        }
+        this.downloadBlob(exportFile.source, this.getExportFilename('svg'), 'image/svg+xml;charset=utf-8');
+        this.showToast('SVG exported as cube groups');
+      },
+
+      exportPNG() {
+        const exportFile = this.createExportSVGSource();
+        if (!exportFile) {
+          this.showToast('Nothing to export');
+          return;
+        }
+        const blob = new Blob([exportFile.source], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        const scale = 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(exportFile.width * scale));
+        canvas.height = Math.max(1, Math.round(exportFile.height * scale));
+        const ctx = canvas.getContext('2d');
+
+        img.onload = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          canvas.toBlob((pngBlob) => {
+            URL.revokeObjectURL(url);
+            if (!pngBlob) {
+              this.showToast('PNG export failed');
+              return;
+            }
+            this.downloadBlob(pngBlob, this.getExportFilename('png'), 'image/png');
+            this.showToast('PNG exported');
+          }, 'image/png');
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          this.showToast('PNG export failed');
+        };
+        img.src = url;
+      },
+
+      getExportFilename(extension) {
+        const dimensions = `${this.state.width}x${this.state.height}x${this.state.depth}`;
+        return `iso-cubes-${dimensions}.${extension}`;
+      },
+
+      downloadBlob(content, filename, type) {
+        const blob = content instanceof Blob ? content : new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 500);
+      },
+
+      showToast(message) {
+        clearTimeout(this.toastTimer);
+        this.el.toast.textContent = message;
+        this.el.toast.classList.add('show');
+        this.toastTimer = setTimeout(() => {
+          this.el.toast.classList.remove('show');
+        }, 2200);
+      },
+
+      saveState() {
+        const payload = {
+          width: this.state.width,
+          height: this.state.height,
+          depth: this.state.depth,
+          spacing: this.state.spacing,
+          removed: Array.from(this.state.removed)
+        };
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(payload));
+      },
+
+      loadState() {
+        try {
+          const raw = localStorage.getItem(this.STORAGE_KEY);
+          if (!raw) return;
+          const saved = JSON.parse(raw);
+          this.state.width = this.clampNumber(saved.width, this.DIM_MIN, this.DIM_MAX);
+          this.state.height = this.clampNumber(saved.height, this.DIM_MIN, this.DIM_MAX);
+          this.state.depth = this.clampNumber(saved.depth, this.DIM_MIN, this.DIM_MAX);
+          this.state.spacing = this.clampNumber(saved.spacing ?? 9, 0, 24);
+          this.state.removed = new Set(Array.isArray(saved.removed) ? saved.removed : []);
+          this.pruneRemoved();
+        } catch (error) {
+          localStorage.removeItem(this.STORAGE_KEY);
+        }
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+
+</html>

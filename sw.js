@@ -1,13 +1,14 @@
 // VGTools Pro - Service Worker
 // Enables offline functionality and caching
 
-const CACHE_NAME = 'vgtools-v1.0.15';
+const CACHE_NAME = 'vgtools-v1.0.17';
 const OFFLINE_URL = '/404.html';
 
 // Core files to cache immediately
 const PRECACHE_ASSETS = [
     '/',
     '/index.html',
+    '/how-to.html',
     '/shared/styles.css',
     '/shared/visual-theme.js',
     '/favicon.svg',
@@ -21,6 +22,7 @@ const PRECACHE_ASSETS = [
 // App directories to cache on first visit
 const APP_ROUTES = [
     '/brickbuilder/',
+    '/isocubes/',
     '/moodboards/',
     '/blobs/',
     '/jigsaws/',
