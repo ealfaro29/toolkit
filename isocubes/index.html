@@ -113,6 +113,23 @@
       width: 64px;
     }
 
+    .mode-row {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mode-row label {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .mode-row select {
+      width: 100%;
+      text-align: left;
+    }
+
     .preset-grid,
     .action-grid,
     .export-grid {
@@ -218,7 +235,8 @@
 
     html[data-visual-theme="noir"][data-theme="light"] header.panel .title-block h1,
     html[data-visual-theme="noir"][data-theme="light"] .control-group-title,
-    html[data-visual-theme="noir"][data-theme="light"] .dimension-row label {
+    html[data-visual-theme="noir"][data-theme="light"] .dimension-row label,
+    html[data-visual-theme="noir"][data-theme="light"] .mode-row label {
       color: #191715 !important;
     }
 
@@ -228,7 +246,8 @@
 
     html[data-visual-theme="noir"][data-theme="dark"] header.panel .title-block h1,
     html[data-visual-theme="noir"][data-theme="dark"] .control-group-title,
-    html[data-visual-theme="noir"][data-theme="dark"] .dimension-row label {
+    html[data-visual-theme="noir"][data-theme="dark"] .dimension-row label,
+    html[data-visual-theme="noir"][data-theme="dark"] .mode-row label {
       color: #efe6da !important;
     }
 
@@ -388,6 +407,13 @@
           <input id="spacing-range" type="range" min="0" max="24" value="9" />
           <output id="spacing-value" class="num-input" for="spacing-range">9</output>
         </div>
+        <div class="mode-row">
+          <label for="fit-mode">Proportions</label>
+          <select id="fit-mode" class="num-input">
+            <option value="natural">Natural</option>
+            <option value="cube">Fit cube</option>
+          </select>
+        </div>
         <div class="preset-grid" aria-label="Presets">
           <button class="btn btn-secondary compact-btn" type="button" data-preset="3,3,3">3x3x3</button>
           <button class="btn btn-secondary compact-btn" type="button" data-preset="2,3,5">2x3x5</button>
@@ -471,7 +497,7 @@
       el: {},
       STORAGE_KEY: 'vgtools-isocubes-state-v1',
       THEMES: ['light', 'dark', 'system'],
-      THEME_ICONS: { light: 'L', dark: 'D', system: 'A' },
+      THEME_ICONS: { light: '☀', dark: '☾', system: '⚙' },
       DIM_MIN: 1,
       DIM_MAX: 10,
       state: {
@@ -479,6 +505,7 @@
         height: 3,
         depth: 3,
         spacing: 9,
+        fitMode: 'natural',
         removed: new Set(),
         history: [],
         future: []
@@ -498,7 +525,7 @@
       cacheDOM() {
         [
           'theme-toggle', 'width-range', 'width-number', 'height-range', 'height-number',
-          'depth-range', 'depth-number', 'spacing-range', 'spacing-value',
+          'depth-range', 'depth-number', 'spacing-range', 'spacing-value', 'fit-mode',
           'remove-cube', 'restore-all', 'undo', 'redo',
           'export-svg', 'export-png', 'scene', 'cubes', 'toast'
         ].forEach((id) => {
@@ -551,6 +578,13 @@
 
         this.el['spacing-range'].addEventListener('input', (event) => {
           this.state.spacing = this.clampNumber(event.target.value, 0, 24);
+          this.syncControls();
+          this.render();
+          this.saveState();
+        });
+
+        this.el['fit-mode'].addEventListener('change', (event) => {
+          this.state.fitMode = event.target.value === 'cube' ? 'cube' : 'natural';
           this.syncControls();
           this.render();
           this.saveState();
@@ -793,13 +827,26 @@
         const cubeD = 36;
         const cubeH = 34;
         const spacing = this.state.spacing;
+        const scale = this.getAxisScaleFactors();
         return {
-          cellX: { x: cubeW / 2 + spacing * 0.72, y: cubeD / 2 + spacing * 0.42 },
-          cellY: { x: -cubeW / 2 - spacing * 0.72, y: cubeD / 2 + spacing * 0.42 },
-          cellZ: { x: 0, y: -cubeH - spacing * 0.82 },
-          localX: { x: cubeW / 2, y: cubeD / 2 },
-          localY: { x: -cubeW / 2, y: cubeD / 2 },
-          localZ: { x: 0, y: -cubeH }
+          cellX: { x: (cubeW / 2 + spacing * 0.72) * scale.x, y: (cubeD / 2 + spacing * 0.42) * scale.x },
+          cellY: { x: (-cubeW / 2 - spacing * 0.72) * scale.y, y: (cubeD / 2 + spacing * 0.42) * scale.y },
+          cellZ: { x: 0, y: (-cubeH - spacing * 0.82) * scale.z },
+          localX: { x: (cubeW / 2) * scale.x, y: (cubeD / 2) * scale.x },
+          localY: { x: (-cubeW / 2) * scale.y, y: (cubeD / 2) * scale.y },
+          localZ: { x: 0, y: -cubeH * scale.z }
+        };
+      },
+
+      getAxisScaleFactors() {
+        if (this.state.fitMode !== 'cube') {
+          return { x: 1, y: 1, z: 1 };
+        }
+        const maxDimension = Math.max(this.state.width, this.state.depth, this.state.height, 1);
+        return {
+          x: maxDimension / Math.max(this.state.width, 1),
+          y: maxDimension / Math.max(this.state.depth, 1),
+          z: maxDimension / Math.max(this.state.height, 1)
         };
       },
 
@@ -892,6 +939,7 @@
         this.el['spacing-range'].value = this.state.spacing;
         this.el['spacing-value'].value = this.state.spacing;
         this.el['spacing-value'].textContent = this.state.spacing;
+        this.el['fit-mode'].value = this.state.fitMode === 'cube' ? 'cube' : 'natural';
       },
 
       pruneRemoved() {
@@ -1173,6 +1221,7 @@
           height: this.state.height,
           depth: this.state.depth,
           spacing: this.state.spacing,
+          fitMode: this.state.fitMode,
           removed: Array.from(this.state.removed)
         };
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(payload));
@@ -1187,6 +1236,7 @@
           this.state.height = this.clampNumber(saved.height, this.DIM_MIN, this.DIM_MAX);
           this.state.depth = this.clampNumber(saved.depth, this.DIM_MIN, this.DIM_MAX);
           this.state.spacing = this.clampNumber(saved.spacing ?? 9, 0, 24);
+          this.state.fitMode = saved.fitMode === 'cube' ? 'cube' : 'natural';
           this.state.removed = new Set(Array.isArray(saved.removed) ? saved.removed : []);
           this.pruneRemoved();
         } catch (error) {
