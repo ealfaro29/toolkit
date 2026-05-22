@@ -881,6 +881,17 @@
           };
         }
 
+        if (this.isMinimalVisualTheme()) {
+          const colors = this.getMinimalFaceColors();
+          if (!selected) return colors;
+
+          return {
+            top: this.mixHex(colors.top, '#FFFFFF', 0.18),
+            left: this.mixHex(colors.left, '#FFFFFF', 0.14),
+            right: this.mixHex(colors.right, '#FFFFFF', 0.12)
+          };
+        }
+
         const base = this.getCubeBaseColor();
         const colors = {
           top: this.shadeHex(base, 24),
@@ -909,6 +920,9 @@
         if (this.isNoirVisualTheme()) {
           return this.isDarkMode() ? '#EFE6DA' : '#191715';
         }
+        if (this.isMinimalVisualTheme()) {
+          return this.isDarkMode() ? '#F8FAFC' : '#58606B';
+        }
         return this.shadeHex(this.getCubeBaseColor(), -38);
       },
 
@@ -918,8 +932,18 @@
           : { top: '#B8AEA2', left: '#91877C', right: '#6D645A' };
       },
 
+      getMinimalFaceColors() {
+        return this.isDarkMode()
+          ? { top: '#F3F4F6', left: '#C9CED6', right: '#9AA3AF' }
+          : { top: '#D8DDE5', left: '#B4BCC8', right: '#8F99A7' };
+      },
+
       isNoirVisualTheme() {
         return document.documentElement.dataset.visualTheme === 'noir';
+      },
+
+      isMinimalVisualTheme() {
+        return document.documentElement.dataset.visualTheme === 'minimal';
       },
 
       isDarkMode() {
