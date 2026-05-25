@@ -50,13 +50,6 @@
       "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
     },
     {
-      "name": "Bubble Scale",
-      "short_name": "Bubbles",
-      "description": "Build proportional bubble diagrams",
-      "url": "/bubblescale/",
-      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
-    },
-    {
       "name": "Background Remover",
       "short_name": "BG Remove",
       "description": "AI-powered background removal",

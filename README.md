@@ -4,7 +4,7 @@
   <img src="mockups/Comicbook.png" alt="VGTools Pro Preview" width="600"/>
 </p>
 
-**VGTools Pro** is a powerful, client-side collection of 18 mini-apps designed to streamline the daily tasks of creative professionals, such as presentation designers, visual artists, and developers. Born from the need for specific, fast, and secure solutions, this toolkit provides a suite of tools that run entirely in your browser, ensuring your data remains private and secure.
+**VGTools Pro** is a powerful, client-side collection of 17 mini-apps designed to streamline the daily tasks of creative professionals, such as presentation designers, visual artists, and developers. Born from the need for specific, fast, and secure solutions, this toolkit provides a suite of tools that run entirely in your browser, ensuring your data remains private and secure.
 
 **No installations, no sign-ups, just a universe of creative power at your fingertips.**
 
@@ -21,13 +21,12 @@
 
 ---
 
-## 🚀 The 18 Apps
+## 🚀 The 17 Apps
 
 | App | Description |
 |-----|-------------|
 | 🧱 **Brick Builder** | Design and build 2D brick structures with drag-and-drop. Export as SVG or PNG. |
 | ◻️ **Iso Cube Builder** | Build isometric cube matrices from width, height, and depth. Remove individual cubelets and export as SVG or PNG. |
-| ⚪ **Bubble Scale** | Place proportional bubbles on a freeform canvas. Values rescale live against the largest number. |
 | 🖼️ **Moodboard Studio** | Create beautiful moodboards with custom branding, colors, and images. |
 | 💧 **Blob Studio** | Generate smooth, organic SVG blob shapes with customizable parameters. |
 | 🧩 **Jigsaw Generator** | Design custom vector jigsaw puzzle grids with full control over styling. |
@@ -99,5 +98,5 @@ This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md) for
 
 <p align="center">
   <strong>Made with ❤️ by the VGTools team</strong><br>
-  <em>Version 1.0.2 • 18 Apps • 2025</em>
+  <em>Version 1.0.2 • 17 Apps • 2025</em>
 </p>
