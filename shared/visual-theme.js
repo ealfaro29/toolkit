@@ -51,6 +51,7 @@
   const EMOJI_THEME_SYMBOLS = {
     brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
     isocubes: ['🧊', '◻️', '📦', '📐'],
+    bubblescale: ['🫧', '⚪', '📊', '🔵'],
     moodboards: ['🖼️', '🎨', '📌', '✨'],
     blobs: ['🫧', '💧', '🌀', '🎨'],
     jigsaws: ['🧩', '✂️', '🖼️', '🧠'],

@@ -5098,6 +5098,19 @@
             <span class="app-card-tag">3D Grid</span>
           </div>
         </a>
+        <a href="bubblescale/" class="app-card app-card-new"
+          style="--card-accent-color: #2F7DE1; --card-icon-bg-color-transparent: rgba(47, 125, 225, 0.15);"
+          data-id="bubblescale" data-new="true" data-new-until="2026-06-25T00:00:00" draggable="true">
+
+          <h2 class="app-card-title">Bubble Scale</h2>
+          <p class="app-card-description">Build freeform proportional bubble diagrams. Click the canvas, enter a value,
+            and every circle rescales against the largest number.</p>
+          <div class="app-card-tags">
+            <span class="app-card-tag">Canvas</span>
+            <span class="app-card-tag">Scale</span>
+            <span class="app-card-tag">SVG</span>
+          </div>
+        </a>
         <!-- Brick Builder - NEW -->
         <a href="brickbuilder/" class="app-card app-card-new"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
@@ -5257,7 +5270,7 @@
         <span class="footer-divider">•</span>
         <span class="footer-credit">by e. 2025</span>
         <span class="footer-divider">•</span>
-        <span class="footer-app-count">17 apps</span>
+        <span class="footer-app-count">18 apps</span>
         <span class="footer-divider">•</span>
         <span class="footer-hint">Use arrow keys to navigate</span>
       </div>
@@ -5302,6 +5315,7 @@
       EMOJI_THEME_SYMBOLS: {
         brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
         isocubes: ['🧊', '◻️', '📦', '📐'],
+        bubblescale: ['🫧', '⚪', '📊', '🔵'],
         moodboards: ['🖼️', '🎨', '📌', '✨'],
         blobs: ['🫧', '💧', '🌀', '🎨'],
         jigsaws: ['🧩', '✂️', '🖼️', '🧠'],
@@ -5318,7 +5332,7 @@
         sankey: ['📊', '↗️', '🔀', '💧'],
         mockups: ['📱', '💻', '🖥️', '✨'],
       },
-      TOOL_IDS: ['brickbuilder', 'isocubes', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
+      TOOL_IDS: ['brickbuilder', 'isocubes', 'bubblescale', 'moodboards', 'blobs', 'jigsaws', 'iconfactory', 'qrcodes', 'colors', 'notes', 'locator', 'signatures', 'svgrecolor', 'any2svg', 'bgremover', 'wordclouds', 'sankey', 'mockups'],
       // Miniwi bitmap font — per-glyph data parsed from miniwi.flf (github.com/xero/figlet-fonts)
       // Each entry: 4 row strings, variable width (most=2, M/W=4, N=3)
       // Row 4 non-empty = descender (only Q among caps)
@@ -5348,6 +5362,7 @@
       TERMINAL_LABELS: {
         brickbuilder: 'BRK',
         isocubes:     'ISO',
+        bubblescale:  'BUB',
         moodboards:   'MOD',
         blobs:        'BLB',
         jigsaws:      'JIG',
@@ -5367,6 +5382,7 @@
       NOIR_CARD_META: {
         brickbuilder: { stamp: 'BUILD',  kicker: 'Constructed Forms',      deck: 'Build modular scenes fast.',         folio: 'VGTOOLS PRESS / NO. 01' },
         isocubes:     { stamp: 'ISO',    kicker: 'Cubed Perspective',      deck: 'Compose isometric cube matrices.',   folio: 'VGTOOLS PRESS / NO. 17' },
+        bubblescale:  { stamp: 'SCALE',  kicker: 'Magnitude Map',          deck: 'Place values as scaled circles.',    folio: 'VGTOOLS PRESS / NO. 18' },
         moodboards:   { stamp: 'MOOD',   kicker: 'Cuttings And Clippings', deck: 'Compose boards from visual scraps.', folio: 'VGTOOLS PRESS / NO. 02' },
         blobs:        { stamp: 'INK',    kicker: 'Liquid Studies',         deck: 'Generate organic vector shapes.',    folio: 'VGTOOLS PRESS / NO. 03' },
         jigsaws:      { stamp: 'PUZZLE', kicker: 'Piece By Piece',         deck: 'Turn images into playable puzzles.', folio: 'VGTOOLS PRESS / NO. 04' },
@@ -5850,6 +5866,7 @@
         const appTech = {
           brickbuilder: ['2D', 'SVG'],
           isocubes: ['SVG', 'Iso', '3D Grid'],
+          bubblescale: ['Canvas', 'Scale', 'SVG'],
           svgrecolor: ['SVG', 'Hue-Shift'],
           moodboards: ['Canvas', 'PNG'],
           blobs: ['SVG', 'Bezier'],

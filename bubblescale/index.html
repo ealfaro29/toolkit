@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bubble Scale</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <script>
+    (function () {
+      try {
+        let theme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        if (theme === 'system') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = theme;
+      } catch (e) { }
+    })();
+  </script>
+  <link rel="stylesheet" href="../shared/styles.css" />
+  <style>
+    body {
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 1500px;
+      grid-template-columns: 320px minmax(0, 1fr);
+      height: calc(100vh - 50px);
+    }
+
+    header.panel {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header.panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("../Theme/comicbook/bubblescale_comicbook.png") center / cover no-repeat;
+      opacity: 0.14;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header-left,
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    .title-block {
+      min-width: 0;
+    }
+
+    .title-block h1,
+    .title-block .sub {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    aside.panel.controls {
+      gap: 18px;
+      padding: 20px;
+    }
+
+    .control-group {
+      gap: 12px;
+    }
+
+    .control-group + .control-group {
+      padding-top: 18px;
+    }
+
+    .control-group-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 12px;
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    .metric-value {
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .metric-label {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .action-grid,
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .compact-btn {
+      min-width: 0;
+      height: 36px;
+      padding: 0 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      gap: 8px;
+    }
+
+    .bubble-list {
+      display: grid;
+      gap: 6px;
+      max-height: 260px;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .bubble-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-height: 38px;
+      padding: 6px 8px;
+      color: var(--ink);
+      background: var(--surface-alt);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .bubble-row:hover,
+    .bubble-row.active {
+      border-color: var(--accent-color);
+    }
+
+    .bubble-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--row-color, var(--accent-color));
+      border: 2px solid var(--row-stroke, var(--ink));
+      justify-self: center;
+    }
+
+    .bubble-value {
+      overflow: hidden;
+      font-weight: 750;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bubble-ratio {
+      color: var(--muted);
+      font-family: var(--font-family-mono);
+      font-size: 11px;
+    }
+
+    .canvas-panel {
+      position: relative;
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: var(--surface);
+      background-image:
+        linear-gradient(to right, rgba(128, 128, 128, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(128, 128, 128, 0.12) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+
+    #bubble-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      cursor: crosshair;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .value-popover {
+      position: fixed;
+      z-index: 2000;
+      display: none;
+      width: 260px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .value-popover.open {
+      display: grid;
+      gap: 10px;
+    }
+
+    .value-popover label {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .value-popover input {
+      width: 100%;
+      height: 42px;
+      text-align: left;
+    }
+
+    .value-popover-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .toast {
+      z-index: 10000;
+    }
+
+    html[data-visual-theme="minimal"] header.panel::before,
+    html[data-visual-theme="terminal"] header.panel::before,
+    html[data-visual-theme="noir"] header.panel::before {
+      display: none;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] header.panel .title-block h1,
+    html[data-visual-theme="noir"][data-theme="light"] .control-group-title,
+    html[data-visual-theme="noir"][data-theme="light"] .metric-value,
+    html[data-visual-theme="noir"][data-theme="light"] .value-popover label {
+      color: #191715 !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] header.panel .title-block h1,
+    html[data-visual-theme="noir"][data-theme="dark"] .control-group-title,
+    html[data-visual-theme="noir"][data-theme="dark"] .metric-value,
+    html[data-visual-theme="noir"][data-theme="dark"] .value-popover label {
+      color: #efe6da !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] .container .btn.btn-secondary,
+    html[data-visual-theme="noir"][data-theme="light"] .container .back-to-home,
+    html[data-visual-theme="noir"][data-theme="light"] .container #theme-toggle,
+    html[data-visual-theme="noir"][data-theme="light"] .container .num-input {
+      background: #f4ede3 !important;
+      color: #191715 !important;
+      border-color: #191715 !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] .container .btn.btn-primary {
+      background: #191715 !important;
+      color: #f4ede3 !important;
+      border-color: #191715 !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] .container .btn.btn-secondary,
+    html[data-visual-theme="noir"][data-theme="dark"] .container .back-to-home,
+    html[data-visual-theme="noir"][data-theme="dark"] .container #theme-toggle,
+    html[data-visual-theme="noir"][data-theme="dark"] .container .num-input {
+      background: #0b0a09 !important;
+      color: #efe6da !important;
+      border-color: #efe6da !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] .container .btn.btn-primary {
+      background: #efe6da !important;
+      color: #0b0a09 !important;
+      border-color: #efe6da !important;
+    }
+
+    html[data-visual-theme="noir"] .container .btn span,
+    html[data-visual-theme="noir"] .container .btn svg {
+      color: inherit !important;
+      stroke: currentColor !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="light"] .canvas-panel {
+      background-color: #e8ded1 !important;
+      background-image:
+        linear-gradient(to right, rgba(25, 23, 21, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(25, 23, 21, 0.12) 1px, transparent 1px) !important;
+    }
+
+    html[data-visual-theme="noir"][data-theme="dark"] .canvas-panel {
+      background-color: #161311 !important;
+      background-image:
+        linear-gradient(to right, rgba(239, 230, 218, 0.12) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(239, 230, 218, 0.12) 1px, transparent 1px) !important;
+    }
+  </style>
+  <script src="../shared/visual-theme.js?v=14"></script>
+</head>
+
+<body>
+  <div class="container">
+    <header class="panel">
+      <div class="header-left">
+        <a href="../index.html" class="back-to-home" title="Back to home" aria-label="Back to home">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"></path>
+          </svg>
+        </a>
+        <div class="title-block">
+          <h1>Bubble Scale</h1>
+          <div class="sub">Freeform proportional bubble canvas.</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle" title="Change color mode" aria-label="Change color mode"></button>
+      </div>
+    </header>
+
+    <aside class="panel controls" aria-label="Bubble controls">
+      <section class="control-group">
+        <div class="control-group-title">Scale</div>
+        <div class="metric-grid">
+          <div class="metric">
+            <div id="bubble-count" class="metric-value">0</div>
+            <div class="metric-label">Bubbles</div>
+          </div>
+          <div class="metric">
+            <div id="max-value" class="metric-value">0</div>
+            <div class="metric-label">Max value</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-group">
+        <div class="control-group-title">Editing</div>
+        <div class="action-grid">
+          <button id="undo" class="btn btn-secondary compact-btn" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 14 4 9l5-5"></path>
+              <path d="M4 9h10a6 6 0 0 1 0 12h-1"></path>
+            </svg>
+            <span>Undo</span>
+          </button>
+          <button id="redo" class="btn btn-secondary compact-btn" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m15 14 5-5-5-5"></path>
+              <path d="M20 9H10a6 6 0 0 0 0 12h1"></path>
+            </svg>
+            <span>Redo</span>
+          </button>
+          <button id="remove" class="btn btn-secondary compact-btn" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 6h18"></path>
+              <path d="M8 6V4h8v2"></path>
+              <path d="m19 6-1 14H6L5 6"></path>
+            </svg>
+            <span>Remove</span>
+          </button>
+          <button id="clear" class="btn btn-secondary compact-btn" type="button" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+              <path d="M3 4v6h6"></path>
+            </svg>
+            <span>Clear</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="control-group">
+        <div class="control-group-title">Bubbles</div>
+        <div id="bubble-list" class="bubble-list"></div>
+      </section>
+
+      <section class="control-group">
+        <div class="control-group-title">Export</div>
+        <div class="export-grid">
+          <button id="export-svg" class="btn btn-secondary compact-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <path d="M7 10l5 5 5-5"></path>
+              <path d="M12 15V3"></path>
+            </svg>
+            <span>SVG</span>
+          </button>
+          <button id="export-png" class="btn btn-secondary compact-btn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <path d="M7 10l5 5 5-5"></path>
+              <path d="M12 15V3"></path>
+            </svg>
+            <span>PNG</span>
+          </button>
+        </div>
+      </section>
+    </aside>
+
+    <main class="panel canvas-panel" aria-label="Bubble scale canvas">
+      <canvas id="bubble-canvas"></canvas>
+    </main>
+  </div>
+
+  <form id="value-popover" class="value-popover" autocomplete="off">
+    <label for="bubble-value">Value</label>
+    <input id="bubble-value" class="num-input" type="number" min="0.01" step="any" inputmode="decimal" />
+    <div class="value-popover-actions">
+      <button id="cancel-value" class="btn btn-secondary compact-btn" type="button">Cancel</button>
+      <button class="btn btn-primary compact-btn" type="submit">Add</button>
+    </div>
+  </form>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <a id="visitor-badge" class="visitor-badge" href="#" target="_blank" title="Visitors"></a>
+  <script src="../shared/visitor-badge.js"></script>
+  <script>
+    const App = {
+      el: {},
+      STORAGE_KEY: 'vgtools-bubblescale-state-v1',
+      THEMES: ['light', 'dark', 'system'],
+      THEME_ICONS: { light: '☀', dark: '☾', system: '⚙' },
+      state: {
+        bubbles: [],
+        selectedId: null,
+        history: [],
+        future: [],
+        nextId: 1
+      },
+      pendingPoint: null,
+      drag: null,
+      toastTimer: null,
+      resizeObserver: null,
+
+      init() {
+        this.cacheDOM();
+        this.initTheme();
+        this.loadState();
+        this.bindEvents();
+        this.resizeCanvas();
+        this.render();
+      },
+
+      cacheDOM() {
+        [
+          'theme-toggle', 'bubble-canvas', 'bubble-count', 'max-value', 'bubble-list',
+          'undo', 'redo', 'remove', 'clear', 'export-svg', 'export-png',
+          'value-popover', 'bubble-value', 'cancel-value', 'toast'
+        ].forEach((id) => {
+          this.el[id] = document.getElementById(id);
+        });
+      },
+
+      initTheme() {
+        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
+        this.setTheme(savedTheme, false);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+          if ((localStorage.getItem('creative-toolkit-theme') || 'system') === 'system') {
+            this.applyTheme('system');
+            this.render();
+          }
+        });
+      },
+
+      setTheme(theme, save = true) {
+        const safeTheme = this.THEMES.includes(theme) ? theme : 'system';
+        if (save) localStorage.setItem('creative-toolkit-theme', safeTheme);
+        this.el['theme-toggle'].textContent = this.THEME_ICONS[safeTheme];
+        this.applyTheme(safeTheme);
+        this.render();
+      },
+
+      cycleTheme() {
+        const current = localStorage.getItem('creative-toolkit-theme') || 'system';
+        const index = this.THEMES.indexOf(current);
+        this.setTheme(this.THEMES[(index + 1) % this.THEMES.length]);
+      },
+
+      applyTheme(theme) {
+        const isDark = theme === 'system'
+          ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          : theme === 'dark';
+        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      },
+
+      bindEvents() {
+        this.el['theme-toggle'].addEventListener('click', () => this.cycleTheme());
+
+        this.el['bubble-canvas'].addEventListener('pointerdown', (event) => this.handlePointerDown(event));
+        this.el['bubble-canvas'].addEventListener('pointermove', (event) => this.handlePointerMove(event));
+        this.el['bubble-canvas'].addEventListener('pointerup', (event) => this.handlePointerUp(event));
+        this.el['bubble-canvas'].addEventListener('pointercancel', (event) => this.handlePointerUp(event));
+        this.el['bubble-canvas'].addEventListener('dblclick', (event) => this.handleDoubleClick(event));
+
+        this.el['value-popover'].addEventListener('submit', (event) => {
+          event.preventDefault();
+          this.submitBubbleValue();
+        });
+        this.el['cancel-value'].addEventListener('click', () => this.closeValuePopover());
+
+        this.el.undo.addEventListener('click', () => this.undo());
+        this.el.redo.addEventListener('click', () => this.redo());
+        this.el.remove.addEventListener('click', () => this.removeSelected());
+        this.el.clear.addEventListener('click', () => this.clearAll());
+        this.el['export-svg'].addEventListener('click', () => this.exportSVG());
+        this.el['export-png'].addEventListener('click', () => this.exportPNG());
+
+        window.addEventListener('keydown', (event) => this.handleKeyDown(event));
+        window.addEventListener('vgtools:visual-theme-applied', () => this.render());
+
+        this.resizeObserver = new ResizeObserver(() => {
+          this.resizeCanvas();
+          this.render();
+        });
+        this.resizeObserver.observe(this.el['bubble-canvas']);
+      },
+
+      handlePointerDown(event) {
+        if (event.button !== 0) return;
+        this.closeValuePopover();
+        const point = this.getCanvasPoint(event);
+        const hit = this.hitTest(point);
+        if (hit) {
+          this.state.selectedId = hit.id;
+          this.drag = {
+            id: hit.id,
+            start: point,
+            moved: false,
+            snapshot: this.snapshot()
+          };
+          this.el['bubble-canvas'].setPointerCapture(event.pointerId);
+          this.render();
+          return;
+        }
+        this.pendingPoint = point;
+      },
+
+      handlePointerMove(event) {
+        if (!this.drag) return;
+        const point = this.getCanvasPoint(event);
+        const distance = Math.hypot(point.x - this.drag.start.x, point.y - this.drag.start.y);
+        if (!this.drag.moved && distance < 3) return;
+        this.drag.moved = true;
+        const bubble = this.getBubbleById(this.drag.id);
+        if (!bubble) return;
+        const size = this.getCanvasSize();
+        bubble.x = this.clamp(point.x / size.width, 0, 1);
+        bubble.y = this.clamp(point.y / size.height, 0, 1);
+        this.render();
+      },
+
+      handlePointerUp(event) {
+        if (this.drag) {
+          const wasMoved = this.drag.moved;
+          const snapshot = this.drag.snapshot;
+          this.drag = null;
+          try {
+            this.el['bubble-canvas'].releasePointerCapture(event.pointerId);
+          } catch (error) { }
+          if (wasMoved) {
+            this.pushSnapshot(snapshot);
+            this.state.future = [];
+            this.saveState();
+          }
+          this.render();
+          return;
+        }
+
+        if (!this.pendingPoint) return;
+        const point = this.getCanvasPoint(event);
+        const distance = Math.hypot(point.x - this.pendingPoint.x, point.y - this.pendingPoint.y);
+        if (distance < 4) {
+          this.openValuePopover(this.pendingPoint, event.clientX, event.clientY);
+        }
+        this.pendingPoint = null;
+      },
+
+      handleDoubleClick(event) {
+        const point = this.getCanvasPoint(event);
+        const hit = this.hitTest(point);
+        if (!hit) return;
+        event.preventDefault();
+        this.state.selectedId = hit.id;
+        this.openValuePopover(point, event.clientX, event.clientY, hit);
+      },
+
+      openValuePopover(point, clientX, clientY, bubble = null) {
+        this.pendingPoint = point;
+        this.editingId = bubble ? bubble.id : null;
+        this.el['bubble-value'].value = bubble ? bubble.value : '';
+        this.el['value-popover'].classList.add('open');
+        const rect = this.el['value-popover'].getBoundingClientRect();
+        const left = Math.min(window.innerWidth - rect.width - 16, Math.max(16, clientX + 12));
+        const top = Math.min(window.innerHeight - rect.height - 16, Math.max(16, clientY + 12));
+        this.el['value-popover'].style.left = `${left}px`;
+        this.el['value-popover'].style.top = `${top}px`;
+        window.setTimeout(() => {
+          this.el['bubble-value'].focus();
+          this.el['bubble-value'].select();
+        }, 0);
+      },
+
+      closeValuePopover() {
+        this.el['value-popover'].classList.remove('open');
+        this.pendingPoint = null;
+        this.editingId = null;
+      },
+
+      submitBubbleValue() {
+        const value = Number.parseFloat(this.el['bubble-value'].value);
+        if (!Number.isFinite(value) || value <= 0) {
+          this.showToast('Use a positive value');
+          return;
+        }
+
+        if (this.editingId) {
+          const bubble = this.getBubbleById(this.editingId);
+          if (!bubble) return;
+          this.pushHistory();
+          bubble.value = value;
+          this.state.future = [];
+          this.closeValuePopover();
+          this.saveState();
+          this.render();
+          return;
+        }
+
+        if (!this.pendingPoint) return;
+        const size = this.getCanvasSize();
+        this.pushHistory();
+        const id = this.state.nextId;
+        this.state.nextId += 1;
+        this.state.bubbles.push({
+          id,
+          value,
+          x: this.clamp(this.pendingPoint.x / size.width, 0, 1),
+          y: this.clamp(this.pendingPoint.y / size.height, 0, 1)
+        });
+        this.state.selectedId = id;
+        this.state.future = [];
+        this.closeValuePopover();
+        this.saveState();
+        this.render();
+      },
+
+      removeSelected() {
+        if (!this.state.selectedId) return;
+        this.pushHistory();
+        this.state.bubbles = this.state.bubbles.filter((bubble) => bubble.id !== this.state.selectedId);
+        this.state.selectedId = null;
+        this.state.future = [];
+        this.saveState();
+        this.render();
+      },
+
+      clearAll() {
+        if (this.state.bubbles.length === 0) return;
+        this.pushHistory();
+        this.state.bubbles = [];
+        this.state.selectedId = null;
+        this.state.future = [];
+        this.saveState();
+        this.render();
+      },
+
+      pushHistory() {
+        this.state.history.push(this.snapshot());
+        if (this.state.history.length > 60) this.state.history.shift();
+      },
+
+      pushSnapshot(snapshot) {
+        this.state.history.push(snapshot);
+        if (this.state.history.length > 60) this.state.history.shift();
+      },
+
+      snapshot() {
+        return {
+          bubbles: this.state.bubbles.map((bubble) => ({ ...bubble })),
+          selectedId: this.state.selectedId,
+          nextId: this.state.nextId
+        };
+      },
+
+      restoreSnapshot(snapshot) {
+        this.state.bubbles = snapshot.bubbles.map((bubble) => ({ ...bubble }));
+        this.state.selectedId = snapshot.selectedId;
+        this.state.nextId = snapshot.nextId;
+      },
+
+      undo() {
+        if (this.state.history.length === 0) return;
+        this.state.future.push(this.snapshot());
+        this.restoreSnapshot(this.state.history.pop());
+        this.saveState();
+        this.render();
+      },
+
+      redo() {
+        if (this.state.future.length === 0) return;
+        this.state.history.push(this.snapshot());
+        this.restoreSnapshot(this.state.future.pop());
+        this.saveState();
+        this.render();
+      },
+
+      handleKeyDown(event) {
+        if (event.target.matches('input, textarea, select')) {
+          if (event.key === 'Escape') this.closeValuePopover();
+          return;
+        }
+
+        if (event.key === 'Escape') {
+          this.closeValuePopover();
+        } else if (event.key === 'Delete' || event.key === 'Backspace') {
+          event.preventDefault();
+          this.removeSelected();
+        } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+          event.preventDefault();
+          if (event.shiftKey) this.redo();
+          else this.undo();
+        } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
+          event.preventDefault();
+          this.redo();
+        }
+      },
+
+      resizeCanvas() {
+        const canvas = this.el['bubble-canvas'];
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const width = Math.max(1, Math.round(rect.width * dpr));
+        const height = Math.max(1, Math.round(rect.height * dpr));
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+        }
+      },
+
+      render() {
+        this.drawToCanvas(this.el['bubble-canvas']);
+        this.renderList();
+        this.updateUI();
+      },
+
+      drawToCanvas(canvas, scale = window.devicePixelRatio || 1) {
+        const ctx = canvas.getContext('2d');
+        const cssWidth = canvas.width / scale;
+        const cssHeight = canvas.height / scale;
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
+        ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+        const palette = this.getPalette();
+        const radii = this.getBubbleRadii(cssWidth, cssHeight);
+        this.state.bubbles.forEach((bubble, index) => {
+          const x = bubble.x * cssWidth;
+          const y = bubble.y * cssHeight;
+          const radius = radii.get(bubble.id) || 0;
+          const color = palette.fills[index % palette.fills.length];
+          const stroke = bubble.id === this.state.selectedId ? palette.selectedStroke : palette.stroke;
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+          ctx.lineWidth = bubble.id === this.state.selectedId ? 3 : 1.6;
+          ctx.strokeStyle = stroke;
+          ctx.stroke();
+
+          if (radius >= 18) {
+            const label = this.formatValue(bubble.value);
+            ctx.fillStyle = palette.text;
+            ctx.font = `700 ${Math.max(10, Math.min(18, radius * 0.34))}px ${this.getCanvasFont()}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y, radius * 1.55);
+          }
+          ctx.restore();
+        });
+      },
+
+      renderList() {
+        const max = this.getMaxValue();
+        if (this.state.bubbles.length === 0) {
+          this.el['bubble-list'].innerHTML = '';
+          return;
+        }
+
+        const palette = this.getPalette();
+        this.el['bubble-list'].innerHTML = this.state.bubbles.map((bubble, index) => {
+          const ratio = max > 0 ? Math.round((bubble.value / max) * 100) : 0;
+          const active = bubble.id === this.state.selectedId ? ' active' : '';
+          return `<button class="bubble-row${active}" type="button" data-id="${bubble.id}" style="--row-color:${palette.fills[index % palette.fills.length]}; --row-stroke:${palette.stroke};">
+            <span class="bubble-dot"></span>
+            <span class="bubble-value">${this.escapeHtml(this.formatValue(bubble.value))}</span>
+            <span class="bubble-ratio">${ratio}%</span>
+          </button>`;
+        }).join('');
+
+        this.el['bubble-list'].querySelectorAll('.bubble-row').forEach((row) => {
+          row.addEventListener('click', () => {
+            this.state.selectedId = Number.parseInt(row.dataset.id, 10);
+            this.render();
+          });
+        });
+      },
+
+      updateUI() {
+        this.el['bubble-count'].textContent = String(this.state.bubbles.length);
+        this.el['max-value'].textContent = this.formatValue(this.getMaxValue());
+        this.el.undo.disabled = this.state.history.length === 0;
+        this.el.redo.disabled = this.state.future.length === 0;
+        this.el.remove.disabled = !this.state.selectedId;
+        this.el.clear.disabled = this.state.bubbles.length === 0;
+        this.el['export-svg'].disabled = this.state.bubbles.length === 0;
+        this.el['export-png'].disabled = this.state.bubbles.length === 0;
+      },
+
+      getBubbleRadii(width, height) {
+        const maxValue = this.getMaxValue();
+        const minRadius = 10;
+        const maxRadius = Math.max(38, Math.min(130, Math.min(width, height) * 0.18));
+        const radii = new Map();
+        this.state.bubbles.forEach((bubble) => {
+          const ratio = maxValue > 0 ? Math.sqrt(bubble.value / maxValue) : 0;
+          radii.set(bubble.id, minRadius + ratio * (maxRadius - minRadius));
+        });
+        return radii;
+      },
+
+      getMaxValue() {
+        return this.state.bubbles.reduce((max, bubble) => Math.max(max, bubble.value), 0);
+      },
+
+      hitTest(point) {
+        const size = this.getCanvasSize();
+        const radii = this.getBubbleRadii(size.width, size.height);
+        for (let index = this.state.bubbles.length - 1; index >= 0; index -= 1) {
+          const bubble = this.state.bubbles[index];
+          const x = bubble.x * size.width;
+          const y = bubble.y * size.height;
+          const radius = radii.get(bubble.id) || 0;
+          if (Math.hypot(point.x - x, point.y - y) <= radius) return bubble;
+        }
+        return null;
+      },
+
+      getCanvasPoint(event) {
+        const rect = this.el['bubble-canvas'].getBoundingClientRect();
+        return {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top
+        };
+      },
+
+      getCanvasSize() {
+        const rect = this.el['bubble-canvas'].getBoundingClientRect();
+        return {
+          width: Math.max(1, rect.width),
+          height: Math.max(1, rect.height)
+        };
+      },
+
+      getBubbleById(id) {
+        return this.state.bubbles.find((bubble) => bubble.id === id);
+      },
+
+      getPalette() {
+        const visualTheme = document.documentElement.dataset.visualTheme || 'comicbook';
+        const isDark = document.documentElement.dataset.theme === 'dark';
+        const accent = this.normalizeHex(getComputedStyle(document.documentElement).getPropertyValue('--accent-color'), '#2F7DE1');
+        const palettes = {
+          comicbook: {
+            fills: ['rgba(231,47,47,0.78)', 'rgba(247,207,39,0.82)', 'rgba(47,125,225,0.76)', 'rgba(20,20,20,0.82)'],
+            stroke: '#111111',
+            selectedStroke: '#ffffff',
+            text: '#ffffff'
+          },
+          glassui: {
+            fills: ['rgba(143,211,255,0.48)', 'rgba(90,108,255,0.42)', 'rgba(230,244,255,0.55)', 'rgba(47,79,216,0.42)'],
+            stroke: isDark ? '#E6F4FF' : '#1A2E6E',
+            selectedStroke: '#8FD3FF',
+            text: isDark ? '#E6F4FF' : '#10205A'
+          },
+          minimal: {
+            fills: isDark
+              ? ['rgba(245,245,247,0.84)', 'rgba(185,190,199,0.78)', 'rgba(133,140,151,0.76)', 'rgba(92,99,112,0.72)']
+              : ['rgba(24,24,27,0.78)', 'rgba(82,82,91,0.66)', 'rgba(113,113,122,0.58)', 'rgba(161,161,170,0.52)'],
+            stroke: isDark ? '#FFFFFF' : '#111111',
+            selectedStroke: isDark ? '#A1A1AA' : '#000000',
+            text: isDark ? '#111111' : '#FFFFFF'
+          },
+          emoji: {
+            fills: ['rgba(255,122,182,0.68)', 'rgba(255,195,102,0.7)', 'rgba(102,215,255,0.68)', 'rgba(137,255,177,0.64)'],
+            stroke: isDark ? '#FFF2C6' : '#5C3566',
+            selectedStroke: '#FF7AB6',
+            text: isDark ? '#24182B' : '#27152E'
+          },
+          terminal: {
+            fills: ['rgba(0,255,65,0.44)', 'rgba(0,210,54,0.36)', 'rgba(104,255,142,0.3)', 'rgba(0,135,35,0.48)'],
+            stroke: '#00FF41',
+            selectedStroke: '#B6FFCA',
+            text: '#00FF41'
+          },
+          noir: {
+            fills: isDark
+              ? ['rgba(240,236,230,0.78)', 'rgba(178,169,158,0.74)', 'rgba(130,120,110,0.72)', 'rgba(86,79,72,0.76)']
+              : ['rgba(25,23,21,0.76)', 'rgba(89,82,75,0.68)', 'rgba(140,130,119,0.62)', 'rgba(186,175,163,0.58)'],
+            stroke: isDark ? '#F0ECE6' : '#191715',
+            selectedStroke: isDark ? '#FFFFFF' : '#000000',
+            text: isDark ? '#111111' : '#F4EDE3'
+          }
+        };
+        if (palettes[visualTheme]) return palettes[visualTheme];
+        return {
+          fills: [
+            `${accent}CC`,
+            `${this.shadeHex(accent, 22)}BB`,
+            `${this.shadeHex(accent, -16)}AA`
+          ],
+          stroke: this.shadeHex(accent, -38),
+          selectedStroke: this.shadeHex(accent, 40),
+          text: '#FFFFFF'
+        };
+      },
+
+      getCanvasFont() {
+        const value = getComputedStyle(document.documentElement).getPropertyValue('--font-family-sans').trim();
+        return value || 'Inter, system-ui, sans-serif';
+      },
+
+      createSVGSource() {
+        const size = this.getCanvasSize();
+        const width = Math.round(size.width);
+        const height = Math.round(size.height);
+        const palette = this.getPalette();
+        const radii = this.getBubbleRadii(width, height);
+        const circles = this.state.bubbles.map((bubble, index) => {
+          const x = (bubble.x * width).toFixed(2);
+          const y = (bubble.y * height).toFixed(2);
+          const radius = (radii.get(bubble.id) || 0).toFixed(2);
+          const fill = palette.fills[index % palette.fills.length];
+          const label = this.escapeHtml(this.formatValue(bubble.value));
+          const fontSize = Math.max(10, Math.min(18, (radii.get(bubble.id) || 0) * 0.34)).toFixed(2);
+          const text = (radii.get(bubble.id) || 0) >= 18
+            ? `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" fill="${palette.text}" font-family="Arial, sans-serif" font-size="${fontSize}" font-weight="700">${label}</text>`
+            : '';
+          return `<g><circle cx="${x}" cy="${y}" r="${radius}" fill="${fill}" stroke="${palette.stroke}" stroke-width="1.6"/>${text}</g>`;
+        }).join('\n');
+        return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n${circles}\n</svg>`;
+      },
+
+      exportSVG() {
+        if (this.state.bubbles.length === 0) {
+          this.showToast('Nothing to export');
+          return;
+        }
+        this.downloadBlob(this.createSVGSource(), 'bubble-scale.svg', 'image/svg+xml;charset=utf-8');
+        this.showToast('SVG exported');
+      },
+
+      exportPNG() {
+        if (this.state.bubbles.length === 0) {
+          this.showToast('Nothing to export');
+          return;
+        }
+        const size = this.getCanvasSize();
+        const scale = 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(size.width * scale);
+        canvas.height = Math.round(size.height * scale);
+        this.drawToCanvas(canvas, scale);
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            this.showToast('PNG export failed');
+            return;
+          }
+          this.downloadBlob(blob, 'bubble-scale.png', 'image/png');
+          this.showToast('PNG exported');
+        }, 'image/png');
+      },
+
+      downloadBlob(content, filename, type) {
+        const blob = content instanceof Blob ? content : new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 500);
+      },
+
+      saveState() {
+        const payload = {
+          bubbles: this.state.bubbles,
+          selectedId: this.state.selectedId,
+          nextId: this.state.nextId
+        };
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(payload));
+      },
+
+      loadState() {
+        try {
+          const raw = localStorage.getItem(this.STORAGE_KEY);
+          if (!raw) return;
+          const saved = JSON.parse(raw);
+          this.state.bubbles = Array.isArray(saved.bubbles)
+            ? saved.bubbles
+              .map((bubble) => ({
+                id: Number.parseInt(bubble.id, 10),
+                value: Number.parseFloat(bubble.value),
+                x: this.clamp(Number.parseFloat(bubble.x), 0, 1),
+                y: this.clamp(Number.parseFloat(bubble.y), 0, 1)
+              }))
+              .filter((bubble) => Number.isFinite(bubble.id) && Number.isFinite(bubble.value) && bubble.value > 0)
+            : [];
+          this.state.selectedId = this.state.bubbles.some((bubble) => bubble.id === saved.selectedId) ? saved.selectedId : null;
+          const maxId = this.state.bubbles.reduce((max, bubble) => Math.max(max, bubble.id), 0);
+          this.state.nextId = Math.max(maxId + 1, Number.parseInt(saved.nextId, 10) || 1);
+        } catch (error) {
+          localStorage.removeItem(this.STORAGE_KEY);
+        }
+      },
+
+      showToast(message) {
+        clearTimeout(this.toastTimer);
+        this.el.toast.textContent = message;
+        this.el.toast.classList.add('show');
+        this.toastTimer = setTimeout(() => {
+          this.el.toast.classList.remove('show');
+        }, 2200);
+      },
+
+      formatValue(value) {
+        if (!Number.isFinite(value)) return '0';
+        return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(value);
+      },
+
+      normalizeHex(value, fallback) {
+        const color = String(value || '').trim();
+        return /^#[0-9a-fA-F]{6}$/.test(color) ? color.toUpperCase() : fallback;
+      },
+
+      hexToRgb(hex) {
+        const safe = this.normalizeHex(hex, '#2F7DE1').slice(1);
+        return {
+          r: Number.parseInt(safe.slice(0, 2), 16),
+          g: Number.parseInt(safe.slice(2, 4), 16),
+          b: Number.parseInt(safe.slice(4, 6), 16)
+        };
+      },
+
+      rgbToHex(r, g, b) {
+        return `#${[r, g, b].map((value) => {
+          const clamped = Math.max(0, Math.min(255, Math.round(value)));
+          return clamped.toString(16).padStart(2, '0');
+        }).join('')}`.toUpperCase();
+      },
+
+      shadeHex(hex, amount) {
+        const rgb = this.hexToRgb(hex);
+        const target = amount >= 0 ? 255 : 0;
+        const ratio = Math.abs(amount) / 100;
+        return this.rgbToHex(
+          rgb.r + (target - rgb.r) * ratio,
+          rgb.g + (target - rgb.g) * ratio,
+          rgb.b + (target - rgb.b) * ratio
+        );
+      },
+
+      clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      },
+
+      escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[char]));
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+
+</html>
