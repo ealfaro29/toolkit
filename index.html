@@ -1,7 +1,8 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-visual-theme="glassui">
 
 <head>
+  <meta data-vgtools-static-shell-csp http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; worker-src 'none'; form-action 'none'; frame-src 'none'">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>VGTools Pro - Creative Mini-Apps for Designers</title>
@@ -19,14 +20,14 @@
   <meta property="og:title" content="VGTools Pro - Creative Mini-Apps for Designers" />
   <meta property="og:description"
     content="A universe of 15 creative mini-apps. 100% client-side, zero installation required." />
-  <meta property="og:image" content="Theme/comicbook/mockups_comicbook.png" />
+  <meta property="og:image" content="Theme/glassui/mockups_glassui.png" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="VGTools Pro - Creative Mini-Apps" />
   <meta name="twitter:description"
     content="15 creative tools for designers. Background remover, QR codes, moodboards & more." />
-  <meta name="twitter:image" content="Theme/comicbook/mockups_comicbook.png" />
+  <meta name="twitter:image" content="Theme/glassui/mockups_glassui.png" />
 
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -41,10 +42,6 @@
   <style>
     /* Hub-Specific Styles */
     :root {
-      --hub-pattern-image: url('Theme/comicbook/pattern_comicbook.jpg');
-    }
-
-    html[data-visual-theme="glassui"] {
       --hub-pattern-image: url('Theme/glassui/pattern_glassui.jpg');
     }
 
@@ -4291,7 +4288,7 @@
     /* ---- THEME PREVIEWS ---- */
 
     /* Comicbook — halftone pattern + POW */
-    .tp-preview-comic { background-image: url('Theme/comicbook/pattern_comicbook.jpg'); background-color: #F7CF27; }
+    .tp-preview-comic { background-image: url('Theme/glassui/pattern_glassui.jpg'); background-color: #F7CF27; }
     .tp-preview-comic::after {
       content: 'POW!'; position: absolute; bottom: 6px; left: 10px;
       font-family: "Bangers", Impact, sans-serif; font-size: 22px;
@@ -5007,15 +5004,7 @@
   </style>
   <script>
     (function () {
-      try {
-        const localTheme = localStorage.getItem('theme');
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (localTheme === 'dark' || ((!localTheme || localTheme === 'system') && systemDark)) {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
-      } catch (e) { }
+      document.documentElement.setAttribute('data-theme', 'light');
     })();
   </script>
   <!-- Prevent hub flash when returning from a mini-app.
@@ -5026,42 +5015,6 @@
 </head>
 
 <body>
-  <!-- Welcome Overlay - Shows only once -->
-  <div id="welcome-overlay" class="welcome-overlay">
-    <div class="welcome-content">
-      <div class="welcome-badge">New Experience</div>
-      <h1 class="welcome-title">
-        Welcome to the new
-        <span>vgtools.pro</span>
-      </h1>
-      <p class="welcome-subtitle">A universe of creative tools, redesigned for you.</p>
-      <div class="welcome-dots">
-        <span class="welcome-dot"></span>
-        <span class="welcome-dot"></span>
-        <span class="welcome-dot"></span>
-      </div>
-    </div>
-  </div>
-
-  <div id="theme-splash-overlay" class="theme-splash-overlay hidden" role="dialog" aria-modal="true"
-    aria-labelledby="theme-splash-title">
-    <div class="theme-splash-content">
-      <button id="theme-splash-close" class="theme-splash-close" type="button" aria-label="Close">&times;</button>
-      <div class="theme-splash-kicker">Theme update</div>
-      <h2 id="theme-splash-title" class="theme-splash-title">New themes are available</h2>
-      <p class="theme-splash-copy">Choose from Comicbook, Glass UI, Minimal, Emoji, Terminal, and Noir across the toolkit.</p>
-      <div class="theme-splash-strip" aria-hidden="true">
-        <span class="theme-splash-chip" style="--chip-color:#e72f2f">Comicbook</span>
-        <span class="theme-splash-chip" style="--chip-color:#7dd3fc">Glass UI</span>
-        <span class="theme-splash-chip" style="--chip-color:#111111">Minimal</span>
-        <span class="theme-splash-chip" style="--chip-color:#ff7ab6">Emoji</span>
-        <span class="theme-splash-chip" style="--chip-color:#00ff41">Terminal</span>
-        <span class="theme-splash-chip" style="--chip-color:#8a8078">Noir</span>
-      </div>
-      <button id="theme-splash-action" class="theme-splash-action" type="button">Explore themes</button>
-    </div>
-  </div>
-
   <div class="container">
     <header class="panel">
       <h1>VGTools Pro</h1>
@@ -5073,18 +5026,11 @@
         </svg>
         <input type="text" id="search-input" class="search-input" placeholder="Search apps..." autocomplete="off">
       </div>
-      <div class="theme-switcher">
-        <button id="theme-picker-btn" title="Change visual theme">
-          <span class="tp-btn-dot"></span>
-          <span class="tp-btn-label" id="tp-btn-label">Theme</span>
-        </button>
-        <button id="theme-toggle" title="Change color mode"></button>
-      </div>
     </header>
 
     <main>
       <div class="app-grid" id="app-grid">
-        <a href="isocubes/" class="app-card app-card-new app-card-banner"
+        <div class="app-card app-card-new app-card-banner"
           style="--card-accent-color: #2F7DE1; --card-icon-bg-color-transparent: rgba(47, 125, 225, 0.15);"
           data-id="isocubes" data-new="true" data-new-until="2026-06-21T00:00:00" data-announcement="true"
           data-label="New tool" draggable="true">
@@ -5097,130 +5043,130 @@
             <span class="app-card-tag">Iso</span>
             <span class="app-card-tag">3D Grid</span>
           </div>
-        </a>
+        </div>
         <!-- Brick Builder - NEW -->
-        <a href="brickbuilder/" class="app-card app-card-new"
+        <div class="app-card app-card-new"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="brickbuilder" data-new="true" draggable="true">
 
           <h2 class="app-card-title">Brick Builder</h2>
           <p class="app-card-description">Design and build 2D brick structures with a simple drag-and-drop interface.
             Export your creations as high-quality SVG or PNG files.</p>
-        </a>
-        <a href="moodboards/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="moodboards" draggable="true">
 
           <h2 class="app-card-title">Moodboard Studio</h2>
           <p class="app-card-description">Create and export beautiful, inspiring moodboards with custom branding,
             colors, typography, and images.</p>
-        </a>
-        <a href="blobs/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="blobs" draggable="true">
 
           <h2 class="app-card-title">Blob Studio</h2>
           <p class="app-card-description">Generate smooth, organic, and unique SVG blob shapes. Fine-tune points,
             variance, and smoothness to your liking.</p>
-        </a>
-        <a href="jigsaws/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="jigsaws" draggable="true">
 
           <h2 class="app-card-title">Jigsaw Generator</h2>
           <p class="app-card-description">Design and export custom vector jigsaw puzzle grids. Full control over rows,
             columns, and tab styling.</p>
-        </a>
-        <a href="iconfactory/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="iconfactory" draggable="true">
 
           <h2 class="app-card-title">Icon Factory</h2>
           <p class="app-card-description">Combine shapes to create custom icons with ease. Build your collection and
             download them all as a ZIP file.</p>
-        </a>
-        <a href="qrcodes/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="qrcodes" draggable="true">
 
           <h2 class="app-card-title">QR Code Generator</h2>
           <p class="app-card-description">Create custom QR codes for URLs, WiFi, vCards, and more. All data is generated
             locally in your browser.</p>
-        </a>
-        <a href="palettes/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="colors" draggable="true">
 
           <h2 class="app-card-title">Color Mixer</h2>
           <p class="app-card-description">Generate harmonic color palettes and discover beautiful gradients from a
             single base color with ease.</p>
-        </a>
-        <a href="notes/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="notes" draggable="true">
 
           <h2 class="app-card-title">Notepad & Kanban</h2>
           <p class="app-card-description">Capture ideas quickly, then drag them into your Kanban workflow. Data is saved
             automatically in the browser.</p>
-        </a>
-        <a href="locator/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="locator" draggable="true">
 
           <h2 class="app-card-title">Locator</h2>
           <p class="app-card-description">Geocode a list of locations and visualize them on an interactive world map.
             Export results as SVG or PNG.</p>
-        </a>
-        <a href="signatures/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="signatures" draggable="true">
 
           <h2 class="app-card-title">Signature to SVG</h2>
           <p class="app-card-description">Convert image signatures into clean, scalable SVG vector graphics with
             adjustable threshold settings.</p>
-        </a>
-        <a href="svgrecolor/" class="app-card app-card-new"
+        </div>
+        <div class="app-card app-card-new"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="svgrecolor" data-new="true" draggable="true">
 
           <h2 class="app-card-title">SVG Recolor</h2>
           <p class="app-card-description">Recolor SVG files using smart hue grouping and quick replacement controls.
             Great for branding variants and presentation-ready exports.</p>
-        </a>
+        </div>
         <!-- Handwriting OCR - Hidden -->
-        <!-- <a href="handwriting/" class="app-card"
+        <!-- <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="handwriting" draggable="true">
 
           <h2 class="app-card-title">Handwriting OCR</h2>
           <p class="app-card-description">Extract text from handwritten images using OCR technology. Perfect for
             digitizing handwritten notes and documents.</p>
-        </a> -->
-        <a href="any2svg/" class="app-card"
+        </div> -->
+        <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="any2svg" draggable="true">
 
           <h2 class="app-card-title">Any2SVG</h2>
           <p class="app-card-description">Convert AI, PSD, PDF, and many more formats to SVG. All files are processed
             locally in your browser.</p>
-        </a>
-        <a href="bgremover/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="bgremover" draggable="true">
 
           <h2 class="app-card-title">Background Remover</h2>
           <p class="app-card-description">Client-side AI-powered cutout tool. Click, drop or paste an image to
             automatically remove the background.</p>
-        </a>
-        <a href="wordclouds/" class="app-card"
+        </div>
+        <div class="app-card"
           style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15);"
           data-id="wordclouds" draggable="true">
 
           <h2 class="app-card-title">Word Cloud Generator</h2>
           <p class="app-card-description">Generate beautiful and customizable word clouds from any text source. Export
             in SVG or PNG formats.</p>
-        </a>
-        <a href="sankey/" class="app-card app-card-new"
+        </div>
+        <div class="app-card app-card-new"
           style="--card-accent-color: #F7CF27; --card-icon-bg-color-transparent: rgba(247, 207, 39, 0.15);"
           data-id="sankey" data-new="true" draggable="true">
 
@@ -5232,9 +5178,9 @@
             <span class="app-card-tag">Data Viz</span>
             <span class="app-card-tag">Flows</span>
           </div>
-        </a>
-        <a href="mockups/" class="app-card app-card-new"
-          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15); --card-bg-image: url('Theme/comicbook/mockups_comicbook.png');"
+        </div>
+        <div class="app-card app-card-new"
+          style="--card-accent-color: #E72F2F; --card-icon-bg-color-transparent: rgba(231, 47, 47, 0.15); --card-bg-image: url('Theme/glassui/mockups_glassui.png');"
           data-id="mockups" data-new="true" draggable="true">
           <div class="new-badge-overlay">NEW</div>
           <div class="card-glass-content">
@@ -5247,7 +5193,7 @@
               <span class="app-card-tag">Mockups</span>
             </div>
           </div>
-        </a>
+        </div>
       </div>
     </main>
 
@@ -5262,14 +5208,14 @@
         <span class="footer-hint">Use arrow keys to navigate</span>
       </div>
       <div class="footer-right">
-        <a class="minimal-btn" href="how-to.html" target="_blank" rel="noopener" title="Open How To guide">
+        <button class="minimal-btn" type="button" title="How To guide">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 7v14"></path>
             <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
           </svg>
           <span>How To</span>
-        </a>
+        </button>
         <button id="feedback-open-btn" class="minimal-btn">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -5277,9 +5223,7 @@
           </svg>
           <span>Feedback</span>
         </button>
-        <a id="visitor-badge-container" class="minimal-btn" href="https://api.visitorbadge.io" target="_blank"
-          title="Visitor counter">
-        </a>
+        <span id="visitor-badge-container" class="minimal-btn" title="Visitor counter"></span>
       </div>
     </footer>
   </div>
@@ -5290,14 +5234,9 @@
       THEMES: ['light', 'dark', 'system'],
       THEME_ICONS: { light: '☀', dark: '☾', system: '⚙' },
       THEME_LABELS: { light: 'Light', dark: 'Dark', system: 'Auto' },
-      VISUAL_THEMES: ['comicbook', 'glassui', 'minimal', 'emoji', 'terminal', 'noir'],
+      VISUAL_THEMES: ['glassui'],
       VISUAL_THEME_META: {
-        comicbook: { group: 'visual',  usesArtwork: true,  usesPattern: true,  transition: 'comic'   },
-        glassui:   { group: 'visual',  usesArtwork: true,  usesPattern: true,  transition: 'glass'   },
-        minimal:   { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'minimal' },
-        emoji:     { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'emoji'   },
-        terminal:  { group: 'basic',   usesArtwork: false, usesPattern: false, transition: 'terminal' },
-        noir:      { group: 'basic',   usesArtwork: true,  usesPattern: false, transition: 'noir'    },
+        glassui: { group: 'visual', usesArtwork: true, usesPattern: true, transition: 'glass' },
       },
       EMOJI_THEME_SYMBOLS: {
         brickbuilder: ['🧱', '📐', '🏗️', '🛠️'],
@@ -5403,17 +5342,10 @@
       },
 
       cacheDOMElements() {
-        this.el.themeToggle = document.getElementById('theme-toggle');
-        this.el.themePickerBtn = document.getElementById('theme-picker-btn');
-        this.el.tpBtnLabel = document.getElementById('tp-btn-label');
-        this.el.themePickerOverlay = document.getElementById('theme-picker-overlay');
-        this.el.tpCloseBtn = document.getElementById('tp-close-btn');
-        this.el.tpRecents = document.getElementById('tp-recents');
-        this.el.tpRecentsRow = document.getElementById('tp-recents-row');
         this.el.appGrid = document.getElementById('app-grid');
         this.el.appCards = Array.from(this.el.appGrid.children);
         this.el.searchInput = document.getElementById('search-input');
-        this.currentVisualTheme = localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+        this.currentVisualTheme = 'glassui';
         this.syncNewCardStates();
 
         // Initialize enhanced tooltips
@@ -5435,48 +5367,6 @@
       },
 
       bindEvents() {
-        this.el.themeToggle.addEventListener('click', () => this.cycleTheme());
-
-        // Theme picker — open/close
-        this.el.themePickerBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          this.el.themePickerOverlay.classList.contains('open')
-            ? this.closeThemePicker()
-            : this.openThemePicker();
-        });
-        this.el.themePickerOverlay.addEventListener('click', () => this.closeThemePicker());
-        // Prevent modal clicks from bubbling to backdrop
-        this.el.themePickerOverlay.querySelector('.tp-modal').addEventListener('click', e => e.stopPropagation());
-
-        // Close button
-        if (this.el.tpCloseBtn) {
-          this.el.tpCloseBtn.addEventListener('click', () => this.closeThemePicker());
-        }
-
-        // Escape key closes picker
-        window.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && this.el.themePickerOverlay.classList.contains('open')) {
-            this.closeThemePicker();
-          }
-        });
-
-        // Visual theme cards (div[role=button])
-        this.el.themePickerOverlay.querySelectorAll('.tp-card[data-theme]').forEach(card => {
-          card.addEventListener('click', () => { this.setVisualTheme(card.dataset.theme); this.closeThemePicker(); });
-          card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.setVisualTheme(card.dataset.theme); this.closeThemePicker(); }
-          });
-        });
-
-        // Favorite buttons — stopPropagation so card click doesn't also fire
-        this.el.themePickerOverlay.querySelectorAll('.tp-fav-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleFavorite(btn.dataset.theme);
-          });
-        });
-
-
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
           if (localStorage.getItem('creative-toolkit-theme') === 'system') {
             this.applyTheme('system');
@@ -5548,7 +5438,7 @@
           // Get card color and title
           const accentColor = getComputedStyle(card).getPropertyValue('--card-accent-color') || '#4f46e5';
           const appTitle = card.querySelector('.app-card-title')?.textContent || 'Loading...';
-          const theme = this.currentVisualTheme || localStorage.getItem('vgtools-visual-theme') || 'comicbook';
+          const theme = this.currentVisualTheme || localStorage.getItem('vgtools-visual-theme') || 'glassui';
           const transitionVariant = this.getVisualTransitionVariant(theme);
 
           // Save for return animation
@@ -5770,7 +5660,7 @@
         const currentVisualTheme = document.documentElement.dataset.visualTheme
           || this.currentVisualTheme
           || localStorage.getItem('vgtools-visual-theme')
-          || 'comicbook';
+          || 'glassui';
 
         if (returning) {
           sessionStorage.removeItem('vgtools-returning');
@@ -6336,17 +6226,15 @@
       // === FIN CÓDIGO KONAMI ===
 
       initTheme() {
-        const savedTheme = localStorage.getItem('creative-toolkit-theme') || 'system';
-        this.setTheme(savedTheme, false);
+        this.setTheme('light', false);
       },
 
       initVisualTheme() {
-        const savedVisualTheme = localStorage.getItem('vgtools-visual-theme') || 'comicbook';
-        this.setVisualTheme(savedVisualTheme, false);
+        this.setVisualTheme('glassui', false);
       },
 
       getVisualThemeMeta(theme) {
-        return this.VISUAL_THEME_META[theme] || this.VISUAL_THEME_META.comicbook;
+        return this.VISUAL_THEME_META.glassui;
       },
 
       getVisualTransitionVariant(theme) {
@@ -6403,7 +6291,7 @@
       },
 
       getAppImagePaths(theme) {
-        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'glassui';
         const themeMeta = this.getVisualThemeMeta(normalizedTheme);
         if (!themeMeta.usesArtwork) {
           return {};
@@ -6415,7 +6303,7 @@
       },
 
       getPatternForTheme(theme) {
-        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'glassui';
         const themeMeta = this.getVisualThemeMeta(normalizedTheme);
         if (!themeMeta.usesPattern) {
           return 'none';
@@ -6433,15 +6321,10 @@
         { label: 'Indigo', bg: 'linear-gradient(135deg,#1a0533 0%,#2d1b69 100%)',                 swatch: '#2d1b69' },
         { label: 'Ocean',  bg: 'linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%)',     swatch: '#2c5364' },
       ],
-      VISUAL_THEME_LABELS: { comicbook: 'Comicbook', glassui: 'Glass UI', emoji: 'Emoji', minimal: 'Minimal', terminal: 'Terminal', noir: 'Noir' },
+      VISUAL_THEME_LABELS: { glassui: 'Glass UI' },
 
       THEME_COLORS: {
-        comicbook: '#f7cf27',
         glassui:   '#4a9eff',
-        emoji:     '#ff6b4a',
-        minimal:   '#6b7280',
-        terminal:  '#00ff41',
-        noir:      '#0a0a0a',
       },
 
       // ---- Recents & Favorites ----
@@ -6611,7 +6494,7 @@
       },
 
       setVisualTheme(theme, save = true) {
-        const normalizedTheme = this.VISUAL_THEMES.includes(theme) ? theme : 'comicbook';
+        const normalizedTheme = 'glassui';
         const previousTheme = this.currentVisualTheme;
         this.currentVisualTheme = normalizedTheme;
         if (save) {
@@ -6631,7 +6514,7 @@
       },
 
       playVisualThemeTransition(theme, onSwitch) {
-        const currentTheme = document.documentElement.dataset.visualTheme || 'comicbook';
+        const currentTheme = document.documentElement.dataset.visualTheme || 'glassui';
         const transitionVariant = this.getVisualTransitionVariant(theme);
         const currentPattern = this.getPatternForTheme(currentTheme);
         const targetPattern = this.getPatternForTheme(theme);
@@ -6728,9 +6611,11 @@
         if (save) {
           localStorage.setItem('creative-toolkit-theme', theme);
         }
-        this.el.themeToggle.textContent = this.THEME_ICONS[theme];
-        this.el.themeToggle.title = `Color theme: ${this.THEME_LABELS[theme] || theme}`;
-        this.el.themeToggle.setAttribute('aria-label', `Color theme: ${this.THEME_LABELS[theme] || theme}`);
+        if (this.el.themeToggle) {
+          this.el.themeToggle.textContent = this.THEME_ICONS[theme];
+          this.el.themeToggle.title = `Color theme: ${this.THEME_LABELS[theme] || theme}`;
+          this.el.themeToggle.setAttribute('aria-label', `Color theme: ${this.THEME_LABELS[theme] || theme}`);
+        }
         this.applyTheme(theme);
       },
 
@@ -6742,10 +6627,7 @@
       },
 
       applyTheme(theme) {
-        const isDark = (theme === 'system')
-          ? window.matchMedia('(prefers-color-scheme: dark)').matches
-          : theme === 'dark';
-        document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+        document.documentElement.dataset.theme = 'light';
         this.applyVisualTheme();
       },
 
@@ -6944,337 +6826,11 @@
       }
       // === FIN DE NUEVAS FUNCIONES ===
     };
-
-    // === WELCOME OVERLAY CONTROLLER ===
-    const WelcomeOverlay = {
-      STORAGE_KEY: 'vgtools-welcome-shown',
-      DISPLAY_DURATION: 2000, // 2 seconds
-
-      init() {
-        const overlay = document.getElementById('welcome-overlay');
-        if (!overlay) return false;
-
-        // Check if welcome was already shown
-        if (this.wasShown()) {
-          overlay.classList.add('hidden');
-          return false;
-        }
-
-        // Show the overlay and schedule dismissal
-        this.scheduleHide(overlay);
-        return true;
-      },
-
-      wasShown() {
-        try {
-          return localStorage.getItem(this.STORAGE_KEY) === 'true';
-        } catch (e) {
-          return false;
-        }
-      },
-
-      markAsShown() {
-        try {
-          localStorage.setItem(this.STORAGE_KEY, 'true');
-        } catch (e) {
-          // localStorage not available
-        }
-      },
-
-      scheduleHide(overlay) {
-        setTimeout(() => {
-          overlay.classList.add('fade-out');
-          this.markAsShown();
-
-          // Remove from DOM after animation
-          setTimeout(() => {
-            overlay.classList.add('hidden');
-          }, 800);
-        }, this.DISPLAY_DURATION);
-
-        // Also allow click to dismiss
-        overlay.addEventListener('click', () => {
-          if (!overlay.classList.contains('fade-out')) {
-            overlay.classList.add('fade-out');
-            this.markAsShown();
-            setTimeout(() => overlay.classList.add('hidden'), 800);
-          }
-        });
-      }
-    };
-
-    const ThemeSplash = {
-      STORAGE_KEY: 'vgtools-theme-splash-v1',
-      SHOW_DELAY: 500,
-      WELCOME_DELAY: 3000,
-      bound: false,
-
-      init(delay = this.SHOW_DELAY) {
-        this.overlay = document.getElementById('theme-splash-overlay');
-        this.closeBtn = document.getElementById('theme-splash-close');
-        this.actionBtn = document.getElementById('theme-splash-action');
-        if (!this.overlay || this.wasShown()) return;
-        this.bind();
-        window.setTimeout(() => this.show(), delay);
-      },
-
-      wasShown() {
-        try {
-          return localStorage.getItem(this.STORAGE_KEY) === 'true';
-        } catch (e) {
-          return false;
-        }
-      },
-
-      markAsShown() {
-        try {
-          localStorage.setItem(this.STORAGE_KEY, 'true');
-        } catch (e) {
-          // localStorage not available
-        }
-      },
-
-      bind() {
-        if (this.bound) return;
-        this.bound = true;
-        this.closeBtn?.addEventListener('click', () => this.dismiss());
-        this.actionBtn?.addEventListener('click', () => this.dismiss(true));
-        this.overlay.addEventListener('click', (event) => {
-          if (event.target === this.overlay) this.dismiss();
-        });
-        document.addEventListener('keydown', (event) => {
-          if (event.key === 'Escape' && this.isOpen()) this.dismiss();
-        });
-      },
-
-      show() {
-        if (!this.overlay || this.wasShown()) return;
-        this.overlay.classList.remove('hidden', 'fade-out');
-        requestAnimationFrame(() => this.overlay.classList.add('is-visible'));
-      },
-
-      isOpen() {
-        return !!this.overlay && this.overlay.classList.contains('is-visible');
-      },
-
-      dismiss(openPicker = false) {
-        if (!this.overlay || this.overlay.classList.contains('hidden')) return;
-        this.markAsShown();
-        this.overlay.classList.remove('is-visible');
-        this.overlay.classList.add('fade-out');
-        window.setTimeout(() => {
-          this.overlay.classList.add('hidden');
-          this.overlay.classList.remove('fade-out');
-          if (openPicker && typeof App.openThemePicker === 'function') {
-            App.openThemePicker();
-          }
-        }, 280);
-      }
-    };
-
     document.addEventListener('DOMContentLoaded', () => {
-      const welcomeIsShowing = WelcomeOverlay.init();
       App.init();
-      ThemeSplash.init(welcomeIsShowing ? ThemeSplash.WELCOME_DELAY : ThemeSplash.SHOW_DELAY);
     });
   </script>
-
-  <!-- Theme Picker Popover -->
-  <div id="theme-picker-overlay" class="tp-overlay">
-    <div class="tp-modal" role="dialog" aria-label="Select a theme" aria-modal="true">
-
-      <!-- Header -->
-      <div class="tp-modal-header">
-        <span class="tp-modal-title">Choose your theme</span>
-        <button class="tp-modal-close" id="tp-close-btn" aria-label="Close">&times;</button>
-      </div>
-
-      <!-- Recently used section (hidden until populated) -->
-      <div class="tp-recents" id="tp-recents">
-        <div class="tp-group-label">Recently used</div>
-        <div class="tp-recents-row" id="tp-recents-row"></div>
-      </div>
-
-      <!-- Main theme grid — 3 columns -->
-      <div class="tp-theme-grid">
-
-        <!-- Comicbook -->
-        <div class="tp-card" role="button" tabindex="0" data-theme="comicbook">
-          <div class="tp-preview tp-preview-comic"></div>
-          <button class="tp-fav-btn" data-theme="comicbook" aria-label="Favorite Comicbook" tabindex="-1">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
-          </button>
-          <div class="tp-card-info">
-            <span class="tp-card-name">Comicbook</span>
-            <span class="tp-card-tagline">Bold graphic energy</span>
-          </div>
-        </div>
-
-        <!-- Glass UI -->
-        <div class="tp-card" role="button" tabindex="0" data-theme="glassui">
-          <div class="tp-preview tp-preview-glass"></div>
-          <button class="tp-fav-btn" data-theme="glassui" aria-label="Favorite Glass UI" tabindex="-1">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
-          </button>
-          <div class="tp-card-info">
-            <span class="tp-card-name">Glass UI</span>
-            <span class="tp-card-tagline">Luminous &amp; futuristic</span>
-          </div>
-        </div>
-
-        <!-- Emoji -->
-        <div class="tp-card" role="button" tabindex="0" data-theme="emoji">
-          <div class="tp-preview tp-preview-emoji" aria-hidden="true">🎨✨🌈🫧📱💡✂️🎉</div>
-          <button class="tp-fav-btn" data-theme="emoji" aria-label="Favorite Emoji" tabindex="-1">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
-          </button>
-          <div class="tp-card-info">
-            <span class="tp-card-name">Emoji</span>
-            <span class="tp-card-tagline">Playful &amp; expressive</span>
-          </div>
-        </div>
-
-        <!-- Minimal -->
-        <div class="tp-card" role="button" tabindex="0" data-theme="minimal">
-          <div class="tp-preview tp-preview-minimal"></div>
-          <button class="tp-fav-btn" data-theme="minimal" aria-label="Favorite Minimal" tabindex="-1">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
-          </button>
-          <div class="tp-card-info">
-            <span class="tp-card-name">Minimal</span>
-            <span class="tp-card-tagline">Clean &amp; quiet</span>
-          </div>
-        </div>
-
-        <!-- Terminal -->
-        <div class="tp-card" role="button" tabindex="0" data-theme="terminal">
-          <div class="tp-preview tp-preview-terminal"></div>
-          <button class="tp-fav-btn" data-theme="terminal" aria-label="Favorite Terminal" tabindex="-1">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
-          </button>
-          <div class="tp-card-info">
-            <span class="tp-card-name">Terminal</span>
-            <span class="tp-card-tagline">Hacker green glow</span>
-          </div>
-        </div>
-
-        <!-- Noir -->
-        <div class="tp-card" role="button" tabindex="0" data-theme="noir">
-          <div class="tp-preview tp-preview-noir"></div>
-          <button class="tp-fav-btn" data-theme="noir" aria-label="Favorite Noir" tabindex="-1">
-            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5l1.8 3.6 4 .6-2.9 2.8.7 4L8 10.4l-3.6 1.9.7-4L2.2 5.7l4-.6z"/></svg>
-          </button>
-          <div class="tp-card-info">
-            <span class="tp-card-name">Noir</span>
-            <span class="tp-card-tagline">High contrast &amp; gritty</span>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-  <div id="feedback-overlay" class="popup-overlay">
-    <div class="feedback-modal-content panel">
-      <div class="feedback-header">
-        <h3>Submit Feedback</h3>
-        <button id="feedback-close-btn" title="Close">&times;</button>
-      </div>
-
-      <form id="feedback-form" action="https://formspree.io/f/xanldeve" method="POST">
-
-        <div id="form-status"></div>
-
-        <div class="form-group">
-          <label for="feedback-type">Message Type</label>
-          <div class="select-wrapper">
-            <select id="feedback-type" name="submission_type" class="form-control" required>
-              <option value="" disabled selected>Choose an option...</option>
-              <option value="feedback">General Feedback</option>
-              <option value="suggest">Suggest an App</option>
-              <option value="bug">Report a Bug</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="form-section-feedback" class="form-section">
-          <div class="form-group">
-            <label>Rating</label>
-            <div class="star-rating">
-              <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
-              <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
-              <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
-              <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
-              <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="feedback-comment">Comments</label>
-            <textarea id="feedback-comment" name="comment" class="form-control" rows="4"
-              placeholder="What do you like or what could we improve?"></textarea>
-          </div>
-        </div>
-
-        <div id="form-section-suggest" class="form-section">
-          <div class="form-group">
-            <label for="suggest-task">Task to Solve</label>
-            <input type="text" id="suggest-task" name="suggest_task" class="form-control"
-              placeholder="e.g., 'Convert audio to text'">
-          </div>
-          <div class="form-group">
-            <label for="suggest-comment">Additional Comments</label>
-            <textarea id="suggest-comment" name="suggest_comment" class="form-control" rows="4"
-              placeholder="Describe your idea a bit more..."></textarea>
-          </div>
-          <div class="form-group">
-            <label for="suggest-name">App Name (Optional)</label>
-            <input type="text" id="suggest-name" name="suggest_name" class="form-control"
-              placeholder="e.g., 'Audio Transcriber'">
-          </div>
-        </div>
-
-        <div id="form-section-bug" class="form-section">
-          <div class="form-group">
-            <label for="bug-app">Which app has the bug?</label>
-            <div class="select-wrapper">
-              <select id="bug-app" name="bug_app" class="form-control">
-                <option value="General">General (Main Website)</option>
-                <option value="Moodboard Studio">Moodboard Studio</option>
-                <option value="Blob Studio">Blob Studio</option>
-                <option value="Jigsaw Generator">Jigsaw Generator</option>
-                <option value="Icon Factory">Icon Factory</option>
-                <option value="QR Code Generator">QR Code Generator</option>
-                <option value="Color Mixer">Color Mixer</option>
-                <option value="Notepad & Kanban">Notepad & Kanban</option>
-                <option value="Locator">Locator</option>
-                <option value="Signature to SVG">Signature to SVG</option>
-                <option value="Any2SVG">Any2SVG</option>
-                <option value="Background Remover">Background Remover</option>
-                <option value="Word Cloud Generator">Word Cloud Generator</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="bug-behavior">Bug Behavior</label>
-            <textarea id="bug-behavior" name="bug_behavior" class="form-control" rows="5"
-              placeholder="What were you doing? What did you expect to happen? What actually happened?"
-              required></textarea>
-          </div>
-        </div>
-
-        <div class_group" style="border-top: 1px solid var(--border-color); padding-top: var(--space-4);">
-          <label for="user-email">Your Name (Optional)</label>
-          <input type="email" id="user-email" name="email" class="form-control"
-            placeholder="So we can get back to you...">
-        </div>
-
-        <button type="submit" class="btn btn-primary" id="feedback-submit-btn">Send Feedback</button>
-      </form>
-    </div>
-  </div>
-  </div>
-
+  <script src="shared/static-shell.js"></script>
 </body>
 
 </html>

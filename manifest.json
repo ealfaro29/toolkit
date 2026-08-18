@@ -26,42 +26,6 @@
       "type": "image/png"
     }
   ],
-  "screenshots": [
-    {
-      "src": "mockups/Comicbook.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "label": "VGTools Pro Hub with mini-apps"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Brick Builder",
-      "short_name": "Bricks",
-      "description": "Design 2D brick structures",
-      "url": "/brickbuilder/",
-      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
-    },
-    {
-      "name": "Iso Cube Builder",
-      "short_name": "Iso Cubes",
-      "description": "Build isometric cube matrices",
-      "url": "/isocubes/",
-      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
-    },
-    {
-      "name": "Background Remover",
-      "short_name": "BG Remove",
-      "description": "AI-powered background removal",
-      "url": "/bgremover/",
-      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
-    },
-    {
-      "name": "QR Code Generator",
-      "short_name": "QR Codes",
-      "description": "Create custom QR codes",
-      "url": "/qrcodes/",
-      "icons": [{ "src": "favicon.svg", "sizes": "96x96" }]
-    }
-  ]
+  "screenshots": [],
+  "shortcuts": []
 }
